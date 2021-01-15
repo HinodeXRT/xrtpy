@@ -134,3 +134,5 @@ dmypy.json
 
 # Miscellaneous
 version.py
+.idea
+.vscode
