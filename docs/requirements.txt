@@ -1,0 +1,10 @@
+-r ../requirements.txt
+
+numpydoc
+pillow
+sphinx == 2.4.4
+sphinx-automodapi
+sphinx-gallery
+sphinx_rtd_theme
+pytest
+setuptools-scm
