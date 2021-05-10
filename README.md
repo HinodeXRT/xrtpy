@@ -8,3 +8,7 @@
 xrtpy is a Python package being developed for the analysis of observations
 made by the X-Ray Telescope (XRT) on  the *Hinode* spacecraft.
 
+## Acknowledgements
+
+The development of xrtpy is supported by NASA contract NNM07AB07C to the
+Smithsonian Astrophysical Observatory.
