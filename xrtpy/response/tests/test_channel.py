@@ -1,5 +1,4 @@
 import pytest
-
 from xrtpy.response.channel import Channel
 
 channel_names = [

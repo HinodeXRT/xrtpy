@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 import warnings
+
 from . import response
 
 try:
@@ -10,5 +11,4 @@ except (ImportError, ModuleNotFoundError):
 
 
 # Then you can be explicit to control what ends up in the namespace,
-__all__ = ['response']
-
+__all__ = ["response"]
