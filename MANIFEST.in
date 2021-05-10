@@ -1,14 +1,12 @@
-include README.rst
+include README.md
 include CHANGES.rst
 include setup.cfg
-include LICENSE.rst
+include LICENSE
 include pyproject.toml
 
-recursive-include xrtpy *.pyx *.c *.pxd
+recursive-include xrtpy *.pyx *.c *.pxd *.genx *.geny *.json
 recursive-include docs *
 recursive-include licenses *
-recursive-include cextern *
-recursive-include scripts *
 
 prune build
 prune docs/_build
