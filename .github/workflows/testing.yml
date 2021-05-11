@@ -33,6 +33,11 @@ jobs:
             python: 3.7
             toxenv: py37-astropydev
 
+          - name: Python 3.9 with SunPy dev
+            os: ubuntu-latest
+            python: 3.9
+            toxenv: py39-sunpydev
+
           - name: Python 3.8 with code coverage
             os: ubuntu-latest
             python: 3.8
