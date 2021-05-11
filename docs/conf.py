@@ -1,17 +1,21 @@
-# -*- coding: utf-8 -*-
-#
 # Configuration file for the Sphinx documentation builder.
 #
 # This file does only contain a selection of the most common options. For a
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+from datetime import datetime
 
 # -- Project information -----------------------------------------------------
 
 project = 'xrtpy'
-copyright = '2020, Joy Velasquez'
-author = 'Joy Velasquez'
+author = 'Joy Velasquez and Nick Murphy'
+
+# TODO: Simplify the copyright year commands in 2022
+current_year = datetime.utcnow().year
+copyright_years = str(current_year) if current_year == 2021 else f"2021–{current_year}"
+
+copyright = f'{copyright_years}, {author}'
 
 # The full version, including alpha/beta/rc tags
 #from xrtpy import __version__
@@ -55,14 +59,21 @@ master_doc = 'index'
 
 # -- Options for intersphinx extension ---------------------------------------
 
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "astropy": ("https://docs.astropy.org/en/stable/", None),
+    "sunpy": ("https://docs.sunpy.org/en/stable/", None),
+    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
+}
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+html_theme = 'bizstyle'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
