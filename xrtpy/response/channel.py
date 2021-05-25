@@ -44,15 +44,15 @@ class Channel:
             raise ValueError(f"{name} is not a valid channel.")
 
     def __str__(self):
-        """Human reable printout"""
+        """Human readable printout"""
         return f"XRT Channel for {self.name}"
     
     def __repr__(self):
-        """Code Represenation"""
+        """Code representation."""
         return f"Channel({repr(self.name)})"
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Name of XRT x-ray channels
         """
@@ -81,21 +81,21 @@ class Channel:
         return self._channel_data['LENGTH']
        
     @property
-    def observatory(self):
+    def observatory(self) -> str:
         """
         Spacecraft: Hinode
         """
         return self._channel_data['OBSERVATORY']
         
     @property
-    def instrument(self):
+    def instrument(self) -> str:
         """
         X-Ray Telescope - XRT
         """
         return self._channel_data['INSTRUMENT']
 
 
-class geometry:
+class Geometry:
     _genx_file = _genx_file
 
     _geom_data = _genx_file[0]["GEOM"]
@@ -126,7 +126,7 @@ class geometry:
         """
         return u.Quantity(self._geom_data['APERTURE_AREA'], u.cm**2)
 
-class entrance_filter:
+class EntranceFilter:
     _genx_file = _genx_file
 
     _en_filter_data = _genx_file[0]["EN_FILTER"]
@@ -344,7 +344,7 @@ class filter1:
 
 
     @property  
-    def filter1_thickness(self): ############
+    def filter1_thickness(self):
         """
         XRT channel Filter-1 Thickness: Unts? A?
         """
@@ -487,7 +487,7 @@ class CCD:
 
     
     @property
-    def ev_ore_el(self,): ##############
+    def ev_ore_el(self,):
         """
         XRT EV_PER_EL : Units eV
         """
@@ -495,7 +495,7 @@ class CCD:
 
     @property
     #@u.quantity_input
-    def full_well(self,): ##############
+    def full_well(self,):
         """
         Units electrons
         """
@@ -518,7 +518,7 @@ class CCD:
     @property
     def quantum_efficiency(self):
         """
-        Quantum Efficiency
+        Quantum efficiency.
         """
         return self._ccd_data['QE'][:self.number_of_wavelengths]
 
