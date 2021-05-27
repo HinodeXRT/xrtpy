@@ -1,4 +1,4 @@
 from . import channel
-from .channel import Channel,geometry,entrance_filter,mirror_1, mirror_2,filter1,filter2
+from .channel import Channel,Geometry,EntranceFilter,Mirror_1, Mirror_2,Filter1,Filter2,CCD
 
-__all__=["Channel","channel","geometry","entrance_filter","mirror_1","mirror_2","filter1","filter2","CCD"]
+__all__=["Channel","channel","Geometry","EntranceFilter","Mirror_1","Mirror_2","Filter1","Filter2","CCD"]

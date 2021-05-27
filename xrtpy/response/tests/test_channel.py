@@ -45,27 +45,27 @@ cls_args_attribute = [
         "C-poly/Ti-poly", 
         ],  # args
         [
-            "name",
+            "name", # first attribute
             "wavelength",  # second attribute
             "transmission",
-            "number_of_wavelengths",  # first attribute
+            "number_of_wavelengths",  
         ],
     ),
     (
-        geometry,  # class
-        [],  # no arguments go to this class
+        geometry, 
+        [],
         [
             "name",
-            "focal_len",  # first attribute
-            "aperture_area",  # second attribute
+            "focal_len", 
+            "aperture_area",  
     ),
     (
-        entrance_filter,  # class
-        [],  # no arguments go to this class
+        entrance_filter,  
+        [], 
         [
             "name",
-            "filter_material",  # first attribute
-            "filter_thickness",  # second attribute
+            "filter_material", 
+            "filter_thickness",
             "filter_density",
             "wavelength",
             "transmission",
@@ -75,12 +75,12 @@ cls_args_attribute = [
         ]
     ),
     (
-        mirror_1,  # class
-        [],  # no arguments go to this class
+        mirror_1,  
+        [],  
         [
             "name",
-            "material",  # first attribute
-            "density",  # second attribute
+            "material", 
+            "density",  
             "graze_angle",
             "wavelength",
             "REFL",
@@ -88,12 +88,12 @@ cls_args_attribute = [
         ]
     ),
     (
-        mirror_2,  # class
-        [],  # no arguments go to this class
+        mirror_2, 
+        [],  
         [
             "name",
-            "material",  # first attribute
-            "density",  # second attribute
+            "material",  
+            "density",  
             "graze_angle",
             "wavelength",
             "REFL",
@@ -101,49 +101,49 @@ cls_args_attribute = [
         ]
     ),
     (
-        filter1,  # class
-        [],  # no arguments go to this class
+        filter1, 
+        [],  
         [
             "name",
-            "material",  # first attribute
-            "filter1_thickness",  # second attribute
+            "material", 
+            "filter1_thickness",  
             "filter_density",
-            "wavelength",  # first attribute
-            "transmission",  # second attribute
+            "wavelength", 
+            "transmission", 
             "number_of_wavelengths",
-            "mesh_trans",  # first attribute
-            "substrate",  # second attribute
+            "mesh_trans",  
+            "substrate",  
         ]
     ),
     (
-        filter2,  # class
-        [],  # no arguments go to this class
+        filter2, 
+        [],  
         [
             "name",
-            "material",  # first attribute
-            "filter1_thickness",  # second attribute
+            "material", 
+            "filter1_thickness",  
             "filter_density",
-            "wavelength",  # first attribute
-            "transmission",  # second attribute
+            "wavelength",  
+            "transmission",  
             "number_of_wavelengths",
-            "mesh_trans",  # first attribute
-            "substrate",  # second attribute
+            "mesh_trans",  
+            "substrate", 
         ]
     ),
     (
-        CCD,  # class
-        [],  # no arguments go to this class
+        CCD, 
+        [],  
         [
             "name",
-            "ev_ore_el",  # first attribute
-            "full_well",  # second attribute
+            "ev_ore_el",  
+            "full_well", 
             "gain_l",
             "gain_r",
-            "quantum_efficiency",  # first attribute
-            "number_of_wavelengths",  # second attribute
+            "quantum_efficiency", 
+            "number_of_wavelengths",  
             "ev_pre_el",
-            "pixel_size",  # first attribute
-            "wavelength",  # second attribute
+            "pixel_size",  
+            "wavelength", 
         ]
     )  
 ]
