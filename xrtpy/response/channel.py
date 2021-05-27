@@ -44,11 +44,11 @@ class Channel:
             raise ValueError(f"{name} is not a valid channel.")
 
     def __str__(self):
-        """Human reable printout."""
+        """Reable printout."""
         return f"XRT Channel for {self.name}"
     
     def __repr__(self):
-        """Code represenation."""
+        """Code representation."""
         return f"Channel({repr(self.name)})"
 
     @property
@@ -342,7 +342,7 @@ class Filter1:
         return self._fp_filter1_data['MATERIAL']
 
     @property  
-    def filter1_thickness(self): ############
+    def filter1_thickness(self):
         """
         XRT channel Filter-1 Thickness: Unts? A?
         """
