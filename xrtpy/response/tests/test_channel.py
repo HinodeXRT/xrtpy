@@ -48,11 +48,21 @@ cls_args_attribute = [
             "name", # first attribute
             "wavelength",  # second attribute
             "transmission",
-            "number_of_wavelengths",  
+            "number_of_wavelengths",
+            "observatory",
+            "instrument",
+            "geometry",
+            "entrancefilter",
+            "mirror_1",
+            "mirror_2",
+            "filter1",
+            "filter2",
+            "ccd",
+
         ],
     ),
     (
-        geometry, 
+        Geometry, 
         [],
         [
             "name",
@@ -60,7 +70,7 @@ cls_args_attribute = [
             "aperture_area",  
     ),
     (
-        entrance_filter,  
+        EntranceFilter,  
         [], 
         [
             "name",
@@ -71,11 +81,11 @@ cls_args_attribute = [
             "transmission",
             "number_of_wavelengths",
             "mesh_trans",
-            "substrate",
+            "filter_substrate",
         ]
     ),
     (
-        mirror_1,  
+        Mirror_1,  
         [],  
         [
             "name",
@@ -83,12 +93,12 @@ cls_args_attribute = [
             "density",  
             "graze_angle",
             "wavelength",
-            "REFL",
+            "reflection1",
             "number_of_wavelengths",
         ]
     ),
     (
-        mirror_2, 
+        Mirror_2, 
         [],  
         [
             "name",
@@ -96,12 +106,12 @@ cls_args_attribute = [
             "density",  
             "graze_angle",
             "wavelength",
-            "REFL",
+            "reflection",
             "number_of_wavelengths",
         ]
     ),
     (
-        filter1, 
+        Filter1, 
         [],  
         [
             "name",
@@ -116,7 +126,7 @@ cls_args_attribute = [
         ]
     ),
     (
-        filter2, 
+        Filter2, 
         [],  
         [
             "name",
@@ -135,13 +145,12 @@ cls_args_attribute = [
         [],  
         [
             "name",
-            "ev_ore_el",  
+            "ev_ore_electron",  
             "full_well", 
-            "gain_l",
-            "gain_r",
+            "gain_left",
+            "gain_right",
             "quantum_efficiency", 
             "number_of_wavelengths",  
-            "ev_pre_el",
             "pixel_size",  
             "wavelength", 
         ]
