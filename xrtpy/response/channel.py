@@ -6,8 +6,7 @@ import numpy as np
 
 from astropy import units as u
 
-filename = pkg_resources.resource_filename
-(
+filename = pkg_resources.resource_filename(
     "xrtpy", "data/channels/xrt_channels_v0016.genx"
 )
 
