@@ -1,4 +1,4 @@
-__all__ = ["Channel","channel","Geometry","EntranceFilter","Mirror_1","Mirror_2","Filter1","Filter2","CCD"]
+__all__ = ["channel","Geometry","EntranceFilter","Mirror","Filter","CCD","Channel"]
 
 import pkg_resources
 import sunpy.io.special
@@ -6,10 +6,7 @@ import numpy as np
 
 from astropy import units as u
 
-filename = pkg_resources.resource_filename
-(
-    "xrtpy", "data/channels/xrt_channels_v0016.genx"
-)
+filename = pkg_resources.resource_filename( "xrtpy", "data/channels/xrt_channels_v0016.genx")
 
 _channel_name_to_index_mapping = {
     "Al-mesh": 0, 
@@ -90,11 +87,11 @@ class EntranceFilter:
         return u.Quantity(self._en_filter_data['THICK'],u.angstrom)
     
     @property
-    def entrancefilter_density(self)-> u.g * u.cm**3 :
+    def entrancefilter_density(self)-> u.g * u.cm**-3 :
         """
         XRT channel filter material density. g cm^-3
         """
-        return u.Quantity(self._en_filter_data['DENS'],u.g * u.cm *u.cm * u.cm)
+        return u.Quantity(self._en_filter_data['DENS'],u.g * u.cm**-3)
 
     @property
     def number_of_wavelengths(self):
@@ -132,270 +129,138 @@ class EntranceFilter:
         """
         return self._en_filter_data['SUBSTRATE']
 
-class Mirror_1:
+class Mirror:
     _genx_file = _genx_file
 
-    def __init__(self, index):
+    def __init__(self, index,mirror_number):
         self._channel_index = index
-        self._mirror1_data = self._genx_file[self._channel_index]["MIRROR1"]
+        self._mirror_data = self._genx_file[self._channel_index][f"MIRROR{mirror_number}"]
 
     @property
-    def mirror1_name(self,) -> str:
+    def mirror_name(self,) -> str:
         """
-        Hinode/XRT flight model mirror-1.
+        Hinode/XRT flight model mirror.
         """
-        return self._mirror1_data["LONG_NAME"]
+        return self._mirror_data["LONG_NAME"]
 
     @property
-    def mirror1_material(self) -> str:
+    def mirror_material(self) -> str:
         """
-        XRT flight model mirror-1 material.
+        XRT flight model mirror material.
         """
-        return self._mirror1_data['MATERIAL']
+        return self._mirror_data['MATERIAL']
 
     @property
     @u.quantity_input
-    def mirror1_density(self)-> u.g * u.cm**3: 
+    def mirror_density(self)-> u.g * u.cm**-3: 
         """
-        Mirror-1 density.
+        Mirror density.
         """
-        return u.Quantity(self._mirror1_data['DENS'], u.g * u.cm**3)
+        return u.Quantity(self._mirror_data['DENS'], u.g * u.cm**-3)
         
     @property
     @u.quantity_input
-    def mirror1_graze_angle(self,)-> u.deg: 
+    def mirror_graze_angle(self,)-> u.deg: 
         """
-        Mirror-1 graze angle in units of degrees.
+        Mirror graze angle in units of degrees.
         """
-        return u.Quantity(self._mirror1_data['GRAZE_ANGLE'], u.deg)
+        return u.Quantity(self._mirror_data['GRAZE_ANGLE'], u.deg)
 
     @property
     @u.quantity_input
-    def mirror1_wavelength(self,) -> u.angstrom:
+    def mirror_wavelength(self,) -> u.angstrom:
         """
         Array of wavelengths for every x-ray channel in Angstroms.
         """
-        return u.Quantity(self._mirror1_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
+        return u.Quantity(self._mirror_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
 
     @property
     @u.quantity_input
-    def mirror1_reflection1(self,) -> u.angstrom:
+    def mirror_reflection1(self,) -> u.angstrom:
         """
-        Reflection of miiror-1.
+        Reflection of miiror.
         """
-        return u.Quantity(self._mirror1_data['REFL'], u.angstrom)[:self.number_of_wavelengths]
+        return u.Quantity(self._mirror_data['REFL'], u.angstrom)[:self.number_of_wavelengths]
 
     @property
     def number_of_wavelengths(self):
         """
         Data number length.
         """
-        return self._mirror1_data['LENGTH']
+        return self._mirror_data['LENGTH']
 
-class Mirror_2:
+class Filter:
     _genx_file = _genx_file
 
-    def __init__(self, index):
+    def __init__(self, index, filter_number):
         self._channel_index = index
-        self._mirror2_data = self._genx_file[self._channel_index]["MIRROR2"]
+        self._fp_filter_data = self._genx_file[self._channel_index][f"FP_FILTER{filter_number}"]
 
     @property
-    def mirror2_name(self,) -> str:
+    def filter_name(self,) -> str:
         """
-        Hinode/XRT Flight Model Mirror-1
+        XRT channel Filter Position
         """
-        return self._mirror2_data["LONG_NAME"]
+        return self._fp_filter_data["LONG_NAME"]
 
     @property
-    def mirror2_material(self) -> str:
+    def filter_material(self) -> str:
         """
-        XRT flight model mirror-1 material
+        XRT channel filter material.
         """
-        return self._mirror2_data['MATERIAL']
-
-    @property
-    @u.quantity_input
-    def mirror2_density(self)-> u.g * u.cm**3:
-        """
-        Mirror-1 density.
-        """
-        return u.Quantity(self._mirror2_data['DENS'], u.g * u.cm**3) 
-
-    @property
-    @u.quantity_input
-    def mirror2_graze_angle(self)-> u.deg:
-        """
-        Mirror-1 graze angle-degrees.
-        """
-        return u.Quantity(self._mirror2_data['GRAZE_ANGLE'], u.deg)
-
-    @property
-    @u.quantity_input
-    def mirror2_wavelength(self)-> u.angstrom:
-        """
-        Array of wavelengths for every x-ray channel in Angstroms.
-        """
-        return u.Quantity(self._mirror2_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
-
-    @property
-    def mirror2_reflection(self):
-        """
-        Mirror-2 reflection.
-        """
-        return self._mirror2_data['REFL'][:self.number_of_wavelengths]
-    
-    @property
-    def number_of_wavelengths(self):
-        """
-        Data number length.
-        """
-        return self._mirror2_data['LENGTH']
-
-class Filter1:
-    _genx_file = _genx_file
-
-    def __init__(self, index):
-        self._channel_index = index
-        self._fp_filter1_data = self._genx_file[self._channel_index]["FP_FILTER1"]
-
-    @property
-    def filter1_name(self,) -> str:
-        """
-        XRT channel Filter-1 Position
-        """
-        return self._fp_filter1_data["LONG_NAME"]
-
-    @property
-    def filter1_material(self) -> str:
-        """
-        XRT channel filter-1 material.
-        """
-        return self._fp_filter1_data['MATERIAL']
+        return self._fp_filter_data['MATERIAL']
 
     @property  
     @u.quantity_input
-    def filter1_thickness(self)-> u.angstrom:
+    def filter_thickness(self)-> u.angstrom:
         """
-        XRT channel filter-1 thickness.
+        XRT channel filter thickness.
         """
-        return u.Quantity(self._fp_filter1_data['THICK'], u.angstrom)
+        return u.Quantity(self._fp_filter_data['THICK'], u.angstrom)
 
     @property
     @u.quantity_input
-    def filter1_density(self)-> u.g * u.cm**3:
+    def filter_density(self)-> u.g * u.cm**-3:
         """
-        XRT channel filter-1 fensity.
+        XRT channel filter fensity.
         """
-        return u.Quantity(self._fp_filter1_data['DENS'], u.g * u.cm**3)
+        return u.Quantity(self._fp_filter_data['DENS'], u.g * u.cm**-3)
 
     @property
     @u.quantity_input
-    def filter1_wavelength(self)-> u.angstrom:
+    def filter_wavelength(self)-> u.angstrom:
         """
-        Array of wavelengths for every x-ray channel-Filter1 in Angstroms.
+        Array of wavelengths for every x-ray channel-Filter in Angstroms.
         """
-        return u.Quantity(self._fp_filter1_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
+        return u.Quantity(self._fp_filter_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
     
     @property
-    def filter1_transmission(self):
+    def filter_transmission(self):
         """
-        Get channel transmission filter-1.
+        Get channel transmission filter.
         """
-        return self._fp_filter1_data['TRANS'][:self.number_of_wavelengths] 
+        return self._fp_filter_data['TRANS'][:self.number_of_wavelengths] 
       
     @property
     def number_of_wavelengths(self):
         """
         Data number length.
         """
-        return self._fp_filter1_data['LENGTH']
+        return self._fp_filter_data['LENGTH']
     
     @property
-    def filter1_mesh_trans(self):
+    def filter_mesh_trans(self):
         """
-        Mech Trans channel filter-1.
+        Mech Trans channel filter.
         """
-        return self._fp_filter1_data['MESH_TRANS']
+        return self._fp_filter_data['MESH_TRANS']
 
     @property
-    def filter1_substrate(self) -> str:
+    def filter_substrate(self) -> str:
         """
-        XRT substrate channel filter-1.
+        XRT substrate channel filter.
         """
-        return self._fp_filter1_data['SUBSTRATE']
-
-class Filter2:
-    _genx_file = _genx_file
-
-    def __init__(self, index):
-        self._channel_index = index
-        self._fp_filter2_data = self._genx_file[self._channel_index]["FP_FILTER2"]
-
-    @property
-    def filter2_name(self,) -> str:
-        """
-        XRT channel Filter-2 position.
-        """
-        return self._fp_filter2_data["LONG_NAME"]
-
-    @property
-    def filter2_material(self) -> str:
-        """
-        XRT channel filter-2 material.
-        """
-        return self._fp_filter2_data['MATERIAL']
-
-    @property 
-    @u.quantity_input 
-    def filter2_thickness(self)-> u.angstrom:
-        """
-        XRT channel filter-2 thickness.
-        """
-        return u.Quantity(self._fp_filter2_data['THICK'], u.angstrom)
-
-    @property 
-    @u.quantity_input
-    def filter2_density(self)-> u.g * u.cm**3:
-        """
-        XRT channel filter-2 density.
-        """
-        return u.Quantity(self._fp_filter2_data['DENS'], u.g * u.cm**3)
-
-    @property
-    @u.quantity_input
-    def filter2_wavelength(self)-> u.angstrom:
-        """
-        Array of wavelengths for every x-ray channel Filter-2 in Angstroms.
-        """
-        return u.Quantity(self._fp_filter2_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
-    
-    @property
-    def filter2_transmission(self):
-        """
-        Get channel transmission filter-2.
-        """
-        return self._fp_filter2_data['TRANS'][:self.number_of_wavelengths] 
-      
-    @property
-    def number_of_wavelengths(self):
-        """
-        Data number length.
-        """
-        return self._fp_filter2_data['LENGTH']
-    
-    @property
-    def filter2_mesh_trans(self):
-        """
-        Mech Trans channel filter-2.
-        """
-        return self._fp_filter2_data['MESH_TRANS']
-
-    @property
-    def filter2_substrate(self) -> str:
-        """
-        XRT substrate channel filter-2.
-        """
-        return self._fp_filter2_data['SUBSTRATE']
+        return self._fp_filter_data['SUBSTRATE']
 
 class CCD:
     _genx_file = _genx_file
@@ -476,23 +341,27 @@ class CCD:
 class Channel:
     """
     XRTpy
+
+    Available channels: ``"Al-mesh"``, ``"Al-poly"``,  ``"C-poly"``, ``"Ti-poly"``, ``"Be-thin"``, ``"Be-med"``, ``"Al-med"``, ``"Al-thick"``,  ``"Be-thick"`` ,
+    ``"Al-poly/Al-mesh"``, ``"Al-poly/Ti-poly"``, ``"Al-poly/Al-thick"``, ``"Al-poly/Be-thick"`` , ``"C-poly/Ti-poly"`` 
     """
     _genx_file = _genx_file
 
     def __init__(self,name):
+        #name = name.capitalize().replace("_","-")
         if name in _channel_name_to_index_mapping:
             self._channel_index = _channel_name_to_index_mapping[name]
             self._channel_data = _genx_file[self._channel_index] 
             self._geometry = Geometry(self._channel_index)
             self._entrancefilter = EntranceFilter(self._channel_index)
-            self._mirror_1 = Mirror_1(self._channel_index)
-            self._mirror_2 = Mirror_2(self._channel_index)
-            self._filter1 = Filter1(self._channel_index)
-            self._filter2 = Filter2(self._channel_index)
+            self._mirror_1 = Mirror(self._channel_index,1)
+            self._mirror_2 = Mirror(self._channel_index,2)
+            self._filter1 = Filter(self._channel_index,1)
+            self._filter2 = Filter(self._channel_index,2)
             self._ccd = CCD(self._channel_index)
 
         else:
-            raise ValueError(f"{name} is not a valid channel.")
+            raise ValueError(f"{name} is not a valid channel. The available channels are: {list(_channel_name_to_index_mapping.keys())}")
     
     @property
     def geometry(self)-> Geometry:
@@ -503,19 +372,19 @@ class Channel:
         return self._entrancefilter
 
     @property
-    def mirror_1(self)-> Mirror_1:
+    def mirror_1(self)-> Mirror:
         return self._mirror_1
 
     @property
-    def mirror_2(self)-> Mirror_2:
+    def mirror_2(self)-> Mirror:
         return self._mirror_2
 
     @property
-    def filter1(self)-> Filter1:
+    def filter1(self)-> Filter:
         return self._filter1
     
     @property
-    def filter2(self)-> Filter2:
+    def filter2(self)-> Filter:
         return self._filter2
 
     @property
