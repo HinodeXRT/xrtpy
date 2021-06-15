@@ -1,4 +1,4 @@
-__all__ = ["channel","Geometry","EntranceFilter","Mirror","Filter","CCD","Channel"]
+__all__ = ["channel","Geometry","EntranceFilter","Mirror","Filter","CCD","Channel","resolve_filter_name"]
 
 import pkg_resources
 import sunpy.io.special
@@ -26,6 +26,13 @@ _channel_name_to_index_mapping = {
 }
 
 _genx_file = sunpy.io.special.genx.read_genx(filename)['SAVEGEN0']
+
+def resolve_filter_name(name):
+    name = name.replace("_","-")
+    parts: list = name.split("/")
+    new_parts: list = [part.capitalize() for part in name.split("/")]
+    name: str = "/".join(new_parts)
+    return(name)
 
 class Geometry:
     _genx_file = _genx_file
@@ -348,7 +355,7 @@ class Channel:
     _genx_file = _genx_file
 
     def __init__(self,name):
-        #name = name.capitalize().replace("_","-")
+        name = resolve_filter_name(name)
         if name in _channel_name_to_index_mapping:
             self._channel_index = _channel_name_to_index_mapping[name]
             self._channel_data = _genx_file[self._channel_index] 
@@ -356,10 +363,9 @@ class Channel:
             self._entrancefilter = EntranceFilter(self._channel_index)
             self._mirror_1 = Mirror(self._channel_index,1)
             self._mirror_2 = Mirror(self._channel_index,2)
-            self._filter1 = Filter(self._channel_index,1)
-            self._filter2 = Filter(self._channel_index,2)
+            self._filter_1 = Filter(self._channel_index,1)
+            self._filter_2 = Filter(self._channel_index,2)
             self._ccd = CCD(self._channel_index)
-
         else:
             raise ValueError(f"{name} is not a valid channel. The available channels are: {list(_channel_name_to_index_mapping.keys())}")
     
@@ -380,12 +386,12 @@ class Channel:
         return self._mirror_2
 
     @property
-    def filter1(self)-> Filter:
-        return self._filter1
+    def filter_1(self)-> Filter:
+        return self._filter_1
     
     @property
-    def filter2(self)-> Filter:
-        return self._filter2
+    def filter_2(self)-> Filter:
+        return self._filter_2
 
     @property
     def ccd(self)-> CCD:

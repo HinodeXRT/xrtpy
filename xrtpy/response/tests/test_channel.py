@@ -24,7 +24,6 @@ def test_channel_name(channel_name):
     channel = Channel(channel_name)
     assert channel.name == channel_name
 
-
 cls_args_attribute = [
     (
         Channel,  # class
@@ -53,12 +52,9 @@ cls_args_attribute = [
             "instrument",
             "geometry",
             "entrancefilter",
-            "mirror_1",
-            "mirror_2",
-            "filter1",
-            "filter2",
+            "mirror",
+            "filter",
             "ccd",
-
         ],
     ),
     (
@@ -85,59 +81,31 @@ cls_args_attribute = [
         ]
     ),
     (
-        Mirror_1,  
+        Mirror,  
         [],  
         [
-            "mirror1_name",
-            "mirror1_material", 
-            "mirror1_density",  
-            "mirror1_graze_angle",
-            "mirror1_wavelength",
-            "mirror1_reflection1",
+            "mirror_name",
+            "mirror_material", 
+            "mirror_density",  
+            "mirror_graze_angle",
+            "mirror_wavelength",
+            "mirror_reflection1",
             "number_of_wavelengths",
         ]
     ),
     (
-        Mirror_2, 
+        Filter, 
         [],  
         [
-            "mirror2_name",
-            "mirror2_material", 
-            "mirror2_density",  
-            "mirror2_graze_angle",
-            "mirror2_wavelength",
-            "mirror2_reflection1",
+            "filter_name",
+            "filter_material", 
+            "filter_thickness",  
+            "filter_density",
+            "filter_wavelength", 
+            "filter_transmission", 
             "number_of_wavelengths",
-        ]
-    ),
-    (
-        Filter1, 
-        [],  
-        [
-            "filter1_name",
-            "filter1_material", 
-            "filter1_thickness",  
-            "filter1_density",
-            "filter1_wavelength", 
-            "filter1_transmission", 
-            "number_of_wavelengths",
-            "filter1_mesh_trans",  
-            "filter1_substrate",  
-        ]
-    ),
-    (
-        Filter2, 
-        [],  
-        [
-            "filter2_name",
-            "filter2_material", 
-            "filter2_thickness",  
-            "filter2_density",
-            "filter2_wavelength", 
-            "filter2_transmission", 
-            "number_of_wavelengths",
-            "filter2_mesh_trans",  
-            "filter2_substrate", 
+            "filter_mesh_trans",  
+            "filter_substrate",  
         ]
     ),
     (
@@ -156,7 +124,9 @@ cls_args_attribute = [
         ]
     )  
 ]
-#cls: "Channel,geometry,entrance_filter,mirror_1,mirror_2,filter1,filter2,CCD"
+
+
+#cls: "Channel,geometry,entrance_filter,mirror,filter,CCD"
 
 #argC name,wavelength,transmission,number_of_wavelengths, observatory, instrument
 #argG name, focal_len, aperture_area
@@ -166,8 +136,6 @@ cls_args_attribute = [
 def test_attributes(cls, args, attribute):
     instance = cls(*args)
     getattr(instance, attribute)
-
-####################################################
 
 class ExampleClass():
     
@@ -187,7 +155,6 @@ properties_to_check = ["first_property", "second_property", "third_property"]
 def test_accessing_property(property):
     instance = ExampleClass()  # change to name of class being checked
     getattr(instance, property)
-
 
 # put the names of properties and the expected values
 properties_and_expected_values = [
