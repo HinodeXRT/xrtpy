@@ -52,7 +52,7 @@ class Geometry:
     @u.quantity_input
     def focal_len(self,)-> u.cm:  
         """
-        Hinode/XRT flight model geometry focual length.
+        Hinode/XRT flight model geometry focal length.
         """
         return u.Quantity(self._geom_data['FOC_LEN'], u.cm)
 
