@@ -74,7 +74,7 @@ class EntranceFilter:
     @property
     def entrancefilter_name(self,) -> str:
         """
-        Entrance filters name.
+        Entrance filter name.
         """
         return self._en_filter_data["LONG_NAME"]
 
