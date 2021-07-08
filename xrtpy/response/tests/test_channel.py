@@ -55,691 +55,615 @@ _channel_name_to_index_mapping = {
 }
 
 
-def test_CCD_units():
-    wavelength_unit_name = v6_genx_s[0]['CCD']['WAVE_UNITS']
-    if wavelength_unit_name == 'Angstroms':
-        assert wavelength_unit_name == 'Angstroms'
-        wavelength_unit_name = 'Angstrom'
-        wavelength_CCD_unit = u.Unit(wavelength_unit_name)
-        return wavelength_CCD_unit
-
-    pixel_size_unit_name_IDL = v6_genx_s[0]['CCD']['PIXEL_SIZE_UNITS']
-    pixel_size_unit_name = u.Unit(pixel_size_unit_name_IDL)
-
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_CCD_wavelength(channel_name):
-    #for i in _channel_name_to_index_mapping:
     channel_filter =  Channel(channel_name)
 
-    ccd_wavelength_length = int(channel_filter.ccd.number_of_wavelengths)   #########Repeated######
+    ccd_wavelength_length = int(channel_filter.ccd.number_of_wavelengths)
     ccd_wavelength = channel_filter.ccd.ccd_wavelength[:ccd_wavelength_length]
 
-    IDL_ccd_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["LENGTH"])  #########Repeated######
+    IDL_ccd_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["LENGTH"])
     IDL_ccd_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["WAVE"][:IDL_ccd_array_length] * u.angstrom
     
     assert u.allclose(IDL_ccd_wavelength_AUTO, ccd_wavelength)
 
-    # All filters have the same starting values 
-    IDL_ccd_wavelength_MANU = [1.00000,1.10000,1.20000,1.30000,1.40000, 1.50000,1.60000,1.70000,1.80000,1.90000] * u.angstrom
-    assert u.allclose(IDL_ccd_wavelength_MANU,ccd_wavelength[0:10])
+    idl_ccd_wavelength_manu = [1.00000,1.10000,1.20000,1.30000,1.40000, 1.50000,1.60000,1.70000,1.80000,1.90000] * u.angstrom
+    assert u.allclose(idl_ccd_wavelength_manu,ccd_wavelength[0:10])
 
-def test_CCD_quantum_efficiency():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
 
-        ccd_array_length = int(channel_filter.ccd.number_of_wavelengths) 
-        ccd_quantum_efficiency = channel_filter.ccd.ccd_quantum_efficiency[:ccd_array_length]
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_CCD_quantum_efficiency(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    ccd_array_length = int(channel_filter.ccd.number_of_wavelengths) 
+    ccd_quantum_efficiency = channel_filter.ccd.ccd_quantum_efficiency[:ccd_array_length]
+    
+    idl_ccd_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["LENGTH"])
+    idl_ccd_quantum_efficiency_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["QE"][:idl_ccd_array_length]
         
-        #IDL_ccd_quantum_efficiency_AUTO = v6_genx_s[1]['CCD']["QE"]
-        IDL_ccd_array_length = int(v6_genx_s[1]['CCD']["LENGTH"])
-        IDL_ccd_quantum_efficiency_AUTO = v6_genx_s[1]['CCD']["QE"][:IDL_ccd_array_length]
-            
-        assert u.allclose(IDL_ccd_quantum_efficiency_AUTO, ccd_quantum_efficiency)
+    assert u.allclose(idl_ccd_quantum_efficiency_auto, ccd_quantum_efficiency)
 
-def test_CCD_pixel_size():
-    for i in _channel_name_to_index_mapping:
-        
-        channel_filter =  Channel(i)
-        ccd_pixel_size = channel_filter.ccd.ccd_pixel_size 
-
-        IDL_ccd_quantum_efficiency_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['CCD']["PIXEL_SIZE"]* u.micron
-
-        assert u.allclose(IDL_ccd_quantum_efficiency_AUTO,ccd_pixel_size)
-
-        
-def test_ccd_gain_left():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        ccd_gain_left = channel_filter.ccd.ccd_gain_left
-
-        IDL_ccd_gain_left_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['CCD']["GAIN_L"]* u.electron
-
-        assert u.isclose(ccd_gain_left,IDL_ccd_gain_left_AUTO)
-
-def test_ccd_gain_right():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        ccd_gain_right = channel_filter.ccd.ccd_gain_right
-
-        IDL_ccd_gain_right_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['CCD']["GAIN_R"]* u.electron
-
-        if ccd_gain_right == IDL_ccd_gain_right_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_ccd_gain_right")
-
-def test_ccd_full_well():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        ccd_full_well = channel_filter.ccd.ccd_full_well
-
-        IDL_ccd_full_well_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['CCD']["FULL_WELL"]* u.electron
-        
-        if ccd_full_well == IDL_ccd_full_well_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_ccd_full_well")
-
-def test_ccd_ev_ore_electron():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        ccd_full_well = channel_filter.ccd.ccd_ev_ore_electron
- 
-        IDL_ccd_full_well_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['CCD']["EV_PER_EL"]* (u.eV/u.electron)
-
-        if ccd_full_well == IDL_ccd_full_well_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_ccd_ev_ore_electron")
+    idl_ccd_quantum_efficiency_manu = [0.0573069,0.0751920 ,0.0960381,0.119867, 0.146638, 0.176252, 0.208541, 0.243277,0.280167, 0.318879, 0.359036,0.400219,0.441984,0.483898]
+    assert idl_ccd_quantum_efficiency_manu,ccd_quantum_efficiency[0:13]
 
 
-def test_ccd_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        ccd_name = channel_filter.ccd.ccd_name
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_CCD_pixel_size(channel_name):
+    channel_filter =  Channel(channel_name)
+    ccd_pixel_size = channel_filter.ccd.ccd_pixel_size 
 
-        IDL_ccd_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['CCD']["LONG_NAME"]
+    idl_ccd_quantum_efficiency_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["PIXEL_SIZE"]* u.micron
 
-        if ccd_name == IDL_ccd_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_ccd_name")
+    assert u.allclose(idl_ccd_quantum_efficiency_auto,ccd_pixel_size)
 
-########################### EN Filter ###########################
 
-def test_entrancefilter_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        entrancefilter_name = channel_filter.entrancefilter.entrancefilter_name
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_ccd_gain_left(channel_name):
+    channel_filter =  Channel(channel_name)
+    ccd_gain_left = channel_filter.ccd.ccd_gain_left
 
-        IDL_entrancefilter_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['EN_FILTER']["LONG_NAME"]
+    idl_ccd_gain_left_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['CCD']["GAIN_L"]* u.electron
 
-        if entrancefilter_name == IDL_entrancefilter_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_entrancefilter_name")
-        
+    assert u.isclose(ccd_gain_left,idl_ccd_gain_left_auto)
 
-def test_entrancefilter_material():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        entrancefilter_material = channel_filter.entrancefilter.entrancefilter_material
- 
-        IDL_entrancefilter_material_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['EN_FILTER']["MATERIAL"]
 
-    if all( entrancefilter_material == IDL_entrancefilter_material_AUTO):
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_ccd_gain_right(channel_name):
+    channel_filter =  Channel(channel_name)
+    ccd_gain_right = channel_filter.ccd.ccd_gain_right
+
+    idl_ccd_gain_right_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['CCD']["GAIN_R"]* u.electron
+
+    assert u.isclose(ccd_gain_right,idl_ccd_gain_right_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_ccd_full_well(channel_name):
+
+    channel_filter =  Channel(channel_name)
+    ccd_full_well = channel_filter.ccd.ccd_full_well
+
+    idl_ccd_full_well_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['CCD']["FULL_WELL"]* u.electron
+    
+    assert u.isclose(ccd_full_well ,idl_ccd_full_well_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_ccd_ev_ore_electron(channel_name):
+
+    channel_filter =  Channel(channel_name)
+    ccd_full_well = channel_filter.ccd.ccd_ev_ore_electron
+
+    idl_ccd_full_well_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['CCD']["EV_PER_EL"]* (u.eV/u.electron)
+
+    assert u.isclose(ccd_full_well,idl_ccd_full_well_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_ccd_name(channel_name):
+    channel_filter =  Channel(channel_name)
+    ccd_name = channel_filter.ccd.ccd_name
+
+    idl_ccd_name_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['CCD']["LONG_NAME"]
+
+    assert ccd_name == idl_ccd_name_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_name(channel_name):
+    
+    channel_filter =  Channel(channel_name)
+    entrancefilter_name = channel_filter.entrancefilter.entrancefilter_name
+
+    IDL_entrancefilter_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["LONG_NAME"]
+
+    assert entrancefilter_name == IDL_entrancefilter_name_AUTO   
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_material(channel_name):
+    
+    channel_filter =  Channel(channel_name)
+    entrancefilter_material = channel_filter.entrancefilter.entrancefilter_material
+
+    idl_entrancefilter_material_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["MATERIAL"]
+
+    if np.all(entrancefilter_material == idl_entrancefilter_material_auto):
         pass
     else:
         raise ValueError("FAIL: test_entrancefilter_material")
 
-def test_entrancefilter_thickness():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        entrancefilter_thickness = channel_filter.entrancefilter.entrancefilter_thickness
 
-        IDL_entrancefilter_thick_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['EN_FILTER']["THICK"]*u.angstrom
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_thickness(channel_name):
 
-        if np.all(entrancefilter_thickness == IDL_entrancefilter_thick_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_entrancefilter_thickness")
+    channel_filter =  Channel(channel_name)
+    entrancefilter_thickness = channel_filter.entrancefilter.entrancefilter_thickness
 
-def test_entrancefilter_density():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        entrancefilter_density = channel_filter.entrancefilter.entrancefilter_density
+    idl_entrancefilter_thick_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["THICK"]*u.angstrom
 
-        IDL_entrancefilter_density_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['EN_FILTER']["DENS"]*(u.g * u.cm**-3)
-        
-        if np.all(entrancefilter_density == IDL_entrancefilter_density_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_entrancefilter_density")
+    assert u.allclose(entrancefilter_thickness , idl_entrancefilter_thick_auto)
 
-def test_entrancefilter_wavelength():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
 
-        entrancefilter_wavelength_length = int(channel_filter.entrancefilter.number_of_wavelengths)  #########Repeated######
-        entrancefilter_wavelength = channel_filter.entrancefilter.entrancefilter_wavelength[:entrancefilter_wavelength_length]
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_density(channel_name):
+    channel_filter =  Channel(channel_name)
+    entrancefilter_density = channel_filter.entrancefilter.entrancefilter_density
 
-        IDL_entrancefilter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['EN_FILTER']["LENGTH"])  #########Repeated######
-        IDL_entrancefilter_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['EN_FILTER']["WAVE"][:IDL_entrancefilter_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-
-        assert u.allclose(IDL_entrancefilter_wavelength_AUTO, entrancefilter_wavelength)
-
-def test_entrancefilter_transmission():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        entrancefilter_transmission_length = int(channel_filter.entrancefilter.number_of_wavelengths)  #########Repeated######
-        entrancefilter_transmission = channel_filter.entrancefilter.entrancefilter_transmission[:entrancefilter_transmission_length]
-
-        IDL_entrancefilter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['EN_FILTER']["LENGTH"])  #########Repeated######
-        IDL_entrancefilter_transmission_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['EN_FILTER']["TRANS"][:IDL_entrancefilter_array_length] 
-
-        assert u.allclose(IDL_entrancefilter_transmission_AUTO, entrancefilter_transmission)
-
-def test_entrancefilter_mesh_transmission():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        entrancefilter_mesh_transmission = channel_filter.entrancefilter.entrancefilter_mesh_transmission
-
-        IDL_entrancefilter_mesh_transmission_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['EN_FILTER']["MESH_TRANS"]
-        
-        if entrancefilter_mesh_transmission == IDL_entrancefilter_mesh_transmission_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_entrancefilter_mesh_transmission")
-
-def test_entrancefilter_substrate():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        entrancefilter_substrate = channel_filter.entrancefilter.entrancefilter_substrate
-
-        IDL_entrancefilter_substrate_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['EN_FILTER']["SUBSTRATE"]
-        
-        if entrancefilter_substrate == IDL_entrancefilter_substrate_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_entrancefilter_substrate")
-
-
-
-########################### Filter_1 ###########################
-
-def test_filter1_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_name = channel_filter.filter_1.filter_name
-
-        IDL_filter_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER1']["LONG_NAME"]
-
-        if filter_name == IDL_filter_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_filter1_name")
-
-def test_filter1_material():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_material = channel_filter.filter_1.filter_material
- 
-        IDL_filter_material_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER1']["MATERIAL"]
-
-    if all( filter_material == IDL_filter_material_AUTO):
-        pass
-    else:
-        raise ValueError("FAIL: test_filter1_material")
-
-def test_filter1_thickness():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_thickness = channel_filter.filter_1.filter_thickness
-
-        IDL_filter_thick_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER1']["THICK"]*u.angstrom
-
-        if np.all(filter_thickness == IDL_filter_thick_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_filter1_thickness")
-
-def test_filter1_density():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_density = channel_filter.filter_1.filter_density
-
-        IDL_filter_density_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER1']["DENS"]*(u.g * u.cm**-3)
-        
-        if np.all(filter_density == IDL_filter_density_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_filter1_density")
-
-def test_filter1_wavelength():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        filter_wavelength_length = int(channel_filter.filter_1.number_of_wavelengths)  #########Repeated######
-        filter_wavelength = channel_filter.filter_1.filter_wavelength[:filter_wavelength_length]
-
-        IDL_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER1']["LENGTH"])  #########Repeated######
-        IDL_filter_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER1']["WAVE"][:IDL_filter_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-
-        assert u.allclose(IDL_filter_wavelength_AUTO, filter_wavelength)
-
-def test_filter1_transmission():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        filter_transmission_length = int(channel_filter.filter_1.number_of_wavelengths)  #########Repeated######
-        filter_transmission = channel_filter.filter_1.filter_transmission[:filter_transmission_length]
-
-        IDL_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER1']["LENGTH"])  #########Repeated######
-        IDL_filter_transmission_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER1']["TRANS"][:IDL_filter_array_length] 
-
-        assert u.allclose(IDL_filter_transmission_AUTO, filter_transmission)
-
-def test_filter1_mesh_transmission():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_mesh_transmission = channel_filter._filter_1.filter_mesh_trans
-
-        IDL_filter_mesh_transmission_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER1']["MESH_TRANS"]
-        
-        if filter_mesh_transmission == IDL_filter_mesh_transmission_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_filter1_mesh_transmission")
-
-def test_filter1_substrate():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_substrate = channel_filter.filter_1.filter_substrate
-
-        IDL_filter_substrate_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER1']["SUBSTRATE"]
-        
-        if filter_substrate == IDL_filter_substrate_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_filter1_substrate")
-
-########################### Filter_2 ###########################
-def test_filter2_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_name = channel_filter.filter_2.filter_name
-
-        IDL_filter_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER2']["LONG_NAME"]
-
-        if filter_name == IDL_filter_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_filter2_name")
-
-def test_filter2_material():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_material = channel_filter.filter_2.filter_material
- 
-        IDL_filter_material_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER2']["MATERIAL"]
-
-    if all( filter_material == IDL_filter_material_AUTO):
-        pass
-    else:
-        raise ValueError("FAIL: test_filter2_material")
-
-
-
-def test_filter2_thickness():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_thickness = channel_filter.filter_2.filter_thickness
-
-        IDL_filter_thick_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER2']["THICK"]*u.angstrom
-
-        if np.all(filter_thickness == IDL_filter_thick_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_filter2_thickness")
-
-def test_filter2_density():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_density = channel_filter.filter_2.filter_density
-
-        IDL_filter_density_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER2']["DENS"]*(u.g * u.cm**-3)
-        
-        if np.all(filter_density == IDL_filter_density_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_filter2_density")
-
-def test_filter2_wavelength():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        filter_wavelength_length = int(channel_filter.filter_2.number_of_wavelengths)  #########Repeated######
-        filter_wavelength = channel_filter.filter_2.filter_wavelength[:filter_wavelength_length]
-
-        IDL_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER2']["LENGTH"])  #########Repeated######
-        IDL_filter_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER2']["WAVE"][:IDL_filter_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-
-        assert u.allclose(IDL_filter_wavelength_AUTO, filter_wavelength)
-
-def test_filter2_transmission():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        filter_transmission_length = int(channel_filter.filter_2.number_of_wavelengths)  #########Repeated######
-        filter_transmission = channel_filter.filter_2.filter_transmission[:filter_transmission_length]
-
-        IDL_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER2']["LENGTH"])  #########Repeated######
-        IDL_filter_transmission_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['FP_FILTER2']["TRANS"][:IDL_filter_array_length] 
-
-        assert u.allclose(IDL_filter_transmission_AUTO, filter_transmission)
-
-def test_filter2_mesh_transmission():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_mesh_transmission = channel_filter.filter_2.filter_mesh_trans
-
-        IDL_filter_mesh_transmission_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER2']["MESH_TRANS"]
-        
-        if filter_mesh_transmission == IDL_filter_mesh_transmission_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_filter2_mesh_transmission")
-
-def test_filter2_substrate():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        filter_substrate = channel_filter.filter_2.filter_substrate
-
-        IDL_filter_substrate_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['FP_FILTER2']["SUBSTRATE"]
-        
-        if filter_substrate == IDL_filter_substrate_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_filter2_substrate")
-
-
-########################### Geomerty  ###########################
-
-def test_geometry_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        geometry_name = channel_filter.geometry.name
-
-        IDL_geometry_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['GEOM']["LONG_NAME"]
-
-        if geometry_name == IDL_geometry_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_geometry_name")
-
-
-
-def test_geometry_focal_len():  
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        geometry_focal_len = channel_filter.geometry.focal_len
-
-        IDL_geometry_focal_len_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['GEOM']["FOC_LEN"]*u.cm
-        
-        if geometry_focal_len == IDL_geometry_focal_len_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_geometry_focal_len")
-
-def test_geometry_aperture_area():  
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        geometry_aperture_area = channel_filter.geometry.aperture_area
-
-        IDL_geometry_aperture_area_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['GEOM']["APERTURE_AREA"]*u.cm**2
-        
-        if geometry_aperture_area == IDL_geometry_aperture_area_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_geometry_aperture_area")
-
-########################### Mirror_1  ###########################
-
-def test_mirror1_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_name = channel_filter.mirror_1.mirror_name
-
-        IDL_mirror_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR1']["LONG_NAME"]
-
-        if mirror_name == IDL_mirror_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_mirror1_name")
-
-def test_mirror1_material():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_material = channel_filter.mirror_1.mirror_material
- 
-        IDL_mirror_material_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR1']["MATERIAL"]
-
-    if mirror_material == IDL_mirror_material_AUTO:
-        pass
-    else:
-        raise ValueError("FAIL: test_mirror1_material")
-
-def test_mirror1_density():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_density = channel_filter.mirror_1.mirror_density
-
-        IDL_mirror_density_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR1']["DENS"]*(u.g * u.cm**-3)
-        
-        if np.all(mirror_density == IDL_mirror_density_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_mirror1_density")
-
-def test_mirro1_graze_angle():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
-
-        IDL_mirror_graze_angle_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR1']['GRAZE_ANGLE']* u.deg
-        
-        if mirror_graze_angle == IDL_mirror_graze_angle_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_mirro1_graze_angle")
-
-
-def test_mirror1_wavelength():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-        mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[:mirror_number_of_length]
-
-        IDL_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR1']["LENGTH"])  #########Repeated######
-        IDL_mirror_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR1']["WAVE"][:IDL_mirror_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-
-        assert u.allclose(IDL_mirror_wavelength_AUTO, mirror_wavelength)
-
-
-def test_mirror1_reflection():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-        mirror_reflection1 = channel_filter.mirror_1.mirror_reflection1[:mirror_number_of_length]
-
-        IDL_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR1']["LENGTH"])  #########Repeated######
-        IDL_mirror_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR1']["REFL"][:IDL_mirror_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-
-        assert u.allclose(IDL_mirror_wavelength_AUTO, mirror_reflection1)
-
-
-########################### Mirror_2  ###########################
-
-def test_mirror2_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_name = channel_filter.mirror_1.mirror_name
-
-        IDL_mirror_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR2']["LONG_NAME"]
-
-        if mirror_name == IDL_mirror_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_mirror2_name")
-
-def test_mirror2_material():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_material = channel_filter.mirror_1.mirror_material
- 
-        IDL_mirror_material_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR2']["MATERIAL"]
-
-    if mirror_material == IDL_mirror_material_AUTO:
-        pass
-    else:
-        raise ValueError("FAIL: test_mirror2_material")
-
-def test_mirror2_density():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_density = channel_filter.mirror_1.mirror_density
-
-        IDL_mirror_density_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR2']["DENS"]*(u.g * u.cm**-3)
-        
-        if np.all(mirror_density == IDL_mirror_density_AUTO):
-            pass
-        else:
-            raise ValueError("FAIL: test_mirror2_density")
-
-def test_mirror2_graze_angle():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
-
-        IDL_mirror_graze_angle_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['MIRROR2']['GRAZE_ANGLE']* u.deg
-        
-        if mirror_graze_angle == IDL_mirror_graze_angle_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_mirror2_graze_angle")
-
-def test_mirror2_wavelength():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-        mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[:mirror_number_of_length]
-
-        IDL_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR2']["LENGTH"])  #########Repeated######
-        IDL_mirror_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR2']["WAVE"][:IDL_mirror_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-
-        assert u.allclose(IDL_mirror_wavelength_AUTO, mirror_wavelength)
-
-
-def test_mirror2_reflection():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-        mirror_reflection1 = channel_filter.mirror_1.mirror_reflection1[:mirror_number_of_length]
-
-        IDL_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR2']["LENGTH"])  #########Repeated######
-        IDL_mirror_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]['MIRROR2']["REFL"][:IDL_mirror_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-
-        assert u.allclose(IDL_mirror_wavelength_AUTO, mirror_reflection1)
-
-########################### Name ###########################
-
-def test_channel_name():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        name = channel_filter.name
-
-        IDL_mirror_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[i] ]['NAME']
-
-        if name == IDL_mirror_name_AUTO:
-            pass
-        else:
-            raise ValueError("FAIL: test_channel_name")
-
-
-########################### ###########################
-
-def test_channel_wavelength():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        wavelength_length = int(channel_filter.number_of_wavelengths)   #########Repeated######
-        wavelength = channel_filter.wavelength[:wavelength_length]
-
-        IDL_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]["LENGTH"])  #########Repeated######
-        IDL_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]["WAVE"][:IDL_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
-        
-        assert u.allclose(IDL_wavelength_AUTO, wavelength)
-
-########################### ###########################
-
-def test_channel_transmission():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        transmission_length = int(channel_filter.number_of_wavelengths)  #########Repeated######
-        transmission = channel_filter.transmission[:transmission_length]
-
-        IDL_array_length = int(v6_genx_s[_channel_name_to_index_mapping[i]]["LENGTH"])  #########Repeated######
-        IDL_transmission_AUTO = v6_genx_s[_channel_name_to_index_mapping[i]]["TRANS"][:IDL_array_length] 
-
-        assert u.allclose(IDL_transmission_AUTO, transmission)
-        
-########################### ###########################
-
-def test_channel_number_of_wavelengths():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-
-        transmission = channel_filter.number_of_wavelengths
-
-        IDL_array_length = v6_genx_s[_channel_name_to_index_mapping[i]]["LENGTH"]
-    if transmission == IDL_array_length:
-        pass
-    else:
-        raise ValueError("FAIL: test_channel_number_of_wavelengths")
-
-########################### ###########################       
-
-def test_channel_observatory():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        
-        observatory = channel_filter.observatory
-        
-        IDL_observatory = v6_genx_s[_channel_name_to_index_mapping[i]]["OBSERVATORY"]
+    idl_entrancefilter_density_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["DENS"]*(u.g * u.cm**-3)
     
-    if observatory == IDL_observatory:
-        pass
-    else:
-        raise ValueError("FAIL: test_channel_observatory")
+    assert u.allclose(entrancefilter_density, idl_entrancefilter_density_auto)
 
-    
-########################### ###########################       
 
-def test_channel_instrument():
-    for i in _channel_name_to_index_mapping:
-        channel_filter =  Channel(i)
-        
-        instrument = channel_filter.instrument
-        
-        IDL_instrument = v6_genx_s[_channel_name_to_index_mapping[i]]["INSTRUMENT"]
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_wavelength(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    entrancefilter_wavelength_length = int(channel_filter.entrancefilter.number_of_wavelengths) 
+    entrancefilter_wavelength = channel_filter.entrancefilter.entrancefilter_wavelength[:entrancefilter_wavelength_length]
+
+    idl_entrancefilter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['EN_FILTER']["LENGTH"]) 
+    idl_entrancefilter_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['EN_FILTER']["WAVE"][:idl_entrancefilter_array_length] * u.Unit('Angstrom')#wavelength_CCD_unit
+
+    assert u.allclose(idl_entrancefilter_wavelength_auto, entrancefilter_wavelength)
+
+    idl_entrancefilter_wavelength_manu=[1.00000,1.00802,1.01610,1.02424,1.03245,1.04073,1.04907,1.05748,1.06595,1.07450]* u.angstrom
+    assert u.allclose(idl_entrancefilter_wavelength_manu,entrancefilter_wavelength[0:10])
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_transmission(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    entrancefilter_transmission_length = int(channel_filter.entrancefilter.number_of_wavelengths) 
+    entrancefilter_transmission = channel_filter.entrancefilter.entrancefilter_transmission[:entrancefilter_transmission_length]
+
+    idl_entrancefilter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['EN_FILTER']["LENGTH"])
+    idl_entrancefilter_transmission_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['EN_FILTER']["TRANS"][:idl_entrancefilter_array_length] 
+
+    assert u.allclose(idl_entrancefilter_transmission_auto, entrancefilter_transmission)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_mesh_transmission(channel_name):
+    channel_filter =  Channel(channel_name)
+    entrancefilter_mesh_transmission = channel_filter.entrancefilter.entrancefilter_mesh_transmission
+
+    IDL_entrancefilter_mesh_transmission_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["MESH_TRANS"]
     
-    if instrument == IDL_instrument:
-        pass
-    else:
-        raise ValueError("FAIL: test_channel_instrument")
+    assert entrancefilter_mesh_transmission == IDL_entrancefilter_mesh_transmission_AUTO
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_entrancefilter_substrate(channel_name):
+    channel_filter =  Channel(channel_name)
+    entrancefilter_substrate = channel_filter.entrancefilter.entrancefilter_substrate
+
+    idl_entrancefilter_substrate_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["SUBSTRATE"]
+    
+    assert entrancefilter_substrate == idl_entrancefilter_substrate_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_name(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_name = channel_filter.filter_1.filter_name
+
+    idl_filter_name_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["LONG_NAME"]
+
+    assert filter_name == idl_filter_name_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_material(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_material = channel_filter.filter_1.filter_material
+
+    idl_filter_material_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["MATERIAL"]
+
+    assert np.all( filter_material == idl_filter_material_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_thickness(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_thickness = channel_filter.filter_1.filter_thickness
+
+    idl_filter_thick_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["THICK"]*u.angstrom
+
+    assert np.all(filter_thickness == idl_filter_thick_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_density(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_density = channel_filter.filter_1.filter_density
+
+    idl_filter_density_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["DENS"]*(u.g * u.cm**-3)
+    
+    assert u.allclose(filter_density, idl_filter_density_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_wavelength(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    filter_wavelength_length = int(channel_filter.filter_1.number_of_wavelengths)
+    filter_wavelength = channel_filter.filter_1.filter_wavelength[:filter_wavelength_length]
+
+    idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["LENGTH"]) 
+    idl_filter_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["WAVE"][:idl_filter_array_length] * u.angstrom
+
+    assert u.allclose(idl_filter_wavelength_auto, filter_wavelength)
+       
+       
+    idl_filter_wavelength_manu=[1.00000,1.00802,1.01610,1.02424,1.03245,1.04073,1.04907,1.05748,1.06595,1.07450]* u.angstrom
+    assert u.allclose(idl_filter_wavelength_manu,filter_wavelength[0:10])
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_transmission(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    filter_transmission_length = int(channel_filter.filter_1.number_of_wavelengths)
+    filter_transmission = channel_filter.filter_1.filter_transmission[:filter_transmission_length]
+
+    idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["LENGTH"])
+    idl_filter_transmission_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["TRANS"][:idl_filter_array_length] 
+
+    assert u.allclose(idl_filter_transmission_auto, filter_transmission)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_mesh_transmission(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_mesh_transmission = channel_filter._filter_1.filter_mesh_trans
+
+    idl_filter_mesh_transmission_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["MESH_TRANS"]
+    
+    assert filter_mesh_transmission == idl_filter_mesh_transmission_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter1_substrate(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_substrate = channel_filter.filter_1.filter_substrate
+
+    idl_filter_substrate_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["SUBSTRATE"]
+    
+    assert filter_substrate == idl_filter_substrate_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_name(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_name = channel_filter.filter_2.filter_name
+
+    IDL_filter_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["LONG_NAME"]
+
+    assert filter_name == IDL_filter_name_AUTO
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_material(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_material = channel_filter.filter_2.filter_material
+
+    idl_filter_material_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["MATERIAL"]
+
+    assert np.all( filter_material == idl_filter_material_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_thickness(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_thickness = channel_filter.filter_2.filter_thickness
+
+    idl_filter_thick_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["THICK"]*u.angstrom
+
+    assert u.allclose(filter_thickness,idl_filter_thick_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_density(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_density = channel_filter.filter_2.filter_density
+
+    IDL_filter_density_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["DENS"]*(u.g * u.cm**-3)
+    
+    np.allclose(filter_density ,IDL_filter_density_AUTO)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_wavelength(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    filter_wavelength_length = int(channel_filter.filter_2.number_of_wavelengths)  
+    filter_wavelength = channel_filter.filter_2.filter_wavelength[:filter_wavelength_length]
+
+    idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["LENGTH"])  
+    idl_filter_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["WAVE"][:idl_filter_array_length] * u.angstrom 
+
+    assert u.allclose(idl_filter_wavelength_auto, filter_wavelength)
+
+    idl_filter_wavelength_manu=[1.00000,1.00802,1.01610,1.02424,1.03245,1.04073,1.04907,1.05748,1.06595,1.07450]* u.angstrom
+    assert u.allclose(idl_filter_wavelength_manu,filter_wavelength[0:10])
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_transmission(channel_name):
+
+    channel_filter =  Channel(channel_name)
+
+    filter_transmission_length = int(channel_filter.filter_2.number_of_wavelengths)
+    filter_transmission = channel_filter.filter_2.filter_transmission[:filter_transmission_length]
+
+    idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["LENGTH"])
+    idl_filter_transmission_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["TRANS"][:idl_filter_array_length] 
+
+    assert u.allclose(idl_filter_transmission_auto, filter_transmission)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_mesh_transmission(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_mesh_transmission = channel_filter.filter_2.filter_mesh_trans
+
+    idl_filter_mesh_transmission_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["MESH_TRANS"]
+    
+    assert filter_mesh_transmission == idl_filter_mesh_transmission_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_filter2_substrate(channel_name):
+    channel_filter =  Channel(channel_name)
+    filter_substrate = channel_filter.filter_2.filter_substrate
+
+    idl_filter_substrate_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["SUBSTRATE"]
+    
+    assert filter_substrate == idl_filter_substrate_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_geometry_name(channel_name):
+    channel_filter =  Channel(channel_name)
+    geometry_name = channel_filter.geometry.name
+
+    IDL_geometry_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['GEOM']["LONG_NAME"]
+
+    assert geometry_name == IDL_geometry_name_AUTO
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_geometry_focal_len(channel_name):  
+    channel_filter =  Channel(channel_name)
+    geometry_focal_len = channel_filter.geometry.focal_len
+
+    IDL_geometry_focal_len_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['GEOM']["FOC_LEN"]*u.cm
+    
+    assert u.isclose(geometry_focal_len , IDL_geometry_focal_len_AUTO)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_geometry_aperture_area(channel_name):  
+    channel_filter =  Channel(channel_name)
+    geometry_aperture_area = channel_filter.geometry.aperture_area
+
+    idl_geometry_aperture_area_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['GEOM']["APERTURE_AREA"]*u.cm**2
+    
+    assert u.isclose(geometry_aperture_area ,idl_geometry_aperture_area_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror1_name(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_name = channel_filter.mirror_1.mirror_name
+
+    IDL_mirror_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']["LONG_NAME"]
+
+    assert mirror_name == IDL_mirror_name_AUTO
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror1_material(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_material = channel_filter.mirror_1.mirror_material
+
+    IDL_mirror_material_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']["MATERIAL"]
+
+    assert mirror_material == IDL_mirror_material_AUTO
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror1_density(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_density = channel_filter.mirror_1.mirror_density
+
+    idl_mirror_density_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']["DENS"]*(u.g * u.cm**-3)
+    
+    assert u.isclose(mirror_density, idl_mirror_density_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirro1_graze_angle(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
+
+    idl_mirror_graze_angle_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']['GRAZE_ANGLE']* u.deg
+    
+    assert u.isclose(mirror_graze_angle ,idl_mirror_graze_angle_auto)
+
+    idl_mirror_graze_angle_manu = [0.910000]* u.deg
+    assert u.isclose(idl_mirror_graze_angle_manu, mirror_graze_angle)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror1_wavelength(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
+    mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[:mirror_number_of_length]
+
+    idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["LENGTH"])
+    idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["WAVE"][:idl_mirror_array_length] * u.Unit('Angstrom')
+
+    assert u.allclose(idl_mirror_wavelength_auto, mirror_wavelength)
+
+    idl_mirror_wavelength_manu=[1.00000,1.10000,1.20000,1.30000,1.40000,1.50000,1.60000,1.70000,1.80000,1.90000]* u.angstrom
+    assert u.allclose(idl_mirror_wavelength_manu,mirror_wavelength[0:10])
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror1_reflection(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
+    mirror_reflection1 = channel_filter.mirror_1.mirror_reflection1[:mirror_number_of_length]
+
+    idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["LENGTH"]) 
+    idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["REFL"][:idl_mirror_array_length] * u.angstrom
+
+    assert u.allclose(idl_mirror_wavelength_auto, mirror_reflection1)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror2_name(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_name = channel_filter.mirror_1.mirror_name
+
+    idl_mirror_name_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']["LONG_NAME"]
+
+    assert mirror_name == idl_mirror_name_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror2_material(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_material = channel_filter.mirror_1.mirror_material
+
+    idl_mirror_material_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']["MATERIAL"]
+
+    assert mirror_material == idl_mirror_material_auto
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror2_density(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_density = channel_filter.mirror_1.mirror_density
+
+    idl_mirror_density_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']["DENS"]*(u.g * u.cm**-3)
+    
+    assert u.isclose(mirror_density, idl_mirror_density_auto)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror2_graze_angle(channel_name):
+    channel_filter =  Channel(channel_name)
+    mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
+
+    idl_mirror_graze_angle_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']['GRAZE_ANGLE']* u.deg
+    
+    assert u.isclose( mirror_graze_angle, idl_mirror_graze_angle_auto)
+
+    idl_mirror_graze_angle_manu = [0.910000]* u.deg
+    assert u.isclose(idl_mirror_graze_angle_manu, mirror_graze_angle)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror2_wavelength(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
+    mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[:mirror_number_of_length]
+
+    idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["LENGTH"])
+    idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["WAVE"][:idl_mirror_array_length] *  u.angstrom 
+
+    assert u.allclose(idl_mirror_wavelength_auto, mirror_wavelength)
+
+    idl_mirror_wavelength_manu=[1.00000,1.10000,1.20000,1.30000,1.40000,1.50000,1.60000,1.70000,1.80000,1.90000]* u.angstrom
+    assert u.allclose(idl_mirror_wavelength_manu,mirror_wavelength[0:10])
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_mirror2_reflection(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
+    mirror_reflection1 = channel_filter.mirror_1.mirror_reflection1[:mirror_number_of_length]
+
+    idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["LENGTH"])
+    idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["REFL"][:idl_mirror_array_length] * u.angstrom
+
+    assert u.allclose(idl_mirror_wavelength_auto, mirror_reflection1)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_channel_name(channel_name):
+    channel_filter =  Channel(channel_name)
+    name = channel_filter.name
+
+    IDL_mirror_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['NAME']
+
+    assert name == IDL_mirror_name_AUTO
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_channel_wavelength(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    wavelength_length = int(channel_filter.number_of_wavelengths)
+    wavelength = channel_filter.wavelength[:wavelength_length]
+
+    idl_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]["LENGTH"])  
+    idl_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["WAVE"][:idl_array_length] * u.angstrom
+    
+    assert u.allclose(idl_wavelength_auto, wavelength)
+        
+    idl_mirror_wavelength_manu=[9.00000,9.10000,9.20000,9.30000,9.40000,9.50000,9.60000,9.70000,9.80000,9.90000]* u.angstrom
+    assert u.allclose(idl_mirror_wavelength_manu,wavelength[80:90])
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_channel_transmission(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    transmission_length = int(channel_filter.number_of_wavelengths)
+    transmission = channel_filter.transmission[:transmission_length]
+
+    idl_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]["LENGTH"])
+    idl_transmission_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["TRANS"][:idl_array_length] 
+
+    assert u.allclose(idl_transmission_auto, transmission)
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_channel_number_of_wavelengths(channel_name):
+    channel_filter =  Channel(channel_name)
+
+    hannel_number_of_wavelengths = channel_filter.number_of_wavelengths
+
+    IDL_array_length = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["LENGTH"]
+    assert hannel_number_of_wavelengths == IDL_array_length
+      
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_channel_observatory(channel_name):
+    channel_filter =  Channel(channel_name)
+    
+    observatory = channel_filter.observatory
+    
+    idl_observatory = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["OBSERVATORY"]
+
+    assert observatory == idl_observatory
+
+
+@pytest.mark.parametrize("channel_name", channel_names)
+def test_channel_instrument(channel_name):
+    channel_filter =  Channel(channel_name)
+    
+    instrument = channel_filter.instrument
+    
+    IDL_instrument = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["INSTRUMENT"]
+
+    assert instrument == IDL_instrument
