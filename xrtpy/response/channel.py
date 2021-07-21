@@ -230,7 +230,7 @@ class Filter:
 
     @property
     def substrate(self) -> str:
-        """XRT substrate for the  focal plane filter."""
+        """XRT substrate for the focal plane filter."""
         return self._fp_filter_data['SUBSTRATE']
 
 class CCD:
