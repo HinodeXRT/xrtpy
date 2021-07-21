@@ -35,7 +35,7 @@ def resolve_filter_name(name):
     return(name)
 
 class Geometry:
-    """The physical geometric parameters of the XRT telescope."""
+    """The physical geometric parameters of Hinode/XRT."""
     _genx_file = _genx_file
 
     def __init__(self, index):
