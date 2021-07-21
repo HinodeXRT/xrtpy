@@ -153,7 +153,7 @@ class Mirror:
     @property
     @u.quantity_input
     def graze_angle(self,)-> u.deg: 
-        """Mirror graze angle in degrees.  in units of degrees."""
+        """Mirror graze angle in units of degrees."""
         return u.Quantity(self._mirror_data['GRAZE_ANGLE'], u.deg)
 
     @property
