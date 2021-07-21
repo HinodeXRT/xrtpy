@@ -215,7 +215,7 @@ class Filter:
     
     @property
     def transmission(self):
-        """Get  focal plane filter transmission."""
+        """Get focal plane filter transmission."""
         return self._fp_filter_data['TRANS'][:self.number_of_wavelengths] 
       
     @property
