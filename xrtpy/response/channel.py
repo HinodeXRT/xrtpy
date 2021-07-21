@@ -289,7 +289,7 @@ class CCD:
     @property
     @u.quantity_input
     def ccd_wavelength(self)-> u.angstrom:
-        """Array of wavelengths for the CCD quantum efficiency  in angstroms."""
+        """Array of wavelengths for the CCD quantum efficiency in angstroms."""
         return u.Quantity(self._ccd_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
 
 class Channel:
