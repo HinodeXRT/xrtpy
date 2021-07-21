@@ -192,7 +192,7 @@ class Filter:
 
     @property
     def material(self) -> str:
-        """XRT  focal plane filter material."""
+        """XRT focal plane filter material."""
         return self._fp_filter_data['MATERIAL']
 
     @property  
