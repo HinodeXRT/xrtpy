@@ -283,7 +283,7 @@ class CCD:
     @property
     @u.quantity_input
     def ccd_pixel_size(self)->u.micron:
-        """CCD pixel size in microns."""
+        """CCD pixel size in micrometers."""
         return u.Quantity(self._ccd_data['PIXEL_SIZE'],u.micron)
 
     @property
