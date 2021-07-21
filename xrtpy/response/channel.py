@@ -187,7 +187,7 @@ class Filter:
 
     @property
     def name(self,) -> str:
-        """XRT  focal plane filter position."""
+        """XRT focal plane filter position."""
         return self._fp_filter_data["LONG_NAME"]
 
     @property
