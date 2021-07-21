@@ -62,10 +62,10 @@ def test_CCD_wavelength(channel_name):
     ccd_wavelength_length = int(channel_filter.ccd.number_of_wavelengths)
     ccd_wavelength = channel_filter.ccd.ccd_wavelength[:ccd_wavelength_length]
 
-    IDL_ccd_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["LENGTH"])
-    IDL_ccd_wavelength_AUTO = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["WAVE"][:IDL_ccd_array_length] * u.angstrom
+    idl_ccd_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["LENGTH"])
+    idl_ccd_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['CCD']["WAVE"][:idl_ccd_array_length] * u.angstrom
     
-    assert u.allclose(IDL_ccd_wavelength_AUTO, ccd_wavelength)
+    assert u.allclose(idl_ccd_wavelength_auto, ccd_wavelength)
 
     idl_ccd_wavelength_manu = [1.00000,1.10000,1.20000,1.30000,1.40000, 1.50000,1.60000,1.70000,1.80000,1.90000] * u.angstrom
     assert u.allclose(idl_ccd_wavelength_manu,ccd_wavelength[0:10])
@@ -119,7 +119,6 @@ def test_ccd_gain_right(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_ccd_full_well(channel_name):
-
     channel_filter =  Channel(channel_name)
     ccd_full_well = channel_filter.ccd.ccd_full_well
 
@@ -229,9 +228,9 @@ def test_entrancefilter_mesh_transmission(channel_name):
     channel_filter =  Channel(channel_name)
     entrancefilter_mesh_transmission = channel_filter.entrancefilter.entrancefilter_mesh_transmission
 
-    IDL_entrancefilter_mesh_transmission_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["MESH_TRANS"]
+    idl_entrancefilter_mesh_transmission_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['EN_FILTER']["MESH_TRANS"]
     
-    assert entrancefilter_mesh_transmission == IDL_entrancefilter_mesh_transmission_AUTO
+    assert entrancefilter_mesh_transmission == idl_entrancefilter_mesh_transmission_auto
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -247,7 +246,7 @@ def test_entrancefilter_substrate(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_name(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_name = channel_filter.filter_1.filter_name
+    filter_name = channel_filter.filter_1.name
 
     idl_filter_name_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["LONG_NAME"]
 
@@ -257,7 +256,7 @@ def test_filter1_name(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_material(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_material = channel_filter.filter_1.filter_material
+    filter_material = channel_filter.filter_1.material
 
     idl_filter_material_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["MATERIAL"]
 
@@ -267,7 +266,7 @@ def test_filter1_material(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_thickness(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_thickness = channel_filter.filter_1.filter_thickness
+    filter_thickness = channel_filter.filter_1.thickness
 
     idl_filter_thick_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["THICK"]*u.angstrom
 
@@ -277,7 +276,7 @@ def test_filter1_thickness(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_density(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_density = channel_filter.filter_1.filter_density
+    filter_density = channel_filter.filter_1.density
 
     idl_filter_density_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["DENS"]*(u.g * u.cm**-3)
     
@@ -289,7 +288,7 @@ def test_filter1_wavelength(channel_name):
     channel_filter =  Channel(channel_name)
 
     filter_wavelength_length = int(channel_filter.filter_1.number_of_wavelengths)
-    filter_wavelength = channel_filter.filter_1.filter_wavelength[:filter_wavelength_length]
+    filter_wavelength = channel_filter.filter_1.wavelength[:filter_wavelength_length]
 
     idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["LENGTH"]) 
     idl_filter_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["WAVE"][:idl_filter_array_length] * u.angstrom
@@ -306,7 +305,7 @@ def test_filter1_transmission(channel_name):
     channel_filter =  Channel(channel_name)
 
     filter_transmission_length = int(channel_filter.filter_1.number_of_wavelengths)
-    filter_transmission = channel_filter.filter_1.filter_transmission[:filter_transmission_length]
+    filter_transmission = channel_filter.filter_1.transmission[:filter_transmission_length]
 
     idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["LENGTH"])
     idl_filter_transmission_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER1']["TRANS"][:idl_filter_array_length] 
@@ -317,7 +316,7 @@ def test_filter1_transmission(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_mesh_transmission(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_mesh_transmission = channel_filter._filter_1.filter_mesh_trans
+    filter_mesh_transmission = channel_filter._filter_1.mesh_trans
 
     idl_filter_mesh_transmission_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["MESH_TRANS"]
     
@@ -327,7 +326,7 @@ def test_filter1_mesh_transmission(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_substrate(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_substrate = channel_filter.filter_1.filter_substrate
+    filter_substrate = channel_filter.filter_1.substrate
 
     idl_filter_substrate_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER1']["SUBSTRATE"]
     
@@ -337,7 +336,7 @@ def test_filter1_substrate(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_name(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_name = channel_filter.filter_2.filter_name
+    filter_name = channel_filter.filter_2.name
 
     IDL_filter_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["LONG_NAME"]
 
@@ -347,7 +346,7 @@ def test_filter2_name(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_material(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_material = channel_filter.filter_2.filter_material
+    filter_material = channel_filter.filter_2.material
 
     idl_filter_material_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["MATERIAL"]
 
@@ -357,7 +356,7 @@ def test_filter2_material(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_thickness(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_thickness = channel_filter.filter_2.filter_thickness
+    filter_thickness = channel_filter.filter_2.thickness
 
     idl_filter_thick_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["THICK"]*u.angstrom
 
@@ -367,7 +366,7 @@ def test_filter2_thickness(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_density(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_density = channel_filter.filter_2.filter_density
+    filter_density = channel_filter.filter_2.density
 
     IDL_filter_density_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["DENS"]*(u.g * u.cm**-3)
     
@@ -379,7 +378,7 @@ def test_filter2_wavelength(channel_name):
     channel_filter =  Channel(channel_name)
 
     filter_wavelength_length = int(channel_filter.filter_2.number_of_wavelengths)  
-    filter_wavelength = channel_filter.filter_2.filter_wavelength[:filter_wavelength_length]
+    filter_wavelength = channel_filter.filter_2.wavelength[:filter_wavelength_length]
 
     idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["LENGTH"])  
     idl_filter_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["WAVE"][:idl_filter_array_length] * u.angstrom 
@@ -396,7 +395,7 @@ def test_filter2_transmission(channel_name):
     channel_filter =  Channel(channel_name)
 
     filter_transmission_length = int(channel_filter.filter_2.number_of_wavelengths)
-    filter_transmission = channel_filter.filter_2.filter_transmission[:filter_transmission_length]
+    filter_transmission = channel_filter.filter_2.transmission[:filter_transmission_length]
 
     idl_filter_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["LENGTH"])
     idl_filter_transmission_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['FP_FILTER2']["TRANS"][:idl_filter_array_length] 
@@ -407,7 +406,7 @@ def test_filter2_transmission(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_mesh_transmission(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_mesh_transmission = channel_filter.filter_2.filter_mesh_trans
+    filter_mesh_transmission = channel_filter.filter_2.mesh_trans
 
     idl_filter_mesh_transmission_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["MESH_TRANS"]
     
@@ -417,7 +416,7 @@ def test_filter2_mesh_transmission(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_substrate(channel_name):
     channel_filter =  Channel(channel_name)
-    filter_substrate = channel_filter.filter_2.filter_substrate
+    filter_substrate = channel_filter.filter_2.substrate
 
     idl_filter_substrate_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['FP_FILTER2']["SUBSTRATE"]
     
@@ -457,7 +456,7 @@ def test_geometry_aperture_area(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_name(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_name = channel_filter.mirror_1.mirror_name
+    mirror_name = channel_filter.mirror_1.name
 
     IDL_mirror_name_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']["LONG_NAME"]
 
@@ -467,7 +466,7 @@ def test_mirror1_name(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_material(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_material = channel_filter.mirror_1.mirror_material
+    mirror_material = channel_filter.mirror_1.material
 
     IDL_mirror_material_AUTO = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']["MATERIAL"]
 
@@ -477,7 +476,7 @@ def test_mirror1_material(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_density(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_density = channel_filter.mirror_1.mirror_density
+    mirror_density = channel_filter.mirror_1.density
 
     idl_mirror_density_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']["DENS"]*(u.g * u.cm**-3)
     
@@ -487,7 +486,7 @@ def test_mirror1_density(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirro1_graze_angle(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
+    mirror_graze_angle = channel_filter.mirror_1.graze_angle
 
     idl_mirror_graze_angle_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR1']['GRAZE_ANGLE']* u.deg
     
@@ -502,7 +501,7 @@ def test_mirror1_wavelength(channel_name):
     channel_filter =  Channel(channel_name)
 
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-    mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[:mirror_number_of_length]
+    mirror_wavelength = channel_filter.mirror_1.wavelength[:mirror_number_of_length]
 
     idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["LENGTH"])
     idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["WAVE"][:idl_mirror_array_length] * u.Unit('Angstrom')
@@ -518,18 +517,18 @@ def test_mirror1_reflection(channel_name):
     channel_filter =  Channel(channel_name)
 
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-    mirror_reflection1 = channel_filter.mirror_1.mirror_reflection1[:mirror_number_of_length]
+    mirror_reflection = channel_filter.mirror_1.reflection[:mirror_number_of_length]
 
     idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["LENGTH"]) 
     idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR1']["REFL"][:idl_mirror_array_length] * u.angstrom
 
-    assert u.allclose(idl_mirror_wavelength_auto, mirror_reflection1)
+    assert u.allclose(idl_mirror_wavelength_auto, mirror_reflection)
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_name(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_name = channel_filter.mirror_1.mirror_name
+    mirror_name = channel_filter.mirror_1.name
 
     idl_mirror_name_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']["LONG_NAME"]
 
@@ -539,7 +538,7 @@ def test_mirror2_name(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_material(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_material = channel_filter.mirror_1.mirror_material
+    mirror_material = channel_filter.mirror_1.material
 
     idl_mirror_material_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']["MATERIAL"]
 
@@ -549,7 +548,7 @@ def test_mirror2_material(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_density(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_density = channel_filter.mirror_1.mirror_density
+    mirror_density = channel_filter.mirror_1.density
 
     idl_mirror_density_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']["DENS"]*(u.g * u.cm**-3)
     
@@ -559,7 +558,7 @@ def test_mirror2_density(channel_name):
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_graze_angle(channel_name):
     channel_filter =  Channel(channel_name)
-    mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
+    mirror_graze_angle = channel_filter.mirror_1.graze_angle
 
     idl_mirror_graze_angle_auto = v6_genx_s[ _channel_name_to_index_mapping[channel_name] ]['MIRROR2']['GRAZE_ANGLE']* u.deg
     
@@ -574,7 +573,7 @@ def test_mirror2_wavelength(channel_name):
     channel_filter =  Channel(channel_name)
 
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-    mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[:mirror_number_of_length]
+    mirror_wavelength = channel_filter.mirror_1.wavelength[:mirror_number_of_length]
 
     idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["LENGTH"])
     idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["WAVE"][:idl_mirror_array_length] *  u.angstrom 
@@ -590,12 +589,12 @@ def test_mirror2_reflection(channel_name):
     channel_filter =  Channel(channel_name)
 
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
-    mirror_reflection1 = channel_filter.mirror_1.mirror_reflection1[:mirror_number_of_length]
+    mirror_reflection = channel_filter.mirror_1.reflection[:mirror_number_of_length]
 
     idl_mirror_array_length = int(v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["LENGTH"])
     idl_mirror_wavelength_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]['MIRROR2']["REFL"][:idl_mirror_array_length] * u.angstrom
 
-    assert u.allclose(idl_mirror_wavelength_auto, mirror_reflection1)
+    assert u.allclose(idl_mirror_wavelength_auto, mirror_reflection)
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -641,10 +640,10 @@ def test_channel_transmission(channel_name):
 def test_channel_number_of_wavelengths(channel_name):
     channel_filter =  Channel(channel_name)
 
-    hannel_number_of_wavelengths = channel_filter.number_of_wavelengths
+    channel_number_of_wavelengths = channel_filter.number_of_wavelengths
 
-    IDL_array_length = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["LENGTH"]
-    assert hannel_number_of_wavelengths == IDL_array_length
+    idl_array_length = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["LENGTH"]
+    assert channel_number_of_wavelengths == idl_array_length
       
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -664,6 +663,6 @@ def test_channel_instrument(channel_name):
     
     instrument = channel_filter.instrument
     
-    IDL_instrument = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["INSTRUMENT"]
+    idl_instrument = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["INSTRUMENT"]
 
-    assert instrument == IDL_instrument
+    assert instrument == idl_instrument
