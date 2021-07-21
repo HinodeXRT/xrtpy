@@ -210,7 +210,7 @@ class Filter:
     @property
     @u.quantity_input
     def wavelength(self)-> u.angstrom:
-        """Array of wavelength for every X-ray  focal plane filter in angstroms."""
+        """Array of wavelength for every X-ray focal plane filter in angstroms."""
         return u.Quantity(self._fp_filter_data['WAVE'], u.angstrom)[:self.number_of_wavelengths]
     
     @property
