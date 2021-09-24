@@ -292,12 +292,12 @@ class Filter:
 
     @property
     def material(self):
-        """Filter Material."""
+        """Filter material."""
         return self._fp_filter_data["MATERIAL"]
     
     @property
     def thickness(self):
-        """Filter Material."""
+        """Filter thickness."""
         return self._fp_filter_data["thick"]
 
 class CCD:
