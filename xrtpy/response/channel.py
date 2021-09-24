@@ -145,6 +145,15 @@ class EntranceFilter:
         """XRT entrance filter substrate."""
         return self._en_filter_data["SUBSTRATE"]
 
+    @property
+    def entrancefilter_material(self):
+        """Filter material on entrance filter."""
+        return self._en_filter_data["MATERIAL"]
+    
+    @property
+    def entrancefilter_thickness(self):
+        """Filter material thickness on entrance filter."""
+        return self._en_filter_data["THICK"]
 
 class Mirror:
     """
@@ -281,6 +290,15 @@ class Filter:
         """XRT substrate for the focal plane filter."""
         return self._fp_filter_data["SUBSTRATE"]
 
+    @property
+    def material(self):
+        """Filter material."""
+        return self._fp_filter_data["MATERIAL"]
+    
+    @property
+    def thickness(self):
+        """Filter thickness."""
+        return self._fp_filter_data["thick"]
 
 class CCD:
     """Charge-coupled device on board XRT."""
