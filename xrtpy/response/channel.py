@@ -144,6 +144,7 @@ class EntranceFilter:
         """Filter material on entrance filter."""
         return self._en_filter_data["MATERIAL"]
 
+
 class Mirror:
     """
     Grazing incidence mirror properties.
