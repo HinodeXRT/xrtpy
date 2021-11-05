@@ -102,11 +102,6 @@ class EntranceFilter:
         return self._en_filter_data["LONG_NAME"]
 
     @property
-    def entrancefilter_material(self) -> str:
-        """XRT entrance filter material."""
-        return self._en_filter_data["MATERIAL"]
-
-    @property
     @u.quantity_input
     def entrancefilter_thickness(self) -> u.angstrom:
         """XRT entrance filter material thickness."""
