@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
       - v0.*.x
     tags:
       - "v*"
@@ -18,15 +18,15 @@ jobs:
       matrix:
         include:
 
-          - name: Python 3.8 with minimal dependencies
-            os: windows-latest
-            python: 3.8
-            toxenv: py38-minimal
-
           - name: Python 3.8 (MacOS X)
             os: macos-latest
             python: 3.8
             toxenv: py38
+
+          - name: Python 3.8 with minimal dependencies
+            os: windows-latest
+            python: 3.8
+            toxenv: py38-minimal
 
          - name: Python 3.9 (Windows)
             os: windows-latest
