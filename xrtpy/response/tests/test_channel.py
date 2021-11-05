@@ -950,3 +950,19 @@ def test_channel_instrument(channel_name):
     ]
 
     assert instrument == idl_instrument
+
+
+@pytest.mark.parametrize("attr",["wavelength","number_of_wavelengths"])
+def test_open_channel(attr):
+
+    open_filter = Channel("open")
+    sample_filter = Channel('Al-mesh')
+
+    open_value = getattr(open_filter, attr)
+    sample_value = getattr(sample_filter, attr)
+    assert u.allclose(open_value, sample_value)
+
+
+def test_open_transmission():
+    open_filter = Channel("open")
+    assert u.allclose(open_filter.transmission, 1)
