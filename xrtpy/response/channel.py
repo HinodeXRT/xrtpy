@@ -1,5 +1,4 @@
 __all__ = [
-    "channel",
     "Geometry",
     "EntranceFilter",
     "Mirror",
@@ -144,12 +143,6 @@ class EntranceFilter:
     def entrancefilter_material(self):
         """Filter material on entrance filter."""
         return self._en_filter_data["MATERIAL"]
-
-    @property
-    def entrancefilter_thickness(self):
-        """Filter material thickness on entrance filter."""
-        return self._en_filter_data["THICK"]
-
 
 class Mirror:
     """
