@@ -5,7 +5,8 @@ include setup.py
 include LICENSE
 include pyproject.toml
 
-recursive-include xrtpy *.pyx *.c *.pxd *.genx *.geny *.json
+recursive-include xrtpy *.pyx *.c *.pxd *.json
+recursive-include xrtpy/data *.genx *.geny *.txt
 recursive-include docs *
 recursive-include licenses *
 
