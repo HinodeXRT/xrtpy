@@ -2,7 +2,7 @@
 
 numpydoc
 pillow
-sphinx == 2.4.4
+sphinx >= 2.4.4
 sphinx-automodapi
 sphinx-gallery
 sphinx_rtd_theme >= 1.0.0
