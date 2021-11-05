@@ -149,11 +149,12 @@ class EntranceFilter:
     def entrancefilter_material(self):
         """Filter material on entrance filter."""
         return self._en_filter_data["MATERIAL"]
-    
+
     @property
     def entrancefilter_thickness(self):
         """Filter material thickness on entrance filter."""
         return self._en_filter_data["THICK"]
+
 
 class Mirror:
     """
@@ -290,11 +291,11 @@ class Filter:
         """XRT substrate for the focal plane filter."""
         return self._fp_filter_data["SUBSTRATE"]
 
-
     @property
     def thickness(self):
         """Filter thickness."""
         return self._fp_filter_data["THICK"]
+
 
 class CCD:
     """Charge-coupled device on board XRT."""
@@ -391,13 +392,13 @@ class Channel:
             self._filter_1 = Filter(self._channel_index, 1)
             self._filter_2 = Filter(self._channel_index, 2)
             self._ccd = CCD(self._channel_index)
-        elif name.lower() == "open": #Complete by adding remaining indexs
+        elif name.lower() == "open":  # Complete by adding remaining indexs
             self._sample_channel_data = _genx_file[1]
             self._channel_data = {
                 "WAVE": self._sample_channel_data["WAVE"],
-                "TRANS":np.ones_like(self._sample_channel_data["TRANS"]),
+                "TRANS": np.ones_like(self._sample_channel_data["TRANS"]),
                 "LENGTH": self._sample_channel_data["LENGTH"],
-                }
+            }
         else:
             raise ValueError(
                 f"{name} is not a valid channel. The available channels are: {list(_channel_name_to_index_mapping.keys())}"
