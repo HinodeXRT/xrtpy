@@ -39,21 +39,6 @@ jobs:
             python: 3.9
             toxenv: py39-cov
 
-            - name: Python 3.8 with Astropy dev
-            os: ubuntu-latest
-            python: 3.8
-            toxenv: py38-astropydev
-
-          - name: Python 3.9 with SunPy dev
-            os: ubuntu-latest
-            python: 3.9
-            toxenv: py39-sunpydev
-
-          - name: Python 3.8 with Numpy dev
-            os: ubuntu-latest
-            python: 3.8
-            toxenv: py38-numpydev
-
           - name: Documentation
             os: ubuntu-latest
             python: 3.9
