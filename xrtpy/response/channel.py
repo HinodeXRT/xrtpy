@@ -9,9 +9,9 @@ __all__ = [
     "resolve_filter_name",
 ]
 
+import numpy as np
 import pkg_resources
 import sunpy.io.special
-import numpy as np
 
 from astropy import units as u
 

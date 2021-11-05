@@ -1,5 +1,5 @@
 from . import channel
-from .channel import Geometry, EntranceFilter, Mirror, Filter, CCD, Channel
+from .channel import CCD, Channel, EntranceFilter, Filter, Geometry, Mirror
 
 __all__ = [
     "channel",

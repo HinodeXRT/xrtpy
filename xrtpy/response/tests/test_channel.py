@@ -1,13 +1,15 @@
-import pytest
-from astropy import units as u
 import numpy as np
-from xrtpy.response.channel import Channel
 import pkg_resources
-import sunpy
-import sunpy.map
-from sunpy.data import manager
+import pytest
 import scipy.io
+import sunpy
 import sunpy.io.special
+import sunpy.map
+
+from astropy import units as u
+from sunpy.data import manager
+
+from xrtpy.response.channel import Channel
 
 channel_names = [
     "Al-mesh",
