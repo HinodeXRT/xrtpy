@@ -280,11 +280,6 @@ class Filter:
         """XRT substrate for the focal plane filter."""
         return self._fp_filter_data["SUBSTRATE"]
 
-    @property
-    def thickness(self):
-        """Filter thickness."""
-        return self._fp_filter_data["THICK"]
-
 
 class CCD:
     """Charge-coupled device on board XRT."""
