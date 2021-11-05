@@ -290,15 +290,11 @@ class Filter:
         """XRT substrate for the focal plane filter."""
         return self._fp_filter_data["SUBSTRATE"]
 
-    @property
-    def material(self):
-        """Filter material."""
-        return self._fp_filter_data["MATERIAL"]
-    
+
     @property
     def thickness(self):
         """Filter thickness."""
-        return self._fp_filter_data["thick"]
+        return self._fp_filter_data["THICK"]
 
 class CCD:
     """Charge-coupled device on board XRT."""
@@ -395,6 +391,13 @@ class Channel:
             self._filter_1 = Filter(self._channel_index, 1)
             self._filter_2 = Filter(self._channel_index, 2)
             self._ccd = CCD(self._channel_index)
+        elif name.lower() == "open": #Complete by adding remaining indexs
+            self._sample_channel_data = _genx_file[1]
+            self._channel_data = {
+                "WAVE": self._sample_channel_data["WAVE"],
+                "TRANS":np.ones_like(self._sample_channel_data["TRANS"]),
+                "LENGTH": self._sample_channel_data["LENGTH"],
+                }
         else:
             raise ValueError(
                 f"{name} is not a valid channel. The available channels are: {list(_channel_name_to_index_mapping.keys())}"
