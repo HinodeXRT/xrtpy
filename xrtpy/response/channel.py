@@ -393,10 +393,7 @@ class Channel:
             self._ccd = CCD(self._channel_index)
         elif name.lower() == "open": #Complete by adding remaining indexs
             self._sample_channel_data = _genx_file[1]
-<<<<<<< HEAD
             self._geometry = Geometry(1)
-=======
->>>>>>> db46bf3dd98ad3e92d4bfe60c4c1584aa004530c
             self._channel_data = {
                 "WAVE": self._sample_channel_data["WAVE"],
                 "TRANS":np.ones_like(self._sample_channel_data["TRANS"]),
