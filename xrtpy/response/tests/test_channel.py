@@ -964,7 +964,12 @@ def test_open_channel(attr):
 
 
 def test_open_transmission():
+<<<<<<< HEAD
 
     open_filter = Channel("open")
 
     assert u.allclose(open_filter.transmission, 1)
+=======
+    open_filter = Channel("open")
+    assert u.allclose(open_filter.transmission, 1)
+>>>>>>> db46bf3dd98ad3e92d4bfe60c4c1584aa004530c
