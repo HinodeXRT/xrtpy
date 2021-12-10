@@ -36,6 +36,28 @@ _channel_name_to_index_mapping = {
     "C-poly/Ti-poly": 13,
 }
 
+index_mapping_to_fw1_name  = {
+    "Open": 0,
+    "Al-poly": 1,
+    "C-poly": 2,
+    "Be-thin": 3,
+    "Be-med": 4,
+    "Al-med": 5,
+}
+
+index_mapping_to_fw2_name = { 
+    "Open": 0,
+    "Al-mesh": 1,
+    "Ti-poly": 2,
+    "G-band": 3,
+    "Al-thick": 4,
+    "Be-thick": 5,
+}
+
+filter_wheel_1 = ("Al-poly","C-poly","Be-thin","Be-med","Al-med")
+
+filter_wheel_2 = ("Al-mesh", "Ti-poly", "G-band", "Al-thick", "Be-thick")
+
 _genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
 
 
