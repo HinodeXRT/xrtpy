@@ -403,10 +403,11 @@ class CCD:
             : self.number_of_wavelengths
         ]
 
-#filename = pkg_resources.resource_filename( "xrtpy", "data/channels/xrt_channels_v0016.genx" )
+_ccd_contam_filename = pkg_resources.resource_filename( "xrtpy","data/channels/xrt_contam_on_ccd.geny")
+_filter_contam_filename = pkg_resources.resource_filename( "xrtpy","data/channels/xrt_contam_on_filter.geny")
 
-_ccd_contam_file = scipy.io.readsav("/Users/jvelasq/Projects/xrtpy/xrtpy/response/data/xrt_contam_on_ccd.geny")
-_filter_contam_file = scipy.io.readsav("/Users/jvelasq/Projects/xrtpy/xrtpy/response/data/xrt_contam_on_filter.geny")
+_ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
+_filter_contam_file =scipy.io.readsav(_filter_contam_filename)
 
 #CCD contam geny files keys for time and date.
 _ccd_contamination_file_time = _ccd_contam_file['p1']
@@ -422,6 +423,7 @@ class EffectiveAreaPreparatory:
     def __init__(self,filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date  = observation_date   
+        self._channel = Channel(self.name)
     
     @property
     def name(self):
@@ -519,10 +521,10 @@ class EffectiveAreaPreparatory:
         
         return round(int(ccd_contam_interpolated_date))
 
-    
+
     @property
     def filter_index_mapping_to_name(self):
-        '''Returns filter's corresponding number value. '''
+        """Returns filter's corresponding number value."""
         if self.name in index_mapping_to_fw1_name.keys():
             return( index_mapping_to_fw1_name.get(self.name))
         elif self.name in index_mapping_to_fw2_name.keys():
@@ -530,26 +532,27 @@ class EffectiveAreaPreparatory:
         
     @property
     def filter_wheel_number(self):
-        '''Defining choosen filter to its corresponding wheel.'''
+        """Defining choosen filter to its corresponding wheel."""
         return 0 if self.name in index_mapping_to_fw1_name.keys() else 1
         
     @property
     def filter_data(self):
-        '''Collecting filter data.'''
+        """Collecting filter data."""
         filter_data = _filter_contamination[self.filter_index_mapping_to_name][self.filter_wheel_number]
         return filter_data
     
     @property 
     def contamination_on_filter(self):
-        '''Calculation of contamination layer on a filter,thickness giving in Angstrom Å.'''
+        """Calculation of contamination layer on a filter,thickness giving in Angstrom Å."""
         interpolater = scipy.interpolate.interp1d( self.filter_data_dates_seconds , self.filter_data ,kind='linear')
         filter_contam_interpolated_date = interpolater( self.filter_observation_date_seconds )
         return round(int(filter_contam_interpolated_date))
 
     @cached_property 
     def n_DEHP_attributes(self):
-        '''Diethylhexylphthalate: Wavelength (nm), Delta, Beta'''
-        with open("/Users/jvelasq/Projects/xrtpy/xrtpy/response/data/n_DEHP.txt", "r") as n_DEHP: 
+        """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
+        _n_DEHP_filename = pkg_resources.resource_filename( "xrtpy","response/data/n_DEHP.txt") 
+        with open(_n_DEHP_filename, "r") as n_DEHP: 
             list_of_lists = []
             for line in n_DEHP:
                 stripped_line = line.strip()
@@ -559,7 +562,7 @@ class EffectiveAreaPreparatory:
 
     @cached_property
     def n_DEHP_wavelength(self):
-        '''Diethylhexylphthalate: Wavelength (nm)'''
+        """Diethylhexylphthalate: Wavelength (nm)."""
         
         wavelength_str = [] #nm
 
@@ -573,7 +576,7 @@ class EffectiveAreaPreparatory:
 
     @cached_property
     def n_DEHP_delta(self):
-        '''Diethylhexylphthalate: Delta'''
+        """Diethylhexylphthalate: Delta."""
 
         delta_str = []
       
@@ -590,7 +593,7 @@ class EffectiveAreaPreparatory:
 
     @cached_property
     def n_DEHP_beta(self):
-        '''#Diethylhexylphthalate: Beta'''
+        """Diethylhexylphthalate: Beta."""
 
         beta_str =[]
 
@@ -683,10 +686,24 @@ class EffectiveAreaPreparatory:
         return transmission
 
     @property
+    def channel_wavelength(self):
+        """Array of wavelengths for every X-ray channel in angstroms."""
+        return Channel(self.name).wavelength
+    
+    @property
+    def channel_geometry_aperture_area(self):
+        """Hinode/XRT flight model geometry aperture area."""
+        return Channel(self.name).geometry.aperture_area
+
+    @property
+    def channel_transmission(self):
+        return Channel(self.name).transmission
+
+    @property
     def interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         CCD_contam_transmission = interpolate.interp1d( self.n_DEHP_wavelength,self.CCD_contamination_transmission)
-        CCD_interpolate = CCD_contam_transmission( Channel('Al-poly').wavelength)
+        CCD_interpolate = CCD_contam_transmission( self.channel_wavelength)
         return CCD_interpolate
     
     @cached_property
@@ -707,21 +724,24 @@ class EffectiveAreaPreparatory:
         return transmission
 
     @property
-    def interpolated_filter_contam_transmission(self):
+    def interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         Filter_contam_transmission = interpolate.interp1d( self.n_DEHP_wavelength , self.filter_contamination_transmission)
-        Filter_interpolate = Filter_contam_transmission( Channel('Al-poly').wavelength)
+        Filter_interpolate = Filter_contam_transmission( self.channel_wavelength)
         return Filter_interpolate
 
     @u.quantity_input
     def effective_area(self)-> u.cm**2:
         """Calculation of the Effecive Area."""
-        return (Channel('Al-poly').geometry.aperture_area
-                * Channel('Al-poly').transmission
-                * self.interpolated_CCD_contamination_transmission 
-                * self.interpolated_filter_contam_transmission     
+        return (self.channel_geometry_aperture_area
+                * self.channel_transmission
+                * self.interpolated_CCD_contamination_transmission
+                * self.interpolated_filter_contamination_transmission
                )
 
+def effective_area(filter_name,observation_date):
+    EAP = EffectiveAreaPreparatory(filter_name,observation_date)
+    return( EAP.effective_area() )
 
 
 class Channel:
@@ -827,12 +847,3 @@ class Channel:
     def instrument(self) -> str:
         """X-Ray Telescope -XRT."""
         return self._channel_data["INSTRUMENT"]
-    
-    
-    #@u.quantity_input
-    #def effective_area(self,obstime)-> u.cm**2:
-    #    """Calculation of the Effecive Area."""
-    #    return (self.new.filter_Channel_aperture_area,
-                #* self.filter_Channel_transmission,
-                #* self.interpolated_CCD_contamination_transmission ,
-                #* self.interpolated_filter_contam_transmission)  
