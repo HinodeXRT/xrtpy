@@ -419,7 +419,7 @@ _filter_contamination = _filter_contam_file['p2']
 
 class EffectiveAreaPreparatory:
 
-    """Data for a single filter at a giving time"""
+    """Data for a single filter at a given time"""
     def __init__(self,filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date  = observation_date   
