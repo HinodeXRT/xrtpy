@@ -496,7 +496,7 @@ class EffectiveAreaPreparatory:
         
     @property    
     def filter_data_dates_seconds(self):
-        """Converting Filter data dates to datetimes."""
+        """Converting Filter contamination data dates to datetimes."""
         
         filter_data_dates_dt = []
         filter_data_dates_seconds = []
