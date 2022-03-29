@@ -149,7 +149,7 @@ class EntranceFilter:
 
     @property
     def entrancefilter_density(self) -> u.g * u.cm ** -3:
-        """XRT entrance filter material density in g/cm^-3."""  
+        """XRT entrance filter material density in g/cm\ :sup:`3`\ ."""  
         return u.Quantity(self._en_filter_data["DENS"], u.g * u.cm ** -3)
 
     @property
@@ -419,7 +419,7 @@ _filter_contamination = _filter_contam_file['p2']
 
 class EffectiveAreaPreparatory:
 
-    """Data for a single filter at a giving time"""
+    """Data for a single filter at a given time"""
     def __init__(self,filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date  = observation_date   
@@ -496,7 +496,7 @@ class EffectiveAreaPreparatory:
         
     @property    
     def filter_data_dates_seconds(self):
-        """Converting Filter data dates to datetimes."""
+        """Converting Filter contamination data dates to datetimes."""
         
         filter_data_dates_dt = []
         filter_data_dates_seconds = []
