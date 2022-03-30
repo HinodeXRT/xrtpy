@@ -615,7 +615,7 @@ class EffectiveAreaPreparatory:
         n_o = 1.0 #index of medium at entrance of filter (assumed vacuum)
         n_t = 1.0 #index of medium at exit of filter (assumed vacuum)
         
-        incidence_angle = 0 #Angle of incidence on Filterin radians
+        incidence_angle = 0 #Angle of incidence on Filter in radians
          
         wavelength_min =  1.   #Angstroms
         wavelength_max = 4000 #Max wavelength in Angstroms
