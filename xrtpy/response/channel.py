@@ -533,7 +533,7 @@ class EffectiveAreaPreparatory:
     @property
     def filter_wheel_number(self):
         """Defining choosen filter to its corresponding wheel."""
-        return 0 if self.name in index_mapping_to_fw1_name.keys() else 1
+        return 0 if self.name in index_mapping_to_fw1_name else 1
         
     @property
     def filter_data(self):
