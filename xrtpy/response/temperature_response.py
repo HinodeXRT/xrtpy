@@ -106,7 +106,7 @@ class TemperatureResponse:
         return( Channel(self.name).geometry.focal_len )
     
     @property
-    def ev_pre_electron(self):
+    def ev_per_electron(self):
         """Amount of energy it takes to dislodge 1 electron in the CCD."""
         return (Channel(self.name).ccd.ccd_ev_ore_electron )
     
