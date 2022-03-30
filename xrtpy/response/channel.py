@@ -732,7 +732,7 @@ class EffectiveAreaPreparatory:
 
     @u.quantity_input
     def effective_area(self)-> u.cm**2:
-        """Calculation of the Effecive Area."""
+        """Calculation of the Effective Area."""
         return (self.channel_geometry_aperture_area
                 * self.channel_transmission
                 * self.interpolated_CCD_contamination_transmission
