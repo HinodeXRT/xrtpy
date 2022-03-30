@@ -121,7 +121,7 @@ class TemperatureResponse:
     @u.quantity_input
     def solid_angle_per_pixel(self) -> u.sr / u.pix:
         """This quantity represents the solid angle, which is given in units of steradians over pixel."""
-        return u.Quantity( ( self.pixel_size/self.focal_len )**2  * u.sr / u.pix  )
+        return  ( self.pixel_size/self.focal_len )**2  * (u.sr / u.pix)
 
     
     @u.quantity_input
