@@ -63,9 +63,9 @@ class TemperatureResponse:
         return CHIANTI_file['name']
 
     @property
-    def abundant_model(self):
+    def abundance_model(self):
         """A brief description of what abundance model was used in the creation of the emission spectra."""
-        return CHIANTI_file['abundant_model']
+        return CHIANTI_file['abundance_model']
 
     @property
     def density_model(self):
