@@ -640,7 +640,7 @@ class EffectiveAreaPreparatory:
         #Define wavevector
         angular_wavenumber = np.array( [((2.*math.pi*index[i]* cos_a)/ self.n_DEHP_wavelength[i] )  for i in range(0,4000)] )
         
-        #Multiply be thickness
+        #Multiply by thickness
         angular_wavenumber_thickness = angular_wavenumber* self.contamination_on_CCD 
 
         real_angular_wavenumber = [(float(angular_wavenumber_thickness[i].real))  for i in range(0,4000)] 
