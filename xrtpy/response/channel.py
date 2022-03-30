@@ -514,7 +514,7 @@ class EffectiveAreaPreparatory:
     
     @property
     def contamination_on_CCD(self):
-        """Calculation of contamination layer on the CCD,thickness giving in Angstrom Å."""
+        """Calculation of contamination layer on the CCD, thickness given in Angstrom (Å)."""
 
         interpolater = scipy.interpolate.interp1d(self.ccd_data_dates_seconds, _ccd_contamination,kind='linear')
         ccd_contam_interpolated_date  =  interpolater(self.ccd_observation_date_seconds)
