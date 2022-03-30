@@ -24,7 +24,7 @@ _XRT_emiss_model_file = _CHIANTI_file['p0']
 
 
 CHIANTI_file = {
-    "abundant_model":_XRT_emiss_model_file["ABUND_MODEL"][0],
+    "abundance_model":_XRT_emiss_model_file["ABUND_MODEL"][0],
     "dens_model": _XRT_emiss_model_file["DENS_MODEL"][0],
     "ioneq_model": _XRT_emiss_model_file["IONEQ_MODEL"][0],  
     "name" : _XRT_emiss_model_file["NAME"][0],
