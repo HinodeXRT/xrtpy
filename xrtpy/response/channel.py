@@ -600,7 +600,7 @@ class EffectiveAreaPreparatory:
         for i in range(2,len(self.n_DEHP_attributes)):
             beta_str.append(self.n_DEHP_attributes[i][2]) 
 
-        #Covering from str to float 
+        #Converting from str to float 
         beta = np.array([float(beta_str[i]) for i in range(0,len(self.n_DEHP_wavelength))])
         
         #Interpolate so ranges are the same
