@@ -91,13 +91,13 @@ class TemperatureResponse:
     @property
     @u.quantity_input
     def CHIANTI_wavelength(self):
-        """CHIANTI file wavelength values in Angstroms,Å."""
+        """CHIANTI file wavelength values in Å."""
         return u.Quantity( CHIANTI_file['wavelength'] * u.Angstrom)
 
     @property
     @u.quantity_input
     def channel_wavelength(self):
-        """Array of wavelengths for every X-ray channel in Angstroms,Å."""
+        """Array of wavelengths for every X-ray channel in Å."""
         return u.Quantity((Channel(self.name).wavelength[:3993])*u.photon) #Make note of reason why you're cuting this short
 
     @property
