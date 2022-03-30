@@ -525,9 +525,9 @@ class EffectiveAreaPreparatory:
     @property
     def filter_index_mapping_to_name(self):
         """Returns filter's corresponding number value."""
-        if self.name in index_mapping_to_fw1_name.keys():
+        if self.name in index_mapping_to_fw1_name:
             return( index_mapping_to_fw1_name.get(self.name))
-        elif self.name in index_mapping_to_fw2_name.keys():
+        elif self.name in index_mapping_to_fw2_name:
             return(index_mapping_to_fw2_name.get(self.name) )
         
     @property
