@@ -6,6 +6,8 @@ import pkg_resources
 
 import sunpy.time
 
+from datetime import datetime 
+
 import scipy.io
 from scipy import integrate
 from scipy import interpolate
