@@ -51,7 +51,7 @@ class TemperatureResponse:
 
     def __init__(self,filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
-        self._observation_date  = observation_date 
+        self.observation_date  = observation_date 
         self._channel = Channel(self.name)
  
     @property
@@ -63,6 +63,17 @@ class TemperatureResponse:
     def observation_date(self):
         """Users date of observation."""
         return self._observation_date 
+
+    @observation_date.setter
+    def observation_date(self,date):
+        """Users observation date input."""
+        astropy_time = sunpy.time.parse_time(date) #Astropy time in utc
+        observation_date = astropy_time.datetime  
+
+        mission_start_date = datetime(year=2006, month=9, day=22, hour=21, minute=36, second=0)
+        if observation_date <= mission_start_date:
+            raise ValueError('Invalid date: {:}.\n Date must be after September 22nd, 2006 21:36:00.'.format(observation_date))
+        self._observation_date = observation_date
 
     @property
     def CHIANTI_version(self):
