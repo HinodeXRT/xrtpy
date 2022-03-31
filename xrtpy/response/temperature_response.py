@@ -71,9 +71,6 @@ class TemperatureResponse:
         """Users observation date input."""
         astropy_time = sunpy.time.parse_time(date) #Astropy time in utc
         observation_date = astropy_time.datetime  
-              
-        #mission_start_date = datetime(year=2006, month=9, day=22, hour=21, minute=36, second=0)
-        #if observation_date <= mission_start_date:
         if observation_date <= epoch:
             raise ValueError('Invalid date: {:}.\n Date must be after September 22nd, 2006 21:36:00.'.format(observation_date))
         self._observation_date = observation_date
