@@ -4,6 +4,8 @@ __all__ = [
 
 import pkg_resources
 
+import sunpy.time
+
 import scipy.io
 from scipy import integrate
 from scipy import interpolate
