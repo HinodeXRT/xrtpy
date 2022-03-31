@@ -1,5 +1,5 @@
 __all__ = [ 
-    "TemperatureResponse"
+    "TemperatureResponse",
     ]
 
 import pkg_resources
@@ -8,7 +8,6 @@ import scipy.io
 from scipy import integrate
 from scipy import interpolate
 
-import numpy as np
 from astropy import units as u
 
 from astropy.constants import c, h
@@ -39,14 +38,22 @@ CHIANTI_file = {
 }
 
 
+def resolve_filter_name(name):
+    name = name.replace("_", "-")
+    parts: list = name.split("/")
+    new_parts: list = [part.capitalize() for part in name.split("/")]
+    name: str = "/".join(new_parts)
+    return name
+
+
 class TemperatureResponse:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
 
     def __init__(self,filter_name, observation_date):
-        self._name = filter_name
+        self._name = resolve_filter_name(filter_name)
         self._observation_date  = observation_date 
         self._channel = Channel(self.name)
-        
+ 
     @property
     def name(self):
         """Name of searched filter."""
@@ -98,7 +105,7 @@ class TemperatureResponse:
     @u.quantity_input
     def channel_wavelength(self):
         """Array of wavelengths for every X-ray channel in Å."""
-        return u.Quantity((Channel(self.name).wavelength[:3993])*u.photon) #Make note of reason why you're cuting this short
+        return u.Quantity((Channel(self.name).wavelength[:3993])*u.photon)
 
     @property
     def focal_len(self):
@@ -123,7 +130,6 @@ class TemperatureResponse:
         """This quantity represents the solid angle, which is given in units of steradians over pixel."""
         return  ( self.pixel_size/self.focal_len )**2  * (u.sr / u.pix)
 
-    
     @u.quantity_input
     def spectra(self): 
         """Interpolation between the spectra wavelength onto the channel wavelength."""
@@ -141,7 +147,7 @@ class TemperatureResponse:
 
         wavelength = (self.channel_wavelength).value
         constants = (_c_Å_per_s * _h_eV_s/ self.channel_wavelength).value
-        factors = (self.solid_angle/self.ev_pre_electron).value
+        factors = (self.solid_angle_per_pixel/self.ev_per_electron).value
         effective_area = (self.effective_area()).value
 
         temp_resp_w_u_c = []
