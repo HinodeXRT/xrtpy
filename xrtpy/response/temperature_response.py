@@ -3,20 +3,18 @@ __all__ = [
     ]
 
 import pkg_resources
-
 import sunpy.time
-
-from datetime import datetime 
-
 import scipy.io
+
 from scipy import integrate
 from scipy import interpolate
-
+from datetime import datetime 
 from astropy import units as u
-
 from astropy.constants import c, h
-
 from xrtpy.response.channel import Channel,effective_area
+
+from xrtpy.util.time import epoch
+
 
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
@@ -73,9 +71,10 @@ class TemperatureResponse:
         """Users observation date input."""
         astropy_time = sunpy.time.parse_time(date) #Astropy time in utc
         observation_date = astropy_time.datetime  
-
-        mission_start_date = datetime(year=2006, month=9, day=22, hour=21, minute=36, second=0)
-        if observation_date <= mission_start_date:
+              
+        #mission_start_date = datetime(year=2006, month=9, day=22, hour=21, minute=36, second=0)
+        #if observation_date <= mission_start_date:
+        if observation_date <= epoch:
             raise ValueError('Invalid date: {:}.\n Date must be after September 22nd, 2006 21:36:00.'.format(observation_date))
         self._observation_date = observation_date
 
