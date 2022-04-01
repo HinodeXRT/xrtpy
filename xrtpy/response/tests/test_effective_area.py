@@ -1,12 +1,11 @@
 import pytest
 import numpy as np
 import pkg_resources
+import glob
 
 from astropy import units as u
 from xrtpy.response.channel import Channel, EffectiveAreaPreparatory
-
 from datetime import datetime 
-import glob
 
 channel_names = [
     "Al-mesh",
