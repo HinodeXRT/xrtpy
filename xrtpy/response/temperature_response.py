@@ -1,5 +1,6 @@
 __all__ = [ 
-    "TemperatureResponse",
+    "resolve_filter_name",
+    "TemperatureResponseFundamental",
     ]
 
 import pkg_resources
@@ -48,7 +49,7 @@ def resolve_filter_name(name):
     return name
 
 
-class TemperatureResponse:
+class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
 
     def __init__(self,filter_name, observation_date):
