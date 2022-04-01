@@ -12,8 +12,8 @@ from scipy import interpolate
 from datetime import datetime 
 from astropy import units as u
 from astropy.constants import c, h
-from xrtpy.response.channel import Channel,effective_area
-
+from xrtpy.response.channel import Channel
+from xrtpy.response.effective_area import effective_area 
 from xrtpy.util.time import epoch
 
 
