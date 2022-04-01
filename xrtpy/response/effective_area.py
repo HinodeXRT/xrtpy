@@ -1,28 +1,24 @@
 __all__ = [
     "resolve_filter_name",
     "EffectiveAreaFundamental",
+    "effective_area",
 ]
-print('Code starting to run...\n ')
+
 import pkg_resources
 import sunpy.io.special
 import numpy as np
 import sunpy.time
 import math 
-
 import scipy.io
 import sunpy.io.special
 
 from scipy import interpolate
 from datetime import date,datetime 
 from datetime import timedelta
-
-from astropy.time import Time, TimeDelta
 from astropy import units as u
-
 from functools import cached_property 
 
 from xrtpy.util.time import epoch
-
 from xrtpy.response.channel import Channel
 
 _channel_name_to_index_mapping = {
@@ -116,77 +112,69 @@ class EffectiveAreaFundamental:
     
 
     @property 
-    def ccd_observation_date_seconds(self):
-        """Converting the observation date to seconds."""
-        ccd_obs_date = []
-        ccd_observation_date_seconds= []
+    def ccd_observation_date_to_seconds(self):
+        """Covering users observation date into secounds. Used for interpolation."""
 
-        #Covering observation date into secounds to interpolate
+        ccd_observation_date_to_seconds = []
+
         for time in _ccd_contamination_file_time:
             t0=_ccd_contamination_file_time[0]
             t1=time
             dt = t1-t0
-            ccd_obs_date.append( ( self.observation_date + timedelta(0,dt) ) )
-            ccd_observation_date_seconds.append(( self.observation_date + timedelta(0,dt) ).strftime('%s'))
+            ccd_observation_date_to_seconds.append(( self.observation_date + timedelta(0,dt) ).strftime('%s'))
 
-        return ccd_observation_date_seconds[0]
+        return ccd_observation_date_to_seconds[0]
     
     @property
-    def ccd_data_dates_seconds(self):
+    def ccd_data_dates_to_seconds(self):
         """Converting CCD data dates to datetimes."""
-        ccd_data_dates_dt = []
-        ccd_data_dates_seconds = []
+        
+        ccd_data_dates_to_seconds = []
 
         for time in _ccd_contamination_file_time:
             t0=_ccd_contamination_file_time[0]
             t1=time
             dt = t1-t0
-            ccd_data_dates_dt.append(epoch + timedelta(0,dt))
-            ccd_data_dates_seconds.append(float((epoch+timedelta(0,dt)).strftime('%s')))
+            ccd_data_dates_to_seconds.append(float((epoch+timedelta(0,dt)).strftime('%s')))
 
-        return ccd_data_dates_seconds
-    
+        return ccd_data_dates_to_seconds
 
     @property 
-    def filter_observation_date_seconds(self): 
-        """Converting the observation date to seconds."""
+    def filter_observation_date_to_seconds(self): 
+        """Covering users observation date into secounds. Used for interpolation."""
 
-        filter_observation_date_seconds= []
+        filter_observation_date_to_seconds= []
         
         for time in _filter_contamination_file_time:
             t0=_filter_contamination_file_time[0]
             t1=time
             dt = t1-t0
-            filter_observation_date_seconds.append(( self.observation_date + timedelta(0,dt)).strftime('%s'))
+            filter_observation_date_to_seconds.append(( self.observation_date + timedelta(0,dt)).strftime('%s'))
             
-        return filter_observation_date_seconds[0]
-        
+        return filter_observation_date_to_seconds[0]
+
     @property    
-    def filter_data_dates_seconds(self):
+    def filter_data_dates_to_seconds(self):
         """Converting Filter contamination data dates to datetimes."""
-        
-        filter_data_dates_dt = []
-        filter_data_dates_seconds = []
+    
+        filter_data_dates_to_seconds = []
 
         for time in _filter_contamination_file_time:
             t0=_filter_contamination_file_time[0]
             t1=time
             dt = t1-t0
-            filter_data_dates_dt.append(epoch + timedelta(0,dt))
-            filter_data_dates_seconds.append(float((epoch + timedelta(0,dt)).strftime('%s')))
+            filter_data_dates_to_seconds.append(float((epoch + timedelta(0,dt)).strftime('%s')))
 
-        return filter_data_dates_seconds
+        return filter_data_dates_to_seconds
 
-    
     @property
     def contamination_on_CCD(self):
         """Calculation of contamination layer on the CCD, thickness given in Angstrom (Å)."""
 
-        interpolater = scipy.interpolate.interp1d(self.ccd_data_dates_seconds, _ccd_contamination,kind='linear')
-        ccd_contam_interpolated_date  =  interpolater(self.ccd_observation_date_seconds)
+        interpolater = scipy.interpolate.interp1d(self.ccd_data_dates_to_seconds, _ccd_contamination,kind='linear')
+        ccd_contam_interpolated_date  =  interpolater(self.ccd_observation_date_to_seconds)
         
-        return round(int(ccd_contam_interpolated_date))
-
+        return int(ccd_contam_interpolated_date)
 
     @property
     def filter_index_mapping_to_name(self):
@@ -198,44 +186,47 @@ class EffectiveAreaFundamental:
         
     @property
     def filter_wheel_number(self):
-        """Defining choosen filter to its corresponding wheel."""
+        """Defining choosen filter to its corresponding filter wheel."""
         return 0 if self.name in index_mapping_to_fw1_name else 1
         
     @property
     def filter_data(self):
         """Collecting filter data."""
-        filter_data = _filter_contamination[self.filter_index_mapping_to_name][self.filter_wheel_number]
-        return filter_data
+        return (_filter_contamination[self.filter_index_mapping_to_name][self.filter_wheel_number])
     
     @property 
     def contamination_on_filter(self):
         """Calculation of contamination layer on a filter,thickness giving in Angstrom Å."""
-        interpolater = scipy.interpolate.interp1d( self.filter_data_dates_seconds , self.filter_data ,kind='linear')
-        filter_contam_interpolated_date = interpolater( self.filter_observation_date_seconds )
-        return round(int(filter_contam_interpolated_date))
+
+        interpolater = scipy.interpolate.interp1d( self.filter_data_dates_to_seconds , self.filter_data ,kind='linear')
+        filter_contam_interpolated_date = interpolater( self.filter_observation_date_to_seconds )
+
+        return int(filter_contam_interpolated_date)
 
     @cached_property 
     def n_DEHP_attributes(self):
         """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
         _n_DEHP_filename = pkg_resources.resource_filename( "xrtpy","response/data/n_DEHP.txt") 
+        
         with open(_n_DEHP_filename, "r") as n_DEHP: 
-            list_of_lists = []
+            list_of_DEHP_attributes = []
             for line in n_DEHP:
                 stripped_line = line.strip()
                 line_list = stripped_line.split()
-                list_of_lists.append(line_list)   
-        return list_of_lists
+                list_of_DEHP_attributes.append(line_list)   
+
+        return list_of_DEHP_attributes
 
     @cached_property
     def n_DEHP_wavelength(self):
-        """Diethylhexylphthalate: Wavelength (nm)."""
+        """Diethylhexylphthalate: Wavelength given in Angstrom (Å)."""
         
         wavelength_str = [] #nm
 
         for i in range(2,len(self.n_DEHP_attributes)):
             wavelength_str.append(self.n_DEHP_attributes[i][0])
 
-        #Convert nm to Angstroms
+        #Convert wavelength values from nanometers to Angstroms
         wavelength = np.array([float(i)*10 for i in wavelength_str])
 
         return(wavelength)
@@ -250,10 +241,10 @@ class EffectiveAreaFundamental:
             delta_str.append(self.n_DEHP_attributes[i][1])
 
         #Covering from str to float 
-        delta = np.array([float(delta_str[i]) for i in range(0,len(self.n_DEHP_wavelength))])
+        delta_float = np.array([float(delta_str[i]) for i in range(0,len(self.n_DEHP_wavelength))])
 
         #Interpolate so ranges are the same
-        delta = interpolate.interp1d(self.n_DEHP_wavelength, delta)(self.n_DEHP_wavelength)
+        delta = interpolate.interp1d(self.n_DEHP_wavelength, delta_float)(self.n_DEHP_wavelength)
 
         return(delta)
 
@@ -267,10 +258,10 @@ class EffectiveAreaFundamental:
             beta_str.append(self.n_DEHP_attributes[i][2]) 
 
         #Converting from str to float 
-        beta = np.array([float(beta_str[i]) for i in range(0,len(self.n_DEHP_wavelength))])
+        beta_float = np.array([float(beta_str[i]) for i in range(0,len(self.n_DEHP_wavelength))])
         
         #Interpolate so ranges are the same
-        beta = interpolate.interp1d(self.n_DEHP_wavelength, beta)(self.n_DEHP_wavelength)
+        beta = interpolate.interp1d(self.n_DEHP_wavelength, beta_float)(self.n_DEHP_wavelength)
         
         return(beta)
 
@@ -278,6 +269,7 @@ class EffectiveAreaFundamental:
     @cached_property
     def transmission_equation(self):
         """Defining equations that will be used to calculate the effective area."""
+        
         n_o = 1.0 #index of medium at entrance of filter (assumed vacuum)
         n_t = 1.0 #index of medium at exit of filter (assumed vacuum)
         
@@ -340,7 +332,7 @@ class EffectiveAreaFundamental:
                
         index,_,_,_,n_o,n_t,_= self.transmission_equation
     
-        i_i=complex(0,1) #Define complete number
+        i_i=complex(0,1) #Define complex number
     
         #Define transfer matrix   
         M = [[[ np.cos(self.angular_wavenumber_CCD[i]), (-i_i*np.sin(self.angular_wavenumber_CCD[i]))/index[i]],[-i_i*np.sin(self.angular_wavenumber_CCD[i])*index[i], np.cos(self.angular_wavenumber_CCD[i])]] for i in range(0,4000)] 
@@ -353,7 +345,7 @@ class EffectiveAreaFundamental:
 
     @property
     def channel_wavelength(self):
-        """Array of wavelengths for every X-ray channel in angstroms."""
+        """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
         return Channel(self.name).wavelength
     
     @property
@@ -378,7 +370,7 @@ class EffectiveAreaFundamental:
 
         index,_,_,_,n_o,n_t,_= self.transmission_equation
         
-        i_i = complex(0,1) #Define complete number
+        i_i = complex(0,1) #Define complex number
        
         #Define transfer matrix   
         M = [[[ np.cos(self.filterwheel_angular_wavenumber[i]), (-i_i*np.sin(self.filterwheel_angular_wavenumber[i]))/index[i]],[-i_i*np.sin(self.filterwheel_angular_wavenumber[i])*index[i], np.cos(self.filterwheel_angular_wavenumber[i])]] for i in range(0,4000)]
@@ -405,16 +397,7 @@ class EffectiveAreaFundamental:
                 * self.interpolated_filter_contamination_transmission
                )
 
+
 def effective_area(filter_name,observation_date):
-    EAP = EffectiveAreaPreparatory(filter_name,observation_date)
+    EAP = EffectiveAreaFundamental(filter_name,observation_date)
     return( EAP.effective_area() )
-
-
-filter = "Al-poly"
-date = datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0) 
-EAP = EffectiveAreaFundamental(filter,date)
-
-effective_area = EAP.effective_area()
-print(effective_area[0:10])
-
-print('\n ..End of code')
