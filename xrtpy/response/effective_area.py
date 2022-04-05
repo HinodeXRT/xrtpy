@@ -141,7 +141,7 @@ class EffectiveAreaFundamental:
 
     @property 
     def filter_observation_date_to_seconds(self): 
-        """Covering users observation date into secounds. Used for interpolation."""
+        """Converting users observation date into seconds. Used for interpolation."""
 
         filter_observation_date_to_seconds= []
         
