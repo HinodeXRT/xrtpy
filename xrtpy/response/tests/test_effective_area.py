@@ -1,10 +1,10 @@
 import pytest
-import numpy as np
 import pkg_resources
 import glob
 
 from astropy import units as u
-from xrtpy.response.channel import Channel, EffectiveAreaPreparatory
+from xrtpy.response.channel import Channel
+from xrtpy.response.effective_area import EffectiveAreaFundamental
 from datetime import datetime 
 
 channel_names = [
@@ -64,8 +64,8 @@ def test_channel_name(channel_name):
 
 @pytest.mark.parametrize("name",channel_names)
 
-def test_EffectiveAreaPreparatory_filter_name(name):
-    instance = EffectiveAreaPreparatory( name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0) )
+def test_EffectiveArea_filter_name(name):
+    instance = EffectiveAreaFundamental( name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0) )
     actual_attr_value = getattr(instance , "name")
     assert actual_attr_value == name 
 
@@ -73,25 +73,26 @@ def test_EffectiveAreaPreparatory_filter_name(name):
 @pytest.mark.parametrize("date", valid_dates)
 @pytest.mark.parametrize("name",channel_names)
 
-def test_EffectiveAreaPreparatory_contamination_on_CCD(name,date):
-    instance = EffectiveAreaPreparatory( name, date )
+def test_EffectiveArea_contamination_on_CCD(name,date):
+    instance = EffectiveAreaFundamental( name, date )
     assert 0 <= instance.contamination_on_CCD <= 1206
+
 
 
 @pytest.mark.parametrize("date", valid_dates)
 @pytest.mark.parametrize("name",channel_single_filter_names) 
 
-def test_EffectiveAreaPreparatory_contamination_on_filter(name,date):
-    instance = EffectiveAreaPreparatory( name, date )
+def test_EffectiveArea_contamination_on_filter(name,date):
+    instance = EffectiveAreaFundamental( name, date )
     assert 0 <= instance.contamination_on_filter <= 2900
 
 
 @pytest.mark.parametrize("date", invalid_dates)
 @pytest.mark.parametrize("name",channel_names)
 
-def test_EffectiveAreaPreparatory_exception_is_raised(name, date):
+def test_EffectiveArea_exception_is_raised(name, date):
     with pytest.raises(ValueError):
-        EffectiveAreaPreparatory( name, date )
+        EffectiveAreaFundamental( name, date )
 
 
 def get_IDL_data_files():
@@ -111,20 +112,20 @@ def _IDL_raw_data_list(filename):
 
     with open(filename, "r") as filter_file:
 
-        list_of_lists = []
+        list_of_IDL_effective_area_data = []
         for line in filter_file:
             stripped_line = line.strip()
             line_list = stripped_line.split()
-            list_of_lists.append(line_list)
+            list_of_IDL_effective_area_data.append(line_list)
     
-    return list_of_lists
+    return list_of_IDL_effective_area_data
 
 
 def IDL_test_filter_name(list_of_lists):
     return(str(list_of_lists[0][1]))
 
 
-def IDL_test_date(list_of_lists):#list_of_lists):
+def IDL_test_date(list_of_lists):
     obs_date = str(list_of_lists[1][1])
     obs_time = str(list_of_lists[1][2])
 
@@ -145,8 +146,6 @@ def IDL_test_date(list_of_lists):#list_of_lists):
 
 
 def _IDL_effective_area_raw_data(filename):
-    
-    #file_name =  pkg_resources.resource_filename("xrtpy", filename[35:])
 
     with open(filename, "r") as filter_file:
 
@@ -173,12 +172,10 @@ def test_EffectiveAreaPreparatory_effective_area(filename,allclose):
    
     filter_name = IDL_test_filter_name(data_list)
     filter_obs_date = IDL_test_date(data_list)
-
   
     IDL_effective_area = _IDL_effective_area_raw_data(filename)
-    print('idl effective area: ',IDL_effective_area)
 
-    instance = EffectiveAreaPreparatory(filter_name, filter_obs_date)
+    instance = EffectiveAreaFundamental(filter_name, filter_obs_date)
     actual_effective_area = instance.effective_area() 
 
     assert actual_effective_area.unit == IDL_effective_area.unit
