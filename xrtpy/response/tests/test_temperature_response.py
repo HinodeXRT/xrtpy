@@ -3,7 +3,7 @@ import glob
 import pkg_resources
 
 from datetime import datetime 
-from xrtpy.response.temperature_response import TemperatureResponse
+from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 def get_IDL_data_files():
@@ -85,7 +85,7 @@ def test_temperature_response(filename,allclose):
 
     IDL_temperature_response = _IDL_temperature_response_raw_data(filename)
 
-    instance = TemperatureResponse(filter_name, filter_obs_date)
+    instance = TemperatureResponseFundamental(filter_name, filter_obs_date)
     actual_temperature_response = instance.temperature_response()
 
     assert allclose(actual_temperature_response.value , IDL_temperature_response,rtol=1e-6)
