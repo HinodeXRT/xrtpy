@@ -151,7 +151,8 @@ class TemperatureResponseFundamental:
             spectra_interpolate.append( interpolater(self.channel_wavelength) )
         return u.Quantity(spectra_interpolate * (u.photon * u.cm**3 * (1/u.sr) * (1/u.s) * (1/u.Angstrom)) ) 
 
-    def effective_area(self):
+    @u.quantity_input
+    def effective_area(self) -> u.cm ** 2:
         return (effective_area( self.name, self.observation_date))
 
     @u.quantity_input
