@@ -113,7 +113,7 @@ class EffectiveAreaFundamental:
 
     @property 
     def ccd_observation_date_to_seconds(self):
-        """Covering users observation date into secounds. Used for interpolation."""
+        """Converting users observation date into secounds. Used for interpolation."""
 
         ccd_observation_date_to_seconds = []
 
