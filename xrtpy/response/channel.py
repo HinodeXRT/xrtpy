@@ -13,21 +13,11 @@ import pkg_resources
 import sunpy.io.special
 import numpy as np
 import sunpy.time
-import math 
 
 import scipy.io
 import sunpy.io.special
 
-from scipy import interpolate
-from datetime import date,datetime 
-from datetime import timedelta
-
-from astropy.time import Time, TimeDelta
 from astropy import units as u
-
-from functools import cached_property 
-
-from xrtpy.util.time import epoch
 
 filename = pkg_resources.resource_filename(
     "xrtpy", "data/channels/xrt_channels_v0016.genx"
@@ -50,27 +40,6 @@ _channel_name_to_index_mapping = {
     "C-poly/Ti-poly": 13,
 }
 
-index_mapping_to_fw1_name  = {
-    "Open": 0,
-    "Al-poly": 1,
-    "C-poly": 2,
-    "Be-thin": 3,
-    "Be-med": 4,
-    "Al-med": 5,
-}
-
-index_mapping_to_fw2_name = { 
-    "Open": 0,
-    "Al-mesh": 1,
-    "Ti-poly": 2,
-    "G-band": 3,
-    "Al-thick": 4,
-    "Be-thick": 5,
-}
-
-filter_wheel_1 = ("Al-poly","C-poly","Be-thin","Be-med","Al-med")
-
-filter_wheel_2 = ("Al-mesh", "Ti-poly", "G-band", "Al-thick", "Be-thick")
 
 _genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
 
@@ -93,9 +62,7 @@ class Geometry:
         self._geom_data = self._genx_file[self._channel_index]["GEOM"]
 
     @property
-    def name(
-        self,
-    ) -> str:
+    def name( self,) -> str:
         """Hinode/XRT flight model geometry."""
         return self._geom_data["LONG_NAME"]
 
