@@ -1,5 +1,4 @@
 __all__ = [
-    "resolve_filter_name",
     "EffectiveAreaFundamental",
     "effective_area",
 ]
@@ -13,30 +12,14 @@ import scipy.io
 import sunpy.io.special
 
 from scipy import interpolate
-from datetime import date,datetime 
 from datetime import timedelta
 from astropy import units as u
 from functools import cached_property 
 
 from xrtpy.util.time import epoch
-from xrtpy.response.channel import Channel
+from xrtpy.response.channel import Channel 
+from xrtpy.response.channel import resolve_filter_name
 
-_channel_name_to_index_mapping = {
-    "Al-mesh": 0,
-    "Al-poly": 1,
-    "C-poly": 2,
-    "Ti-poly": 3,
-    "Be-thin": 4,
-    "Be-med": 5,
-    "Al-med": 6,
-    "Al-thick": 7,
-    "Be-thick": 8,
-    "Al-poly/Al-mesh": 9,
-    "Al-poly/Ti-poly": 10,
-    "Al-poly/Al-thick": 11,
-    "Al-poly/Be-thick": 12,
-    "C-poly/Ti-poly": 13,
-}
 
 index_mapping_to_fw1_name  = {
     "Open": 0,
@@ -56,17 +39,6 @@ index_mapping_to_fw2_name = {
     "Be-thick": 5,
 }
 
-filter_wheel_1 = ("Al-poly","C-poly","Be-thin","Be-med","Al-med")
-
-filter_wheel_2 = ("Al-mesh", "Ti-poly", "G-band", "Al-thick", "Be-thick")
-
-
-def resolve_filter_name(name):
-    name = name.replace("_", "-")
-    parts: list = name.split("/")
-    new_parts: list = [part.capitalize() for part in name.split("/")]
-    name: str = "/".join(new_parts)
-    return name
 
 _ccd_contam_filename = pkg_resources.resource_filename( "xrtpy","data/channels/xrt_contam_on_ccd.geny")
 _filter_contam_filename = pkg_resources.resource_filename( "xrtpy","data/channels/xrt_contam_on_filter.geny")
@@ -264,7 +236,6 @@ class EffectiveAreaFundamental:
         beta = interpolate.interp1d(self.n_DEHP_wavelength, beta_float)(self.n_DEHP_wavelength)
         
         return(beta)
-
    
     @cached_property
     def transmission_equation(self):
@@ -288,7 +259,6 @@ class EffectiveAreaFundamental:
     
         return(index,sin_a,cos_a,wavelength_max,n_o,n_t,incidence_angle)
         
-
     @cached_property
     def angular_wavenumber_CCD(self):
         """Define angular wavenumber on CCD."""
