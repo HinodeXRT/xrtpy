@@ -1,18 +1,12 @@
 import pytest
-import warnings
-import doctest
-
 import numpy as np
 import pkg_resources
 import sunpy
 import sunpy.map
-import scipy.io
 import sunpy.io.special
 from astropy import units as u
 from xrtpy.response.channel import Channel
-from sunpy.data import manager
-from datetime import datetime 
-import glob
+
 
 channel_names = [
     "Al-mesh",
@@ -29,46 +23,6 @@ channel_names = [
     "Al-poly/Al-thick",
     "Al-poly/Be-thick",
     "C-poly/Ti-poly",
-]
-
-channel_single_filter_names = [
-    "Al-mesh",
-    "Al-poly",
-    "C-poly",
-    "Ti-poly",
-    "Be-thin",
-    "Be-med",
-    "Al-med",
-    "Al-thick",
-    "Be-thick",
-]
-
-channel_double_filter = [
-    "Al-poly/Al-mesh",
-    "Al-poly/Ti-poly",
-    "Al-poly/Al-thick",
-    "Al-poly/Be-thick",
-    "C-poly/Ti-poly",
-]
-
-
-valid_dates = [
-    datetime(year=2006, month=9, day=25, hour=22, minute=1, second=1),
-    datetime(year=2007, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2009, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2010, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2012, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2015, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2017, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2019, month=9, day=23, hour=22, minute=1, second=1)
-]
-
-invalid_dates = [
-    datetime(year=2006, month=8, day=25, hour=22, minute=1, second=1),
-    datetime(year=2005, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2002, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2000, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=1990, month=9, day=22, hour=22, minute=1, second=1)
 ]
 
 
@@ -279,19 +233,6 @@ def test_entrancefilter_material(channel_name):
     else:
         raise ValueError("FAIL: test_entrancefilter_material")
 
-'''
-@pytest.mark.parametrize("channel_name", channel_names)
-def test_entrancefilter_thickness(channel_name):
-
-    channel_filter = Channel(channel_name)
-    entrancefilter_thickness = channel_filter.entrancefilter.entrancefilter_thickness
-
-    #idl_entrancefilter_thick_auto =  v6_genx_s[_channel_name_to_index_mapping[channel_name]]["EN_FILTER"]["THICK"]
-    idl_entrancefilter_thick_auto =  v6_genx_s[_channel_name_to_index_mapping[channel_name]]['EN_FILTER']['THICK']#* (u.angstrom)
-
-    assert entrancefilter_thickness.value == idl_entrancefilter_thick_auto
-    #assert u.allclose(entrancefilter_thickness == idl_entrancefilter_thick_auto)
-'''
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_density(channel_name):
@@ -416,19 +357,6 @@ def test_filter1_material(channel_name):
 
     assert np.all(filter_material == idl_filter_material_auto)
 
-'''
-@pytest.mark.parametrize("channel_name", channel_names)
-def test_filter1_thickness(channel_name):
-    channel_filter = Channel(channel_name)
-    filter_thickness = channel_filter.filter_1.thickness
-
-    idl_filter_thick_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["FP_FILTER1"]["THICK"]
-        * u.angstrom
-    )
-
-    assert np.allclose(filter_thickness == idl_filter_thick_auto)
-'''
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_density(channel_name):
@@ -542,19 +470,6 @@ def test_filter2_material(channel_name):
 
     assert np.all(filter_material == idl_filter_material_auto)
 
-'''
-@pytest.mark.parametrize("channel_name", channel_names)
-def test_filter2_thickness(channel_name):
-    channel_filter = Channel(channel_name)
-    filter_thickness = channel_filter.filter_2.thickness
-
-    idl_filter_thick_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["FP_FILTER2"]["THICK"]
-        * u.angstrom
-    )
-
-    assert u.allclose(filter_thickness, idl_filter_thick_auto)
-'''
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_density(channel_name):
