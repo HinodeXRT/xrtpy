@@ -56,7 +56,18 @@ _filter_contamination = _filter_contam_file['p2']
 
 class EffectiveAreaFundamental:
 
-    """Data for a single filter at a given time"""
+    """
+    Class for calculating the effective area.
+    
+    Parameters
+    -----------
+    filter_name : str
+        The name of the filter.
+        
+    observation_date
+        The date of the observation.  For valid date formats, look at the documentation for
+        `sunpy.time.parse_time`.
+    """
     def __init__(self,filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date  = observation_date   
@@ -85,7 +96,7 @@ class EffectiveAreaFundamental:
 
     @property 
     def ccd_observation_date_to_seconds(self):
-        """Covering users observation date into secounds. Used for interpolation."""
+        """Converting users observation date into secounds. Used for interpolation."""
 
         ccd_observation_date_to_seconds = []
 
@@ -113,7 +124,7 @@ class EffectiveAreaFundamental:
 
     @property 
     def filter_observation_date_to_seconds(self): 
-        """Covering users observation date into secounds. Used for interpolation."""
+        """Converting users observation date into seconds. Used for interpolation."""
 
         filter_observation_date_to_seconds= []
         
