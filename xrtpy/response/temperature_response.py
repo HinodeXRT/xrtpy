@@ -1,5 +1,4 @@
 __all__ = [ 
-    "resolve_filter_name",
     "TemperatureResponseFundamental",
     ]
 
@@ -14,6 +13,7 @@ from astropy import units as u
 from astropy.constants import c, h
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import effective_area 
+from xrtpy.response.channel import resolve_filter_name
 from xrtpy.util.time import epoch
 
 
@@ -39,14 +39,6 @@ CHIANTI_file = {
     "wavelength" : _XRT_emiss_model_file["WAVE"][0],
     "wavelength_units" : _XRT_emiss_model_file["WAVE_UNITS"][0],
 }
-
-
-def resolve_filter_name(name):
-    name = name.replace("_", "-")
-    parts: list = name.split("/")
-    new_parts: list = [part.capitalize() for part in name.split("/")]
-    name: str = "/".join(new_parts)
-    return name
 
 
 class TemperatureResponseFundamental:
