@@ -108,8 +108,6 @@ filenames = get_IDL_data_files()
 
 def _IDL_raw_data_list(filename):
 
-    #file_name =  pkg_resources.resource_filename("xrtpy", filename[35:])
-
     with open(filename, "r") as filter_file:
 
         list_of_IDL_effective_area_data = []
