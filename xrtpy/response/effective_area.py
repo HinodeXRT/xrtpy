@@ -250,7 +250,8 @@ class EffectiveAreaFundamental:
    
     @cached_property
     def transmission_equation(self):
-        """Defining equations that will be used to calculate the effective area."""
+        """Defining equations that will be used to calculate the effective area. 
+        REFERENCES: G.R Fowles, Intro to Modern Optics 2nd Edition, pp 96-101."""
         
         n_o = 1.0 #index of medium at entrance of filter (assumed vacuum)
         n_t = 1.0 #index of medium at exit of filter (assumed vacuum)
