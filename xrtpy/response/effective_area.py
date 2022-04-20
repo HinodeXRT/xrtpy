@@ -282,8 +282,8 @@ class EffectiveAreaFundamental:
         #Multiply by thickness
         angular_wavenumber_thickness = angular_wavenumber* self.contamination_on_CCD 
 
-        real_angular_wavenumber = [(float(angular_wavenumber_thickness[i].real))  for i in range(0,4000)] 
-        imaginary_angular_wavenumber = [(angular_wavenumber_thickness[i].imag) for i in range(0,4000) ]                 
+        real_angular_wavenumber = angular_wavenumber_thickness.real
+        imaginary_angular_wavenumber = angular_wavenumber_thickness.imag         
         
         kl = [ (complex(real_angular_wavenumber[i],imaginary_angular_wavenumber[i])) for i in range(0,4000) ]
 
