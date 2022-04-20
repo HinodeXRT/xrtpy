@@ -158,7 +158,7 @@ class TemperatureResponseFundamental:
         temp_resp_w_u_c = []
         for i in range(0,61): 
             temp_resp_w_u_c.append(integrate.simpson( self.spectra()[i] * effective_area * constants * factors, wavelength ))
-        return u.Quantity(temp_resp_w_u_c * ( u.electron * u.cm**5 * (1/u.s) * (1/ u.pix) )) 
+        return temp_resp_w_u_c * ( u.electron * u.cm**5 * (1/u.s) * (1/ u.pix) ) 
 
     @property
     @u.quantity_input
