@@ -223,7 +223,7 @@ class EffectiveAreaFundamental:
         for i in range(2,len(self.n_DEHP_attributes)):
             delta_str.append(self.n_DEHP_attributes[i][1])
 
-        #Covering from str to float 
+        #Converting from str to float 
         delta_float = np.array([float(delta_str[i]) for i in range(0,len(self.n_DEHP_wavelength))])
 
         #Interpolate so ranges are the same
