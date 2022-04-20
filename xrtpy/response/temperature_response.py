@@ -141,7 +141,7 @@ class TemperatureResponseFundamental:
         for i in range(0,61):
             interpolater = interpolate.interp1d( self.CHIANTI_wavelength ,CHIANTI_file['spectra'][0][i],kind='linear')
             spectra_interpolate.append( interpolater(self.channel_wavelength) )
-        return u.Quantity(spectra_interpolate * (u.photon * u.cm**3 * (1/u.sr) * (1/u.s) * (1/u.Angstrom)) ) 
+        return spectra_interpolate * (u.photon * u.cm**3 * (1/u.sr) * (1/u.s) * (1/u.Angstrom)) 
 
     @u.quantity_input
     def effective_area(self) -> u.cm ** 2:
