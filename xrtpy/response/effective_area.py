@@ -157,7 +157,7 @@ class EffectiveAreaFundamental:
         interpolater = scipy.interpolate.interp1d(self.ccd_data_dates_to_seconds, _ccd_contamination,kind='linear')
         ccd_contam_interpolated_date  =  interpolater(self.ccd_observation_date_to_seconds)
         
-        return int(ccd_contam_interpolated_date)
+        return ccd_contam_interpolated_date
 
     @property
     def filter_index_mapping_to_name(self):
