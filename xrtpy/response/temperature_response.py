@@ -135,7 +135,7 @@ class TemperatureResponseFundamental:
         return  ( self.pixel_size/self.focal_len )**2  * (u.sr / u.pix)
 
     @u.quantity_input
-    def spectra(self): 
+    def spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom): 
         """Interpolation between the spectra wavelength onto the channel wavelength."""
         spectra_interpolate = []
         for i in range(0,61):
