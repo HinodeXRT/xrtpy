@@ -148,7 +148,7 @@ class TemperatureResponseFundamental:
         return (effective_area( self.name, self.observation_date))
 
     @u.quantity_input
-    def integration(self):
+    def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
 
         wavelength = (self.channel_wavelength).value
         constants = (_c_Å_per_s * _h_eV_s/ self.channel_wavelength).value
