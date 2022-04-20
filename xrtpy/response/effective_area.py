@@ -184,7 +184,7 @@ class EffectiveAreaFundamental:
         interpolater = scipy.interpolate.interp1d( self.filter_data_dates_to_seconds , self.filter_data ,kind='linear')
         filter_contam_interpolated_date = interpolater( self.filter_observation_date_to_seconds )
 
-        return int(filter_contam_interpolated_date)
+        return filter_contam_interpolated_date
 
     @cached_property 
     def n_DEHP_attributes(self):
