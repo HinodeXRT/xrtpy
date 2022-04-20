@@ -163,7 +163,7 @@ class TemperatureResponseFundamental:
     @property
     @u.quantity_input
     def ccd_gain_right(self): 
-        """The camera gain has units of [el DN^-1].Gain applied to convert units."""
+        """Provide the camera gain in electrons per data number."""
         return (Channel(self.name).ccd.ccd_gain_right /u.DN) 
 
     @u.quantity_input
