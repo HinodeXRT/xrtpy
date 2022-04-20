@@ -167,6 +167,6 @@ class TemperatureResponseFundamental:
         return (Channel(self.name).ccd.ccd_gain_right /u.DN) 
 
     @u.quantity_input
-    def temperature_response(self):
-        """Apply gain value to the Temperature Response, units DN cm^5 s^-1 pix^-1"""
-        return u.Quantity( self.integration()/self.ccd_gain_right)
+    def temperature_response(self) -> u.DN * u.cm ** 5 / (u.s * u.pix):
+        """Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
+        return self.integration()/self.ccd_gain_right
