@@ -130,8 +130,7 @@ class EffectiveAreaFundamental:
         
         for time in _filter_contamination_file_time:
             t0=_filter_contamination_file_time[0]
-            t1=time
-            dt = t1-t0
+            dt = time-t0
             filter_observation_date_to_seconds.append(( self.observation_date + timedelta(0,dt)).strftime('%s'))
             
         return filter_observation_date_to_seconds[0]
@@ -144,8 +143,7 @@ class EffectiveAreaFundamental:
 
         for time in _filter_contamination_file_time:
             t0=_filter_contamination_file_time[0]
-            t1=time
-            dt = t1-t0
+            dt = time-t0
             filter_data_dates_to_seconds.append(float((epoch + timedelta(0,dt)).strftime('%s')))
 
         return filter_data_dates_to_seconds
