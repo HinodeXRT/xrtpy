@@ -8,7 +8,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 def get_IDL_data_files():
     
-    directory = pkg_resources.resource_filename("xrtpy", 'response/tests/data/temperature_response_testing_files')
+    directory = pkg_resources.resource_filename("xrtpy", 'response/tests/data/temperature_response_IDL_testing_files')
     
     filter_data_files = glob.glob(directory+'/**/*.txt') 
 
@@ -31,13 +31,13 @@ def _IDL_raw_data_list(filename):
     return IDL_data_list
 
 
-def IDL_test_filter_name(list_of_lists):
-    return(str(list_of_lists[1][1]))
+def IDL_test_filter_name(IDL_data_list):
+    return(str(IDL_data_list[1][1]))
 
 
-def IDL_test_date(list_of_lists):
-    obs_date = str(list_of_lists[2][1])
-    obs_time = str(list_of_lists[2][2])
+def IDL_test_date(IDL_data_list):
+    obs_date = str(IDL_data_list[2][1])
+    obs_time = str(IDL_data_list[2][2])
 
     day = int(obs_date[0:2])
     
@@ -65,12 +65,13 @@ def _IDL_temperature_response_raw_data(filename):
             line_list = stripped_line.split()
             IDL_data_list.append(line_list)
     
+
     new_IDL_data_list = []
-    for list_ in IDL_data_list[3:]:
-        new_IDL_data_list.extend(list_)
+    for i in range(4,len(IDL_data_list)):
+        new_IDL_data_list.append(IDL_data_list[i][1])
     
     temperature_response = [float(i) for i in new_IDL_data_list]
-    
+
     return(temperature_response)
 
 
