@@ -2,4 +2,4 @@
 # ought to mirror 'build-system.requires' under in pyproject.toml
 setuptools >= 50.0
 setuptools_scm >= 6.0
-wheel >= 0.29.0
+wheel >= 0.34.0
