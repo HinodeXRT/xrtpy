@@ -22,7 +22,7 @@ jobs:
         - name: Python 3.10
           os: ubuntu-latest
           python: '3.10'
-          toxenv: py310
+          toxenv: py310-all
 
         - name: Linters
           os: ubuntu-latest
@@ -145,7 +145,7 @@ jobs:
       run: python setup.py sdist
     - name: Twine check
       run: twine check dist/*
-    - name: Install PlasmaPy in all variants
+    - name: Install xrtpy in all variants
       run: |
         pip install --progress-bar off .[all,dev]
         pip install --progress-bar off -e .[all,dev]
