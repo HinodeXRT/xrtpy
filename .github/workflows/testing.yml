@@ -20,7 +20,7 @@ jobs:
 
           - name: Python 3.10
             os: ubuntu-latest
-            python: 3.10
+            python: "3.10"
             toxenv: py310
 
           - name: Python 3.8 with minimal dependencies
@@ -46,7 +46,7 @@ jobs:
 
           - name: Documentation
             os: ubuntu-latest
-            python: 3.10
+            python: "3.10"
             toxenv: build_docs
 
           - name: Linters
