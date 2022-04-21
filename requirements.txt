@@ -1,3 +1,4 @@
 numpy >= 1.20
 astropy >= 4.3.1
 sunpy >= 2.0
+jinja2 < 3.1
