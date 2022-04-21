@@ -84,7 +84,7 @@ def test_EffectiveArea_contamination_on_CCD(name,date):
 
 def test_EffectiveArea_contamination_on_filter(name,date):
     instance = EffectiveAreaFundamental( name, date )
-    assert 0 <= instance.contamination_on_filter <= 2900
+    assert 0 <= instance.contamination_on_filter <= 2901
 
 
 @pytest.mark.parametrize("date", invalid_dates)
