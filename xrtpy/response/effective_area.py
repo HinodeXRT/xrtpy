@@ -262,7 +262,7 @@ class EffectiveAreaFundamental:
         index = [( complex((1 - self.n_DEHP_delta[i]), (1.*self.n_DEHP_beta[i])) ) for i in range(0,4000)]
           
         #Snell's law    
-        sin_a = [ ( (n_o* np.sin(incidence_angle)) /index[i]) for i in range(0,4000) ]
+        sin_a = (n_o* np.sin(incidence_angle)) /index
         
         #cos_a = [ (math.sqrt(1- (sin_a[i]**2) ) )  for i in range(0,wavelength_max) ]
         cos_a = 1
