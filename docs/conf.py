@@ -58,8 +58,6 @@ exclude_patterns = [
     "_links.rst",
     "_substitutions.rst",
     "Thumbs.db",
-    ".*\.genx",  # guessing this needs a Python regular expression
-    ".*\.geny",
 ]
 
 # The suffix(es) of source filenames.
