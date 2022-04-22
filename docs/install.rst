@@ -6,10 +6,11 @@ Installing XRTpy
 
 .. important::
 
-   These instructions were written for the initial release of `xrtpy`
-   which has not yet happened. At present, `xrtpy` is not able to be
-   installed via ``pip``, ``conda``, or Anaconda Navigator. No official
-   releases are available on Zenodo or GitHub
+   These instructions were written in preparation for the initial
+   release of `xrtpy` which has not yet happened. At present, `xrtpy` is
+   not able to be installed via ``pip`` from PyPI_, ``conda``, or
+   Anaconda Navigator. No official releases are available on Zenodo or
+   GitHub.
 
 .. .. note::
    If you would like to contribute to XRTpy, please refer to the
@@ -161,7 +162,7 @@ Obtaining official releases
 A ZIP_ file containing the source code for official releases of
 `xrtpy` can be obtained `from PyPI`_ or `from Zenodo`_.
 
-Alternatively, official releases since 0.7.0 can be downloaded from the
+Alternatively, official releases can be downloaded from the
 releases_ page on `XRTpy's GitHub repository`_.
 
 Obtaining source code from GitHub
