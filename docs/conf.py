@@ -29,7 +29,7 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
-    # "sphinx.ext.graphviz",
+    "sphinx.ext.graphviz",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
