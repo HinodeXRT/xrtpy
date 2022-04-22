@@ -15,6 +15,7 @@ for the analysis of observations made by the `X-Ray Telescope`_ (XRT)
    :caption: Contents:
 
    getting_started
+   examples
    bibliography
    glossary
 
