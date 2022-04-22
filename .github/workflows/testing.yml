@@ -135,9 +135,7 @@ jobs:
     - name: Install Python dependencies
       run: python -m pip install --progress-bar off --upgrade codespell
     - name: Run tests
-      run: |
-        echo "\n**********\nAdd false positives to ignore-words-list under [codespell] in setup.cfg\n**********\n"
-        codespell
+      run: codespell
 
   build-n-publish:
     name: Packaging
