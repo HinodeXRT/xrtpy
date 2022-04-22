@@ -136,8 +136,9 @@ jobs:
       run: python -m pip install --progress-bar off --upgrade codespell
     - name: Run tests
       run: |
-        codespell
         echo "Add false positives to ignore-words-list under [codespell] in setup.cfg"
+        codespell
+
   build-n-publish:
     name: Packaging
     runs-on: ubuntu-latest
