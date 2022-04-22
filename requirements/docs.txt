@@ -11,11 +11,11 @@ numpydoc >= 1.2
 pillow
 pygments >= 2.11.0
 sphinx <= 2.4.4
-sphinx_automodapi
 sphinx-changelog
 sphinx-copybutton
 sphinx-gallery
 sphinx-hoverxref
+sphinx_automodapi
 sphinx_rtd_theme >= 1.0.0
 sphinxcontrib-bibtex
 towncrier >= 20.0

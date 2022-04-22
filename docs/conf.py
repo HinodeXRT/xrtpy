@@ -4,8 +4,9 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
-from datetime import datetime
 import os
+
+from datetime import datetime
 
 # -- Project information -----------------------------------------------------
 
