@@ -7,6 +7,7 @@
 docutils < 0.18
 jinja2 < 3.1
 ipykernel
+ipython
 nbsphinx >= 0.8
 numpydoc >= 1.2
 pillow
