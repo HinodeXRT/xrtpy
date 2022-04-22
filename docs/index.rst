@@ -14,6 +14,7 @@ for the analysis of observations made by the `X-Ray Telescope`_ (XRT)
    :maxdepth: 2
    :caption: Contents:
 
+   install
    getting_started
    examples
    bibliography

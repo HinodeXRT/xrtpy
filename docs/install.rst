@@ -11,8 +11,7 @@ Installing XRTpy
    installed via ``pip``, ``conda``, or Anaconda Navigator. No official
    releases are available on Zenodo or GitHub
 
-.. note::
-
+.. .. note::
    If you would like to contribute to XRTpy, please refer to the
    instructions on :ref:`installing XRTpy for development
    <install-xrtpy-dev>`.
@@ -212,8 +211,7 @@ will be installed.
    be improved or have become out of date, please `create an issue`_ on
    `XRTpy's GitHub repository`_. It would really help!
 
-.. tip::
-
+.. .. tip::
    The :ref:`contributing-to-xrtpy` guide has instructions on how to
    fork a repository and create branches so that you may make
    contributions via pull requests.
