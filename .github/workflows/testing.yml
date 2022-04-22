@@ -133,9 +133,9 @@ jobs:
       with:
         python-version: 3.9
     - name: Install Python dependencies
-      run: python -m pip install --progress-bar off --upgrade codespell
+      run: python -m pip install --progress-bar off --upgrade tox
     - name: Run tests
-      run: codespell
+      run: tox -e codespell
 
   build-n-publish:
     name: Packaging
