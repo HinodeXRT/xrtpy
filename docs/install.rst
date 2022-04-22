@@ -208,7 +208,7 @@ will be installed.
 .. note::
 
    If you noticed any places where the installation instructions could
-   be improved or have become out of date, please `create an issue`_ on
+   be improved or have become out of date, please create an issue on
    `XRTpy's GitHub repository`_. It would really help!
 
 .. .. tip::
