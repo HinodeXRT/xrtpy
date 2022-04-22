@@ -42,6 +42,7 @@ _genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
 
 
 def resolve_filter_name(name):
+    """Resolve the filter name."""
     name = name.replace("_", "-")
     parts: list = name.split("/")
     new_parts: list = [part.capitalize() for part in name.split("/")]
