@@ -1,6 +1,7 @@
-"""ADD DOCSTRING HERE"""
-
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+A Python data analysis package for the `X-Ray Telescope`_ (XRT) on
+Hinode_.
+"""
 
 import warnings
 

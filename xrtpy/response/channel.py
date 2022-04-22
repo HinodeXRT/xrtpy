@@ -1,3 +1,5 @@
+"""Classes for describing channels on Hinode/XRT."""
+
 __all__ = [
     "channel",
     "Geometry",

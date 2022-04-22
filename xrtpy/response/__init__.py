@@ -1,3 +1,5 @@
+"""Response analysis for Hinode/XRT"""
+
 from . import channel
 from .channel import Geometry, EntranceFilter, Mirror, Filter, CCD, Channel
 
