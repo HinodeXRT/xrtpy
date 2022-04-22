@@ -194,8 +194,8 @@ nitpick_ignore_regex = [
 # be used globally.
 rst_epilog = ""
 for epilog_file in ["_links.rst", "_substitutions.rst"]:
-    with open(epilog_file) as cl:
-        rst_epilog += cl.read()
+    with open(epilog_file) as file:
+        rst_epilog += file.read()
 
 
 def setup(app: Sphinx) -> None:
