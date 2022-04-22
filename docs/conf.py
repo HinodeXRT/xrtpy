@@ -29,7 +29,7 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.graphviz",
+    # "sphinx.ext.graphviz",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
@@ -187,3 +187,10 @@ nitpick_ignore_regex = [
     (python_role, ".*real number.*"),
     (python_role, ".*Unit.*"),
 ]
+
+# This is added to the end of RST files — a good place to put substitutions to
+# be used globally.
+rst_epilog = ""
+for epilog_file in ["_links.rst", "_substitutions.rst"]:
+    with open(epilog_file) as cl:
+        rst_epilog += cl.read()
