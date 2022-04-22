@@ -3,7 +3,7 @@
 # This lists the requirements that would be installed when doing:
 # pip install xrtpy[docs]
 -r extras.txt
--r install.txtx
+-r install.txt
 docutils < 0.18
 jinja2 < 3.1
 nbsphinx >= 0.8
