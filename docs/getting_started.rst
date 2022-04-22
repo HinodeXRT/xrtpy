@@ -1,4 +1,8 @@
 Getting Started
 ===============
 
-This page will include how to get started using `xrtpy`.
+This page includes example notebooks intended for new users of `xrtpy`.
+
+.. nbgallery::
+
+  notebooks/getting_started/units
