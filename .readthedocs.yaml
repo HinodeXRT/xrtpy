@@ -11,3 +11,10 @@ sphinx:
 python:
   install:
   - requirements: requirements/docs.txt
+  - method: pip
+    path: .
+  - method: setuptools
+  system_packages: true
+
+formats:
+  htmlzip
