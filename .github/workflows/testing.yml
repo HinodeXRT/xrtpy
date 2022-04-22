@@ -135,7 +135,7 @@ jobs:
     - name: Install Python dependencies
       run: python -m pip install --progress-bar off --upgrade tox
     - name: Run tests
-      run: tox -e codespell
+      run: tox -e codespell -q
 
   build-n-publish:
     name: Packaging
