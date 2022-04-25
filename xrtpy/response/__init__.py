@@ -1,7 +1,9 @@
+"""Response analysis for Hinode/XRT"""
+
 from . import channel
 from . import effective_area
 from . import temperature_response
-from .channel import Geometry, EntranceFilter, Mirror, Filter, CCD, Channel
+from .channel import Geometry, EntranceFilter, Mirror, Filter, CCD, Channel, resolve_filter_name
 from .effective_area import EffectiveAreaFundamental
 from .temperature_response import TemperatureResponseFundamental
 
