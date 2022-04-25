@@ -65,8 +65,10 @@ def test_channel_name(channel_name):
 @pytest.mark.parametrize("name",channel_names)
 
 def test_EffectiveArea_filter_name(name):
+
     instance = EffectiveAreaFundamental( name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0) )
     actual_attr_value = getattr(instance , "name")
+
     assert actual_attr_value == name 
 
 
@@ -76,7 +78,6 @@ def test_EffectiveArea_filter_name(name):
 def test_EffectiveArea_contamination_on_CCD(name,date):
     instance = EffectiveAreaFundamental( name, date )
     assert 0 <= instance.contamination_on_CCD <= 1206
-
 
 
 @pytest.mark.parametrize("date", valid_dates)
