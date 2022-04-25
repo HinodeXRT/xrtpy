@@ -61,7 +61,7 @@ class TemperatureResponseFundamental:
 
     @observation_date.setter
     def observation_date(self,date):
-        """Users observation date input."""
+        """Validating users requested observation date."""
         astropy_time = sunpy.time.parse_time(date) #Astropy time in utc
         observation_date = astropy_time.datetime  
         if observation_date <= epoch:
@@ -91,7 +91,7 @@ class TemperatureResponseFundamental:
     @property
     @u.quantity_input
     def CHIANTI_temperature(self):
-        """CHIANTI temperatures in kelvin."""
+        """CHIANTI temperatures in Kelvin."""
         return u.Quantity( CHIANTI_file['temperature']*u.K)
 
     @property
@@ -114,12 +114,12 @@ class TemperatureResponseFundamental:
     @property
     def focal_len(self):
         """Focal length of the telescope in units of cm."""
-        return( Channel(self.name).geometry.focal_len )
+        return( Channel(self.name).geometry.geometry_focal_len )
     
     @property
     def ev_per_electron(self):
         """Amount of energy it takes to dislodge 1 electron in the CCD."""
-        return (Channel(self.name).ccd.ccd_ev_ore_electron )
+        return (Channel(self.name).ccd.ccd_ev_pre_electron )
     
     @property
     @u.quantity_input
