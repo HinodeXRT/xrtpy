@@ -55,7 +55,6 @@ _filter_contamination_file_time =_filter_contam_file['p1']
 _filter_contamination = _filter_contam_file['p2']
 
 class EffectiveAreaFundamental:
-
     """
     Class for calculating the effective area.
     
@@ -64,28 +63,29 @@ class EffectiveAreaFundamental:
     filter_name : str
         The name of the filter.
         
-    observation_date
+    observation_date: str date-time
         The date of the observation.  For valid date formats, look at the documentation for
         `sunpy.time.parse_time`.
     """
+
     def __init__(self,filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date  = observation_date   
         self._channel = Channel(self.name)
     
     @property
-    def name(self):
-        """Name of Filter."""
+    def name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
         return self._name
 
     @property
-    def observation_date(self):
+    def observation_date(self) -> str:
         """Date of observation."""
         return self._observation_date 
     
     @observation_date.setter
     def observation_date(self,date):
-        """Users observation date input."""
+        """Validating users requested observation date."""
         astropy_time = sunpy.time.parse_time(date) #Astropy time in utc
         observation_date = astropy_time.datetime  
 
@@ -93,17 +93,14 @@ class EffectiveAreaFundamental:
             raise ValueError('Invalid date: {:}.\n Date must be after September 22nd, 2006 21:36:00.'.format(observation_date))
         self._observation_date = observation_date
     
-
     @property 
     def ccd_observation_date_to_seconds(self):
-        """Converting users observation date into secounds. Used for interpolation."""
+        """Converting users observation date into secounds with respect to CCD contamination data. Used for interpolation."""
 
         ccd_observation_date_to_seconds = []
-
         for time in _ccd_contamination_file_time:
             t0=_ccd_contamination_file_time[0]
-            t1=time
-            dt = t1-t0
+            dt = time-t0
             ccd_observation_date_to_seconds.append(( self.observation_date + timedelta(0,dt) ).strftime('%s'))
 
         return ccd_observation_date_to_seconds[0]
@@ -113,21 +110,18 @@ class EffectiveAreaFundamental:
         """Converting CCD data dates to datetimes."""
         
         ccd_data_dates_to_seconds = []
-
         for time in _ccd_contamination_file_time:
             t0=_ccd_contamination_file_time[0]
-            t1=time
-            dt = t1-t0
+            dt = time-t0
             ccd_data_dates_to_seconds.append(float((epoch+timedelta(0,dt)).strftime('%s')))
 
         return ccd_data_dates_to_seconds
 
     @property 
     def filter_observation_date_to_seconds(self): 
-        """Converting users observation date into seconds. Used for interpolation."""
+        """Converting users observation date into seconds with respect to filter contamination data. Used for interpolation."""
 
         filter_observation_date_to_seconds= []
-        
         for time in _filter_contamination_file_time:
             t0=_filter_contamination_file_time[0]
             dt = time-t0
@@ -137,10 +131,9 @@ class EffectiveAreaFundamental:
 
     @property    
     def filter_data_dates_to_seconds(self):
-        """Converting Filter contamination data dates to datetimes."""
+        """Converting filter contamination data dates to datetimes."""
     
         filter_data_dates_to_seconds = []
-
         for time in _filter_contamination_file_time:
             t0=_filter_contamination_file_time[0]
             dt = time-t0
@@ -203,7 +196,6 @@ class EffectiveAreaFundamental:
         """Diethylhexylphthalate: Wavelength given in Angstrom (Å)."""
         
         wavelength_str = [] #nm
-
         for i in range(2,len(self.n_DEHP_attributes)):
             wavelength_str.append(self.n_DEHP_attributes[i][0])
 
@@ -217,7 +209,6 @@ class EffectiveAreaFundamental:
         """Diethylhexylphthalate: Delta."""
 
         delta_str = []
-      
         for i in range(2,len(self.n_DEHP_attributes)):
             delta_str.append(self.n_DEHP_attributes[i][1])
 
@@ -234,7 +225,6 @@ class EffectiveAreaFundamental:
         """Diethylhexylphthalate: Beta."""
 
         beta_str =[]
-
         for i in range(2,len(self.n_DEHP_attributes)):
             beta_str.append(self.n_DEHP_attributes[i][2]) 
 
@@ -290,7 +280,7 @@ class EffectiveAreaFundamental:
     @cached_property
     def filterwheel_angular_wavenumber(self): 
         """Define angular wavenumber for a filter."""
-        index,_,cos_a,wavelength_max,_,_,_ = self.transmission_equation        
+        index,_,cos_a,_,_,_,_ = self.transmission_equation        
         
         #Define wavevector
         angular_wavenumber = np.array([((2.* math.pi*index[i]* cos_a)/ self.n_DEHP_wavelength[i] )  for i in range(0,4000)])
@@ -329,8 +319,8 @@ class EffectiveAreaFundamental:
     
     @property
     def channel_geometry_aperture_area(self):
-        """Hinode/XRT flight model geometry aperture area."""
-        return Channel(self.name).geometry.aperture_area
+        """XRT flight model geometry aperture area."""
+        return Channel(self.name).geometry.geometry_aperture_area
 
     @property
     def channel_transmission(self):
@@ -370,11 +360,12 @@ class EffectiveAreaFundamental:
     @u.quantity_input
     def effective_area(self)-> u.cm**2:
         """Calculation of the Effective Area."""
-        return (self.channel_geometry_aperture_area
-                * self.channel_transmission
-                * self.interpolated_CCD_contamination_transmission
-                * self.interpolated_filter_contamination_transmission
-               )
+        return (
+            self.channel_geometry_aperture_area *
+             self.channel_transmission *
+              self.interpolated_CCD_contamination_transmission *
+               self.interpolated_filter_contamination_transmission
+            )
 
 
 def effective_area(filter_name,observation_date):
