@@ -5,17 +5,19 @@
 -r extras.txt
 -r install.txt
 docutils < 0.18
+ipykernel
+ipython
 jinja2 < 3.1
 nbsphinx >= 0.8
 numpydoc >= 1.2
 pillow
 pygments >= 2.11.0
-sphinx <= 2.4.4
-sphinx_automodapi
+sphinx >= 4.5.0
 sphinx-changelog
 sphinx-copybutton
 sphinx-gallery
 sphinx-hoverxref
+sphinx_automodapi
 sphinx_rtd_theme >= 1.0.0
 sphinxcontrib-bibtex
 towncrier >= 20.0

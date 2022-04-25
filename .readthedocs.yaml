@@ -1,0 +1,13 @@
+version: 2
+
+formats:
+- htmlzip
+
+python:
+  version: '3.8'
+  install:
+  - requirements: requirements/install.txt
+  - requirements: requirements/docs.txt
+  - method: setuptools
+    path: .
+  system_packages: true
