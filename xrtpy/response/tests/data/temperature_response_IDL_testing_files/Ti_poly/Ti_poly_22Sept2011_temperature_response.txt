@@ -1,7 +1,7 @@
 Temperature Response: IDL Results
 Filter Ti-poly
 observation_date 22-Sept-2011 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.47544e-31
       112202.   2.10270e-31
       125893.   3.36557e-31

@@ -1,7 +1,7 @@
 Temperature Response: IDL Results
 Filter Al-med
 observation_date 22-Sept-2007 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   3.08759e-36
       112202.   4.33133e-36
       125893.   6.93769e-36

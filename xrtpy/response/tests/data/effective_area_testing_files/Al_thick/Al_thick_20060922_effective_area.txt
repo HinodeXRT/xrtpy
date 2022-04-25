@@ -1,6 +1,6 @@
 Filter Al-thick
 observation_date 22-Sept-2006 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.52799e-10
       1.10000   6.99242e-10
       1.20000   1.75060e-09

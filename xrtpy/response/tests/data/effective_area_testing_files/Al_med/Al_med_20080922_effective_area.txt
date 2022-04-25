@@ -1,6 +1,6 @@
 Filter Al-med
 observation_date 22-Sept-2008 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.66386e-10
       1.10000   7.49527e-10
       1.20000   1.91514e-09

@@ -1,6 +1,6 @@
 Filter C-poly
 observation_date 22-Sept-2010 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.78572e-10
       1.10000   7.95348e-10
       1.20000   2.06793e-09

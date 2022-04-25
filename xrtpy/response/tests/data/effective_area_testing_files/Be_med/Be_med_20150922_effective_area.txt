@@ -1,6 +1,6 @@
 Filter Be-med
 observation_date 22-Sept-2015 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.78115e-10
       1.10000   7.93777e-10
       1.20000   2.06298e-09

@@ -1,12 +1,17 @@
 """Response analysis for Hinode/XRT"""
 
-from . import channel
-from . import effective_area
-from . import temperature_response
-from .channel import Geometry, EntranceFilter, Mirror, Filter, CCD, Channel, resolve_filter_name
-from .effective_area import EffectiveAreaFundamental
-from .temperature_response import TemperatureResponseFundamental
-
+from xrtpy.response import channel, effective_area, temperature_response
+from xrtpy.response.channel import (
+    CCD,
+    Channel,
+    EntranceFilter,
+    Filter,
+    Geometry,
+    Mirror,
+    resolve_filter_name,
+)
+from xrtpy.response.effective_area import EffectiveAreaFundamental
+from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 __all__ = [
     "channel",

@@ -1,6 +1,6 @@
 Filter Be-thick
 observation_date 22-Sept-2013 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.73355e-10
       1.10000   7.77277e-10
       1.20000   2.01070e-09

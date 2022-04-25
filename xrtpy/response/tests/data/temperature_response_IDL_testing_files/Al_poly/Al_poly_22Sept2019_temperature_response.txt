@@ -1,7 +1,7 @@
 Temperature Response: IDL Results
 Filter Al-poly
 observation_date 22-Sept-2019 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.18391e-30
       112202.   1.63055e-30
       125893.   2.56775e-30

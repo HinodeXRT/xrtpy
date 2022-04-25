@@ -1,7 +1,7 @@
 Temperature Response: IDL Results
 Filter Al-mesh
 observation_date 22-Sept-2013 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   8.23545e-29
       112202.   1.06178e-28
       125893.   1.55356e-28

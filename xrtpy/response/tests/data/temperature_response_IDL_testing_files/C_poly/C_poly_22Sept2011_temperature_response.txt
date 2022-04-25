@@ -1,7 +1,7 @@
 Temperature Response: IDL Results
 Filter C-poly
 observation_date 22-Sept-2011 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.90679e-32
       112202.   3.20373e-32
       125893.   5.87619e-32

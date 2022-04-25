@@ -5,10 +5,10 @@ Hinode_.
 
 import warnings
 
-from . import response
+from xrtpy import response
 
 try:
-    from .version import __version__
+    from xrtpy.version import __version__
 except (ImportError, ModuleNotFoundError):
     warnings.warn("version not found.")
 

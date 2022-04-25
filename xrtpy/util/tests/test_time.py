@@ -1,11 +1,10 @@
 __all__ = []
 
+import numpy as np
 import pkg_resources
 import sunpy.io.special
-import numpy as np
 
 from astropy import units as u
-
 
 _channel_name_to_index_mapping = {
     "Al-mesh": 0,

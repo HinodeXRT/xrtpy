@@ -1,7 +1,7 @@
 Temperature Response: IDL Results
 Filter Be-thin
 observation_date 22-Sept-2015 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   8.00557e-37
       112202.   1.28601e-36
       125893.   2.22082e-36
