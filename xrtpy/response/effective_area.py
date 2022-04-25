@@ -95,7 +95,7 @@ class EffectiveAreaFundamental:
     
     @property 
     def ccd_observation_date_to_seconds(self):
-        """Converting users observation date into secounds with respect to CCD contamination data. Used for interpolation."""
+        """Converting users observation date into seconds with respect to CCD contamination data. Used for interpolation."""
 
         ccd_observation_date_to_seconds = []
         for time in _ccd_contamination_file_time:
@@ -160,7 +160,7 @@ class EffectiveAreaFundamental:
         
     @property
     def filter_wheel_number(self):
-        """Defining choosen filter to its corresponding filter wheel."""
+        """Defining chosen filter to its corresponding filter wheel."""
         return 0 if self.name in index_mapping_to_fw1_name else 1
         
     @property

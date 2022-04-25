@@ -85,7 +85,7 @@ class TemperatureResponseFundamental:
     
     @property
     def ionization_model(self):
-        """A brief description of that ionization equilibrum model was used in the creation of the emission spectra."""
+        """A brief description of that ionization equilibrium model was used in the creation of the emission spectra."""
         return CHIANTI_file['ioneq_model']
 
     @property

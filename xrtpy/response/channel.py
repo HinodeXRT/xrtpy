@@ -346,7 +346,7 @@ class Channel:
             self._filter_1 = Filter(self._channel_index, 1)
             self._filter_2 = Filter(self._channel_index, 2)
             self._ccd = CCD(self._channel_index)
-        elif name.lower() == "open": #Complete by adding remaining indexs
+        elif name.lower() == "open": #Complete by adding remaining indices
             self._sample_channel_data = _genx_file[1]
             self._geometry = Geometry(1)
             self._channel_data = {
