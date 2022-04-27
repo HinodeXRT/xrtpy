@@ -93,9 +93,7 @@ class EffectiveAreaFundamental:
 
         if observation_date <= epoch:
             raise ValueError(
-                "Invalid date: {:}.\n Date must be after September 22nd, 2006 21:36:00.".format(
-                    observation_date
-                )
+                f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
         self._observation_date = observation_date
 
@@ -280,7 +278,6 @@ class EffectiveAreaFundamental:
 
         incidence_angle = 0  # Angle of incidence on Filter in radians
 
-        wavelength_min = 1.0  # Angstroms
         wavelength_max = 4000  # Max wavelength in Angstroms
 
         index = [
