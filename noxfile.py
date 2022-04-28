@@ -2,6 +2,13 @@ import nox
 
 python_versions = ("3.8", "3.9", "3.10")
 
+sphinx_paths = ["docs", "docs/_build/html"]
+sphinx_fail_on_warnings = ["-W", "--keep-going"]
+sphinx_builder = ["-b", "html"]
+sphinx_opts = sphinx_paths + sphinx_fail_on_warnings + sphinx_builder
+sphinx_no_notebooks = ["-D", "nbsphinx_execute=never"]
+sphinx_nitpicky = ["-n"]
+
 
 @nox.session(python=python_versions)
 def tests(session):
@@ -9,12 +16,16 @@ def tests(session):
     session.install(".")
     session.run("pytest")
 
-
 @nox.session
 def linters(session):
     session.install("-r", "requirements/tests.txt")
     flake8_options = ["--count", "--show-source", "--statistics"]
     session.run("flake8", "xrtpy", *flake8_options, *session.posargs)
+
+@nox.session(python="3.10")
+def codespell(session):
+    session.install("codespell")
+    session.run("codespell", ".")
 
 
 @nox.session
@@ -23,12 +34,19 @@ def build_docs(session):
     session.install(".")
     session.run(
         "sphinx-build",
-        "docs",
-        "docs/_build/html",
-        "-W",
-        "--keep-going",
-        "-b",
-        "html",
+        *sphinx_opts,
+        *session.posargs,
+    )
+
+
+@nox.session
+def build_docs_nitpicky(session):
+    session.install("-r", "requirements/docs.txt")
+    session.install(".")
+    session.run(
+        "sphinx-build",
+        *sphinx_opts,
+        *sphinx_nitpicky,
         *session.posargs,
     )
 
@@ -39,19 +57,7 @@ def build_docs_no_examples(session):
     session.install(".")
     session.run(
         "sphinx-build",
-        "-D",
-        "nbsphinx_execute=never",
-        "docs",
-        "docs/_build/html",
-        "-W",
-        "--keep-going",
-        "-b",
-        "html",
+        *sphinx_opts,
+        *sphinx_no_notebooks,
         *session.posargs,
     )
-
-
-@nox.session(python="3.10")
-def codespell(session):
-    session.install("codespell")
-    session.run("codespell", ".")
