@@ -6,4 +6,3 @@
 codespell
 nox
 pre-commit
-tox
