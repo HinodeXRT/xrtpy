@@ -22,10 +22,16 @@ def linters(session):
     flake8_options = ["--count", "--show-source", "--statistics"]
     session.run("flake8", "xrtpy", *flake8_options, *session.posargs)
 
-@nox.session(python="3.10")
+@nox.session
 def codespell(session):
     session.install("codespell")
     session.run("codespell", ".")
+
+
+@nox.session
+def import_package(session):
+    session.install(".")
+    session.run("python -c 'import xrtpy'")
 
 
 @nox.session
