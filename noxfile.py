@@ -33,7 +33,7 @@ def codespell(session):
 @nox.session
 def import_package(session):
     session.install(".")
-    session.run("python", "-c", "'import xrtpy'")
+    session.run("python", "-c", 'import xrtpy')  # fmt: skip
 
 
 @nox.session
