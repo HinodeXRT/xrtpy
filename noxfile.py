@@ -1,5 +1,7 @@
 import nox
 
+nox.options.sessions = ["tests", "linters"]
+
 python_versions = ("3.8", "3.9", "3.10")
 
 sphinx_paths = ["docs", "docs/_build/html"]
