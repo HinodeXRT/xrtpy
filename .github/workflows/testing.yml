@@ -15,16 +15,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-
-        - name: 'Python 3.10'
-          os: ubuntu-latest
-          python: '3.10'
-          noxenv: tests-3.10
-
-        - name: Linters
-          os: ubuntu-latest
-          python: 3.8
-          noxenv: linters
+      - name: 'Python 3.10'
+        os: ubuntu-latest
+        python: '3.10'
+        noxenv: tests-3.10
+      - name: Linters
+        os: ubuntu-latest
+        python: 3.8
+        noxenv: linters
 
     steps:
 
