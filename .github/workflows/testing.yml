@@ -10,12 +10,6 @@ on:
 
 jobs:
 
-  codespell:
-    name: Codespell
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-
   initial-tests:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
