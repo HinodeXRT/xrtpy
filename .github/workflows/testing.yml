@@ -54,8 +54,8 @@ jobs:
 
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
-#    needs: initial-tests
-#    if: github.event.pull_request.draft == false
+    needs: initial-tests
+    if: github.event.pull_request.draft == false
 
     strategy:
       fail-fast: false
