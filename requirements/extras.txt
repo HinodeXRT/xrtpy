@@ -4,5 +4,6 @@
 # pip install xrtpy[extras]
 -r install.txt
 codespell
+nox
 pre-commit
 tox
