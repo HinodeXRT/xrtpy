@@ -28,6 +28,9 @@ jobs:
         - name: Codespell
           noxenv: codespell
 
+        - name: Import package
+          noxenv: import_package
+
     steps:
 
     - name: Checkout code
@@ -51,6 +54,7 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     needs: initial-tests
+    if: github.event.pull_request.draft == false
 
     strategy:
       fail-fast: false
@@ -113,6 +117,7 @@ jobs:
   build-n-publish:
     name: Packaging
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     needs:
     - comprehensive-tests
@@ -145,7 +150,7 @@ jobs:
     - name: Twine check
       run: twine check dist/*
 
-    - name: Install xrtpy in all variants
+    - name: Install package in all variants
       run: |
         pip install --progress-bar off .[all,dev]
         pip install --progress-bar off -e .[all,dev]
