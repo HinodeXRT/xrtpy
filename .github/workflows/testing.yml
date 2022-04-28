@@ -1,4 +1,4 @@
-name: CI (nox)
+name: CI
 
 on:
   push:
@@ -34,8 +34,8 @@ jobs:
     - name: Setup nox
       uses: ./.github/actions/setup-nox
 
-    - name: Python 3.10 - nox
+    - name: Python 3.10
       run: nox -s tests-3.10
 
-    - name: Linters - nox
+    - name: Linters
       run: nox -s linters
