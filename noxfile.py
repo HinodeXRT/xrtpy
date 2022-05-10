@@ -18,11 +18,13 @@ def tests(session):
     session.install(".")
     session.run("pytest")
 
+
 @nox.session
 def linters(session):
     session.install("-r", "requirements/tests.txt")
     flake8_options = ["--count", "--show-source", "--statistics"]
     session.run("flake8", "xrtpy", *flake8_options, *session.posargs)
+
 
 @nox.session
 def codespell(session):
