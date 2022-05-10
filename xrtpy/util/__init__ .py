@@ -1,4 +1,6 @@
-from xrtpy.util import time
+from xrtpy.util.time import epoch, xrt_data_time_to_dt
 
-# Then you can be explicit to control what ends up in the namespace,
-__all__ = ["time"]
+__all__ = [
+    "epoch",
+    "xrt_data_time_to_dt"
+    ]
