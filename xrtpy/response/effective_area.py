@@ -38,10 +38,10 @@ index_mapping_to_fw2_name = {
 
 
 _ccd_contam_filename = pkg_resources.resource_filename(
-    "xrtpy", "data/channels/xrt_contam_on_ccd.geny"
+    "xrtpy", "response/data/xrt_contam_on_ccd.geny" #data/channels
 )
 _filter_contam_filename = pkg_resources.resource_filename(
-    "xrtpy", "data/channels/xrt_contam_on_filter.geny"
+    "xrtpy", "response/data/xrt_contam_on_filter.geny"
 )
 
 _ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)

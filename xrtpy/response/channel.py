@@ -19,7 +19,7 @@ import sunpy.time
 from astropy import units as u
 
 filename = pkg_resources.resource_filename(
-    "xrtpy", "data/channels/xrt_channels_v0016.genx"
+    "xrtpy", "response/data/xrt_channels_v0016.genx"
 )
 
 _channel_name_to_index_mapping = {
