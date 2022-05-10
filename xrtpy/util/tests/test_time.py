@@ -1,3 +1,4 @@
+"""
 __all__ = []
 
 import numpy as np
@@ -22,3 +23,6 @@ _channel_name_to_index_mapping = {
     "Al-poly/Be-thick": 12,
     "C-poly/Ti-poly": 13,
 }
+
+
+"""
