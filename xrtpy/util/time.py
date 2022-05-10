@@ -1,6 +1,5 @@
 __all__ = [
     "epoch",
-    "xrt_data_time_to_dt",
 ]
 
 from datetime import datetime, timedelta
