@@ -18,8 +18,6 @@ import sunpy.time
 
 from astropy import units as u
 
-from sty import fg
-
 filename = pkg_resources.resource_filename(
     "xrtpy", "response/data/xrt_channels_v0016.genx"
 )

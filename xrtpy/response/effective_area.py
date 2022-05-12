@@ -18,8 +18,6 @@ from scipy import interpolate
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.util.time import epoch
 
-from sty import fg
-
 index_mapping_to_fw1_name = {
     "Open": 0,
     "Al-poly": 1,
