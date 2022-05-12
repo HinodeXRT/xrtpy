@@ -1,6 +1,6 @@
-"""
-__all__ = []
 
+__all__ = []
+"""
 import numpy as np
 import pkg_resources
 import sunpy.io.special
@@ -23,6 +23,4 @@ _channel_name_to_index_mapping = {
     "Al-poly/Be-thick": 12,
     "C-poly/Ti-poly": 13,
 }
-
-
 """
