@@ -98,7 +98,7 @@ def test_EffectiveArea_exception_is_raised(name, date):
 def get_IDL_data_files():
 
     directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/effective_area_testing_files"
+        "xrtpy", "response/tests/data/effective_area_IDL_testing_files"
     )
 
     filter_data_files = glob.glob(directory + "/**/*.txt")
