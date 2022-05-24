@@ -1,11 +1,10 @@
 .. _release guide:
 
-********************************
-Updating Data from SolarSoft IDL
-********************************
+**********************************************
+Updating XRTpy testing data from SolarSoft IDL
+**********************************************
 
-This page is intentionally made for a user to update IDL files to the XRTpy
-
+This page is intentionally made for an XRTpy maintainer to update IDL testing text files to the XRTpy testing directory. The directory where the testing text files can be found is in xrtpy/xrtpy/response/test/data. 
 
 
 IDL Testing Script 
