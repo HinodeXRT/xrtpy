@@ -83,16 +83,20 @@ pro write_xrt_eff_area
   channel = make_xrt_wave_resp(contam_time = observation_date)
 
 
-; ==== Individual string of the observation date create for text file title==
+; ==== Individual string of the observation date create for text file
+; title ==
 
   year = strmid( observation_date, 0,2)
   month = strmid( observation_date, 3,4)
   day = strmid( observation_date, 8,4)
   observation_date_str = year+month+day
 
-
+; === index is a list numbers corresponding to each filter ===
   index = [0,1,2,3,4,5,6,7,8]
 
+; === IDL for loop creating a text file containing what is stated in
+; OUTPUTS ===
+  
   for i=0,n_elements(index) -1 do begin
      openw,unit,channel[index[i]].name+'_'+ observation_date_str +'_effective_area.txt',/get_lun
 
