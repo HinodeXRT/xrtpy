@@ -93,8 +93,11 @@ pro write_xrt_tr
 
   temp_resp = make_xrt_temp_resp( wave_resp , /chianti )
 
+; === index is a list numbers corresponding to each filter ===
   index = [0,1,2,3,4,5,6,7,8] 
 
+; === IDL for loop creating a text file containing what is stated in
+; OUTPUTS ===
   for i=0,n_elements(index) -1 do begin
   
      openw,unit,wave_resp[index[i]].name+'_'+ observation_date_str +'_temperature_response.txt',/get_lun
