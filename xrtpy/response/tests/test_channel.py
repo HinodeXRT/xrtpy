@@ -34,7 +34,7 @@ def test_channel_name(channel_name):
 
 
 filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_channels_v0016.genx" 
+    "xrtpy", "response/data/xrt_channels_v0016.genx"
 )
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)

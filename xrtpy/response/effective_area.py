@@ -38,7 +38,7 @@ index_mapping_to_fw2_name = {
 
 
 _ccd_contam_filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_contam_on_ccd.geny" #data/channels
+    "xrtpy", "response/data/xrt_contam_on_ccd.geny"  # data/channels
 )
 _filter_contam_filename = pkg_resources.resource_filename(
     "xrtpy", "response/data/xrt_contam_on_filter.geny"
