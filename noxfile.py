@@ -11,6 +11,12 @@ sphinx_opts = sphinx_paths + sphinx_fail_on_warnings + sphinx_builder
 sphinx_no_notebooks = ["-D", "nbsphinx_execute=never"]
 sphinx_nitpicky = ["-n"]
 
+pytest_options = [
+    "--ignore",
+    "xrtpy/response/effective_area.py",
+    "--ignore",
+    "xrtpy/response/temperature_response.py",
+]
 
 @nox.session(python=python_versions)
 def tests(session):
