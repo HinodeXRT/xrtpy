@@ -22,7 +22,7 @@ pytest_options = [
 def tests(session):
     session.install("-r", "requirements/tests.txt")
     session.install(".")
-    session.run("pytest")
+    session.run("pytest", *pytest_options)
 
 
 @nox.session
