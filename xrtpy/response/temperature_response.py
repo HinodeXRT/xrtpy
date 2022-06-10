@@ -126,7 +126,7 @@ class TemperatureResponseFundamental:
     @property
     @u.quantity_input
     def pixel_size(self) -> u.cm:
-        """CCD pixel size. Units converted from microns to cm."""
+        """CCD pixel size. Units converted from μm to cm."""
         ccd_pixel_size = Channel(self.name).ccd.ccd_pixel_size
         return ccd_pixel_size.to(u.cm)
 
