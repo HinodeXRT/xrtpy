@@ -10,7 +10,7 @@ epoch = datetime(year=2006, month=9, day=22, hour=21, minute=36, second=0)
 
 def xrt_data_time_to_dt(data_time, epoch):
     """
-    Covering data time (float64) to a datetime object.
+    Converting data time (float64) to a datetime object.
 
     Parameters
     ----------
