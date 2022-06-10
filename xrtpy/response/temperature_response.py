@@ -121,7 +121,7 @@ class TemperatureResponseFundamental:
     @property
     def ev_per_electron(self):
         """Amount of energy it takes to dislodge 1 electron in the CCD."""
-        return Channel(self.name).ccd.ccd_ev_pre_electron
+        return Channel(self.name).ccd.ccd_energy_per_electron
 
     @property
     @u.quantity_input
