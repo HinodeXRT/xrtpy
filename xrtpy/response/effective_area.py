@@ -289,7 +289,7 @@ class EffectiveAreaFundamental:
         # Snell's law
         sin_a = (n_o * np.sin(incidence_angle)) / index
 
-        cos_a = 1  # cos_a = [ (math.sqrt(1- (sin_a[i]**2) ) )  for i in range(0,wavelength_max) ]
+        cos_a = 1
 
         return (index, sin_a, cos_a, wavelength_max, n_o, n_t, incidence_angle)
 
