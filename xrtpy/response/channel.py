@@ -140,7 +140,7 @@ class EntranceFilter:
     @property
     @u.quantity_input
     def entrancefilter_thickness(self) -> u.angstrom:
-        """XRT entrance filter material thickness in angstrom."""
+        """XRT entrance filter material thickness in angstroms."""
         return u.Quantity(self._en_filter_data["THICK"], u.angstrom)
 
     @property
