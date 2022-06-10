@@ -286,7 +286,7 @@ class CCD:
 
     @property
     @u.quantity_input
-    def ccd_ev_pre_electron(self) -> u.eV / u.electron:
+    def ccd_energy_per_electron(self) -> u.eV / u.electron:
         """The energy necessary to dislodge one electron."""
         return u.Quantity(self._ccd_data["EV_PER_EL"], u.eV / u.electron)
 
