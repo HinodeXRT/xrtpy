@@ -93,7 +93,7 @@ class TemperatureResponseFundamental:
     @property
     @u.quantity_input
     def CHIANTI_temperature(self):
-        """CHIANTI temperatures in Kelvin."""
+        """CHIANTI temperatures in kelvin."""
         return u.Quantity(CHIANTI_file["temperature"] * u.K)
 
     @property
