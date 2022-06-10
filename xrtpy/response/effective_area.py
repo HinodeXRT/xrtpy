@@ -399,6 +399,7 @@ class EffectiveAreaFundamental:
 
     @property
     def channel_transmission(self):
+        """XRT channel transmission."""
         return Channel(self.name).transmission
 
     @property
