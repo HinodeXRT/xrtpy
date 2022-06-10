@@ -187,7 +187,7 @@ class EffectiveAreaFundamental:
         ]
 
     @property
-    def contamination_on_filter(self):
+    def contamination_on_filter(self) -> u.angstrom:
         """
         Thickness of the contamination layer on a filter."""
 
