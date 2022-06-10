@@ -226,9 +226,9 @@ class Filter:
 
     @property
     @u.quantity_input
-    def filter_density(self) -> (u.g * u.cm**-3):
+    def filter_density(self) -> u.g * u.cm**-3:
         """XRT filter density."""
-        return u.Quantity(self._fp_filter_data["DENS"], (u.g * u.cm**-3))
+        return u.Quantity(self._fp_filter_data["DENS"], u.g * u.cm**-3)
 
     @property
     def filter_material(self) -> str:
