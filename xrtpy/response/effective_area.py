@@ -65,7 +65,7 @@ class EffectiveAreaFundamental:
     filter_name : str
         The name of the filter.
 
-    observation_date: str date-time
+    observation_date: str
         The date of the observation.  For valid date formats, look at the documentation for
         `sunpy.time.parse_time`.
     """
