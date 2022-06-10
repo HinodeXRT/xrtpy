@@ -188,7 +188,8 @@ class EffectiveAreaFundamental:
 
     @property
     def contamination_on_filter(self):
-        """Calculation of contamination layer on a filter,thickness giving in Angstrom Å."""
+        """
+        Thickness of the contamination layer on a filter."""
 
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self.filter_data, kind="linear"
