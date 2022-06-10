@@ -735,10 +735,10 @@ def test_filter2_wavelength(channel_name):
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
-def test_ccd_ev_pre_electron(channel_name):
+def test_ccd_energy_pre_electron(channel_name):
 
     channel_filter = Channel(channel_name)
-    ccd_full_well = channel_filter.ccd.ccd_ev_pre_electron
+    ccd_full_well = channel_filter.ccd.ccd_energy_per_electron
 
     idl_ccd_full_well_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]][
         "CCD"
