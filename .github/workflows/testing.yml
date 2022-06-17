@@ -92,7 +92,6 @@ jobs:
     if: github.event.pull_request.draft == false
 
     needs:
-    - comprehensive-tests
     - documentation
 
     steps:
