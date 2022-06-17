@@ -18,6 +18,7 @@ pytest_options = [
     "xrtpy/response/temperature_response.py",
 ]
 
+
 @nox.session(python=python_versions)
 def tests(session):
     session.install("-r", "requirements/tests.txt")

@@ -18,7 +18,7 @@ def xrt_data_time_to_dt(data_time, epoch):
         Description...
     epoch : `datetime.datetime`
         This function will convert the requested date and time into a datetime
-         object in seconds from the respected launched date to collect the correct date. 
+         object in seconds from the respected launched date to collect the correct date.
     """
     data_dates_dt = []
     data_dates_seconds = []
