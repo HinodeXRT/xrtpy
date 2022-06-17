@@ -212,6 +212,7 @@ class EffectiveAreaFundamental:
     def n_DEHP_wavelength(self):
         """Diethylhexylphthalate: Wavelength given in Angstrom (Å)."""
 
+        # Convert wavelength values from nanometers to Angstroms
         wavelength_str = [
             self.n_DEHP_attributes[i][0] for i in range(2, len(self.n_DEHP_attributes))
         ]
