@@ -11,4 +11,5 @@ flake8-rst-docstrings
 flake8-use-fstring
 pydocstyle
 pytest >= 5.4.0
+pytest-allclose
 pytest-xdist
