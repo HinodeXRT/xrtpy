@@ -383,7 +383,7 @@ class EffectiveAreaFundamental:
             for i in range(0, 4000)
         ]
 
-        transmission = np.array( [abs(transmittance[i] ** 2) for i in range(4000)] )
+        transmission = np.array([abs(transmittance[i] ** 2) for i in range(4000)])
 
         return transmission
 
