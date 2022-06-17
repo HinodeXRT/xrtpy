@@ -91,9 +91,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
 
-    needs:
-    - documentation
-
     steps:
     - uses: actions/checkout@v3
 
