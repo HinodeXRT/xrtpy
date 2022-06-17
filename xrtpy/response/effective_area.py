@@ -232,7 +232,7 @@ class EffectiveAreaFundamental:
             [float(delta_str[i]) for i in range(len(self.n_DEHP_wavelength))]
         )
 
-         # Interpolate so ranges are the same
+        # Interpolate so ranges are the same
         return interpolate.interp1d(self.n_DEHP_wavelength, delta_float)(
             self.n_DEHP_wavelength
         )
