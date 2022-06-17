@@ -250,6 +250,7 @@ class EffectiveAreaFundamental:
             [float(beta_str[i]) for i in range(len(self.n_DEHP_wavelength))]
         )
 
+        # Interpolate so ranges are the same
         return interpolate.interp1d(self.n_DEHP_wavelength, beta_float)(
             self.n_DEHP_wavelength
         )
