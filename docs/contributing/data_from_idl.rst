@@ -1,5 +1,3 @@
-.. _release guide:
-
 ********************************
 Updating Data from SolarSoft IDL
 ********************************
