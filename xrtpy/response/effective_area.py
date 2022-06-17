@@ -213,8 +213,7 @@ class EffectiveAreaFundamental:
         """Diethylhexylphthalate: Wavelength given in Angstrom (Å)."""
 
         wavelength_str = [
-            self.n_DEHP_attributes[i][0]
-            for i in range(2, len(self.n_DEHP_attributes))
+            self.n_DEHP_attributes[i][0] for i in range(2, len(self.n_DEHP_attributes))
         ]
 
         return np.array([float(i) * 10 for i in wavelength_str])
@@ -224,15 +223,13 @@ class EffectiveAreaFundamental:
         """Diethylhexylphthalate: Delta."""
 
         delta_str = [
-            self.n_DEHP_attributes[i][1]
-            for i in range(2, len(self.n_DEHP_attributes))
+            self.n_DEHP_attributes[i][1] for i in range(2, len(self.n_DEHP_attributes))
         ]
 
         # Converting from str to float
         delta_float = np.array(
             [float(delta_str[i]) for i in range(len(self.n_DEHP_wavelength))]
         )
-
 
         return interpolate.interp1d(self.n_DEHP_wavelength, delta_float)(
             self.n_DEHP_wavelength
@@ -243,15 +240,13 @@ class EffectiveAreaFundamental:
         """Diethylhexylphthalate: Beta."""
 
         beta_str = [
-            self.n_DEHP_attributes[i][2]
-            for i in range(2, len(self.n_DEHP_attributes))
+            self.n_DEHP_attributes[i][2] for i in range(2, len(self.n_DEHP_attributes))
         ]
 
         # Converting from str to float
         beta_float = np.array(
             [float(beta_str[i]) for i in range(len(self.n_DEHP_wavelength))]
         )
-
 
         return interpolate.interp1d(self.n_DEHP_wavelength, beta_float)(
             self.n_DEHP_wavelength
@@ -274,7 +269,6 @@ class EffectiveAreaFundamental:
             for i in range(4000)
         ]
 
-
         # Snell's law
         sin_a = (n_o * np.sin(incidence_angle)) / index
 
@@ -295,7 +289,6 @@ class EffectiveAreaFundamental:
                 for i in range(4000)
             ]
         )
-
 
         # Multiply by thickness
         angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_CCD
@@ -320,7 +313,6 @@ class EffectiveAreaFundamental:
                 for i in range(4000)
             ]
         )
-
 
         # Multiply by thickness
         angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_filter
@@ -356,7 +348,6 @@ class EffectiveAreaFundamental:
             for i in range(4000)
         ]
 
-
         transmittance = [
             2
             * n_o
@@ -368,7 +359,6 @@ class EffectiveAreaFundamental:
             )
             for i in range(4000)
         ]
-
 
         return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
 
@@ -408,19 +398,15 @@ class EffectiveAreaFundamental:
             [
                 [
                     np.cos(self.filterwheel_angular_wavenumber[i]),
-                    (-i_i * np.sin(self.filterwheel_angular_wavenumber[i]))
-                    / index[i],
+                    (-i_i * np.sin(self.filterwheel_angular_wavenumber[i])) / index[i],
                 ],
                 [
-                    -i_i
-                    * np.sin(self.filterwheel_angular_wavenumber[i])
-                    * index[i],
+                    -i_i * np.sin(self.filterwheel_angular_wavenumber[i]) * index[i],
                     np.cos(self.filterwheel_angular_wavenumber[i]),
                 ],
             ]
             for i in range(4000)
         ]
-
 
         transmittance = [
             2
@@ -433,7 +419,6 @@ class EffectiveAreaFundamental:
             )
             for i in range(4000)
         ]
-
 
         return [abs(transmittance[i] ** 2) for i in range(4000)]
 
