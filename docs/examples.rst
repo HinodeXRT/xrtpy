@@ -14,3 +14,4 @@ Getting started
   :glob:
 
   notebooks/getting_started/*
+  notebooks/*
