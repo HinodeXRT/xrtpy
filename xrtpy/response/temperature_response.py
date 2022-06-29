@@ -140,7 +140,7 @@ class TemperatureResponseFundamental:
     def spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
         """Interpolation between the spectra wavelength onto the channel wavelength."""
         spectra_interpolate = []
-        for i in range(0, 61):
+        for i in range(61):
             interpolater = interpolate.interp1d(
                 self.CHIANTI_wavelength, CHIANTI_file["spectra"][0][i], kind="linear"
             )
@@ -161,13 +161,14 @@ class TemperatureResponseFundamental:
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
         effective_area = (self.effective_area()).value
 
-        temp_resp_w_u_c = []
-        for i in range(0, 61):
-            temp_resp_w_u_c.append(
-                integrate.simpson(
-                    self.spectra()[i] * effective_area * constants * factors, wavelength
-                )
+        temp_resp_w_u_c = [
+            integrate.simpson(
+                self.spectra()[i] * effective_area * constants * factors,
+                wavelength,
             )
+            for i in range(61)
+        ]
+
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
     @property

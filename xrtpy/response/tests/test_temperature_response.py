@@ -13,7 +13,7 @@ def get_IDL_data_files():
         "xrtpy", "response/tests/data/temperature_response_IDL_testing_files"
     )
 
-    filter_data_files = glob.glob(directory + "/**/*.txt")
+    filter_data_files = glob.glob(f"{directory}/**/*.txt")
 
     return sorted(filter_data_files)
 
@@ -42,20 +42,18 @@ def IDL_test_date(IDL_data_list):
     obs_date = str(IDL_data_list[2][1])
     obs_time = str(IDL_data_list[2][2])
 
-    day = int(obs_date[0:2])
+    day = int(obs_date[:2])
 
     month_datetime_object = datetime.strptime(obs_date[3:6], "%b")
     month = month_datetime_object.month
 
     year = int(obs_date[8:12])
 
-    hour = int(obs_time[0:2])
+    hour = int(obs_time[:2])
     minute = int(obs_time[3:5])
     second = int(obs_time[6:8])
 
-    observation_date_dt = datetime(year, month, day, hour, minute, second)
-
-    return observation_date_dt
+    return datetime(year, month, day, hour, minute, second)
 
 
 def _IDL_temperature_response_raw_data(filename):
@@ -68,13 +66,8 @@ def _IDL_temperature_response_raw_data(filename):
             line_list = stripped_line.split()
             IDL_data_list.append(line_list)
 
-    new_IDL_data_list = []
-    for i in range(4, len(IDL_data_list)):
-        new_IDL_data_list.append(IDL_data_list[i][1])
-
-    temperature_response = [float(i) for i in new_IDL_data_list]
-
-    return temperature_response
+    new_IDL_data_list = [IDL_data_list[i][1] for i in range(4, len(IDL_data_list))]
+    return [float(i) for i in new_IDL_data_list]
 
 
 @pytest.mark.parametrize("filename", filenames)
