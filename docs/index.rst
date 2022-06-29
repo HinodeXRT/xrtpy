@@ -17,7 +17,6 @@ for the analysis of observations made by the `X-Ray Telescope`_ (XRT)
    install
    getting_started
    examples
-   about-xrt
    bibliography
    glossary
    contributing/index
