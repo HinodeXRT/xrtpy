@@ -10,7 +10,7 @@ XRTpy Objects:
 **************
 
 XRTpy currently offers *Channel*, *Effective Area*, and *Temperature Response*.
-Exaplin each oject (what they do), detials on how to use them (Filter, date,time), Referecnes, and reference notebook/example.
+Exaplin each object (what they do), detials on how to use them (Filter, date,time), Referecnes, and reference notebook/example.
 
 Channel
 -------
@@ -29,30 +29,31 @@ Filters
 *******
 The XRT controls filter imaging using two sequentially positioned filter wheels, Figure 3.1: in the  `SolarSoft XRT Analysis Guide`_ shows the XRT filter wheels as viewed from the sun.
 The existing filters are structures as so:
-    1. Filters
-        A. Filter Wheel 1 position:
-            -  Open
-            -  Aluminum Polyimide
-            -  Carbon Polyimide
-            -  Beryllium thin
-            -  Beryllium medium
-            -  Aluminum med
-        B. Filter Wheel 2 position
-            -  Open
-            -  Aluminum mesh
-            -  Titanium Polyimide
-            -  Gband
-            -  Aluminum thick
-            -  Beryllium thick
-        C. Open
-            Visible light shutter position. Reference the XRT mechanisms section 3.5 in the `SolarSoft XRT Analysis Guide`_ for more
-            information about 'Open' shutter position.
-        C. Naming
-            Filters are expressed by their abbreviation when used in a XRTpy object. For example, if we want to explore the
-            channel filter that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all xrt filters.
-    2. Mirror
-        A. Explain XRT mirrors - how to use mirror 1 and 2.
 
+#. Filters
+    #. Filter Wheel 1 position:
+        - Open
+        -  Aluminum Polyimide
+        -  Carbon Polyimide
+        -  Beryllium thin
+        -  Beryllium medium
+        -  Aluminum med
+    #. Filter Wheel 2 position
+        -  Open
+        -  Aluminum mesh
+        -  Titanium Polyimide
+        -  Gband
+        -  Aluminum thick
+        -  Beryllium thick
+    #. Open
+        Visible light shutter position. Reference the XRT mechanisms section 3.5 in the `SolarSoft XRT Analysis Guide`_ for more
+        information about 'Open' shutter position.
+    #. Naming
+        Filters are expressed by their abbreviation when used in a XRTpy object. For example, if we want to explore the
+        channel filter that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all xrt filters.
+
+#. Mirror
+    #. Explain XRT mirrors - how to use mirror 1 and 2.
 
 .. note::
    The X-Ray Telescope Software Guide not intended to be a guide to use XRTpy.
