@@ -18,11 +18,16 @@ Test Channel text.
 
 Effective Area
 --------------
-Testing Effective Area text.
+XRTpy produces the effective areas for a set of XRT x-ray channels paired with thicknesses of the CCD contamination layer.
 
 Temperature Response
 --------------------
-Temperature Response Referecnes `Narukage et al. 2011`_ and `Narukage et al. 2014`_.
+XRTpy produces the temperature response for each XRT X-ray channel, assuming a spectral emission model, referecne `Narukage et al. 2011`_ and `Narukage et al. 2014`_.
+XRTpy default emission model from CHIANTI. This structure contains data and information about a plasma emission model, as a function of wavelength and temperature.
+The default model assumes coronal abundances `Feldman (1992)`_. Examples of how to calcuated the temperature response function can be found in our Example page.
+
+.. note::
+   XRTpy has future plans to accept other emission model.
 
 
 Filters
@@ -62,7 +67,7 @@ The existing filters are structures as so:
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
 .. _xrt-cfa-harvard: https://xrt.cfa.harvard.edu/index.php
 
-
+.. _Feldman (1992): https://doi.org/10.1088/0031-8949/46/3/002
 
 .. _Narukage et al. 2011: https://doi.org/10.1007/s11207-010-9685-2
 .. _Narukage et al. 2014: https://doi.org/10.1007/s11207-013-0368-7
