@@ -3,7 +3,7 @@ Getting Started
 ===============
 
 XRTpy is a Python package being developed for the analysis of observations made by the X-Ray Telescope (XRT)
-on the Hinode spacecraft. This page is intended for new users of `xrtpy`.
+on the Hinode spacecraft. This page is intended for new users of `XRTpy`.
 
 XRTpy Objects:
 **************
@@ -13,20 +13,23 @@ Exaplin each object (what they do), detials on how to use them (Filter, date,tim
 
 Channel
 -------
-Test Channel text.
+Channel explores properties of the X-Ray Telescope (XRT). Channel offers a detailed review of the instrument's for a chosen
+channel filter e.g. Charge-Coupled Device (CCD), Entrance Filter, Filter(s), Geometry, and Mirror(s). An example guide can be found in our Example page.
 
 Effective Area
 --------------
 XRTpy produces the effective areas for a set of XRT x-ray channels paired with thicknesses of the CCD contamination layer.
+Reference the `SolarSoft XRT Analysis Guide`_ for more information about the instrumental spectral responses.
+An example of how to calculate the effective areas can be found in our Example page.
 
 Temperature Response
 --------------------
 XRTpy produces the temperature response for each XRT X-ray channel, assuming a spectral emission model, reference `Narukage et al. 2011`_ and `Narukage et al. 2014`_.
 XRTpy default emission model from CHIANTI. This structure contains data and information about a plasma emission model, as a function of wavelength and temperature.
-The default model assumes coronal abundances `Feldman (1992)`_. Examples of how to calculate the temperature response function can be found in our Example page.
+The default model assumes coronal abundances `Feldman (1992)`_. An example of how to calculate the temperature response can be found in our Example page.
 
 .. note::
-   XRTpy has future plans to accept other emission model.
+   XRTpy has future plans to accept other plasma emission spectra model.
 
 Filters
 *******
@@ -34,13 +37,14 @@ The XRT controls filter imaging using two sequentially positioned filter wheels,
 The existing filters are structures as so:
 
 #. Filters
-    #. Filter Wheel 1 position:
-        - Open
-        -  Aluminum Polyimide
-        -  Carbon Polyimide
-        -  Beryllium thin
-        -  Beryllium medium
-        -  Aluminum med
+    #. Filter position
+        #. Filter Wheel 1 position:
+            -  Open
+            -  Aluminum Polyimide
+            -  Carbon Polyimide
+            -  Beryllium thin
+            -  Beryllium medium
+            -  Aluminum med
     #. Filter Wheel 2 position
         -  Open
         -  Aluminum mesh
