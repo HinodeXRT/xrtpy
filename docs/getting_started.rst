@@ -5,7 +5,6 @@ Getting Started
 XRTpy is a Python package being developed for the analysis of observations made by the X-Ray Telescope (XRT)
 on the Hinode spacecraft. This page is intended for new users of `xrtpy`.
 
-
 XRTpy Objects:
 **************
 
