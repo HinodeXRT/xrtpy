@@ -9,7 +9,7 @@ XRTpy Objects:
 **************
 
 XRTpy currently offers *Channel*, *Effective Area*, and *Temperature Response*.
-Exaplin each object (what they do), detials on how to use them (Filter, date,time), Referecnes, and reference notebook/example.
+Exaplin each object (what they do), details on how to use them (Filter, date, time), References, and reference notebook/example.
 
 Channel
 -------
@@ -33,37 +33,42 @@ The default model assumes coronal abundances `Feldman (1992)`_. An example of ho
 
 Filters
 *******
-The XRT controls filter imaging using two sequentially positioned filter wheels, Figure 3.1: in the  `SolarSoft XRT Analysis Guide`_ shows the XRT filter wheels as viewed from the sun.
+The XRT controls filter imaging using two sequentially positioned filter wheels, Figure 3.1: in the `SolarSoft XRT Analysis Guide`_ shows the XRT filter wheels as viewed from the sun.
 The existing filters are structures as so:
 
 #. Filters
     #. Filter position
-        #. Filter Wheel 1 position:
+        #. Filter Wheel 1:
             -  Open
             -  Aluminum Polyimide
             -  Carbon Polyimide
             -  Beryllium thin
             -  Beryllium medium
             -  Aluminum med
-    #. Filter Wheel 2 position
-        -  Open
-        -  Aluminum mesh
-        -  Titanium Polyimide
-        -  Gband
-        -  Aluminum thick
-        -  Beryllium thick
+        #. Filter Wheel 2:
+            -  Open
+            -  Aluminum mesh
+            -  Titanium Polyimide
+            -  G-band
+            -  Aluminum thick
+            -  Beryllium thick
     #. Open
-        Visible light shutter position. Reference the XRT mechanisms section 3.5 in the `SolarSoft XRT Analysis Guide`_ for more
+        Visible light shutter position. Reference the XRT mechanisms in the `SolarSoft XRT Analysis Guide`_ for more
         information about 'Open' shutter position.
-    #. Naming
-        Filters are expressed by their abbreviation when used in a XRTpy object. For example, if we want to explore the
+    #. G-band
+        G-band visible light onto the CCD
+
+#. Filter Naming
+        Filters are expressed by their abbreviation when used in a XRTpy. For example, if we want to explore the
         channel filter that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all xrt filters.
 
-#. Mirror
-    #. Explain XRT mirrors - how to use mirror 1 and 2.
 
-.. note::
-   The X-Ray Telescope Software Guide not intended to be a guide to use XRTpy.
+#. Distinguish - Filter & Mirror
+    #. Filter in Filter Wheel
+        #. The XRT data is recorded through nine X-ray filters using two filter wheels. We are able to explore detailed information of the chosen XRT channel filter using `channel.filter_#`, where '#' is expressing filter wheel 1 or 2. For example, if we are  exploring Carbon-on-Polyimide in filter wheel 1, we will be exploring channel.filter_1.  Exploring the other filter will yield "Open".
+    #. Mirror
+        #. XRTpy offers the ability to inspect the first and second surface mirror. To distinguish the mirrors we use `channel_mirror_#`, where '#' is the first or second mirror surface.
+
 
 
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
