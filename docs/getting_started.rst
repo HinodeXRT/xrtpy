@@ -9,7 +9,7 @@ XRTpy Objects:
 **************
 
 XRTpy currently offers *Channel*, *Effective Area*, and *Temperature Response*.
-Exaplin each object (what they do), details on how to use them (Filter, date, time), References, and reference notebook/example.
+Explain each object (what they do), details on how to use them (Filter, date, time), References, and reference notebook/example.
 
 Channel
 -------
@@ -31,44 +31,46 @@ The default model assumes coronal abundances `Feldman (1992)`_. An example of ho
 .. note::
    XRTpy has future plans to accept other plasma emission spectra model.
 
+
+XRTpy Variable Functionalities
+******************************
+    #. Filters
+        #. Practicable Filters
+            #. XRTpy objects workable filter: Aluminum medium, Aluminum mesh, Aluminum thick, Aluminum polyimide, Beryllium medium, Beryllium thick, Beryllium thin, Carbon polyimide, and Titanium polyimide,
+        #. Naming
+            #. Filters are expressed by their abbreviation when used in a XRTpy. For example, if we want to explore the channel filter that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all xrt filters.
+    #. Distinguish - Filter & Mirror
+        #. Filter in Filter Wheel
+            #. The XRT data is recorded through nine X-ray filters using two filter wheels. We are able to explore detailed information of the chosen XRT channel filter using `channel.filter_#`, where '#' is expressing filter wheel 1 or 2. For example, if we are exploring Carbon-on-Polyimide in filter wheel 1, we will be exploring channel.filter_1.
+        #. Mirror
+            #. XRTpy offers the ability to inspect the first and second surface mirror. To distinguish the mirrors we use `channel_mirror_#`, where '#' is the first or second mirror surface.
+
 Filters
 *******
-The XRT controls filter imaging using two sequentially positioned filter wheels, Figure 3.1: in the `SolarSoft XRT Analysis Guide`_ shows the XRT filter wheels as viewed from the sun.
+The XRT controls filter imaging using two sequentially positioned filter wheels, Figure 3.1 in the `SolarSoft XRT Analysis Guide`_ shows the XRT filter wheels as viewed from the sun.
 The existing filters are structures as so:
 
-#. Filters
+#. Filter Configuration
     #. Filter position
         #. Filter Wheel 1:
             -  Open
             -  Aluminum Polyimide
             -  Carbon Polyimide
-            -  Beryllium thin
-            -  Beryllium medium
-            -  Aluminum med
+            -  Beryllium Thin
+            -  Beryllium Medium
+            -  Aluminum Medium
         #. Filter Wheel 2:
             -  Open
-            -  Aluminum mesh
+            -  Aluminum Mesh
             -  Titanium Polyimide
             -  G-band
-            -  Aluminum thick
-            -  Beryllium thick
+            -  Aluminum Thick
+            -  Beryllium Thick
     #. Open
         Visible light shutter position. Reference the XRT mechanisms in the `SolarSoft XRT Analysis Guide`_ for more
         information about 'Open' shutter position.
     #. G-band
-        G-band visible light onto the CCD
-
-#. Filter Naming
-        Filters are expressed by their abbreviation when used in a XRTpy. For example, if we want to explore the
-        channel filter that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all xrt filters.
-
-
-#. Distinguish - Filter & Mirror
-    #. Filter in Filter Wheel
-        #. The XRT data is recorded through nine X-ray filters using two filter wheels. We are able to explore detailed information of the chosen XRT channel filter using `channel.filter_#`, where '#' is expressing filter wheel 1 or 2. For example, if we are  exploring Carbon-on-Polyimide in filter wheel 1, we will be exploring channel.filter_1.  Exploring the other filter will yield "Open".
-    #. Mirror
-        #. XRTpy offers the ability to inspect the first and second surface mirror. To distinguish the mirrors we use `channel_mirror_#`, where '#' is the first or second mirror surface.
-
+        The G-Band filter allows visible light into the telescope and onto the CCD.
 
 
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
