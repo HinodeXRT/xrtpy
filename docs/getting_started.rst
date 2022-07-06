@@ -38,7 +38,7 @@ XRTpy Variable Functionalities
 ******************************
     #. Filters
         #. Practicable Filters
-            #. XRTpy objects workable filter: Aluminum medium, Aluminum mesh, Aluminum thick, Aluminum polyimide, Beryllium medium, Beryllium thick, Beryllium thin, Carbon polyimide, and Titanium polyimide,
+            #. XRTpy workable filters : Aluminum medium, Aluminum mesh, Aluminum thick, Aluminum polyimide, Beryllium medium, Beryllium thick, Beryllium thin, Carbon polyimide, and Titanium polyimide,
         #. Naming
             #. Filters are expressed by their abbreviation when used in a XRTpy. For example, if we want to explore the channel filter that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all XRT practicable filters.
     #. Distinguish instances - Filter & Mirror
