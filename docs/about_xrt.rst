@@ -1,8 +1,8 @@
 .. _about-xrt:
 
-*********
-About XRT
-*********
+*******************************
+About the X-Ray Telescope (XRT)
+*******************************
 
 .. contents:: Contents
    :local:
@@ -10,26 +10,27 @@ About XRT
 Hinode
 ======
 Hinode (`formerly known as Solar-B`_) is a joint mission between the space agencies of Japan, United States, Europe, and the United Kingdom.
-The craft carries three instruments, a Solar Optical Telescope (SOT), Extreme Ultraviolet Imaging Spectrometer (EIS) and X-Ray Telescope (XRT); together,
-they are designed to provide multi-wavelength data from the photosphere to the upper corona. The 875-kg craft was launched on September 23, 2006 into a polar,
+The spacecraft carries three instruments, a Solar Optical Telescope (SOT), Extreme Ultraviolet Imaging Spectrometer (EIS) and X-Ray Telescope (XRT); together,
+they are designed to provide multi-wavelength data from the photosphere to the upper corona. The 875-kg spacecraft was launched on September 23, 2006 into a polar,
 sun-synchronous orbit, allowing for continuous observations of the Sun. Further information can be found at `NASA's Hinode space mission to Sun`_.
 
 
 The X-Ray Telescope
 ====================
 The X-Ray Telescope (XRT) is an internment onboard the Hinode spacecraft. The XRT will provide 2-arcsecond resolution images of the highest temperature solar coronal
-material, from 1,000,000 to 10,000,000 Kelvin. Visit `xrt-cfa-harvard`_  for mission overview information about the Hinode satellite and the XRT.
+material, from 1,000,000 to 10,000,000 Kelvin. Visit the official `xrt-cfa-harvard`_ site for mission overview information about the Hinode satellite and the XRT.
 
 .. tip::
-   Please checkout `XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for content about the XRT solar observations.
+   Visit the`XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for content about the XRT solar observations.
 
 
 SolarSoft XRT Analysis Guide
 ============================
+The `SolarSoft XRT Analysis Guide - Hinode X-Ray Telescope`_ is a guide to analyze the XRT data.
+The Software Guide consist of the Instrument Guide and a broad overview of the X-Ray telescope’s hardware components.
 The XRT software was created in Interactive Data Language (IDL).
 IDL is a software programming language used to analyze and create meaningful information from numerical data.
-The `SolarSoft XRT Analysis Guide - Hinode X-Ray Telescope`_ is a guide to analyze XRT data in IDL.
-The Software Guide describes how to analyze XRT data; the Instrument Guide gives a broad overview of the X-Ray Telescope’s hardware components.
+
 
 .. note::
    The `SolarSoft XRT Analysis Guide - Hinode X-Ray Telescope`_ is not intended to be a guide to use XRTpy.
