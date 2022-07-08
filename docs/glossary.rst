@@ -8,3 +8,5 @@ Glossary
 
 .. glossary::
    :sorted:
+
+   Texting
