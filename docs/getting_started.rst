@@ -3,7 +3,9 @@ Getting Started
 ===============
 
 XRTpy is a Python package being developed for the analysis of observations made by the X-Ray Telescope (XRT)
-on the Hinode spacecraft. This page is intended for new users of `XRTpy`.
+on the board Hinode spacecraft. This page is intended for new users of `XRTpy`. For more background information about
+XRT at large reference the `SolarSoft XRT Analysis Guide`_.
+
 
 XRTpy Objects:
 **************
@@ -33,19 +35,6 @@ The default model assumes coronal abundances `Feldman (1992)`_. An example of ho
 .. note::
    XRTpy has future plans to accept other plasma emission spectra model.
 
-
-XRTpy Variable Functionalities
-******************************
-    #. Filters
-        #. Practicable Filters
-            #. XRTpy workable filters : Aluminum medium, Aluminum mesh, Aluminum thick, Aluminum polyimide, Beryllium medium, Beryllium thick, Beryllium thin, Carbon polyimide, and Titanium polyimide,
-        #. Naming
-            #. Filters are expressed by their abbreviation when used in a XRTpy. For example, if we want to explore the channel filter that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all XRT practicable filters.
-    #. Distinguish instances - Filter & Mirror
-        #. Filter instance in Filter Wheel
-            #. The XRT data is recorded through nine X-Ray filters using two filter wheels. We are able to explore detailed information of the chosen XRT channel filter using `channel.filter_#`, where '#' is expressing filter wheel 1 or 2. For example, if we are exploring Carbon-on-Polyimide in filter wheel 1, we will be exploring channel.filter_1.
-        #. Mirror
-            #. XRTpy offers the ability to inspect the first and second surface mirror. To distinguish the mirrors we use `channel_mirror_#`, where '#' is the first or second mirror surface.
 
 X-Ray Filter Channels
 *********************
