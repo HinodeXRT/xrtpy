@@ -15,3 +15,12 @@ Getting started
 
   notebooks/getting_started/*
   notebooks/*
+
+Computing response functions
+----------------------------
+
+.. nbgallery::
+  :glob:
+
+  notebooks/getting_started/*
+  notebooks/computing_functions/*
