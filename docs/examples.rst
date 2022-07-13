@@ -14,4 +14,11 @@ Getting started
   :glob:
 
   notebooks/getting_started/*
-  notebooks/*
+
+Computing response functions
+----------------------------
+
+.. nbgallery::
+  :glob:
+
+  notebooks/computing_functions/*
