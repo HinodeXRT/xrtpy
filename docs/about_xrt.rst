@@ -45,4 +45,4 @@ IDL is a software programming language used to analyze and create meaningful inf
 .. _Artist's concept of the Hinode:  https://www.nasa.gov/mission_pages/sunearth/missions/mission-hinode.html
 
 .. _Hinode-XRT YouTube: https://www.youtube.com/user/xrtpow
-.. _XRT Picture of the Week: https://xrt.cfa.harvard.edu/xpow/
+.. _XRT Picture of the Week: https://xrt.cfa.harvard.edu/xpow
