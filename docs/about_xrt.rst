@@ -17,7 +17,7 @@ sun-synchronous orbit, allowing for continuous observations of the Sun. Further 
 
 The X-Ray Telescope
 ====================
-The X-Ray Telescope (XRT) is an internment onboard the Hinode spacecraft. The XRT will provide 2-arcsecond resolution images of the highest temperature solar coronal
+The X-Ray Telescope (XRT) is an internment onboard the Hinode spacecraft. The XRT provides 2-arcsecond resolution images of the highest temperature solar coronal
 material, from 1,000,000 to 10,000,000 Kelvin. Visit the official `xrt-cfa-harvard`_ site for mission overview information about the XRT.
 
 .. tip::
@@ -45,4 +45,4 @@ IDL is a software programming language used to analyze and create meaningful inf
 .. _Artist's concept of the Hinode:  https://www.nasa.gov/mission_pages/sunearth/missions/mission-hinode.html
 
 .. _Hinode-XRT YouTube: https://www.youtube.com/user/xrtpow
-.. _XRT Picture of the Week: https://xrt.cfa.harvard.edu/xpow/20220623.html
+.. _XRT Picture of the Week: https://xrt.cfa.harvard.edu/xpow/
