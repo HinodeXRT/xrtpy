@@ -27,7 +27,7 @@ material, from 1,000,000 to 10,000,000 Kelvin. Visit the official `xrt-cfa-harva
 SolarSoft XRT Analysis Guide
 ============================
 The `SolarSoft XRT Analysis Guide`_  - Hinode X-Ray Telescope is a guide to analyze the XRT data.
-The Software Guide consist of the Instrument Guide and a broad overview of the X-Ray telescope’s hardware components.
+The Software Guide consists of the Instrument Guide and a broad overview of the X-Ray telescope’s hardware components.
 The XRT software was created in Interactive Data Language (IDL).
 IDL is a software programming language used to analyze and create meaningful information from numerical data.
 
