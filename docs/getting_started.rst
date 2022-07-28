@@ -16,7 +16,7 @@ to explore properties of the XRT. Visit our Example page for detail example guid
 Channel
 -------
 Channel is an instrument configuration class that explores properties of the XRT. Channel offers a detailed review of instruments for a chosen
-filter channel including the Charge-Coupled Device (CCD), Entrance Filter, Filter(s), Geometry, and Mirror(s).
+filter channel including the Charge-Coupled Device (CCD), Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
 
 
 Effective Area
