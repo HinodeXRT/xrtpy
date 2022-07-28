@@ -26,21 +26,21 @@ material, from 1,000,000 to 10,000,000 Kelvin. Visit the official `xrt-cfa-harva
 
 SolarSoft XRT Analysis Guide
 ============================
-The `SolarSoft XRT Analysis Guide - Hinode X-Ray Telescope`_ is a guide to analyze the XRT data.
+The `SolarSoft XRT Analysis Guide`_  - Hinode X-Ray Telescope is a guide to analyze the XRT data.
 The Software Guide consist of the Instrument Guide and a broad overview of the X-Ray telescope’s hardware components.
 The XRT software was created in Interactive Data Language (IDL).
 IDL is a software programming language used to analyze and create meaningful information from numerical data.
 
 
 .. note::
-   The `SolarSoft XRT Analysis Guide - Hinode X-Ray Telescope`_ is not intended to be a guide to use XRTpy.
+   The `SolarSoft XRT Analysis Guide`_  - Hinode X-Ray Telescope is not intended to be a guide to use XRTpy.
 
 
 .. _formerly known as Solar-B: https://www.esa.int/Science_Exploration/Space_Science/Solar-B_renamed_Hinode_after_launch#:~:text=Solar%2DB%2C%20JAXA's%20mission%20to,'sunrise'%2C%20after%20launch.
 .. _NASA's Hinode space mission to the Sun: https://www.nasa.gov/mission_pages/hinode/mission.html
 .. _Interactive Data Language: https://www.l3harrisgeospatial.com/Software-Technology/IDL
 
-.. _SolarSoft XRT Analysis Guide - Hinode X-Ray Telescope: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
+.. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
 .. _xrt-cfa-harvard: https://xrt.cfa.harvard.edu/index.php
 .. _Artist's concept of the Hinode:  https://www.nasa.gov/mission_pages/sunearth/missions/mission-hinode.html
 
