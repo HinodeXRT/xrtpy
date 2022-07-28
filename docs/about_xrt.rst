@@ -33,7 +33,7 @@ IDL is a software programming language used to analyze and create meaningful inf
 
 
 .. note::
-   The `SolarSoft XRT Analysis Guide`_  - Hinode X-Ray Telescope is not intended to be a guide to use XRTpy.
+   The `SolarSoft XRT Analysis Guide`_ is not intended to be a guide to use XRTpy.
 
 
 .. _formerly known as Solar-B: https://www.esa.int/Science_Exploration/Space_Science/Solar-B_renamed_Hinode_after_launch#:~:text=Solar%2DB%2C%20JAXA's%20mission%20to,'sunrise'%2C%20after%20launch.
