@@ -44,18 +44,18 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
     #. Filter position
         #. Filter Wheel 1:
             -  *Open*
-            -  Aluminum Polyimide
-            -  Carbon Polyimide
-            -  Beryllium Thin
-            -  Beryllium Medium
-            -  Aluminum Medium
+            -  Aluminum Polyimide (*Al-poly*)
+            -  Carbon Polyimide (*C-poly*)
+            -  Beryllium Thin (*Be-thin*)
+            -  Beryllium Medium (*Be-med*)
+            -  Aluminum Medium (*Al-med*)
         #. Filter Wheel 2:
             -  *Open*
-            -  Aluminum Mesh
-            -  Titanium Polyimide
+            -  Aluminum Mesh (*Al-mesh*)
+            -  Titanium Polyimide (*Ti-poly*)
             -  *G-band*
-            -  Aluminum Thick
-            -  Beryllium Thick
+            -  Aluminum Thick (*Al-thick*)
+            -  Beryllium Thick (*Be-thick*)
     #. *Open*
         Visible light shutter position. Reference the Section 3.5 `XRT Mechanisms` in the `SolarSoft XRT Analysis Guide`_ for more
         information about 'Open' shutter position.
