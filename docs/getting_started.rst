@@ -3,8 +3,7 @@ Getting Started
 ===============
 
 XRTpy is a Python package being developed for the analysis of observations made by the X-Ray Telescope (XRT)
-on the board Hinode spacecraft. This page is intended for new users of `xrtpy`. For more background information about the
-XRT at large reference the `SolarSoft XRT Analysis Guide`_.
+on the board Hinode spacecraft. This page is intended for new users of `xrtpy`. For more background information about XRT please refer to the `SolarSoft XRT Analysis Guide`_.
 
 
 XRTpy Objects:
