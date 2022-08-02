@@ -32,7 +32,7 @@ XRTpy default emission model from CHIANTI. This structure contains data and info
 The default model assumes coronal abundances :cite:p:`feldman:1992`.
 
 .. note::
-   XRTpy has future plans to accept other plasma emission spectra model.
+   XRTpy has future plans to accept other plasma emission spectra models.
 
 
 X-Ray Filter Channel
