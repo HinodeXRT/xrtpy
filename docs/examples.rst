@@ -14,7 +14,7 @@ Getting started
   :glob:
 
   notebooks/getting_started/*
-  notebooks/*
+  notebooks/computing_functions/*
 
 Computing response functions
 ----------------------------
