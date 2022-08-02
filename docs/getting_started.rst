@@ -37,7 +37,7 @@ The default model assumes coronal abundances :cite:p:`feldman:1992`.
 
 X-Ray Filter Channel
 *********************
-The XRT controls filter imaging using two sequentially positioned filter wheels, reference Section 3 `X-Ray Telescope Instrument Guide`
+The XRT controls filter imaging using two sequentially positioned filter wheels. Refer to Section 3 in the `X-Ray Telescope Instrument Guide`
 in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filters. The existing filters are structured as so:
 
 #. Filter Configuration
