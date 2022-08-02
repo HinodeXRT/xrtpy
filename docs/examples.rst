@@ -14,7 +14,6 @@ Getting started
   :glob:
 
   notebooks/getting_started/*
-  notebooks/computing_functions/*
 
 Computing response functions
 ----------------------------
@@ -22,5 +21,4 @@ Computing response functions
 .. nbgallery::
   :glob:
 
-  notebooks/getting_started/*
   notebooks/computing_functions/*
