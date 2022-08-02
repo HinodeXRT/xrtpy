@@ -8,7 +8,7 @@ on the board Hinode spacecraft. This page is intended for new users of `xrtpy`. 
 
 XRTpy Objects:
 **************
-XRTpy currently offers `~xrtpy.response.channel.Channel`, *Effective Area*, and
+XRTpy currently offers *Channel*, *Effective Area*, and
 *Temperature Response* classes. These classes allow users
 to explore properties of the XRT. Visit our Example page for detail example guides on how to use the XRTpy classes.
 
