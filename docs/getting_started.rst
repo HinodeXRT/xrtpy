@@ -64,7 +64,7 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
 
 .. note::
     Filters are expressed by their abbreviation when used in XRTpy. For example, if we want to explore the filter channel
-    that selects the titanium-on-polyimide filter, then the string would be 'Ti-poly'. The process is the same for all XRT
+    that selects the titanium-on-polyimide filter, then the string would be ``'Ti-poly'``. The process is the same for all XRT
     filter channels.
 
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
