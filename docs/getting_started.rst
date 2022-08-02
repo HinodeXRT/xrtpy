@@ -29,7 +29,7 @@ Temperature Response
 --------------------
 XRTpy produces the temperature response for each XRT filter channel, assuming a spectral emission model, refer to :cite:t:`Narukage:2011` and :cite:t:`Narukage:2014`.
 XRTpy default emission model from CHIANTI. This structure contains data and information about a plasma emission model, as a function of wavelength and temperature.
-The default model assumes coronal abundances `Feldman (1992)`_.
+The default model assumes coronal abundances :cite:p:`feldman:1992`.
 
 .. note::
    XRTpy has future plans to accept other plasma emission spectra model.
