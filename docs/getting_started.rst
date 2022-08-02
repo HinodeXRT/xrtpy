@@ -27,9 +27,9 @@ Refer to the `SolarSoft XRT Analysis Guide`_ for more information about the inst
 
 Temperature Response
 --------------------
-XRTpy produces the temperature response for each XRT filter channel, assuming a spectral emission model, refer to :cite:t:`Narukage:2011` and :cite:t:`Narukage:2014`.
+XRTpy produces the temperature response for each XRT filter channel, assuming a spectral emission model, refer to :cite:t:`narukage:2011` and :cite:t:`narukage:2014`.
 XRTpy default emission model from CHIANTI. This structure contains data and information about a plasma emission model, as a function of wavelength and temperature.
-The default model assumes coronal abundances :cite:p:`feldman:1992`.
+The default model assumes coronal abundances :cite:t:`feldman:1992`.
 
 .. note::
    XRTpy has future plans to accept other plasma emission spectra models.
@@ -69,8 +69,3 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
 
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
 .. _xrt-cfa-harvard: https://xrt.cfa.harvard.edu/index.php
-
-.. _Feldman (1992): https://doi.org/10.1088/0031-8949/46/3/002
-
-.. _Narukage et al. 2011: https://doi.org/10.1007/s11207-010-9685-2
-.. _Narukage et al. 2014: https://doi.org/10.1007/s11207-013-0368-7
