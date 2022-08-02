@@ -21,8 +21,8 @@ filter channel including the Charge-Coupled Device (CCD), Entrance Filter, Focus
 
 Effective Area
 --------------
-XRTpy produces the effective areas for a set of XRT X-Ray filter channels paired with thicknesses of the CCD contamination layer.
-Reference the `SolarSoft XRT Analysis Guide`_ for more information about the instrumental spectral responses.
+XRTpy produces the effective areas for a set of XRT filter channels paired with thicknesses of the CCD contamination layer.
+Refer to the `SolarSoft XRT Analysis Guide`_ for more information about the instrumental spectral responses.
 
 
 Temperature Response
