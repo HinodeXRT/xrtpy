@@ -5,3 +5,5 @@
 *************
 Communication
 *************
+
+Please direct any comments, questions, or suggestions: xrtpy@cfa.harvard.edu
