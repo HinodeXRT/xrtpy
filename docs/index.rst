@@ -20,6 +20,7 @@ for the analysis of observations made by the `X-Ray Telescope`_ (XRT)
    examples
    bibliography
    glossary
+   feedback_communication
    contributing/index
 
 Indices and tables
