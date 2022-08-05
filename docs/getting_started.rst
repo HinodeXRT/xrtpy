@@ -60,7 +60,8 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
         Visible light shutter position. Reference the Section 3.5 `XRT Mechanisms` in the `SolarSoft XRT Analysis Guide`_ for more
         information about 'Open' shutter position.
     #. *G-band*
-        The G-Band filter allows visible light into the telescope and onto the CCD.
+        The G-Band filter allows visible light into the telescope and onto the CCD. XRTpy does not
+        calculate the effective area or the temperature response for the G-Band filter.
 
 .. note::
     Filters are expressed by their abbreviation when used in XRTpy. For example, if we want to explore the filter channel
