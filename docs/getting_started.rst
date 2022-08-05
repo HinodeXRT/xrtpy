@@ -57,7 +57,7 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
             -  Aluminum Thick (*Al-thick*)
             -  Beryllium Thick (*Be-thick*)
     #. *Open*
-        Each filter wheel has an empty position name 'Open'. The open position is in place when a filter on the other filter wheel is being used.
+        Each filter wheel has an empty position, named 'Open'. The open position is in place when a filter on the other filter wheel is being used.
     #. *G-band*
         The G-Band filter allows visible light into the telescope and onto the CCD. XRTpy does not
         calculate the effective area or the temperature response for the G-Band filter.
