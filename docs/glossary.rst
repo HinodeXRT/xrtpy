@@ -9,8 +9,6 @@ Glossary
 .. glossary::
    :sorted:
 
-   channel filter
-      Explain what filter means.
    open
       Visible light shutter during exposure as name
    temperature
