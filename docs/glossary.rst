@@ -11,6 +11,7 @@ Glossary
 
    open
       Visible light shutter during exposure as name
+
    temperature
       Temperature :math:`T`, is a `~astropy.units.Quantity` with units of temperature (e.g., kelvin)
 
