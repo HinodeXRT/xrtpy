@@ -70,6 +70,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/api
 
 # PyBuilder
 target/
@@ -128,5 +129,15 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# emacs
+*#
+*~
+
 # Miscellaneous
 version.py
+.idea
+.vscode
+
+#ignore mac files
+.DS_store
+.DS_Store
