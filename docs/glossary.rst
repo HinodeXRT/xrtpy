@@ -15,6 +15,7 @@ Glossary
       Visible light shutter during exposure as name
    temperature
       Temperature :math:`T`, is a `~astropy.units.Quantity` with units of temperature (e.g., kelvin)
+
    temperature response
       Instrument temperature response function, for a filter-channel. Units are [DN cm^5 s−1 pix−1]
    solar-emission-spectra
