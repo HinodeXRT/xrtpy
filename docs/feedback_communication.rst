@@ -15,7 +15,7 @@ We appreciate any feedback describing your experience using XRTpy. We welcome ot
 
 Bug Encounters
 ==============
-In the event that you come across a direct XRTpy error, flaw, or unexpected operation. Please report it to us directly via `email`_ or by creating a `GitHub-issue`_.
+In the event that you come across a direct XRTpy error, flaw, or unexpected operation, please report it to us directly via `email`_ or by creating a `GitHub-issue`_.
 
 
 .. _xrtpy@cfa.harvard.edu: xrtpy@cfa.harvard.edu
