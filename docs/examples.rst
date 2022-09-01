@@ -13,7 +13,7 @@ Getting started
 .. nbgallery::
   :glob:
 
-  notebooks/getting_started/*
+  notebooks/getting_started/units.ipynb
 
 Computing response functions
 ----------------------------
@@ -21,4 +21,4 @@ Computing response functions
 .. nbgallery::
   :glob:
 
-  notebooks/computing_functions/*
+  notebooks/computing_functions/temperature_response.ipynb
