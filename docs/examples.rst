@@ -12,6 +12,7 @@ Getting started
 
 .. nbgallery::
   :glob:
+
   notebooks/getting_started/*
 
 Computing response functions
@@ -19,4 +20,5 @@ Computing response functions
 
 .. nbgallery::
   :glob:
+
   notebooks/computing_functions/*
