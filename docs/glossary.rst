@@ -9,9 +9,6 @@ Glossary
 .. glossary::
    :sorted:
 
-   Open (Filter Channel)
-      Visible light shutter during exposure as name.
-
    Temperature
       Temperature :math:`T`, is a `~astropy.units.Quantity` with units of temperature (e.g., kelvin).
 
