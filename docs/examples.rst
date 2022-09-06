@@ -21,4 +21,5 @@ Computing response functions
 .. nbgallery::
   :glob:
 
+  notebooks/*
   notebooks/computing_functions/*
