@@ -3,13 +3,14 @@ A Python data analysis package for the `X-Ray Telescope`_ (XRT) on
 Hinode_.
 """
 
+
 import warnings
 
 from xrtpy import response
 
 try:
     from xrtpy.version import __version__
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     warnings.warn("version not found.")
 
 

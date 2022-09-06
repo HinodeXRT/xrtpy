@@ -101,7 +101,7 @@ def get_IDL_data_files():
         "xrtpy", "response/tests/data/effective_area_IDL_testing_files"
     )
 
-    filter_data_files = glob.glob(directory + "/**/*.txt")
+    filter_data_files = glob.glob(f"{directory}/**/*.txt")
 
     return sorted(filter_data_files)
 
@@ -130,20 +130,18 @@ def IDL_test_date(list_of_lists):
     obs_date = str(list_of_lists[1][1])
     obs_time = str(list_of_lists[1][2])
 
-    day = int(obs_date[0:2])
+    day = int(obs_date[:2])
 
     month_datetime_object = datetime.strptime(obs_date[3:6], "%b")
     month = month_datetime_object.month
 
     year = int(obs_date[8:12])
 
-    hour = int(obs_time[0:2])
+    hour = int(obs_time[:2])
     minute = int(obs_time[3:5])
     second = int(obs_time[6:8])
 
-    observation_date_dt = datetime(year, month, day, hour, minute, second)
-
-    return observation_date_dt
+    return datetime(year, month, day, hour, minute, second)
 
 
 def _IDL_effective_area_raw_data(filename):
@@ -156,10 +154,7 @@ def _IDL_effective_area_raw_data(filename):
             line_list = stripped_line.split()
             list_of_lists.append(line_list)
 
-    effective_area = []
-    for i in range(3, len(list_of_lists)):
-        effective_area.append(list_of_lists[i][1])
-
+    effective_area = [list_of_lists[i][1] for i in range(3, len(list_of_lists))]
     effective_area = [float(i) for i in effective_area] * u.cm**2
 
     return effective_area

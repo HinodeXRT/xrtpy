@@ -122,9 +122,7 @@ def test_entrancefilter_material(channel_name):
         _channel_name_to_index_mapping[channel_name]
     ]["EN_FILTER"]["MATERIAL"]
 
-    if np.all(entrancefilter_material == idl_entrancefilter_material_auto):
-        pass
-    else:
+    if not np.all(entrancefilter_material == idl_entrancefilter_material_auto):
         raise ValueError("FAIL: test_entrancefilter_material")
 
 
@@ -191,7 +189,7 @@ def test_entrancefilter_wavelength(channel_name):
     ] * u.angstrom
 
     assert u.allclose(
-        idl_entrancefilter_wavelength_manu, entrancefilter_wavelength[0:10]
+        idl_entrancefilter_wavelength_manu, entrancefilter_wavelength[:10]
     )
 
 
@@ -345,7 +343,7 @@ def test_mirror1_wavelength(channel_name):
         1.90000,
     ] * u.angstrom
 
-    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[0:10])
+    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -462,7 +460,7 @@ def test_mirror2_wavelength(channel_name):
         1.90000,
     ] * u.angstrom
 
-    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[0:10])
+    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -597,7 +595,7 @@ def test_filter1_wavelength(channel_name):
         1.07450,
     ] * u.angstrom
 
-    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[0:10])
+    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -731,7 +729,7 @@ def test_filter2_wavelength(channel_name):
         1.07450,
     ] * u.angstrom
 
-    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[0:10])
+    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -851,7 +849,7 @@ def test_CCD_quantum_efficiency(channel_name):
         0.483898,
     ]
 
-    assert idl_ccd_quantum_efficiency_manu, ccd_quantum_efficiency[0:13]
+    assert idl_ccd_quantum_efficiency_manu, ccd_quantum_efficiency[:13]
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -886,7 +884,7 @@ def test_CCD_wavelength(channel_name):
         1.90000,
     ] * u.angstrom
 
-    assert u.allclose(idl_ccd_wavelength_manu, ccd_wavelength[0:10])
+    assert u.allclose(idl_ccd_wavelength_manu, ccd_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)

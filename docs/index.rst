@@ -15,6 +15,7 @@ for the analysis of observations made by the `X-Ray Telescope`_ (XRT)
    :caption: Contents:
 
    install
+   about_xrt
    getting_started
    examples
    bibliography
