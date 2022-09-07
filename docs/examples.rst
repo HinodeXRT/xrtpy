@@ -23,3 +23,4 @@ Computing response functions
 
   notebooks/*
   notebooks/computing_functions/effective_area.ipynb
+  notebooks/computing_functions/temperature_response.ipynb
