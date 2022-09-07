@@ -2,28 +2,28 @@ pro write_xrt_eff_area
 ; ==============================================
 ;
 ; PROJECT:
-;       Solar-B / XRT / XRTpy 
+;       Solar-B / XRT / XRTpy
 ;
 ; NAME:
-;       
+;
 ;       MAKE_XRT_EFF_AREA
 ;
 ; CATEGORY:
-;       
-;       XRTpy 
+;
+;       XRTpy
 ;
 ; PURPOSE:
 ;
-;       Produces testing formated text files containing header
+;       Produces testing formatted text files containing header
 ;       information i.e Filter,observation_data, and two rows
 ;       of data; wavelength and effective area for a set of XRT
-;       x-ray channels paired with thicknesses of the CCD 
+;       x-ray channels paired with thicknesses of the CCD
 ;       contamination layer.
 ;
 ; INPUTS:
 ;
 ;       INPUT1   - [Mandatory] observation_date, (string)
-;		      String formated observation date is required
+;		      String formatted observation date is required
 ;		      to calculate the effective area. Format of
 ;		      observation date 'DD-MMMM-YYYY HH:MM:SS'.
 ;
@@ -53,7 +53,7 @@ pro write_xrt_eff_area
 ; INFORMATION EXTENSION:
 ;
 ;      make_xrt_wave_resp  - Reference make_xrt_temp_resp.pro for the
-;			   procedure to calcuate the effective areas and spectral responses
+;			   procedure to calculate the effective areas and spectral responses
 ;			   for a set of XRT x-ray channel accounting for some thickness
 ;       		   of the CCD contamination layer. The spectral response is
 ;       		   directly calculated from the effective area, and both are
@@ -96,19 +96,19 @@ pro write_xrt_eff_area
 
 ; === IDL for loop creating a text file containing what is stated in
 ; OUTPUTS ===
-  
+
   for i=0,n_elements(index) -1 do begin
      openw,unit,channel[index[i]].name+'_'+ observation_date_str +'_effective_area.txt',/get_lun
 
      printf, unit, 'Filter ',channel[index[i]].name
-     printf, unit, 'observation_date ', observation_date_str 
+     printf, unit, 'observation_date ', observation_date_str
      printf, unit, 'wavelength', ' ', 'effective area '
      match = where(channel[index[i]].effar.wave ne 0)
-     
+
      for j=0,n_elements(match)-1 do begin
         printf, unit, channel[index[i]].effar.wave[j],' ',channel[index[i]].effar.eff_area[j]
      endfor
-     
+
      close, unit, /force
 
   endfor
