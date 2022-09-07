@@ -2,19 +2,19 @@ pro write_xrt_tr
 ; ==============================================
 ;
 ; PROJECT:
-;       Solar-B / XRT / XRTpy 
+;       Solar-B / XRT / XRTpy
 ;
 ; NAME:
-;       
+;
 ;       MAKE_XRT_TR
 ;
 ; CATEGORY:
-;       
-;       XRTpy 
+;
+;       XRTpy
 ;
 ; PURPOSE:
 ;
-;       Produces temperature response testing formated text files
+;       Produces temperature response testing formatted text files
 ;	containing header information i.e Filter,observation_data, and two rows
 ;       of data; temperature and temperature response for a set of XRT
 ;       x-ray channels.
@@ -22,7 +22,7 @@ pro write_xrt_tr
 ; INPUTS:
 ;
 ;       INPUT1   - [Mandatory] observation_date, (string)
-;		      String formated observation date is required
+;		      String formatted observation date is required
 ;		      to calculate the temperature response. Format of
 ;		      observation date 'DD-MMMM-YYYY HH:MM:SS'.
 ;
@@ -53,14 +53,14 @@ pro write_xrt_tr
 ; INFORMATION EXTENSION:
 ;
 ;      make_xrt_wave_resp  - Reference make_xrt_temp_resp.pro for the
-;			   procedure to calcuate the effective areas and spectral responses
+;			   procedure to calculate the effective areas and spectral responses
 ;			   for a set of XRT x-ray channel accounting for some thickness
 ;       		   of the CCD contamination layer. The spectral response is
 ;       		   directly calculated from the effective area, and both are
 ;       		   functions of wavelength.
 ;
 ; 	make_xrt_temp_resp - Reference make_xrt_temp_resp.pro for the
-;			   procedure to calcuate the temperature response. 
+;			   procedure to calculate the temperature response.
 ;
 ; CONTACT:
 ;
@@ -94,23 +94,23 @@ pro write_xrt_tr
   temp_resp = make_xrt_temp_resp( wave_resp , /chianti )
 
 ; === index is a list numbers corresponding to each filter ===
-  index = [0,1,2,3,4,5,6,7,8] 
+  index = [0,1,2,3,4,5,6,7,8]
 
 ; === IDL for loop creating a text file containing what is stated in
 ; OUTPUTS ===
   for i=0,n_elements(index) -1 do begin
-  
+
      openw,unit,wave_resp[index[i]].name+'_'+ observation_date_str +'_temperature_response.txt',/get_lun
-     
+
      printf, unit, 'Temperature Response: IDL Results'
      printf, unit, 'Filter ',wave_resp[index[i]].name
-     printf, unit, 'observation_date ', observation_date 
+     printf, unit, 'observation_date ', observation_date
      printf,unit,'Temperature', ' ', 'Temperature Response '
 
      for j=0,n_elements(temp_resp[index[i]].temp_resp)-1 do begin ;-1
         printf, unit, temp_resp[index[i]].temp[j],' ',temp_resp[index[i]].temp_resp[j]
      endfor
-    
+
     close, unit, /force
 
   endfor
