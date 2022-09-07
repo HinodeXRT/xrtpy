@@ -22,4 +22,4 @@ Computing response functions
   :glob:
 
   notebooks/*
-  notebooks/computing_functions/*
+  notebooks/computing_functions/effective_area.ipynb
