@@ -66,7 +66,7 @@ For more detailed information, please refer to this tutorial on
 
 .. _install-conda:
 
-Installing Xrtpy with Conda
+Installing XRTpy with Conda
 ==============================
 
 Conda_ is a package management system and environment manager that is
