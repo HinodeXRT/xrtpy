@@ -2,6 +2,7 @@ __all__ = [
     "TemperatureResponseFundamental",
 ]
 
+import numpy as np
 import pkg_resources
 import scipy.io
 import sunpy.time
@@ -160,14 +161,11 @@ class TemperatureResponseFundamental:
         constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
         effective_area = (self.effective_area()).value
+        dwvl = (wavelength[1:] - wavelength[:-1])
+        dwvl = np.append(dwvl, dwvl[-1])
 
-        temp_resp_w_u_c = [
-            integrate.simpson(
-                self.spectra()[i] * effective_area * constants * factors,
-                wavelength,
-            )
-            for i in range(61)
-        ]
+        temp_resp_w_u_c = (self.spectra().value * effective_area * constants *
+                factors * dwvl).sum(axis=1)
 
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
