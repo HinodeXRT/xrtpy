@@ -1,6 +1,5 @@
 import sys
 import numpy as np
-from scipy.integrate import simpson
 from astropy.io import fits
 from astropy.constants import c,h
 from astropy import units as u
@@ -81,7 +80,7 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac = 1, trange = None,
        >> te, em, et, ee = xrt_teem(hdr1, data1, hdr2, data2)
 
        If you want to bin data in space to collect photons (to reduce photon
-       noise), set bin to True as follows:
+       noise), set binfac to an integer value as follows:
        In this case, data is binned as 3x3 in pixels first. After this,
        temperature is derived with binned data.
        >> te, em, et, ee = xrt_teem(hdr1, data1, hdr2, data2, binfac=3)
