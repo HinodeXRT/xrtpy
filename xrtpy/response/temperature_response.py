@@ -165,7 +165,7 @@ class TemperatureResponseFundamental:
         dwvl = np.append(dwvl, dwvl[-1])
 
         temp_resp_w_u_c = (self.spectra().value * effective_area * constants *
-                factors * dwvl).sum(axis=1)
+                           factors * dwvl).sum(axis=1)
 
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
