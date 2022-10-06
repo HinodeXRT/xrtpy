@@ -784,7 +784,9 @@ def test_ccd_gain_right(channel_name):
         * u.electron
     )
 
-    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_auto)
+    idl_ccd_gain_right_correction = 57.5 * u.electron
+
+    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_correction)
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
