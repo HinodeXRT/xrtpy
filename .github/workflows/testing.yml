@@ -5,6 +5,7 @@ on:
     branches:
     - main
     - stable
+    - v*.*.x
   pull_request:
   workflow_dispatch:
 
@@ -52,7 +53,7 @@ jobs:
 
         - name: Import package
           os: windows-latest
-          python: 3.8
+          python: 3.9
           noxenv: import_package
 
     steps:
@@ -67,8 +68,8 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
-    - name: Install nox
-      run: python -m pip install --progress-bar off --upgrade nox
+    - name: Set up nox
+      uses: excitedleigh/setup-nox@v2.0.0
 
     - name: ${{ matrix.name }}
       run: nox -s ${{ matrix.noxenv }} -- ${{ matrix.noxposargs }}
