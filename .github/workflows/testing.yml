@@ -33,6 +33,12 @@ jobs:
           os: ubuntu-latest
           noxenv: tests-3.10
           python: '3.10'
+          noxposargs:
+
+        - name: Python 3.11
+          os: ubuntu-latest
+          noxenv: tests-3.11
+          python: '3.11'
           noxposargs: --durations=10
 
         - name: Linters
