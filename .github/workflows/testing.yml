@@ -68,8 +68,8 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
-    - name: Set up nox
-      uses: excitedleigh/setup-nox@v2.0.0
+    - name: Install nox
+      run: python -m pip install --progress-bar off --upgrade nox
 
     - name: ${{ matrix.name }}
       run: nox -s ${{ matrix.noxenv }} -- ${{ matrix.noxposargs }}
