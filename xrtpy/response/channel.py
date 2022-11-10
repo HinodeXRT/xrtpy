@@ -300,7 +300,7 @@ class CCD:
     @u.quantity_input
     def ccd_gain_left(self) -> u.electron / u.DN:
         """Gain when reading the left port of the CCD."""
-        return u.Quantity(self._ccd_data["GAIN_L"], (u.electron / u.DN))
+        return u.Quantity(self._ccd_data["GAIN_L"], u.electron / u.DN)
 
     @property
     @u.quantity_input
