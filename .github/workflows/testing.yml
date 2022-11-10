@@ -24,13 +24,14 @@ jobs:
           python: 3.8
           noxenv: tests-3.8
 
-        - name: Python 3.9 (MacOS X)
-          os: ubuntu-latest
+        - name: Python 3.9 (MacOS)
+          os: macos-latest
           python: 3.9
           noxenv: tests-3.9
 
         - name: Python 3.10
           noxenv: tests-3.10
+	  python: 3.10
           noxposargs: --durations=10
 
         - name: Linters
