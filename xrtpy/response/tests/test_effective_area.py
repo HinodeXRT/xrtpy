@@ -1,10 +1,9 @@
 import glob
 import pkg_resources
+import pytest
 
 from astropy import units as u
 from datetime import datetime
-
-import pytest
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
