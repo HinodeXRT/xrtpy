@@ -161,14 +161,15 @@ class TemperatureResponseFundamental:
         constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
         effective_area = (self.effective_area()).value
-        dwvl = (wavelength[1:] - wavelength[:-1])
+        dwvl = wavelength[1:] - wavelength[:-1]
         dwvl = np.append(dwvl, dwvl[-1])
         # Simple summing like this is appropriate for binned data like in the current
         # spectrum file. More recent versions of Chianti include the line width,
         # which then makes the previous version that uses Simpson's method
         # to integrate more appropriate (10/05/2022)
-        temp_resp_w_u_c = (self.spectra().value * effective_area * constants *
-                           factors * dwvl).sum(axis=1)
+        temp_resp_w_u_c = (
+            self.spectra().value * effective_area * constants * factors * dwvl
+        ).sum(axis=1)
 
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
