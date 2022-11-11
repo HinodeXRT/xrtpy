@@ -36,9 +36,6 @@ jobs:
         - name: Linters
           noxenv: linters
 
-        - name: Codespell
-          noxenv: codespell
-
         - name: Import package
           noxenv: import_package
 
