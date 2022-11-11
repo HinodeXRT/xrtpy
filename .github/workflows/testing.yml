@@ -20,11 +20,6 @@ jobs:
       matrix:
         include:
 
-        - name: Python 3.9 (Ubuntu)
-          os: ubuntu-latest
-          python: 3.9
-          noxenv: tests-3.9
-
         - name: Python 3.11 (Windows)
           os: windows-latest
           noxenv: tests-3.11
@@ -73,6 +68,11 @@ jobs:
           os: windows-latest
           python: 3.8
           noxenv: tests-3.8
+
+        - name: Python 3.9 (Ubuntu)
+          os: ubuntu-latest
+          python: 3.9
+          noxenv: tests-3.9
 
         - name: Import package
           os: windows-latest
