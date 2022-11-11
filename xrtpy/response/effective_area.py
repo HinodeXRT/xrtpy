@@ -105,7 +105,7 @@ class EffectiveAreaFundamental:
             t0 = _ccd_contamination_file_time[0]
             dt = time - t0
             ccd_observation_date_to_seconds.append(
-                (self.observation_date + timedelta(0, dt)).strftime("%s")
+                (self.observation_date + timedelta(0, dt)).strftime("%S")
             )
 
         return ccd_observation_date_to_seconds[0]
@@ -119,7 +119,7 @@ class EffectiveAreaFundamental:
             t0 = _ccd_contamination_file_time[0]
             dt = time - t0
             ccd_data_dates_to_seconds.append(
-                float((epoch + timedelta(0, dt)).strftime("%s"))
+                float((epoch + timedelta(0, dt)).strftime("%S"))
             )
 
         return ccd_data_dates_to_seconds
@@ -133,7 +133,7 @@ class EffectiveAreaFundamental:
             t0 = _filter_contamination_file_time[0]
             dt = time - t0
             filter_observation_date_to_seconds.append(
-                (self.observation_date + timedelta(0, dt)).strftime("%s")
+                (self.observation_date + timedelta(0, dt)).strftime("%S")
             )
 
         return filter_observation_date_to_seconds[0]
@@ -147,7 +147,7 @@ class EffectiveAreaFundamental:
             t0 = _filter_contamination_file_time[0]
             dt = time - t0
             filter_data_dates_to_seconds.append(
-                float((epoch + timedelta(0, dt)).strftime("%s"))
+                float((epoch + timedelta(0, dt)).strftime("%S"))
             )
 
         return filter_data_dates_to_seconds
