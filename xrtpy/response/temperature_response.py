@@ -68,7 +68,7 @@ class TemperatureResponseFundamental:
         observation_date = astropy_time.datetime
         if observation_date <= epoch:
             raise ValueError(
-                f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
+                rf"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
         self._observation_date = observation_date
 
@@ -182,5 +182,5 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
-        """Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
+        r"""Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
         return self.integration() / self.ccd_gain_right

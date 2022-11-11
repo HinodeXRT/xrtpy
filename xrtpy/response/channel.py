@@ -99,7 +99,7 @@ class EntranceFilter:
 
     @property
     def entrancefilter_density(self) -> u.g * u.cm**-3:
-        """XRT entrance filter material density in g/cm\ :sup:`3`\ ."""
+        r"""XRT entrance filter material density in g/cm\ :sup:`3`\ ."""
         return u.Quantity(self._en_filter_data["DENS"], u.g * u.cm**-3)
 
     @property
