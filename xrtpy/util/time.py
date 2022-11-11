@@ -28,5 +28,5 @@ def xrt_data_time_to_dt(data_time, epoch):
         t1 = time
         dt = t1 - t0
         data_dates_dt.append(epoch + timedelta(0, dt))
-        data_dates_seconds.append(float((epoch + timedelta(0, dt)).strftime("%s")))
+        data_dates_seconds.append(float((epoch + timedelta(0, dt)).strftime("%S")))
     return (data_dates_dt, data_dates_seconds)
