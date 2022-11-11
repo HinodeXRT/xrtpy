@@ -18,7 +18,7 @@ import sunpy.time
 from astropy import units as u
 from pathlib import Path
 
-filename = Path.cwd() / "response" / "data" / "xrt_channels_v0016.genx"
+filename = Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 _channel_name_to_index_mapping = {
     "Al-mesh": 0,

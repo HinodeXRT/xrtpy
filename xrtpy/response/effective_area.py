@@ -36,8 +36,12 @@ index_mapping_to_fw2_name = {
     "Be-thick": 5,
 }
 
-_ccd_contam_filename = Path.cwd() / "data" / "xrt_contam_on_ccd.geny"
-_filter_contam_filename = Path.cwd() / "data" / "xrt_contam_on_filter.geny"
+_ccd_contam_filename = (
+    Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
+)
+_filter_contam_filename = (
+    Path(__file__).parent.absolute() / "data" / "xrt_contam_on_filter.geny"
+)
 
 _ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
 _filter_contam_file = scipy.io.readsav(_filter_contam_filename)

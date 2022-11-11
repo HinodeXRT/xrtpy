@@ -8,7 +8,11 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 def get_IDL_data_files():
-    path = Path.cwd() / "data" / "temperature_response_IDL_testing_files"
+    path = (
+        Path(__file__).parent.parent.absolute()
+        / "data"
+        / "temperature_response_IDL_testing_files"
+    )
     filter_data_files = list(path.glob("**/*.*"))
     return sorted(filter_data_files)
 

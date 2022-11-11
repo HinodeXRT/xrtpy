@@ -97,7 +97,11 @@ def test_EffectiveArea_exception_is_raised(name, date):
 
 
 def get_IDL_data_files():
-    directory = Path.cwd() / "data" / "effective_area_IDL_testing_files"
+    directory = (
+        Path(__file__).parent.parent.absolute()
+        / "data"
+        / "effective_area_IDL_testing_files"
+    )
     filter_data_files = directory.glob("**/*.txt")
     return sorted(filter_data_files)
 

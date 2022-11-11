@@ -20,7 +20,9 @@ _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
 
 
-_CHIANTI_filename = Path.cwd() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
+_CHIANTI_filename = (
+    Path(__file__).parent.absolute() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
+)
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
 
