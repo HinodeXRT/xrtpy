@@ -1,11 +1,11 @@
 import numpy as np
-import pkg_resources
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
 
 from astropy import units as u
+from pathlib import Path
 
 from xrtpy.response.channel import Channel
 
@@ -33,9 +33,7 @@ def test_channel_name(channel_name):
     assert channel.name == channel_name
 
 
-filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_channels_v0016.genx"
-)
+filename = Path.cwd() / ".." / "data" / "xrt_channels_v0016.genx"
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)
 v6_genx_s = v6_genx["SAVEGEN0"]

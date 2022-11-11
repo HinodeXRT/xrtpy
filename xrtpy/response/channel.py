@@ -11,16 +11,14 @@ __all__ = [
 ]
 
 import numpy as np
-import pkg_resources
 import scipy.io
 import sunpy.io.special
 import sunpy.time
 
 from astropy import units as u
+from pathlib import Path
 
-filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_channels_v0016.genx"
-)
+filename = Path.cwd() / "data" / "xrt_channels_v0016.genx"
 
 _channel_name_to_index_mapping = {
     "Al-mesh": 0,

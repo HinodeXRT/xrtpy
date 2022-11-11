@@ -5,7 +5,6 @@ __all__ = [
 
 import math
 import numpy as np
-import pkg_resources
 import scipy.io
 import sunpy.io.special
 import sunpy.time
@@ -13,6 +12,7 @@ import sunpy.time
 from astropy import units as u
 from datetime import timedelta
 from functools import cached_property
+from pathlib import Path
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
@@ -36,13 +36,8 @@ index_mapping_to_fw2_name = {
     "Be-thick": 5,
 }
 
-
-_ccd_contam_filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_contam_on_ccd.geny"  # data/channels
-)
-_filter_contam_filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_contam_on_filter.geny"
-)
+_ccd_contam_filename = Path.cwd() / "data" / "xrt_contam_on_ccd.geny"
+_filter_contam_filename = Path.cwd() / "data" / "xrt_contam_on_filter.geny"
 
 _ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
 _filter_contam_file = scipy.io.readsav(_filter_contam_filename)
@@ -195,9 +190,7 @@ class EffectiveAreaFundamental:
     @cached_property
     def n_DEHP_attributes(self):
         """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
-        _n_DEHP_filename = pkg_resources.resource_filename(
-            "xrtpy", "response/data/n_DEHP.txt"
-        )
+        _n_DEHP_filename = Path.cwd() / "data" / "n_DEHP.txt"
 
         with open(_n_DEHP_filename, "r") as n_DEHP:
             list_of_DEHP_attributes = []

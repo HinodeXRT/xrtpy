@@ -1,9 +1,9 @@
 import glob
-import pkg_resources
 import pytest
 
 from astropy import units as u
 from datetime import datetime
+from pathlib import Path
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
@@ -96,13 +96,8 @@ def test_EffectiveArea_exception_is_raised(name, date):
 
 
 def get_IDL_data_files():
-
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/effective_area_IDL_testing_files"
-    )
-
-    filter_data_files = glob.glob(f"{directory}/**/*.txt")
-
+    directory = Path.cwd() / "data" / "effective_area_IDL_testing_files"
+    filter_data_files = directory.glob("**/*.txt")
     return sorted(filter_data_files)
 
 
