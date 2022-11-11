@@ -2,6 +2,7 @@ __all__ = [
     "TemperatureResponseFundamental",
 ]
 
+import numpy as np
 import scipy.io
 import sunpy.time
 
@@ -159,22 +160,23 @@ class TemperatureResponseFundamental:
         constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
         effective_area = (self.effective_area()).value
-
-        temp_resp_w_u_c = [
-            integrate.simpson(
-                self.spectra()[i] * effective_area * constants * factors,
-                wavelength,
-            )
-            for i in range(61)
-        ]
+        dwvl = wavelength[1:] - wavelength[:-1]
+        dwvl = np.append(dwvl, dwvl[-1])
+        # Simple summing like this is appropriate for binned data like in the current
+        # spectrum file. More recent versions of Chianti include the line width,
+        # which then makes the previous version that uses Simpson's method
+        # to integrate more appropriate (10/05/2022)
+        temp_resp_w_u_c = (
+            self.spectra().value * effective_area * constants * factors * dwvl
+        ).sum(axis=1)
 
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
     @property
     @u.quantity_input
-    def ccd_gain_right(self) -> 1 / u.DN:
+    def ccd_gain_right(self) -> u.electron / u.DN:
         """Provide the camera gain in electrons per data number."""
-        return Channel(self.name).ccd.ccd_gain_right / u.DN
+        return Channel(self.name).ccd.ccd_gain_right
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
