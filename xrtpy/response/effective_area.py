@@ -104,10 +104,6 @@ class EffectiveAreaFundamental:
         for time in _ccd_contamination_file_time:
             t0 = _ccd_contamination_file_time[0]
             dt = time - t0
-            print(f"{self.observation_date = }")
-            print(f"{time = }")
-            print(f"{dt = }")
-            print("timedelta(0, dt) = ", timedelta(0, dt))
             ccd_observation_date_to_seconds.append(
                 (self.observation_date + timedelta(0, dt)).strftime("%s")
             )
