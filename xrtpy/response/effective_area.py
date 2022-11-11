@@ -194,7 +194,7 @@ class EffectiveAreaFundamental:
     @cached_property
     def n_DEHP_attributes(self):
         """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
-        _n_DEHP_filename = Path.cwd() / "data" / "n_DEHP.txt"
+        _n_DEHP_filename = Path(__file__).parent.absolute() / "data" / "n_DEHP.txt"
 
         with open(_n_DEHP_filename, "r") as n_DEHP:
             list_of_DEHP_attributes = []
