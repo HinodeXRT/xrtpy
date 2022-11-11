@@ -31,11 +31,6 @@ jobs:
           python: '3.11'
           noxenv: linters
 
-        - name: Codespell
-          os: ubuntu-latest
-          python: '3.11'
-          noxenv: codespell
-
     steps:
 
     - name: Checkout code
