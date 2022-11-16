@@ -115,7 +115,7 @@ class EffectiveAreaFundamental:
 
         if self.observation_date > ccd_data_dates_dt[-1]:
             raise ValueError(
-                "No contamination data is presently available for {:}.\n The lastest available data {:}\n Contamination data is update monthly.".format(
+                "No contamination data is presently available for {:}.\n The latest available data {:}\n Contamination data is update monthly.".format(
                     self.observation_date, ccd_data_dates_dt[-1]
                 )
             )
