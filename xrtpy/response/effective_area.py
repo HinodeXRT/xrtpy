@@ -3,8 +3,10 @@ __all__ = [
     "effective_area",
 ]
 
+import datetime
 import math
 import numpy as np
+import os
 import pkg_resources
 import scipy.io
 import sunpy.io.special
@@ -98,6 +100,29 @@ class EffectiveAreaFundamental:
         self._observation_date = observation_date
 
     @property
+    def ccd_data_dates_to_seconds(self):
+        """Converting CCD data dates to datetimes."""
+
+        ccd_data_dates_dt = []
+        ccd_data_dates_to_seconds = []
+        for time in _ccd_contamination_file_time:
+            t0 = _ccd_contamination_file_time[0]
+            dt = time - t0
+            ccd_data_dates_dt.append((epoch + timedelta(0, dt)))
+            ccd_data_dates_to_seconds.append(
+                float((epoch + timedelta(0, dt)).strftime("%s"))
+            )
+
+        if self.observation_date > ccd_data_dates_dt[-1]:
+            raise ValueError(
+                "No contamination data is presently available for {:}.\n The lastest available data {:}\n Contamination data is update monthly.".format(
+                    self.observation_date, ccd_data_dates_dt[-1]
+                )
+            )
+
+        return ccd_data_dates_to_seconds
+
+    @property
     def ccd_observation_date_to_seconds(self):
         """Converting users observation date into seconds with respect to CCD contamination data. Used for interpolation."""
 
@@ -110,20 +135,6 @@ class EffectiveAreaFundamental:
             )
 
         return ccd_observation_date_to_seconds[0]
-
-    @property
-    def ccd_data_dates_to_seconds(self):
-        """Converting CCD data dates to datetimes."""
-
-        ccd_data_dates_to_seconds = []
-        for time in _ccd_contamination_file_time:
-            t0 = _ccd_contamination_file_time[0]
-            dt = time - t0
-            ccd_data_dates_to_seconds.append(
-                float((epoch + timedelta(0, dt)).strftime("%s"))
-            )
-
-        return ccd_data_dates_to_seconds
 
     @property
     def filter_observation_date_to_seconds(self):
