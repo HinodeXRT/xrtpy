@@ -123,7 +123,13 @@ class EffectiveAreaFundamental:
 
         if self.observation_date > ccd_data_dates_dt[-1]:
             raise ValueError(
-                f"No contamination data is presently available for {self.observation_date}.\n The latest available data {ccd_data_dates_dt[-1]}.\n Contamination data is update monthly. Last update was on {self.xrt_contam_on_ccd_geny_update}"
+                "No contamination data is presently available for "
+                f"{self.observation_date}.\n The latest available data "
+                f"{ccd_data_dates_dt[-1]}.\n Contamination data is "
+                "updated periodically. Last update was on "
+                f"{self.xrt_contam_on_ccd_geny_update}. If this is more "
+                "than one month ago, please raise an issue at: "
+                "https://github.com/HinodeXRT/xrtpy/issues/new"
             )
         return ccd_data_dates_to_seconds
 
