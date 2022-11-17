@@ -100,6 +100,14 @@ class EffectiveAreaFundamental:
         self._observation_date = observation_date
 
     @property
+    def xrt_contam_on_ccd_geny_update(self):
+        """Return a string of the last time the file was modified."""
+        modified_time = os.path.getmtime(_ccd_contam_filename)
+        modified_time_dt = datetime.datetime.fromtimestamp(modified_time)
+
+        return modified_time_dt.strftime("%Y/%m/%d")
+
+    @property
     def ccd_data_dates_to_seconds(self):
         """Converting CCD data dates to datetimes."""
 
@@ -115,7 +123,7 @@ class EffectiveAreaFundamental:
 
         if self.observation_date > ccd_data_dates_dt[-1]:
             raise ValueError(
-                f"No contamination data is presently available for {self.observation_date}.\n The latest available data {ccd_data_dates_dt[-1]}.\n Contamination data is update monthly."
+                f"No contamination data is presently available for {self.observation_date}.\n The latest available data {ccd_data_dates_dt[-1]}.\n Contamination data is update monthly. Last update was on {self.xrt_contam_on_ccd_geny_update}"
             )
         return ccd_data_dates_to_seconds
 
