@@ -1,20 +1,19 @@
 import glob
-import pkg_resources
 import pytest
 
 from datetime import datetime
+from pathlib import Path
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 def get_IDL_data_files():
-
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/temperature_response_IDL_testing_files"
+    path = (
+        Path(__file__).parent.parent.absolute()
+        / "data"
+        / "temperature_response_IDL_testing_files"
     )
-
-    filter_data_files = glob.glob(f"{directory}/**/*.txt")
-
+    filter_data_files = list(path.glob("**/*.*"))
     return sorted(filter_data_files)
 
 

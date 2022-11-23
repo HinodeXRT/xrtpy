@@ -69,3 +69,9 @@ repos:
   hooks:
   - id: absolufy-imports
     exclude: docs/plasmapy_sphinx
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.2
+  hooks:
+  - id: codespell
+    args: [--config pyproject.toml]
