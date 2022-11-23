@@ -1,9 +1,10 @@
 import glob
-import pytest
 
 from astropy import units as u
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
@@ -46,7 +47,6 @@ valid_dates = [
     datetime(year=2015, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2017, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2019, month=9, day=23, hour=22, minute=1, second=1),
-    datetime(year=2022, month=9, day=23, hour=22, minute=1, second=1),
 ]
 
 invalid_dates = [
