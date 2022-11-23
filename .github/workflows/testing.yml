@@ -31,6 +31,9 @@ jobs:
           python: '3.11'
           noxenv: linters
 
+        - name: Import package
+          noxenv: import_package
+
     steps:
 
     - name: Checkout code
