@@ -3,13 +3,13 @@ __all__ = [
 ]
 
 import numpy as np
-import pkg_resources
 import scipy.io
 import sunpy.time
 
 from astropy import units as u
 from astropy.constants import c, h
 from datetime import datetime
+from pathlib import Path
 from scipy import integrate, interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
@@ -19,8 +19,9 @@ from xrtpy.util.time import epoch
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
 
-_CHIANTI_filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/XRT_emiss_model.default_CHIANTI.geny"
+
+_CHIANTI_filename = (
+    Path(__file__).parent.absolute() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
 )
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
@@ -67,7 +68,7 @@ class TemperatureResponseFundamental:
         observation_date = astropy_time.datetime
         if observation_date <= epoch:
             raise ValueError(
-                f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
+                rf"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
         self._observation_date = observation_date
 
@@ -181,5 +182,5 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
-        """Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
+        r"""Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
         return self.integration() / self.ccd_gain_right
