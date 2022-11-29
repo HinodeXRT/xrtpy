@@ -184,19 +184,19 @@ class EffectiveAreaFundamental:
     @property
     def combo_filter1_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        filter1, _ = self.combo_filter_number
+        filter1, _ = self.combo_filter_name_split
         return 0 if filter1 in index_mapping_to_fw1_name else 1
 
     @property
     def combo_filter2_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        _, filter2 = self.combo_filter_number
+        _, filter2 = self.combo_filter_name_split
         return 0 if filter2 in index_mapping_to_fw1_name else 1
 
     @property
     def combo_filter_index_mapping_to_name_filter1(self):
         """Returns filter's corresponding number value."""
-        filter1, _ = self.combo_filter_number
+        filter1, _ = self.combo_filter_name_split
 
         if filter1 in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(filter1)
