@@ -182,6 +182,26 @@ class EffectiveAreaFundamental:
         return filter1, filter2
 
     @property
+    def combo_filter_index_mapping_to_name_filter1(self):
+        """Returns filter's corresponding number value."""
+        filter1, _ = self.combo_filter_number
+
+        if filter1 in index_mapping_to_fw1_name:
+            return index_mapping_to_fw1_name.get(filter1)
+        elif filter1 in index_mapping_to_fw2_name:
+            return index_mapping_to_fw2_name.get(filter1)
+
+    @property
+    def combo_filter_index_mapping_to_name_filter2(self):
+        """Returns filter's corresponding number value."""
+        _, filter2 = self.combo_filter_number
+
+        if filter2 in index_mapping_to_fw1_name:
+            return index_mapping_to_fw1_name.get(filter2)
+        elif filter2 in index_mapping_to_fw2_name:
+            return index_mapping_to_fw2_name.get(filter2)
+
+    @property
     def filter_data(self):
         """Collecting filter data."""
         return _filter_contamination[self.filter_index_mapping_to_name][
