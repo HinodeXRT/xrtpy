@@ -111,7 +111,7 @@ filenames = get_IDL_data_files()
 
 def _IDL_raw_data_list(filename):
 
-    with open(filename, "r") as filter_file:
+    with open(filename) as filter_file:
 
         list_of_IDL_effective_area_data = []
         for line in filter_file:
@@ -146,7 +146,7 @@ def IDL_test_date(list_of_lists):
 
 def _IDL_effective_area_raw_data(filename):
 
-    with open(filename, "r") as filter_file:
+    with open(filename) as filter_file:
 
         list_of_lists = []
         for line in filter_file:
