@@ -5,6 +5,7 @@ from astropy import units as u
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 from sunpy.coordinates.sun import angular_radius
 
+
 def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
              no_threshold=False, Te_err_threshold=0.5,
              photon_noise_threshold=0.2, mask=None, verbose=False):
@@ -93,7 +94,7 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
        The returned values of pixels where the temperature cannot be derived
        or the error is greater than the threshold or the photon noise is
        greater than the threshold are set to 0. The EM for those pixels is
-       also set to 0. 
+       also set to 0.
 
        The details of the coronal-temperature-diagnostic capability of
        Hinode/XRT is described in
@@ -109,6 +110,7 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     IDL routine written by N.Narukage (NAOJ). Converted to python by Jonathan
     D. Slavin (SAO). See original IDL code for more details.
     """
+
     n1 = ('XRT_RENORMALIZE' in hdr1['HISTORY'])
     n2 = ('XRT_RENORMALIZE' in hdr2['HISTORY'])
     # This allows use of normalized data (contrary to original IDL code):
@@ -187,7 +189,7 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
         raise ValueError('Invalid filter values, both fw1 and fw2 are Open')
     date_obs2 = hdr2['DATE_OBS']
     tresp2 = TemperatureResponseFundamental(filt2, date_obs2)
-    
+
     if filt1 == filt2:
         raise ValueError('Filters for the two images cannot be the same')
 
@@ -206,6 +208,10 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     t2mk = np.argmin(np.abs(Tmodel - 2.E6))
     logTmodel = np.log10(Tmodel)
     rev_ratio = (ratio[t2mk] > 1.)
+    spect1 = tresp1.spectra().value
+    spect2 = tresp2.spectra().value
+    effarea1 = tresp1.effective_area().value    # in cm^2
+    effarea2 = tresp2.effective_area().value    # in cm^2
 
     # Note: this requires Trange to be a 2 element iterable ordered low to
     # high (Trange is log10 of temperature limits).
@@ -247,7 +253,7 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     ok_num[ok_cnt != 1] = 0
     a = np.abs(model_ratio[ok_num] - data_ratio)
     b = np.abs(model_ratio[np.maximum((ok_num - 1), 0)] - data_ratio)
-    Te = ((np.log10(Tmodel[ok_num])*b 
+    Te = ((np.log10(Tmodel[ok_num])*b
            + np.log10(Tmodel[np.maximum((ok_num - 1), 0)])*a) / (a + b))
     Te = np.ma.masked_where(Te <= 0., Te)
 
@@ -268,25 +274,21 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     dlnR_dlnT = np.interp(Te, logTmodel, dlnR_dlnT_mod, left=0., right=0.)
     dlnR_dlnT = np.ma.masked_where(((dlnR_dlnT == 0.) | (Te <= 0.)), dlnR_dlnT)
 
-    spect1 = tresp1.spectra().value
-    effarea1 = tresp1.effective_area().value    # in cm^2
-    spect2 = tresp2.spectra().value
-    effarea2 = tresp2.effective_area().value    # in cm^2
     wvl = tresp1.channel_wavelength
     eVe = tresp1.ev_per_electron
     gain = tresp1.ccd_gain_right
     # (h*c/lambda) * 1/(eV per electron) * 1/gain
     e2dn = (h.to(u.eV*u.s)*c.to(u.angstrom/u.s)/(wvl*eVe*gain)).value
     dwvl = wvl[1:] - wvl[:-1]
-    dwvl = np.append(dwvl,dwvl[-1]).value
-    
+    dwvl = np.append(dwvl, dwvl[-1]).value
+
     # These sums should be converted to integrals if the spectrum includes
     # line broadening (as is the default in ChiantiPy).
     K1_mod = np.array([(s1 * effarea1 * e2dn**2 * dwvl).sum() /
                        (s1 * effarea1 * e2dn * dwvl).sum()
                        for s1 in spect1])
-    K2_mod = np.array([(s2 * effarea2 * e2dn**2 * dwvl).sum() / 
-                       (s2 * effarea2 * e2dn * dwvl).sum() 
+    K2_mod = np.array([(s2 * effarea2 * e2dn**2 * dwvl).sum() /
+                       (s2 * effarea2 * e2dn * dwvl).sum()
                        for s2 in spect2])
     K1 = np.interp(Te, logTmodel, K1_mod, left=0., right=0.)
     K2 = np.interp(Te, logTmodel, K2_mod, left=0., right=0.)
