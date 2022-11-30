@@ -69,3 +69,22 @@ repos:
   hooks:
   - id: absolufy-imports
     exclude: docs/plasmapy_sphinx
+
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.2
+  hooks:
+  - id: codespell
+    args: [--config pyproject.toml]
+
+- repo: https://github.com/asottile/pyupgrade
+  rev: v2.38.2
+  hooks:
+  - id: pyupgrade
+    args: [--keep-runtime-typing, --py38-plus]
+    files: ^xrtpy/
+
+- repo: https://github.com/pre-commit/pygrep-hooks
+  rev: v1.9.0
+  hooks:
+  - id: rst-directive-colons
+  - id: rst-inline-touching-normal
