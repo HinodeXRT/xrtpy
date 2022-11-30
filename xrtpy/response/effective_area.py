@@ -269,7 +269,7 @@ class EffectiveAreaFundamental:
         """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
         _n_DEHP_filename = Path(__file__).parent.absolute() / "data" / "n_DEHP.txt"
 
-        with open(_n_DEHP_filename, "r") as n_DEHP:
+        with open(_n_DEHP_filename) as n_DEHP:
             list_of_DEHP_attributes = []
             for line in n_DEHP:
                 stripped_line = line.strip()

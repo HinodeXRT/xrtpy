@@ -32,6 +32,8 @@ jobs:
           noxenv: linters
 
         - name: Import package
+          os: windows-latest
+          python: '3.11'
           noxenv: import_package
 
     steps:
