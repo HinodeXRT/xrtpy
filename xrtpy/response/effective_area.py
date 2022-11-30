@@ -42,6 +42,7 @@ index_mapping_to_fw2_name = {
 _ccd_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
 )
+
 _filter_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_filter.geny"
 )
@@ -116,7 +117,7 @@ class EffectiveAreaFundamental:
         for time in _ccd_contamination_file_time:
             t0 = _ccd_contamination_file_time[0]
             dt = time - t0
-            ccd_data_dates_dt.append((epoch + timedelta(0, dt)))
+            ccd_data_dates_dt.append(epoch + timedelta(0, dt))
             ccd_data_dates_to_seconds.append(
                 float((epoch + timedelta(0, dt)).strftime("%S"))
             )
