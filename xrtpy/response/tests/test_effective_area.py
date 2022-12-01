@@ -1,9 +1,9 @@
 import glob
-import pkg_resources
 import pytest
 
 from astropy import units as u
 from datetime import datetime
+from pathlib import Path
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
@@ -46,6 +46,7 @@ valid_dates = [
     datetime(year=2015, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2017, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2019, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2022, month=9, day=23, hour=22, minute=1, second=1),
 ]
 
 invalid_dates = [
@@ -96,13 +97,12 @@ def test_EffectiveArea_exception_is_raised(name, date):
 
 
 def get_IDL_data_files():
-
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/effective_area_IDL_testing_files"
+    directory = (
+        Path(__file__).parent.parent.absolute()
+        / "data"
+        / "effective_area_IDL_testing_files"
     )
-
-    filter_data_files = glob.glob(f"{directory}/**/*.txt")
-
+    filter_data_files = directory.glob("**/*.txt")
     return sorted(filter_data_files)
 
 
@@ -111,7 +111,7 @@ filenames = get_IDL_data_files()
 
 def _IDL_raw_data_list(filename):
 
-    with open(filename, "r") as filter_file:
+    with open(filename) as filter_file:
 
         list_of_IDL_effective_area_data = []
         for line in filter_file:
@@ -146,7 +146,7 @@ def IDL_test_date(list_of_lists):
 
 def _IDL_effective_area_raw_data(filename):
 
-    with open(filename, "r") as filter_file:
+    with open(filename) as filter_file:
 
         list_of_lists = []
         for line in filter_file:
