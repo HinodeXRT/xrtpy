@@ -7,7 +7,6 @@ import datetime
 import math
 import numpy as np
 import os
-import pkg_resources
 import scipy.io
 import sunpy.io.special
 import sunpy.time
