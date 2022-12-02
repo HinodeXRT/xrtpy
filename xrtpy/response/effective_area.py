@@ -18,9 +18,6 @@ from scipy import interpolate
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.util.time import epoch
 
-# from pathlib import Path
-
-
 index_mapping_to_fw1_name = {
     "Open": 0,
     "Al-poly": 1,
@@ -38,15 +35,6 @@ index_mapping_to_fw2_name = {
     "Al-thick": 4,
     "Be-thick": 5,
 }
-
-"""
-_ccd_contam_filename = (
-    Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
-)
-_filter_contam_filename = (
-    Path(__file__).parent.absolute() / "data" / "xrt_contam_on_filter.geny"
-)
-"""
 
 _ccd_contam_filename = pkg_resources.resource_filename(
     "xrtpy", "response/data/xrt_contam_on_ccd.geny"
@@ -210,7 +198,6 @@ class EffectiveAreaFundamental:
         _n_DEHP_filename = pkg_resources.resource_filename(
             "xrtpy", "response/data/n_DEHP.txt"
         )
-        # _n_DEHP_filename = Path(__file__).parent.absolute() / "data" / "n_DEHP.txt"
 
         with open(_n_DEHP_filename) as n_DEHP:
             list_of_DEHP_attributes = []
