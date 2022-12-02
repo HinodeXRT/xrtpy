@@ -5,6 +5,7 @@ __all__ = [
 
 import math
 import numpy as np
+import pkg_resources
 import scipy.io
 import sunpy.io.special
 import sunpy.time
@@ -12,11 +13,13 @@ import sunpy.time
 from astropy import units as u
 from datetime import timedelta
 from functools import cached_property
-from pathlib import Path
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.util.time import epoch
+
+# from pathlib import Path
+
 
 index_mapping_to_fw1_name = {
     "Open": 0,
@@ -36,11 +39,21 @@ index_mapping_to_fw2_name = {
     "Be-thick": 5,
 }
 
+"""
 _ccd_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
 )
 _filter_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_filter.geny"
+)
+"""
+
+_ccd_contam_filename = pkg_resources.resource_filename(
+    "xrtpy", "response/data/xrt_contam_on_ccd.geny"
+)
+
+_filter_contam_filename = pkg_resources.resource_filename(
+    "xrtpy", "response/data/xrt_contam_on_filter.geny"
 )
 
 _ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
