@@ -3,13 +3,13 @@ __all__ = [
 ]
 
 import numpy as np
+import pkg_resources
 import scipy.io
 import sunpy.time
 
 from astropy import units as u
 from astropy.constants import c, h
 from datetime import datetime
-from pathlib import Path
 from scipy import integrate, interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
@@ -19,10 +19,10 @@ from xrtpy.util.time import epoch
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
 
-
-_CHIANTI_filename = (
-    Path(__file__).parent.absolute() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
+_CHIANTI_filename = pkg_resources.resource_filename(
+    "xrtpy", "response/data/XRT_emiss_model.default_CHIANTI.geny"
 )
+
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
 
