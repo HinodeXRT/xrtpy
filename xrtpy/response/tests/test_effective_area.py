@@ -47,6 +47,9 @@ valid_dates = [
     datetime(year=2015, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2017, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2019, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2020, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2021, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2022, month=9, day=23, hour=22, minute=1, second=1),
 ]
 
 invalid_dates = [
