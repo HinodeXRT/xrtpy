@@ -135,7 +135,8 @@ class EffectiveAreaFundamental:
 
     @property
     def ccd_observation_date_to_seconds(self):
-        """Converting users observation date into seconds with respect to CCD contamination data. Used for interpolation."""
+        """Converting users observation date into seconds with
+        respect to CCD contamination data. Used for interpolation."""
 
         ccd_observation_date_to_seconds = []
         for time in _ccd_contamination_file_time:
