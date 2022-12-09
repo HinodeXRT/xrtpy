@@ -1,11 +1,11 @@
 import numpy as np
-import pkg_resources
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
 
 from astropy import units as u
+from pathlib import Path
 
 from xrtpy.response.channel import Channel
 
@@ -33,9 +33,7 @@ def test_channel_name(channel_name):
     assert channel.name == channel_name
 
 
-filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_channels_v0016.genx"
-)
+filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)
 v6_genx_s = v6_genx["SAVEGEN0"]
@@ -765,10 +763,9 @@ def test_ccd_gain_left(channel_name):
     channel_filter = Channel(channel_name)
     ccd_gain_left = channel_filter.ccd.ccd_gain_left
 
-    idl_ccd_gain_left_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["CCD"]["GAIN_L"]
-        * u.electron
-    )
+    idl_ccd_gain_left_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]][
+        "CCD"
+    ]["GAIN_L"] * (u.electron / u.DN)
 
     assert u.isclose(ccd_gain_left, idl_ccd_gain_left_auto)
 
@@ -779,12 +776,13 @@ def test_ccd_gain_right(channel_name):
     channel_filter = Channel(channel_name)
     ccd_gain_right = channel_filter.ccd.ccd_gain_right
 
-    idl_ccd_gain_right_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["CCD"]["GAIN_R"]
-        * u.electron
-    )
+    idl_ccd_gain_right_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]][
+        "CCD"
+    ]["GAIN_R"] * (u.electron / u.DN)
 
-    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_auto)
+    idl_ccd_gain_right_correction = 57.5 * (u.electron / u.DN)
+
+    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_correction)
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
