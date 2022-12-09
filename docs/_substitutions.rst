@@ -9,6 +9,7 @@
 .. |Time| replace:: :class:`~astropy.time.Time`
 .. |Channel| replace:: :class:`~xrtpy.response.channel.Channel`
 .. |EffectiveAreaFundamental| replace:: :class:`~xrtpy.response.effective_area.EffectiveAreaFundamental`
+.. |TemperatureResponseFundamental| replace:: :class:`~xrtpy.response.temperature_response.TemperatureResponseFundamental`
 
 .. A workaround for nested inline literals so that the filename will get
    formatted like a file but will be a link. In the text, these get used
