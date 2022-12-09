@@ -230,7 +230,7 @@ class EffectiveAreaFundamental:
     @property
     def combo_filter_index_mapping_to_name_filter2(self):
         """Returns filter's corresponding number value."""
-        _, filter2 = self.combo_filter_name_split
+        filter1, filter2 = self.combo_filter_name_split
 
         if filter2 in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(filter2)
