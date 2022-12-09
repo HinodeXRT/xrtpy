@@ -91,7 +91,9 @@ class EffectiveAreaFundamental:
     def observation_date(self, date):
         """Validating users requested observation date."""
         astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
+        print("astropy_time:Sunpy.time.parse_time: ", astropy_time)
         observation_date = astropy_time.datetime
+        print("astropy_time.datetime: ", observation_date)
 
         if observation_date <= epoch:
             raise ValueError(
