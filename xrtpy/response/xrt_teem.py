@@ -98,11 +98,11 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
 
        The details of the coronal-temperature-diagnostic capability of
        Hinode/XRT is described in
-         Narukage et al. 2011, Solar Phys., 269, 169.
-         http://adsabs.harvard.edu/doi/10.1007/s11207-010-9685-2
+       Narukage et al. 2011, Solar Phys., 269, 169.
+       http://adsabs.harvard.edu/doi/10.1007/s11207-010-9685-2
        and
-         Narukage et al. 2013, Solar Phys., in press
-         http://adsabs.harvard.edu/doi/10.1007/s11207-013-0368-7
+       Narukage et al. 2013, Solar Phys.,
+       http://adsabs.harvard.edu/doi/10.1007/s11207-013-0368-7
        These two papers are the reference papers of this program.
 
     Modification History:
