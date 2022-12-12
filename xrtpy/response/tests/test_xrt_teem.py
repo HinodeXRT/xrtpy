@@ -56,19 +56,19 @@ def test_standard_case():
     # only a test written for the standard case
     fnames = [td.name for td in testdata]
     idata1 = fnames.index('IDL_results_bin1.sav')
-    testdata1 = fnames[idata1]
+    testdata1 = testdata[idata1]
 
     idldata = readsav(testdata1)
     goodT = (Te > 0.) & (idldata.te > 0.)
     goodE = (EM > 0.) & (idldata.em > 0.)
-    assert np.allclose(10.**Te[goodT], 10.**idldata.te[goodT], atol=1.E3,
+    assert np.allclose(10.**Te[goodT], 10.**idldata.te[goodT], atol=2.E5,
             rtol=0.02)
-    assert np.allclose(10.**EM[goodE], 10.**idldata.em[goodE], atol=8.E43,
-            rtol=0.1)
-    assert np.allclose(10.**Terr[goodT], 10.**idldata.et[goodT], atol=2.E4,
-            rtol=0.05)
-    assert np.allclose(10.**EMerr[goodT], 10.**idldata.ee[goodT], atol=2.E43,
-            rtol=0.15)
+    assert np.allclose(10.**EM[goodE], 10.**idldata.em[goodE], atol=4.E44,
+            rtol=0.03)
+    assert np.allclose(10.**Terr[goodT], 10.**idldata.et[goodT], atol=1.E4,
+            rtol=0.08)
+    assert np.allclose(10.**EMerr[goodE], 10.**idldata.ee[goodE], atol=4.E43,
+            rtol=0.02)
 
 def test_binning_case():
     """
@@ -101,16 +101,21 @@ def test_binning_case():
     # only a test written for the standard case
     fnames = [td.name for td in testdata]
     idata1 = fnames.index('IDL_results_bin2.sav')
-    testdata1 = fnames[idata1]
+    testdata1 = testdata[idata1]
 
     idldata = readsav(testdata1)
     goodT = (Te > 0.) & (idldata.te > 0.)
     goodE = (EM > 0.) & (idldata.em > 0.)
-    assert np.allclose(10.**Te[goodT], 10.**idldata.te[goodT], atol=1.E3,
+
+    delta = (10.**Te[goodT] - 10.**idldata.te[goodT])
+    x = 10.**idldata.te[goodT]
+    
+
+    assert np.allclose(10.**Te[goodT], 10.**idldata.te[goodT], atol=2.E5,
             rtol=0.02)
-    assert np.allclose(10.**EM[goodE], 10.**idldata.em[goodE], atol=8.E43,
+    assert np.allclose(10.**EM[goodE], 10.**idldata.em[goodE], atol=1.E44,
+            rtol=0.05)
+    assert np.allclose(10.**Terr[goodT], 10.**idldata.et[goodT], atol=1.E4,
             rtol=0.1)
-    assert np.allclose(10.**Terr[goodT], 10.**idldata.et[goodT], atol=2.E4,
-            rtol=0.055)
-    assert np.allclose(10.**EMerr[goodT], 10.**idldata.ee[goodT], atol=2.E43,
-            rtol=0.15)
+    assert np.allclose(10.**EMerr[goodE], 10.**idldata.ee[goodE], atol=2.E43,
+            rtol=0.03)
