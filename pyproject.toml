@@ -7,7 +7,9 @@ build-backend = "setuptools.build_meta"
 [tool.codespell]
 skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
 ignore-words-list = """
-circularly"""
+circularly,
+te
+"""
 
 [tool.gilesbot]
 
