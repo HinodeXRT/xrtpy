@@ -10,9 +10,16 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 def get_IDL_data_files():
     files = []
-    data_root = 'data/temperature_response_IDL_testing_files/'
-    for top_dir in get_pkg_data_filenames(data_root, package='xrtpy.response.tests', ):
-        files += list(get_pkg_data_filenames(top_dir, package='xrtpy.response.tests', pattern='*.txt'))
+    data_root = "data/temperature_response_IDL_testing_files/"
+    for top_dir in get_pkg_data_filenames(
+        data_root,
+        package="xrtpy.response.tests",
+    ):
+        files += list(
+            get_pkg_data_filenames(
+                top_dir, package="xrtpy.response.tests", pattern="*.txt"
+            )
+        )
     return sorted(files)
 
 
