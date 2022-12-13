@@ -8,9 +8,8 @@ import sunpy.time
 
 from astropy import units as u
 from astropy.constants import c, h
-from datetime import datetime
 from pathlib import Path
-from scipy import integrate, interpolate
+from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.response.effective_area import effective_area

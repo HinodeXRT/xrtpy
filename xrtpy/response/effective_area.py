@@ -12,6 +12,7 @@ import sunpy.io.special
 import sunpy.time
 
 from astropy import units as u
+from astropy.utils.data import get_pkg_data_filename
 from datetime import timedelta
 from functools import cached_property
 from pathlib import Path
@@ -218,7 +219,8 @@ class EffectiveAreaFundamental:
     @cached_property
     def n_DEHP_attributes(self):
         """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
-        _n_DEHP_filename = Path(__file__).parent.absolute() / "data" / "n_DEHP.txt"
+        _n_DEHP_filename = get_pkg_data_filename("data/n_DEHP.txt",
+                                                 package="xrtpy.response.data")
 
         with open(_n_DEHP_filename) as n_DEHP:
             list_of_DEHP_attributes = []

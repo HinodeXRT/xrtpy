@@ -11,7 +11,6 @@ __all__ = [
 ]
 
 import numpy as np
-import scipy.io
 import sunpy.io.special
 import sunpy.time
 
