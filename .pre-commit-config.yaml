@@ -10,6 +10,7 @@ repos:
   - id: check-ast
   - id: trailing-whitespace
   - id: end-of-file-fixer
+    exclude: .*\.fits
   - id: check-merge-conflict
     exclude: .*\.rst
   - id: requirements-txt-fixer
