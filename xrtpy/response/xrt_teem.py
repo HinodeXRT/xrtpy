@@ -14,9 +14,9 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     the filter ratio method.
 
     Currently this program uses the solar spectrum calculated with CHIANTI
-    database ver. 6.0.1 (density: 10^9 [cm^-3], ionization equilibrium:
-    chianti.ioneq, abundance: sun_coronal_ext), because this is the only
-    spectrum available in xrtpy. We expect this to change.
+    database ver. 6.0.1 (density: :math:`10^9` cm\ :sup:`-3`\ , ionization
+    equilibrium: chianti.ioneq, abundance: sun_coronal_ext), because this
+    is the only spectrum available in xrtpy. We expect this to change.
 
     Parameters:
     -----------
