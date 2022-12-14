@@ -92,21 +92,21 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     the image size is not reduced, but pixels within 3×3 squares are set to
     the same value, which results from averaging over those pixels.
 
-    NOTES:
+    Notes
+    -----
+    The returned values of pixels where the temperature cannot be derived
+    or the error is greater than the threshold or the photon noise is
+    greater than the threshold are set to 0. The EM for those pixels is
+    also set to 0.
 
-       The returned values of pixels where the temperature cannot be derived
-       or the error is greater than the threshold or the photon noise is
-       greater than the threshold are set to 0. The EM for those pixels is
-       also set to 0.
-
-       The details of the coronal-temperature-diagnostic capability of
-       Hinode/XRT is described in
-       Narukage et al. 2011, Solar Phys., 269, 169.
-       http://adsabs.harvard.edu/doi/10.1007/s11207-010-9685-2
-       and
-       Narukage et al. 2013, Solar Phys.,
-       http://adsabs.harvard.edu/doi/10.1007/s11207-013-0368-7
-       These two papers are the reference papers of this program.
+    The details of the coronal-temperature-diagnostic capability of
+    Hinode/XRT is described in
+    Narukage et al. 2011, Solar Phys., 269, 169.
+    http://adsabs.harvard.edu/doi/10.1007/s11207-010-9685-2
+    and
+    Narukage et al. 2013, Solar Phys.,
+    http://adsabs.harvard.edu/doi/10.1007/s11207-013-0368-7
+    These two papers are the reference papers of this program.
 
     Modification History:
 
