@@ -75,19 +75,22 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     EMerror : 2-dimensional float array
         error of log10 volume emission measure [cm^-3].
 
-    EXAMPLES:
+    Examples
+    --------
+    Using this function, you can derive the coronal temperature using
+    filter ratio method.
 
-       Using this function, you can derive the coronal temperature using
-       filter ratio method.
-       >> Te, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2)
+    >>> Te, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2)
 
-       If you want to bin the image data in space to reduce photon noise, set
-       binfac to the factor by which you want to bin.  For example to bin the
-       data by a factor of 3 do:
-       >> Te, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2, binfac=3)
-       The data is binned first and then the temperature is derived. Note that
-       the image size is not reduced, but pixels within 3x3 squares are set to
-       the same value, which results from averaging over those pixels.
+    If you want to bin the image data in space to reduce photon noise, set
+    binfac to the factor by which you want to bin.  For example to bin the
+    data by a factor of 3 do:
+
+    >>> Te, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2, binfac=3)
+
+    The data is binned first and then the temperature is derived. Note that
+    the image size is not reduced, but pixels within 3×3 squares are set to
+    the same value, which results from averaging over those pixels.
 
     NOTES:
 
