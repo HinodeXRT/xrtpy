@@ -21,14 +21,14 @@ def xrt_teem(
     mask=None,
     verbose=False,
 ):
-    """
+    r"""
     Get coronal temperatures and emission measures from a pair of images using
     the filter ratio method.
 
     Currently this program uses the solar spectrum calculated with CHIANTI
-    database ver. 6.0.1 (density: 10^9 [cm^-3], ionization equilibrium:
-    chianti.ioneq, abundance: sun_coronal_ext), because this is the only
-    spectrum available in xrtpy. We expect this to change.
+    database ver. 6.0.1 (density: :math:`10^9` cm\ :sup:`-3`\ , ionization
+    equilibrium: chianti.ioneq, abundance: sun_coronal_ext), because this
+    is the only spectrum available in xrtpy. We expect this to change.
 
     Parameters:
     -----------
@@ -87,37 +87,38 @@ def xrt_teem(
     EM_error : 2-dimensional float array
         error of log10 volume emission measure [cm^-3].
 
-    EXAMPLES:
+    Examples
+    --------
+    Using this function, you can derive the coronal temperature using
+    filter ratio method.
 
-       Using this function, you can derive the coronal temperature using
-       filter ratio method.
-       >> T_e, EM, T_error, EMerror = xrt_teem(hdr1, data1, hdr2,
-       data2) # doctest: +SKIP
+    >>> T_e, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2) # doctest: +SKIP
 
-       If you want to bin the image data in space to reduce photon noise, set
-       binfac to the factor by which you want to bin.  For example to bin the
-       data by a factor of 3 do:
-       >> T_e, EM, T_error, EMerror = xrt_teem(hdr1, data1, hdr2, data2,
-       binfac=3) # doctest: +SKIP
-       The data is binned first and then the temperature is derived. Note that
-       the image size is not reduced, but pixels within 3x3 squares are set to
-       the same value, which results from averaging over those pixels.
+    If you want to bin the image data in space to reduce photon noise, set
+    binfac to the factor by which you want to bin.  For example to bin the
+    data by a factor of 3 do:
 
-    NOTES:
+    >>> T_e, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2, binfac=3) # doctest: +SKIP
 
-       The returned values of pixels where the temperature cannot be derived
-       or the error is greater than the threshold or the photon noise is
-       greater than the threshold are set to 0. The EM for those pixels is
-       also set to 0.
+    The data is binned first and then the temperature is derived. Note that
+    the image size is not reduced, but pixels within 3×3 squares are set to
+    the same value, which results from averaging over those pixels.
 
-       The details of the coronal-temperature-diagnostic capability of
-       Hinode/XRT is described in
-       Narukage et al. 2011, Solar Phys., 269, 169.
-       http://adsabs.harvard.edu/doi/10.1007/s11207-010-9685-2
-       and
-       Narukage et al. 2013, Solar Phys.,
-       http://adsabs.harvard.edu/doi/10.1007/s11207-013-0368-7
-       These two papers are the reference papers of this program.
+    Notes
+    -----
+    The returned values of pixels where the temperature cannot be derived
+    or the error is greater than the threshold or the photon noise is
+    greater than the threshold are set to 0. The EM for those pixels is
+    also set to 0.
+
+    The details of the coronal-temperature-diagnostic capability of
+    Hinode/XRT is described in
+    Narukage et al. 2011, Solar Phys., 269, 169.
+    http://adsabs.harvard.edu/doi/10.1007/s11207-010-9685-2
+    and
+    Narukage et al. 2013, Solar Phys.,
+    http://adsabs.harvard.edu/doi/10.1007/s11207-013-0368-7
+    These two papers are the reference papers of this program.
 
     Modification History:
 
