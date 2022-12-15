@@ -1,14 +1,26 @@
-import sys
 import numpy as np
-from astropy.constants import c, h
+import sys
+
 from astropy import units as u
-from xrtpy.response.temperature_response import TemperatureResponseFundamental
+from astropy.constants import c, h
 from sunpy.coordinates.sun import angular_radius
 
+from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
-def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
-             no_threshold=False, Te_err_threshold=0.5,
-             photon_noise_threshold=0.2, mask=None, verbose=False):
+
+def xrt_teem(
+    hdr1,
+    data1,
+    hdr2,
+    data2,
+    binfac=1,
+    Trange=None,
+    no_threshold=False,
+    Te_err_threshold=0.5,
+    photon_noise_threshold=0.2,
+    mask=None,
+    verbose=False,
+):
     """
     Get coronal temperatures and emission measures from a pair of images using
     the filter ratio method.
@@ -66,25 +78,27 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
 
     Returns:
     --------
-    Te : 2-dimensional float array
+    T_e : 2-dimensional float array
         log10 of the derived electron temperature [K].
     EM : 2-dimensional float array
         log10 of the derived volume emission measure [cm^-3].
-    Terror : 2-dimensional float array
+    T_error : 2-dimensional float array
         error of log10 temperature [K].
-    EMerror : 2-dimensional float array
+    EM_error : 2-dimensional float array
         error of log10 volume emission measure [cm^-3].
 
     EXAMPLES:
 
        Using this function, you can derive the coronal temperature using
        filter ratio method.
-       >> Te, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2)
+       >> T_e, EM, T_error, EMerror = xrt_teem(hdr1, data1, hdr2,
+       data2) # doctest: +SKIP
 
        If you want to bin the image data in space to reduce photon noise, set
        binfac to the factor by which you want to bin.  For example to bin the
        data by a factor of 3 do:
-       >> Te, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2, binfac=3)
+       >> T_e, EM, T_error, EMerror = xrt_teem(hdr1, data1, hdr2, data2,
+       binfac=3) # doctest: +SKIP
        The data is binned first and then the temperature is derived. Note that
        the image size is not reduced, but pixels within 3x3 squares are set to
        the same value, which results from averaging over those pixels.
@@ -111,19 +125,19 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     D. Slavin (SAO). See original IDL code for more details.
     """
 
-    n1 = ('XRT_RENORMALIZE' in hdr1['HISTORY'])
-    n2 = ('XRT_RENORMALIZE' in hdr2['HISTORY'])
+    n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
+    n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
     # This allows use of normalized data (contrary to original IDL code):
     if n1 or n2:
         if n1 and n2:
-            data1 = data1*hdr1['EXPTIME']
-            data2 = data2*hdr2['EXPTIME']
+            data1 = data1 * hdr1["EXPTIME"]
+            data2 = data2 * hdr2["EXPTIME"]
         elif n1:
-            data1 = data1*hdr1['EXPTIME']
+            data1 = data1 * hdr1["EXPTIME"]
         else:
-            data2 = data2*hdr2['EXPTIME']
+            data2 = data2 * hdr2["EXPTIME"]
     if data1.shape != data2.shape:
-        raise ValueError('The input images must be the same size')
+        raise ValueError("The input images must be the same size")
 
     if mask is None:
         mask = np.zeros_like(data1, dtype=bool)
@@ -133,7 +147,7 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     data2 = np.ma.masked_where(mask, data2)
     if binfac > 1:
         s = data1.shape
-        ns = (s[0]//binfac, s[1]//binfac)
+        ns = (s[0] // binfac, s[1] // binfac)
         rbs = (ns[0], binfac, ns[1], binfac)
         # sums the data in binfac x binfac sized regions
         d1 = data1.reshape(rbs).sum(-1).sum(1)
@@ -162,62 +176,61 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     # True in places we want to mask out
     # Here we additionally mask out pixels in which the data in either image
     # is <= 0
-    dmask = ((data1 <= 0.) | (data2 <= 0.))
-    mask = (mask | dmask)
+    dmask = (data1 <= 0.0) | (data2 <= 0.0)
+    mask = mask | dmask
 
-    fw1 = hdr1['EC_FW1_']
-    fw2 = hdr1['EC_FW2_']
-    if fw1 != 'Open':
+    fw1 = hdr1["EC_FW1_"]
+    fw2 = hdr1["EC_FW2_"]
+    if fw1 != "Open":
         filt1 = fw1
-        if fw2 != 'Open':
-            filt1 = f'{fw1}/{fw2}'
-    elif fw2 != 'Open':
+        if fw2 != "Open":
+            filt1 = f"{fw1}/{fw2}"
+    elif fw2 != "Open":
         filt1 = fw2
     else:
-        raise ValueError('Invalid filter values, both fw1 and fw2 are Open')
-    date_obs1 = hdr1['DATE_OBS']
+        raise ValueError("Invalid filter values, both fw1 and fw2 are Open")
+    date_obs1 = hdr1["DATE_OBS"]
     tresp1 = TemperatureResponseFundamental(filt1, date_obs1)
-    fw1 = hdr2['EC_FW1_']
-    fw2 = hdr2['EC_FW2_']
-    if fw1 != 'Open':
+    fw1 = hdr2["EC_FW1_"]
+    fw2 = hdr2["EC_FW2_"]
+    if fw1 != "Open":
         filt2 = fw1
-        if fw2 != 'Open':
-            filt2 = f'{fw1}/{fw2}'
-    elif fw2 != 'Open':
+        if fw2 != "Open":
+            filt2 = f"{fw1}/{fw2}"
+    elif fw2 != "Open":
         filt2 = fw2
     else:
-        raise ValueError('Invalid filter values, both fw1 and fw2 are Open')
-    date_obs2 = hdr2['DATE_OBS']
+        raise ValueError("Invalid filter values, both fw1 and fw2 are Open")
+    date_obs2 = hdr2["DATE_OBS"]
     tresp2 = TemperatureResponseFundamental(filt2, date_obs2)
 
     if filt1 == filt2:
-        raise ValueError('Filters for the two images cannot be the same')
+        raise ValueError("Filters for the two images cannot be the same")
 
     flux1 = tresp1.temperature_response().value
     flux2 = tresp2.temperature_response().value
 
     # Need to convert column emission measure to volume emission measure - to
     # do that we multiply the EM by the area (in cm^2) of a sky pixel
-    plate_scale = hdr1['PLATESCL']
-    lsun = 6.95700E10/angular_radius(hdr1['DATE_OBS']).value
-    em2vem = (plate_scale*lsun)**2
+    plate_scale = hdr1["PLATESCL"]
+    lsun = 6.95700e10 / angular_radius(hdr1["DATE_OBS"]).value
+    em2vem = (plate_scale * lsun) ** 2
     flux1 /= em2vem
     flux2 /= em2vem
-    ratio = flux1/flux2
+    ratio = flux1 / flux2
     Tmodel = tresp1.CHIANTI_temperature.value
-    t2mk = np.argmin(np.abs(Tmodel - 2.E6))
+    t2mk = np.argmin(np.abs(Tmodel - 2.0e6))
     logTmodel = np.log10(Tmodel)
-    rev_ratio = (ratio[t2mk] > 1.)
+    rev_ratio = ratio[t2mk] > 1.0
     spect1 = tresp1.spectra().value
     spect2 = tresp2.spectra().value
-    effarea1 = tresp1.effective_area().value    # in cm^2
-    effarea2 = tresp2.effective_area().value    # in cm^2
+    effarea1 = tresp1.effective_area().value  # in cm^2
+    effarea2 = tresp2.effective_area().value  # in cm^2
 
     # Note: this requires Trange to be a 2 element iterable ordered low to
     # high (Trange is log10 of temperature limits).
     if Trange:
-        in_trange = ((logTmodel >= Trange[0]) &
-                     (logTmodel <= Trange[1]))
+        in_trange = (logTmodel >= Trange[0]) & (logTmodel <= Trange[1])
         if np.any(in_trange):
             Tmodel = Tmodel[in_trange]
             logTmodel = np.log10(Tmodel)
@@ -226,22 +239,25 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
             spect1 = spect1[in_trange, :]
             spect2 = spect2[in_trange, :]
         else:
-            raise ValueError('The temperature response does not include'
-                             ' any of the input temperatures in Trange')
+            raise ValueError(
+                "The temperature response does not include"
+                " any of the input temperatures in Trange"
+            )
 
     if rev_ratio:
-        data_ratio = (data2/hdr2['EXPTIME'])/(data1/hdr1['EXPTIME'])
-        model_ratio = flux2/flux1
+        data_ratio = (data2 / hdr2["EXPTIME"]) / (data1 / hdr1["EXPTIME"])
+        model_ratio = flux2 / flux1
     else:
-        data_ratio = (data1/hdr1['EXPTIME'])/(data2/hdr2['EXPTIME'])
-        model_ratio = flux1/flux2
+        data_ratio = (data1 / hdr1["EXPTIME"]) / (data2 / hdr2["EXPTIME"])
+        model_ratio = flux1 / flux2
     ok_num = np.zeros(data_ratio.shape, dtype=int)
     ok_cnt = np.zeros(data_ratio.shape, dtype=int)
     for i, m in enumerate(model_ratio[1:]):
         # n is True for all pixels that have flux ratios that are between the
         # model ratio for i and i + 1
-        n = ((data_ratio >= min(model_ratio[i], m)) &
-             (data_ratio < max(model_ratio[i], m)))
+        n = (data_ratio >= min(model_ratio[i], m)) & (
+            data_ratio < max(model_ratio[i], m)
+        )
         if np.sum(n) > 0:
             ok_num[n] = i + 1
             # ok_cnt keeps track of the number of model ratios that match the
@@ -253,105 +269,120 @@ def xrt_teem(hdr1, data1, hdr2, data2, binfac=1, Trange=None,
     ok_num[ok_cnt != 1] = 0
     a = np.abs(model_ratio[ok_num] - data_ratio)
     b = np.abs(model_ratio[np.maximum((ok_num - 1), 0)] - data_ratio)
-    Te = ((np.log10(Tmodel[ok_num])*b
-           + np.log10(Tmodel[np.maximum((ok_num - 1), 0)])*a) / (a + b))
-    Te = np.ma.masked_where(Te <= 0., Te)
+    T_e = (
+        np.log10(Tmodel[ok_num]) * b + np.log10(Tmodel[np.maximum((ok_num - 1), 0)]) * a
+    ) / (a + b)
+    T_e = np.ma.masked_where(T_e <= 0.0, T_e)
 
     # This masks out pixels where more than one temperature is consistent with
     # the observed flux ratio - so temperatures for which the model filter
     # ratio is non-monotonic are effectively removed
-    ok_pixel = ((ok_cnt == 1) & (~mask))
-    Te[~ok_pixel] = 0.
+    ok_pixel = (ok_cnt == 1) & (~mask)
+    T_e[~ok_pixel] = 0.0
 
-    # Note that Te is the log10 of the electron temperature here
-    DN = np.interp(Te, logTmodel, flux1, left=0., right=0.)
-    DN = np.ma.masked_where(((DN <= 0.) | (Te <= 0.)), DN)
-    EM = np.ma.log10(data1/(DN*hdr1['EXPTIME'])) - np.log10(binfac**2)
-    EM[~ok_pixel] = 0.
+    # Note that T_e is the log10 of the electron temperature here
+    DN = np.interp(T_e, logTmodel, flux1, left=0.0, right=0.0)
+    DN = np.ma.masked_where(((DN <= 0.0) | (T_e <= 0.0)), DN)
+    EM = np.ma.log10(data1 / (DN * hdr1["EXPTIME"])) - np.log10(binfac**2)
+    EM[~ok_pixel] = 0.0
 
-    # derive Te error, EM error:
+    # derive T_e error, EM error:
     dlnR_dlnT_mod = np.abs(deriv(np.log(Tmodel), np.log(model_ratio)))
-    dlnR_dlnT = np.interp(Te, logTmodel, dlnR_dlnT_mod, left=0., right=0.)
-    dlnR_dlnT = np.ma.masked_where(((dlnR_dlnT == 0.) | (Te <= 0.)), dlnR_dlnT)
+    dlnR_dlnT = np.interp(T_e, logTmodel, dlnR_dlnT_mod, left=0.0, right=0.0)
+    dlnR_dlnT = np.ma.masked_where(((dlnR_dlnT == 0.0) | (T_e <= 0.0)), dlnR_dlnT)
 
     wvl = tresp1.channel_wavelength
     eVe = tresp1.ev_per_electron
     gain = tresp1.ccd_gain_right
     # (h*c/lambda) * 1/(eV per electron) * 1/gain
-    e2dn = (h.to(u.eV*u.s)*c.to(u.angstrom/u.s)/(wvl*eVe*gain)).value
+    e2dn = (h.to(u.eV * u.s) * c.to(u.angstrom / u.s) / (wvl * eVe * gain)).value
     dwvl = wvl[1:] - wvl[:-1]
     dwvl = np.append(dwvl, dwvl[-1]).value
 
     # These sums should be converted to integrals if the spectrum includes
     # line broadening (as is the default in ChiantiPy).
-    K1_mod = np.array([(s1 * effarea1 * e2dn**2 * dwvl).sum() /
-                       (s1 * effarea1 * e2dn * dwvl).sum()
-                       for s1 in spect1])
-    K2_mod = np.array([(s2 * effarea2 * e2dn**2 * dwvl).sum() /
-                       (s2 * effarea2 * e2dn * dwvl).sum()
-                       for s2 in spect2])
-    K1 = np.interp(Te, logTmodel, K1_mod, left=0., right=0.)
-    K2 = np.interp(Te, logTmodel, K2_mod, left=0., right=0.)
-    K1 = np.ma.masked_where(((K1 == 0.) | (Te <= 0.)), K1)
-    K2 = np.ma.masked_where(((K2 == 0.) | (Te <= 0.)), K2)
+    K1_mod = np.array(
+        [
+            (s1 * effarea1 * e2dn**2 * dwvl).sum()
+            / (s1 * effarea1 * e2dn * dwvl).sum()
+            for s1 in spect1
+        ]
+    )
+    K2_mod = np.array(
+        [
+            (s2 * effarea2 * e2dn**2 * dwvl).sum()
+            / (s2 * effarea2 * e2dn * dwvl).sum()
+            for s2 in spect2
+        ]
+    )
+    K1 = np.interp(T_e, logTmodel, K1_mod, left=0.0, right=0.0)
+    K2 = np.interp(T_e, logTmodel, K2_mod, left=0.0, right=0.0)
+    K1 = np.ma.masked_where(((K1 == 0.0) | (T_e <= 0.0)), K1)
+    K2 = np.ma.masked_where(((K2 == 0.0) | (T_e <= 0.0)), K2)
 
     dlnf1_dlnT_mod = deriv(np.log(Tmodel), np.log(flux1))
-    dlnf1_dlnT = np.interp(Te, logTmodel, dlnf1_dlnT_mod, left=0., right=0.)
-    dlnf1_dlnT = np.ma.masked_where(((dlnf1_dlnT == 0.) | (Te <= 0.)),
-                                    dlnf1_dlnT)
+    dlnf1_dlnT = np.interp(T_e, logTmodel, dlnf1_dlnT_mod, left=0.0, right=0.0)
+    dlnf1_dlnT = np.ma.masked_where(((dlnf1_dlnT == 0.0) | (T_e <= 0.0)), dlnf1_dlnT)
 
     dlnf2_dlnT_mod = deriv(np.log(Tmodel), np.log(flux2))
-    dlnf2_dlnT = np.interp(Te, logTmodel, dlnf2_dlnT_mod, left=0., right=0.)
-    dlnf2_dlnT = np.ma.masked_where(((dlnf2_dlnT == 0.) | (Te <= 0.)),
-                                    dlnf2_dlnT)
+    dlnf2_dlnT = np.interp(T_e, logTmodel, dlnf2_dlnT_mod, left=0.0, right=0.0)
+    dlnf2_dlnT = np.ma.masked_where(((dlnf2_dlnT == 0.0) | (T_e <= 0.0)), dlnf2_dlnT)
 
-    Terror = np.ma.log10(np.sqrt(K1/data1 + K2/data2)/dlnR_dlnT) + Te
+    T_error = np.ma.log10(np.sqrt(K1 / data1 + K2 / data2) / dlnR_dlnT) + T_e
 
-    EMerror = np.ma.log10(np.ma.sqrt(dlnf2_dlnT**2 * K1/data1
-                          + dlnf1_dlnT**2*K2/data2)/dlnR_dlnT) + EM
-    Te = Te.filled(0.)
-    EM = EM.filled(0.)
-    Terror = Terror.filled(0.)
-    EMerror = EMerror.filled(0.)
+    EMerror = (
+        np.ma.log10(
+            np.ma.sqrt(dlnf2_dlnT**2 * K1 / data1 + dlnf1_dlnT**2 * K2 / data2)
+            / dlnR_dlnT
+        )
+        + EM
+    )
+    T_e = T_e.filled(0.0)
+    EM = EM.filled(0.0)
+    T_error = T_error.filled(0.0)
+    EMerror = EMerror.filled(0.0)
 
     if not no_threshold:
         ok_wothr = ok_pixel.copy()
-        Kd1 = np.sqrt(K1/data1)
-        Kd1 = Kd1.filled(0.)
-        Kd2 = np.sqrt(K2/data2)
-        Kd2 = Kd2.filled(0.)
-        tthr = ((Terror - Te) <= np.log10(Te_err_threshold))
-        k1thr = (Kd1 <= photon_noise_threshold)
-        k2thr = (Kd2 <= photon_noise_threshold)
-        ok_pixel = (ok_pixel & ((Terror - Te) <= np.log10(Te_err_threshold))
-                    & (Kd1 <= photon_noise_threshold)
-                    & (Kd2 <= photon_noise_threshold))
+        Kd1 = np.sqrt(K1 / data1)
+        Kd1 = Kd1.filled(0.0)
+        Kd2 = np.sqrt(K2 / data2)
+        Kd2 = Kd2.filled(0.0)
+        tthr = (T_error - T_e) <= np.log10(Te_err_threshold)
+        k1thr = Kd1 <= photon_noise_threshold
+        k2thr = Kd2 <= photon_noise_threshold
+        ok_pixel = (
+            ok_pixel
+            & ((T_error - T_e) <= np.log10(Te_err_threshold))
+            & (Kd1 <= photon_noise_threshold)
+            & (Kd2 <= photon_noise_threshold)
+        )
         if verbose:
-            print(f'number of pixels ruled out by threshold = '
-                  f'{np.sum(~ok_pixel)}')
-            print(f'number of pixels ruled out by Te errors = {np.sum(~tthr)}')
-            print(f'number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}')
-            print(f'number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}')
-            print(f'number of bad pixels before threshold   = '
-                  f'{np.sum(~ok_wothr)}')
-        mask = (mask | ~ok_pixel)
-        Te[mask] = 0.
-        EM[mask] = 0.
-        Terror[mask] = 0.
-        EMerror[mask] = 0.
+            print(f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}")
+            print(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
+            print(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
+            print(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
+            print(f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}")
+        mask = mask | ~ok_pixel
+        T_e[mask] = 0.0
+        EM[mask] = 0.0
+        T_error[mask] = 0.0
+        EMerror[mask] = 0.0
 
         if verbose:
-            print('from xrt_teem:')
-            print(f'Examined Te range: {Tmodel.min()} - {Tmodel.max()} K')
-            print(f'Applied thresholds: - Te error < {Te_err_threshold*100.} %')
-            print(f'                    - Photon noise < '
-                  f'{photon_noise_threshold*100.} %')
+            print("from xrt_teem:")
+            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
+            print(f"Applied thresholds: - T_e error < {Te_err_threshold*100.} %")
+            print(
+                f"                    - Photon noise < "
+                f"{photon_noise_threshold*100.} %"
+            )
     else:
         if verbose:
-            print('from xrt_teem:')
-            print(f'Examined Te range: {Tmodel.min()} - {Tmodel.max()} K')
-            print('No thresholds applied')
-    return Te, EM, Terror, EMerror
+            print("from xrt_teem:")
+            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
+            print("No thresholds applied")
+    return T_e, EM, T_error, EMerror
 
 
 def deriv(x, y):
@@ -382,13 +413,17 @@ def deriv(x, y):
     x01 = x0 - x1
     x02 = x0 - x2
     x12 = x1 - x2
-    dydx1 = y0*x12/(x01*x02) + y1*(1./x12 - 1./x01) - y2*x01/(x02*x12)
-    dydx0 = (y0[0]*(x01[0]
-             + x02[0])/(x01[0]*x02[0])
-             - y1[0]*x02[0]/(x01[0]*x12[0])
-             + y2[0]*x01[0]/(x02[0]*x12[0]))
-    dydxN = (-y0[-1]*x12[-1]/(x01[-1]*x02[-1])
-             + y1[-1]*x02[-1]/(x01[-1]*x12[-1])
-             - y2[-1]*(x02[-1]
-             + x12[-1])/(x02[-1]*x12[-1]))
+    dydx1 = (
+        y0 * x12 / (x01 * x02) + y1 * (1.0 / x12 - 1.0 / x01) - y2 * x01 / (x02 * x12)
+    )
+    dydx0 = (
+        y0[0] * (x01[0] + x02[0]) / (x01[0] * x02[0])
+        - y1[0] * x02[0] / (x01[0] * x12[0])
+        + y2[0] * x01[0] / (x02[0] * x12[0])
+    )
+    dydxN = (
+        -y0[-1] * x12[-1] / (x01[-1] * x02[-1])
+        + y1[-1] * x02[-1] / (x01[-1] * x12[-1])
+        - y2[-1] * (x02[-1] + x12[-1]) / (x02[-1] * x12[-1])
+    )
     return np.append(np.insert(dydx1, 0, dydx0), dydxN)
