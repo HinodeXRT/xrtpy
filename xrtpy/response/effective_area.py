@@ -220,7 +220,7 @@ class EffectiveAreaFundamental:
     def n_DEHP_attributes(self):
         """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
         _n_DEHP_filename = get_pkg_data_filename(
-            "data/n_DEHP.txt", package="xrtpy.response.data"
+            "data/n_DEHP.txt", package="xrtpy.response"
         )
 
         with open(_n_DEHP_filename) as n_DEHP:
