@@ -205,7 +205,6 @@ class EffectiveAreaFundamental:
         filter1, filter2 = name[0], name[1]
         return filter1, filter2
 
-    '''
     @property
     def combo_filter1_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
@@ -271,7 +270,6 @@ class EffectiveAreaFundamental:
             self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
-    '''
 
     @property
     def filter_data(self):
