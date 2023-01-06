@@ -91,15 +91,12 @@ class EffectiveAreaFundamental:
     @observation_date.setter
     def observation_date(self, date):
         """Validating users requested observation date."""
-        # astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
-        # observation_date = astropy_time.datetime
-        obs_date_utime = Time(date).utime
-        observation_date = obs_date_utime.datetime
+        astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
+        observation_date = astropy_time.datetime
         if observation_date <= epoch:
             raise ValueError(
                 f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
-        # self._observation_date = observation_date
         self._observation_date = obs_date_utime
 
     @property
