@@ -12,6 +12,7 @@ import sunpy.io.special
 import sunpy.time
 
 from astropy import units as u
+from astropy.time import Time
 from datetime import timedelta
 from functools import cached_property
 from pathlib import Path
@@ -90,16 +91,16 @@ class EffectiveAreaFundamental:
     @observation_date.setter
     def observation_date(self, date):
         """Validating users requested observation date."""
-        astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
-        print("astropy_time:Sunpy.time.parse_time: ", astropy_time)
-        observation_date = astropy_time.datetime
-        print("astropy_time.datetime: ", observation_date)
-
+        # astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
+        # observation_date = astropy_time.datetime
+        obs_date_utime = Time(date).utime
+        observation_date = obs_date_utime.datetime
         if observation_date <= epoch:
             raise ValueError(
                 f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
-        self._observation_date = observation_date
+        # self._observation_date = observation_date
+        self._observation_date = obs_date_utime
 
     @property
     def xrt_contam_on_ccd_geny_update(self):
