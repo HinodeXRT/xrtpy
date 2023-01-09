@@ -20,6 +20,11 @@ repos:
   - id: check-toml
   - id: check-yaml
 
+- repo: https://github.com/tox-dev/pyproject-fmt
+  rev: 0.4.1
+  hooks:
+  - id: pyproject-fmt
+
 - repo: https://github.com/PyCQA/isort
   rev: 5.11.4
   hooks:
@@ -54,8 +59,6 @@ repos:
   rev: v2.5.0
   hooks:
   - id: pretty-format-ini
-    args: [--autofix]
-  - id: pretty-format-toml
     args: [--autofix]
   - id: pretty-format-yaml
     args: [--autofix]
