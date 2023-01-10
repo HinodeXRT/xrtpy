@@ -42,6 +42,14 @@ CHIANTI_file = {
     "wavelength_units": _XRT_emiss_model_file["WAVE_UNITS"][0],
 }
 
+_corona_CHIANTI_filename = (
+    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
+)
+
+_XRT_corona_chianti_emiss_model = sunpy.io.special.genx.read_genx(
+    _corona_CHIANTI_filename
+)
+
 
 class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
