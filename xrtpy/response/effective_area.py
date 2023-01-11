@@ -254,7 +254,7 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_filter1_combo(self) -> u.angstrom:
         """
-        Thickness of the contamination layer on a filter."""
+        Thickness of the contamination layer on a filter-1."""
 
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
@@ -264,12 +264,17 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_filter2_combo(self) -> u.angstrom:
         """
-        Thickness of the contamination layer on a filter."""
+        Thickness of the contamination layer on a filter-2."""
 
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
+
+    @property
+    def contamination_on_filter_combo(self) -> u.angstrom:
+        """Combined filter 1 + filter 2 contamination thickness."""
+        return self.contamination_on_filter1_combo + self.contamination_on_filter2_combo
 
     @property
     def filter_data(self):
