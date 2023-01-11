@@ -50,6 +50,13 @@ _XRT_photos_chianti_emiss_model = sunpy.io.special.genx.read_genx(
     _photos_CHIANTI_filename
 )
 
+photospheric_CHIANTI_file = {
+    "logged_temperature": _XRT_photos_chianti_emiss_model["LOGTE"],
+    "wavelength": _XRT_photos_chianti_emiss_model["LMBDA"],
+    "corona_solar_spectra": _XRT_photos_chianti_emiss_model["SOLSPEC"],
+    "spectra_generated_information": _XRT_photos_chianti_emiss_model["HEADER"]["TEXT"],
+}
+
 
 class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
