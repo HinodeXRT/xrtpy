@@ -428,6 +428,32 @@ class EffectiveAreaFundamental:
         ]
 
     @cached_property
+    def filterwheel_combo_angular_wavenumber(self):
+        """Define angular wavenumber for a filter."""
+        index, _, cos_a, _, _, _, _ = self.transmission_equation
+
+        # Define wavevector
+        angular_wavenumber = np.array(
+            [
+                (2.0 * math.pi * index[i] * cos_a) / self.n_DEHP_wavelength[i]
+                for i in range(4000)
+            ]
+        )
+
+        # Multiply by thickness
+        angular_wavenumber_thickness = (
+            angular_wavenumber * self.contamination_on_filter_combo
+        )
+
+        real_angular_wavenumber = angular_wavenumber_thickness.real
+        imaginary_angular_wavenumber = angular_wavenumber_thickness.imag
+
+        return [
+            (complex(real_angular_wavenumber[i], imaginary_angular_wavenumber[i]))
+            for i in range(4000)
+        ]
+
+    @cached_property
     def CCD_contamination_transmission(self):
         """Calculate transmission matrix coefficient and transmittance on the CCD."""
 
