@@ -550,6 +550,46 @@ class EffectiveAreaFundamental:
 
         return [abs(transmittance[i] ** 2) for i in range(4000)]
 
+    @cached_property
+    def filter_combo_contamination_transmission(self):
+        """Calculate transmission matrix coefficient and transmittance on a filter."""
+
+        index, _, _, _, n_o, n_t, _ = self.transmission_equation
+
+        i_i = complex(0, 1)  # Define complex number
+
+        # Define transfer matrix
+        M = [
+            [
+                [
+                    np.cos(self.filterwheel_combo_angular_wavenumber[i]),
+                    (-i_i * np.sin(self.filterwheel_combo_angular_wavenumber[i]))
+                    / index[i],
+                ],
+                [
+                    -i_i
+                    * np.sin(self.filterwheel_combo_angular_wavenumber[i])
+                    * index[i],
+                    np.cos(self.filterwheel_combo_angular_wavenumber[i]),
+                ],
+            ]
+            for i in range(4000)
+        ]
+
+        transmittance = [
+            2
+            * n_o
+            / (
+                (M[i][0][0] * n_o)
+                + (M[i][0][1] * n_o * n_t)
+                + (M[i][1][0])
+                + (M[i][1][1] * n_t)
+            )
+            for i in range(4000)
+        ]
+
+        return [abs(transmittance[i] ** 2) for i in range(4000)]
+
     @property
     def interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
