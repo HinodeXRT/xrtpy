@@ -598,6 +598,14 @@ class EffectiveAreaFundamental:
         )
         return Filter_contam_transmission(self.channel_wavelength)
 
+    @property
+    def interpolated_filter_combo_contamination_transmission(self):
+        """Interpolate filter contam transmission to the wavelength."""
+        Filter_contam_transmission = interpolate.interp1d(
+            self.n_DEHP_wavelength, self.filter_combo_contamination_transmission
+        )
+        return Filter_contam_transmission(self.channel_wavelength)
+
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
         """Calculation of the Effective Area."""
