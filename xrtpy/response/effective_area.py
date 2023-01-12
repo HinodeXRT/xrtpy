@@ -616,6 +616,16 @@ class EffectiveAreaFundamental:
             * self.interpolated_filter_contamination_transmission
         )
 
+    @u.quantity_input
+    def effective_area_combo(self) -> u.cm**2:
+        """Calculation of the Effective Area."""
+        return (
+            self.channel_geometry_aperture_area
+            * self.channel_transmission
+            * self.interpolated_CCD_contamination_transmission
+            * self.interpolated_filter_combo_contamination_transmission
+        )
+
 
 def effective_area(filter_name, observation_date):
     EAP = EffectiveAreaFundamental(filter_name, observation_date)
