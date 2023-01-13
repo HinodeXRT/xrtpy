@@ -630,3 +630,8 @@ class EffectiveAreaFundamental:
 def effective_area(filter_name, observation_date):
     EAP = EffectiveAreaFundamental(filter_name, observation_date)
     return EAP.effective_area()
+
+
+def effective_area_filter_combo(filter_name, observation_date):
+    EAP = EffectiveAreaFundamental(filter_name, observation_date)
+    return EAP.effective_area()
