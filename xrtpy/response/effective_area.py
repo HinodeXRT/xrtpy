@@ -100,7 +100,7 @@ class EffectiveAreaFundamental:
             raise ValueError(
                 f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
-        self._observation_date = obs_date_utime
+        self._observation_date = observation_date
 
     @property
     def xrt_contam_on_ccd_geny_update(self):
