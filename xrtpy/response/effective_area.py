@@ -3,6 +3,7 @@ __all__ = [
     "effective_area",
 ]
 
+import astropy.time
 import datetime
 import math
 import numpy as np
