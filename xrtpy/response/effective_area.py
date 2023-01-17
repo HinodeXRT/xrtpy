@@ -3,6 +3,7 @@ __all__ = [
     "effective_area",
 ]
 
+
 import astropy.time
 import datetime
 import math
@@ -14,6 +15,7 @@ import sunpy.time
 
 from astropy import units as u
 from astropy.time import Time
+from astropy.utils.data import get_pkg_data_filename
 from datetime import timedelta
 from functools import cached_property
 from pathlib import Path
