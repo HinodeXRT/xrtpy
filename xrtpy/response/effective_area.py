@@ -145,49 +145,6 @@ class EffectiveAreaFundamental:
                 "https://github.com/HinodeXRT/xrtpy/issues/new"
             )
         return ccd_data_dates_to_seconds
-
-    @property
-    def ccd_observation_date_to_seconds(self):
-        """Converting users observation date into seconds with
-        respect to CCD contamination data. Used for interpolation."""
-
-        ccd_observation_date_to_seconds = []
-        for time in _ccd_contamination_file_time:
-            t0 = _ccd_contamination_file_time[0]
-            dt = time - t0
-            ccd_observation_date_to_seconds.append(
-                (self.observation_date + timedelta(0, dt)).strftime("%S")
-            )
-
-        return ccd_observation_date_to_seconds[0]
-
-    @property
-    def filter_observation_date_to_seconds(self):
-        """Converting users observation date into seconds with respect to filter contamination data. Used for interpolation."""
-
-        filter_observation_date_to_seconds = []
-        for time in _filter_contamination_file_time:
-            t0 = _filter_contamination_file_time[0]
-            dt = time - t0
-            filter_observation_date_to_seconds.append(
-                (self.observation_date + timedelta(0, dt)).strftime("%S")
-            )
-
-        return filter_observation_date_to_seconds[0]
-
-    @property
-    def filter_data_dates_to_seconds(self):
-        """Converting filter contamination data dates to datetimes."""
-
-        filter_data_dates_to_seconds = []
-        for time in _filter_contamination_file_time:
-            t0 = _filter_contamination_file_time[0]
-            dt = time - t0
-            filter_data_dates_to_seconds.append(
-                float((epoch + timedelta(0, dt)).strftime("%S"))
-            )
-
-        return filter_data_dates_to_seconds
     '''
 
     @property
