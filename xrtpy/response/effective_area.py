@@ -5,7 +5,6 @@ __all__ = [
 
 
 import astropy.time
-import datetime
 import math
 import numpy as np
 import os
@@ -14,9 +13,7 @@ import sunpy.io.special
 import sunpy.time
 
 from astropy import units as u
-from astropy.time import Time
 from astropy.utils.data import get_pkg_data_filename
-from datetime import timedelta
 from functools import cached_property
 from pathlib import Path
 from scipy import interpolate
@@ -99,31 +96,26 @@ class EffectiveAreaFundamental:
     @observation_date.setter
     def observation_date(self, date):
         """Validating users requested observation date."""
-        # astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
-        # observation_date = astropy_time.datetime
         observation_date = sunpy.time.parse_time(date)
         if observation_date <= epoch:
             raise ValueError(
                 f"Invalid date: {observation_date.iso}.\n Date must be after {epoch.iso}."
             )
+        # import pdb; pdb.set_trace()
         self._observation_date = observation_date
-        # f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00.")
 
     @property
     def xrt_contam_on_ccd_geny_update(self):
         """Return a string of the last time the file was modified."""
         modified_time = os.path.getmtime(_ccd_contam_filename)
-        # modified_time_dt = datetime.datetime.fromtimestamp(modified_time)
         modified_time = astropy.time.Time(modified_time, format="unix")
 
-        # return modified_time_dt.strftime("%Y/%m/%d")
         return modified_time
 
     '''
     @property
     def ccd_data_dates_to_seconds(self):
         """Converting CCD data dates to datetimes."""
-
         ccd_data_dates_dt = []
         ccd_data_dates_to_seconds = []
         for time in _ccd_contamination_file_time:
@@ -133,6 +125,8 @@ class EffectiveAreaFundamental:
             ccd_data_dates_to_seconds.append(
                 float((epoch + timedelta(0, dt)).strftime("%S"))
             )
+
+        obs_date_ut = self.observation_date.utime
 
         if self.observation_date > ccd_data_dates_dt[-1]:
             raise ValueError(
@@ -144,7 +138,10 @@ class EffectiveAreaFundamental:
                 "than one month ago, please raise an issue at: "
                 "https://github.com/HinodeXRT/xrtpy/issues/new"
             )
-        return ccd_data_dates_to_seconds
+
+        import pdb; pdb.set_trace()
+
+            return modified_time
     '''
 
     @property
