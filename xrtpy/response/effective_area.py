@@ -54,19 +54,16 @@ _ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
 _filter_contam_file = scipy.io.readsav(_filter_contam_filename)
 
 # CCD contam geny files keys for time and date.
-# _ccd_contamination_file_time = _ccd_contam_file["p1"]
+
 _ccd_contamination_file_time = astropy.time.Time(
     _ccd_contam_file["p1"], format="utime", scale="utc"
 )
-
 _ccd_contamination = _ccd_contam_file["p2"]
 
 # Filter contam geny files keys for time and date.
-# _filter_contamination_file_time = _filter_contam_file["p1"]
 _filter_contamination_file_time = astropy.time.Time(
     _filter_contam_file["p1"], format="utime", scale="utc"
 )
-
 _filter_contamination = _filter_contam_file["p2"]
 
 
@@ -196,14 +193,9 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_CCD(self):
         """Calculation of contamination layer on the CCD, thickness given in Angstrom (Å)."""
-
-        # interpolater = scipy.interpolate.interp1d(
-        #    self.ccd_data_dates_to_seconds, _ccd_contamination, kind="linear"
-        # )
         interpolater = scipy.interpolate.interp1d(
             _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
         )
-        # return interpolater(self.ccd_observation_date_to_seconds)
         return interpolater(self.observation_date.utime)
 
     @property
@@ -230,20 +222,14 @@ class EffectiveAreaFundamental:
     def contamination_on_filter(self) -> u.angstrom:
         """
         Thickness of the contamination layer on a filter."""
-
-        # interpolater = scipy.interpolate.interp1d(
-        #    self.filter_data_dates_to_seconds, self.filter_data, kind="linear"
-        # )
         interpolater = scipy.interpolate.interp1d(
             _filter_contamination_file_time.utime, self.filter_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
-        # return interpolater(self.filter_observation_date_to_seconds)
 
     @cached_property
     def n_DEHP_attributes(self):
         """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
-        # _n_DEHP_filename = Path(__file__).parent.absolute() / "data" / "n_DEHP.txt"
         _n_DEHP_filename = get_pkg_data_filename(
             "data/n_DEHP.txt", package="xrtpy.response"
         )
