@@ -8,13 +8,11 @@ import sunpy.time
 
 from astropy import units as u
 from astropy.constants import c, h
-from datetime import datetime
 from pathlib import Path
-from scipy import integrate, interpolate
+from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
-from xrtpy.response.effective_area import effective_area
-from xrtpy.util.time import epoch
+from xrtpy.response.effective_area import EffectiveAreaFundamental
 
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
