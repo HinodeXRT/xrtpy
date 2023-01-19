@@ -8,13 +8,26 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 def get_IDL_data_files():
-    path = (
+    files = []
+    data_root = "data/temperature_response_IDL_testing_files/"
+    for top_dir in get_pkg_data_filenames(
+        data_root,
+        package="xrtpy.response.tests",
+    ):
+        files += list(
+            get_pkg_data_filenames(
+                top_dir, package="xrtpy.response.tests", pattern="*.txt"
+            )
+        )
+    return sorted(files)
+    """path = (
         Path(__file__).parent.parent.absolute()
         / "data"
         / "temperature_response_IDL_testing_files"
     )
     filter_data_files = list(path.glob("**/*.*"))
     return sorted(filter_data_files)
+    """
 
 
 filenames = get_IDL_data_files()
@@ -70,7 +83,8 @@ def _IDL_temperature_response_raw_data(filename):
 
 
 @pytest.mark.parametrize("filename", filenames)
-def test_temperature_response(filename, allclose):
+def test_temperature_response(filename):
+    # def test_temperature_response(filename, allclose):
 
     IDL_data = _IDL_raw_data_list(filename)
 
@@ -82,6 +96,6 @@ def test_temperature_response(filename, allclose):
     instance = TemperatureResponseFundamental(filter_name, filter_obs_date)
     actual_temperature_response = instance.temperature_response()
 
-    assert allclose(
+    assert u.allclose(
         actual_temperature_response.value, IDL_temperature_response, rtol=1e-6
     )
