@@ -46,7 +46,10 @@ class TemperatureResponseFundamental:
 
     def __init__(self, filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
-        self.observation_date = observation_date
+        # self.observation_date = observation_date
+        self._effective_area_fundamental = EffectiveAreaFundamental(
+            self.name, observation_date
+        )
         self._channel = Channel(self.name)
 
     @property
@@ -56,9 +59,11 @@ class TemperatureResponseFundamental:
 
     @property
     def observation_date(self):
-        """Users date of observation."""
-        return self._observation_date
+        """Date of observation."""
+        return self._effective_area_fundamental.observation_date
+        # return self._observation_date
 
+    '''
     @observation_date.setter
     def observation_date(self, date):
         """Validating users requested observation date."""
@@ -69,6 +74,7 @@ class TemperatureResponseFundamental:
                 rf"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
         self._observation_date = observation_date
+    '''
 
     @property
     def CHIANTI_version(self):
@@ -151,7 +157,8 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        return effective_area(self.name, self.observation_date)
+        # return effective_area(self.name, self.observation_date)
+        return self._effective_area_fundamental.effective_area()
 
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
