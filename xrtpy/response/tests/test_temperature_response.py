@@ -1,8 +1,8 @@
-import glob
-import pytest
-
+from astropy.utils.data import get_pkg_data_filenames
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
