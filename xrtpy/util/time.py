@@ -7,7 +7,6 @@ import astropy.time
 from datetime import timedelta
 
 # Hinode-XRT mission elapsed time "Epoch" is Sept 22, 2006 21:36:00.
-# epoch = datetime(year=2006, month=9, day=22, hour=21, minute=36, second=0)
 epoch = astropy.time.Time("2006-09-22 21:36:00")
 
 
