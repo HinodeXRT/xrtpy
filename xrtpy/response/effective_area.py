@@ -110,39 +110,20 @@ class EffectiveAreaFundamental:
         modified_time = os.path.getmtime(_ccd_contam_filename)
         modified_time = astropy.time.Time(modified_time, format="unix")
 
-        return modified_time
-
-    '''
-    @property
-    def ccd_data_dates_to_seconds(self):
-        """Converting CCD data dates to datetimes."""
-        ccd_data_dates_dt = []
-        ccd_data_dates_to_seconds = []
-        for time in _ccd_contamination_file_time:
-            t0 = _ccd_contamination_file_time[0]
-            dt = time - t0
-            ccd_data_dates_dt.append(epoch + timedelta(0, dt))
-            ccd_data_dates_to_seconds.append(
-                float((epoch + timedelta(0, dt)).strftime("%S"))
-            )
-
-        obs_date_ut = self.observation_date.utime
-
-        if self.observation_date > ccd_data_dates_dt[-1]:
+        if self.observation_date > modified_time:
             raise ValueError(
                 "No contamination data is presently available for "
                 f"{self.observation_date}.\n The latest available data is on "
-                f"{ccd_data_dates_dt[-1]}.\n Contamination data is "
+                f"{modified_time}.\n Contamination data is "
                 "updated periodically. The last update was on "
-                f"{self.xrt_contam_on_ccd_geny_update}. If this is more "
+                f"{self.observation_date}. If this is more "
                 "than one month ago, please raise an issue at: "
                 "https://github.com/HinodeXRT/xrtpy/issues/new"
             )
 
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
 
-            return modified_time
-    '''
+        return modified_time
 
     @property
     def contamination_on_CCD(self):
