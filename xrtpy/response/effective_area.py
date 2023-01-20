@@ -5,6 +5,7 @@ __all__ = [
 
 
 import astropy.time
+import datetime
 import math
 import numpy as np
 import os
@@ -107,23 +108,40 @@ class EffectiveAreaFundamental:
     @property
     def xrt_contam_on_ccd_geny_update(self):
         """Return a string of the last time the file was modified."""
-        modified_time = os.path.getmtime(_ccd_contam_filename)
-        modified_time = astropy.time.Time(modified_time, format="unix")
+        modified_time_path = os.path.getmtime(_ccd_contam_filename)
+        modified_time = astropy.time.Time(modified_time_path, format="unix")
+
+        # tt = astropy.time.TimeDatetime(modified_time)
+        import pdb
+
+        pdb.set_trace()
+
+        observation_date_dt = self.observation_date.datetime
+        modified_time_dt_ts = datetime.datetime.fromtimestamp(
+            modified_time_path
+        ).strftime("%Y/%m/%d")
 
         if self.observation_date > modified_time:
             raise ValueError(
                 "No contamination data is presently available for "
-                f"{self.observation_date}.\n The latest available data is on "
-                f"{modified_time}.\n Contamination data is "
+                f"{observation_date_dt}.\n The latest available data is on "
+                f"{tt}.\n Contamination data is "
                 "updated periodically. The last update was on "
-                f"{self.observation_date}. If this is more "
+                f"{modified_time_dt_ts}. If this is more "
                 "than one month ago, please raise an issue at: "
                 "https://github.com/HinodeXRT/xrtpy/issues/new"
             )
 
-        # import pdb; pdb.set_trace()
-
         return modified_time
+        """
+
+
+                "updated periodically. The last update was on "
+                f"{modified_time_dt_ts}. If this is more "
+                "than one month ago, please raise an issue at: "
+                "https://github.com/HinodeXRT/xrtpy/issues/new"
+            )
+                """
 
     @property
     def contamination_on_CCD(self):
