@@ -102,46 +102,36 @@ class EffectiveAreaFundamental:
             raise ValueError(
                 f"Invalid date: {observation_date.iso}.\n Date must be after {epoch.iso}."
             )
+
         # import pdb; pdb.set_trace()
+        modified_time_path = os.path.getmtime(_ccd_contam_filename)
+        modified_time = astropy.time.Time(modified_time_path, format="unix")
+        latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
+            "%Y/%m/%d"
+        )
+        modified_time_dt_ts = datetime.datetime.fromtimestamp(
+            modified_time_path
+        ).strftime("%Y/%m/%d")
+
+        if observation_date > modified_time:
+            raise ValueError(
+                "No contamination data is presently available for "
+                f"{observation_date.datetime}.\n The latest available data is on "
+                f"{latest_available_ccd_data}.\n Contamination data is "
+                "updated periodically. The last update was on "
+                f"{modified_time_dt_ts}. If this is more "
+                "than one month ago, please raise an issue at: "
+                "https://github.com/HinodeXRT/xrtpy/issues/new"
+            )
+
         self._observation_date = observation_date
 
     @property
     def xrt_contam_on_ccd_geny_update(self):
         """Return a string of the last time the file was modified."""
         modified_time_path = os.path.getmtime(_ccd_contam_filename)
-        modified_time = astropy.time.Time(modified_time_path, format="unix")
 
-        # tt = astropy.time.TimeDatetime(modified_time)
-        import pdb
-
-        pdb.set_trace()
-
-        observation_date_dt = self.observation_date.datetime
-        modified_time_dt_ts = datetime.datetime.fromtimestamp(
-            modified_time_path
-        ).strftime("%Y/%m/%d")
-
-        if self.observation_date > modified_time:
-            raise ValueError(
-                "No contamination data is presently available for "
-                f"{observation_date_dt}.\n The latest available data is on "
-                f"{tt}.\n Contamination data is "
-                "updated periodically. The last update was on "
-                f"{modified_time_dt_ts}. If this is more "
-                "than one month ago, please raise an issue at: "
-                "https://github.com/HinodeXRT/xrtpy/issues/new"
-            )
-
-        return modified_time
-        """
-
-
-                "updated periodically. The last update was on "
-                f"{modified_time_dt_ts}. If this is more "
-                "than one month ago, please raise an issue at: "
-                "https://github.com/HinodeXRT/xrtpy/issues/new"
-            )
-                """
+        return astropy.time.Time(modified_time_path, format="unix")
 
     @property
     def contamination_on_CCD(self):
