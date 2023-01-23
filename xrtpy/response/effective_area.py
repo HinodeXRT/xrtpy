@@ -52,7 +52,6 @@ _ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
 _filter_contam_file = scipy.io.readsav(_filter_contam_filename)
 
 # CCD contam geny files keys for time and date.
-
 _ccd_contamination_file_time = astropy.time.Time(
     _ccd_contam_file["p1"], format="utime", scale="utc"
 )
@@ -97,10 +96,13 @@ class EffectiveAreaFundamental:
     @observation_date.setter
     def observation_date(self, date):
         """Validating users requested observation date."""
+
         observation_date = sunpy.time.parse_time(date)
+
         if observation_date <= epoch:
             raise ValueError(
-                f"Invalid date: {observation_date.iso}.\n Date must be after {epoch.iso}."
+                f"\nInvalid date: {observation_date.datetime}.\n"
+                f"Date must be after {epoch}."
             )
 
         modified_time_path = os.path.getmtime(_ccd_contam_filename)
@@ -114,7 +116,7 @@ class EffectiveAreaFundamental:
 
         if observation_date > modified_time:
             raise ValueError(
-                "No contamination data is presently available for "
+                "\nNo contamination data is presently available for "
                 f"{observation_date.datetime}.\n The latest available data is on "
                 f"{latest_available_ccd_data}.\n Contamination data is "
                 "updated periodically. The last update was on "
@@ -148,15 +150,14 @@ class EffectiveAreaFundamental:
 
     @property
     def filter_data(self):
-        """Collecting filter data."""
+        """Collecting filter contamination data."""
         return _filter_contamination[self.filter_index_mapping_to_name][
             self.filter_wheel_number
         ]
 
     @property
     def contamination_on_filter(self) -> u.angstrom:
-        """
-        Thickness of the contamination layer on a filter."""
+        """Thickness of the contamination layer on a filter."""
         interpolater = scipy.interpolate.interp1d(
             _filter_contamination_file_time.utime, self.filter_data, kind="linear"
         )
