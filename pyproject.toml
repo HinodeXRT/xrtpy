@@ -10,6 +10,8 @@ requires = [
 skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
 ignore-words-list = """
 circularly,
+nd,
+sav,
 te
 """
 

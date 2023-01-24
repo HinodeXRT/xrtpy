@@ -78,6 +78,7 @@ repos:
   rev: v2.2.2
   hooks:
   - id: codespell
+    exclude: .*\.fits
     additional_dependencies:
     - tomli
 
