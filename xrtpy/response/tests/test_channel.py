@@ -1,11 +1,11 @@
 import numpy as np
-import pkg_resources
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
 
 from astropy import units as u
+from pathlib import Path
 
 from xrtpy.response.channel import Channel
 
@@ -33,9 +33,7 @@ def test_channel_name(channel_name):
     assert channel.name == channel_name
 
 
-filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_channels_v0016.genx"
-)
+filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)
 v6_genx_s = v6_genx["SAVEGEN0"]
@@ -122,9 +120,7 @@ def test_entrancefilter_material(channel_name):
         _channel_name_to_index_mapping[channel_name]
     ]["EN_FILTER"]["MATERIAL"]
 
-    if np.all(entrancefilter_material == idl_entrancefilter_material_auto):
-        pass
-    else:
+    if not np.all(entrancefilter_material == idl_entrancefilter_material_auto):
         raise ValueError("FAIL: test_entrancefilter_material")
 
 
@@ -191,7 +187,7 @@ def test_entrancefilter_wavelength(channel_name):
     ] * u.angstrom
 
     assert u.allclose(
-        idl_entrancefilter_wavelength_manu, entrancefilter_wavelength[0:10]
+        idl_entrancefilter_wavelength_manu, entrancefilter_wavelength[:10]
     )
 
 
@@ -345,7 +341,7 @@ def test_mirror1_wavelength(channel_name):
         1.90000,
     ] * u.angstrom
 
-    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[0:10])
+    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -462,7 +458,7 @@ def test_mirror2_wavelength(channel_name):
         1.90000,
     ] * u.angstrom
 
-    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[0:10])
+    assert u.allclose(idl_mirror_wavelength_manu, mirror_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -597,7 +593,7 @@ def test_filter1_wavelength(channel_name):
         1.07450,
     ] * u.angstrom
 
-    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[0:10])
+    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -731,7 +727,7 @@ def test_filter2_wavelength(channel_name):
         1.07450,
     ] * u.angstrom
 
-    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[0:10])
+    assert u.allclose(idl_filter_wavelength_manu, filter_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -767,10 +763,9 @@ def test_ccd_gain_left(channel_name):
     channel_filter = Channel(channel_name)
     ccd_gain_left = channel_filter.ccd.ccd_gain_left
 
-    idl_ccd_gain_left_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["CCD"]["GAIN_L"]
-        * u.electron
-    )
+    idl_ccd_gain_left_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]][
+        "CCD"
+    ]["GAIN_L"] * (u.electron / u.DN)
 
     assert u.isclose(ccd_gain_left, idl_ccd_gain_left_auto)
 
@@ -781,12 +776,13 @@ def test_ccd_gain_right(channel_name):
     channel_filter = Channel(channel_name)
     ccd_gain_right = channel_filter.ccd.ccd_gain_right
 
-    idl_ccd_gain_right_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["CCD"]["GAIN_R"]
-        * u.electron
-    )
+    idl_ccd_gain_right_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]][
+        "CCD"
+    ]["GAIN_R"] * (u.electron / u.DN)
 
-    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_auto)
+    idl_ccd_gain_right_correction = 57.5 * (u.electron / u.DN)
+
+    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_correction)
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -851,7 +847,7 @@ def test_CCD_quantum_efficiency(channel_name):
         0.483898,
     ]
 
-    assert idl_ccd_quantum_efficiency_manu, ccd_quantum_efficiency[0:13]
+    assert idl_ccd_quantum_efficiency_manu, ccd_quantum_efficiency[:13]
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
@@ -886,7 +882,7 @@ def test_CCD_wavelength(channel_name):
         1.90000,
     ] * u.angstrom
 
-    assert u.allclose(idl_ccd_wavelength_manu, ccd_wavelength[0:10])
+    assert u.allclose(idl_ccd_wavelength_manu, ccd_wavelength[:10])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)

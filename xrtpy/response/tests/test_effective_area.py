@@ -1,9 +1,9 @@
 import glob
-import pkg_resources
 import pytest
 
 from astropy import units as u
 from datetime import datetime
+from pathlib import Path
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
@@ -46,6 +46,9 @@ valid_dates = [
     datetime(year=2015, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2017, month=9, day=22, hour=22, minute=1, second=1),
     datetime(year=2019, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2020, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2021, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2022, month=9, day=23, hour=22, minute=1, second=1),
 ]
 
 invalid_dates = [
@@ -96,13 +99,12 @@ def test_EffectiveArea_exception_is_raised(name, date):
 
 
 def get_IDL_data_files():
-
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/effective_area_IDL_testing_files"
+    directory = (
+        Path(__file__).parent.parent.absolute()
+        / "data"
+        / "effective_area_IDL_testing_files"
     )
-
-    filter_data_files = glob.glob(directory + "/**/*.txt")
-
+    filter_data_files = directory.glob("**/*.txt")
     return sorted(filter_data_files)
 
 
@@ -111,7 +113,7 @@ filenames = get_IDL_data_files()
 
 def _IDL_raw_data_list(filename):
 
-    with open(filename, "r") as filter_file:
+    with open(filename) as filter_file:
 
         list_of_IDL_effective_area_data = []
         for line in filter_file:
@@ -130,25 +132,23 @@ def IDL_test_date(list_of_lists):
     obs_date = str(list_of_lists[1][1])
     obs_time = str(list_of_lists[1][2])
 
-    day = int(obs_date[0:2])
+    day = int(obs_date[:2])
 
     month_datetime_object = datetime.strptime(obs_date[3:6], "%b")
     month = month_datetime_object.month
 
     year = int(obs_date[8:12])
 
-    hour = int(obs_time[0:2])
+    hour = int(obs_time[:2])
     minute = int(obs_time[3:5])
     second = int(obs_time[6:8])
 
-    observation_date_dt = datetime(year, month, day, hour, minute, second)
-
-    return observation_date_dt
+    return datetime(year, month, day, hour, minute, second)
 
 
 def _IDL_effective_area_raw_data(filename):
 
-    with open(filename, "r") as filter_file:
+    with open(filename) as filter_file:
 
         list_of_lists = []
         for line in filter_file:
@@ -156,10 +156,7 @@ def _IDL_effective_area_raw_data(filename):
             line_list = stripped_line.split()
             list_of_lists.append(line_list)
 
-    effective_area = []
-    for i in range(3, len(list_of_lists)):
-        effective_area.append(list_of_lists[i][1])
-
+    effective_area = [list_of_lists[i][1] for i in range(3, len(list_of_lists))]
     effective_area = [float(i) for i in effective_area] * u.cm**2
 
     return effective_area

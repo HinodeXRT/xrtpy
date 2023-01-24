@@ -11,16 +11,14 @@ __all__ = [
 ]
 
 import numpy as np
-import pkg_resources
 import scipy.io
 import sunpy.io.special
 import sunpy.time
 
 from astropy import units as u
+from pathlib import Path
 
-filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_channels_v0016.genx"
-)
+filename = Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 _channel_name_to_index_mapping = {
     "Al-mesh": 0,
@@ -101,7 +99,7 @@ class EntranceFilter:
 
     @property
     def entrancefilter_density(self) -> u.g * u.cm**-3:
-        """XRT entrance filter material density in g/cm\ :sup:`3`\ ."""
+        r"""XRT entrance filter material density in g/cm\ :sup:`3`\ ."""
         return u.Quantity(self._en_filter_data["DENS"], u.g * u.cm**-3)
 
     @property
@@ -298,15 +296,15 @@ class CCD:
 
     @property
     @u.quantity_input
-    def ccd_gain_left(self) -> u.electron:
+    def ccd_gain_left(self) -> u.electron / u.DN:
         """Gain when reading the left port of the CCD."""
-        return u.Quantity(self._ccd_data["GAIN_L"], u.electron)
+        return u.Quantity(self._ccd_data["GAIN_L"], u.electron / u.DN)
 
     @property
     @u.quantity_input
-    def ccd_gain_right(self) -> u.electron:
+    def ccd_gain_right(self) -> u.electron / u.DN:
         """Gain when reading the right port of the CCD."""
-        return u.Quantity(self._ccd_data["GAIN_R"], u.electron)
+        return u.Quantity(57.5, u.electron / u.DN)
 
     @property
     def ccd_name(self) -> str:

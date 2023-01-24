@@ -2,7 +2,7 @@ import nox
 
 nox.options.sessions = ["tests", "linters"]
 
-python_versions = ("3.8", "3.9", "3.10")
+python_versions = ("3.8", "3.9", "3.10", "3.11")
 
 sphinx_paths = ["docs", "docs/_build/html"]
 sphinx_fail_on_warnings = ["-W", "--keep-going"]
@@ -18,6 +18,7 @@ pytest_options = [
     "xrtpy/response/temperature_response.py",
 ]
 
+
 @nox.session(python=python_versions)
 def tests(session):
     session.install("-r", "requirements/tests.txt")
@@ -30,12 +31,6 @@ def linters(session):
     session.install("-r", "requirements/tests.txt")
     flake8_options = ["--count", "--show-source", "--statistics"]
     session.run("flake8", "xrtpy", *flake8_options, *session.posargs)
-
-
-@nox.session
-def codespell(session):
-    session.install("codespell")
-    session.run("codespell", ".")
 
 
 @nox.session
