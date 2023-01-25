@@ -8,6 +8,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 def get_IDL_data_files():
+    """
     files = []
     data_root = "data/temperature_response_IDL_testing_files/"
     for top_dir in get_pkg_data_filenames(
@@ -19,15 +20,17 @@ def get_IDL_data_files():
                 top_dir, package="xrtpy.response.tests", pattern="*.txt"
             )
         )
+    #import pdb; pdb.Pdb
     return sorted(files)
-    """path = (
+    """
+    path = (
         Path(__file__).parent.parent.absolute()
         / "data"
         / "temperature_response_IDL_testing_files"
     )
     filter_data_files = list(path.glob("**/*.*"))
+    print("ALAALCNCOINEOin")
     return sorted(filter_data_files)
-    """
 
 
 filenames = get_IDL_data_files()
