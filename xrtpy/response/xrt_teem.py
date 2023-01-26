@@ -9,10 +9,8 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 def xrt_teem(
-    hdr1,
-    data1,
-    hdr2,
-    data2,
+    map1,
+    map2,
     binfac=1,
     Trange=None,
     no_threshold=False,
@@ -32,22 +30,18 @@ def xrt_teem(
 
     Parameters:
     -----------
-    hdr1 : fits header
-        header for the first image
+    map1 : XRTMap object (i.e. sunpy.map.sources.hinode.XRTMap)
+        map for the first XRT level 1 data image.  If the image is
+        normalized, then it is assumed that the un-normalized image can be
+        recovered by multiplying by the exposure time (exposure time must be
+        available in the metadata). It is also assumed that the metadata
+        history will contain the string XRT_RENORMALIZE if the image has been
+        normalized.
 
-    data1 : array
-        XRT level1 data for first image. If the image is normalized, then it
-        is assumed that the un-normalized image can be recovered by
-        multiplying by the exposure time (exposure time must be available). It
-        is also assumed that the header history will contain the string
-        XRT_RENORMALIZE if the image has been normalized.
-
-    hdr2 : fits header
-        header for the second image (must use different filters from the first
-        image)
-
-    data2 : array
-        XRT level1 data for second image. Shape must match data1.
+    map2 : XRTMap object
+        map for the second image (must use different filters from the first
+        image). The image shape should match that in map1. The same
+        considerations apply as for map1.
 
     binfac : integer, optional (default = 1)
         spatial binning factor
@@ -65,7 +59,7 @@ def xrt_teem(
         [20%]). If photon noise/signal exceeds this value, the corresponding
         temperatures are set to 0.
 
-    mask : Boolean array of shape of images [Optional]
+    mask : Boolean array of the same shape as the images [Optional]
         If provided, masks out parts of the images from the analysis. Note:
         pixels to be masked out should be True, unmasked should be False
 
@@ -92,13 +86,13 @@ def xrt_teem(
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
-    >>> T_e, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2) # doctest: +SKIP
+    >>> T_e, EM, Terror, EMerror = xrt_teem(map1, map2) # doctest: +SKIP
 
     If you want to bin the image data in space to reduce photon noise, set
     binfac to the factor by which you want to bin.  For example to bin the
     data by a factor of 3 do:
 
-    >>> T_e, EM, Terror, EMerror = xrt_teem(hdr1, data1, hdr2, data2, binfac=3) # doctest: +SKIP
+    >>> T_e, EM, Terror, EMerror = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
 
     The data is binned first and then the temperature is derived. Note that
     the image size is not reduced, but pixels within 3×3 squares are set to
@@ -126,6 +120,10 @@ def xrt_teem(
     D. Slavin (SAO). See original IDL code for more details.
     """
 
+    hdr1 = map1.meta
+    hdr2 = map2.meta
+    data1 = map1.data
+    data2 = map2.data
     n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
     n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
     # This allows use of normalized data (contrary to original IDL code):

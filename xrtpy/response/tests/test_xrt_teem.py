@@ -1,6 +1,7 @@
 import numpy as np
 import pkg_resources
 import pytest
+import sunpy.map
 
 from astropy.io import fits
 from pathlib import Path
@@ -40,16 +41,10 @@ def test_standard_case():
     # of the files
     file1 = data_files[1]
     file2 = data_files[0]
-    hdu1 = fits.open(file1)
-    data1 = hdu1[0].data
-    hdr1 = hdu1[0].header
-    hdu2 = fits.open(file2)
-    hdr2 = hdu2[0].header
-    data2 = hdu2[0].data
-    hdu1.close()
-    hdu2.close()
+    map1 = sunpy.map.Map(file1)
+    map2 = sunpy.map.Map(file2)
 
-    Te, EM, Terr, EMerr = xrt_teem(hdr1, data1, hdr2, data2)
+    Te, EM, Terr, EMerr = xrt_teem(map1, map2)
 
     testdata = get_IDL_results_data()
 
@@ -90,16 +85,10 @@ def test_binning_case():
     # of the files
     file1 = data_files[1]
     file2 = data_files[0]
-    hdu1 = fits.open(file1)
-    data1 = hdu1[0].data
-    hdr1 = hdu1[0].header
-    hdu2 = fits.open(file2)
-    hdr2 = hdu2[0].header
-    data2 = hdu2[0].data
-    hdu1.close()
-    hdu2.close()
+    map1 = sunpy.map.Map(file1)
+    map2 = sunpy.map.Map(file2)
 
-    Te, EM, Terr, EMerr = xrt_teem(hdr1, data1, hdr2, data2, binfac=2)
+    Te, EM, Terr, EMerr = xrt_teem(map1, map2, binfac=2)
 
     testdata = get_IDL_results_data()
 
