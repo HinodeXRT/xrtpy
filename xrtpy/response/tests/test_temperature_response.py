@@ -8,7 +8,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 def get_IDL_data_files():
-    """
+
     files = []
     data_root = "data/temperature_response_IDL_testing_files/"
     for top_dir in get_pkg_data_filenames(
@@ -20,17 +20,19 @@ def get_IDL_data_files():
                 top_dir, package="xrtpy.response.tests", pattern="*.txt"
             )
         )
-    #import pdb; pdb.Pdb
+
     return sorted(files)
-    """
-    path = (
-        Path(__file__).parent.parent.absolute()
-        / "data"
-        / "temperature_response_IDL_testing_files"
-    )
-    filter_data_files = list(path.glob("**/*.*"))
-    print("ALAALCNCOINEOin")
-    return sorted(filter_data_files)
+
+
+"""
+path = (
+    Path(__file__).parent.parent.absolute()
+    / "data"
+    / "temperature_response_IDL_testing_files"
+)
+filter_data_files = list(path.glob("**/*.*"))
+return sorted(filter_data_files)
+"""
 
 
 filenames = get_IDL_data_files()
@@ -84,7 +86,10 @@ def _IDL_temperature_response_raw_data(filename):
     new_IDL_data_list = [IDL_data_list[i][1] for i in range(4, len(IDL_data_list))]
     return [float(i) for i in new_IDL_data_list]
 
+
 assert filenames
+
+
 @pytest.mark.parametrize("filename", filenames)
 def test_temperature_response(filename):
     # def test_temperature_response(filename, allclose):
