@@ -84,7 +84,7 @@ def _IDL_temperature_response_raw_data(filename):
     new_IDL_data_list = [IDL_data_list[i][1] for i in range(4, len(IDL_data_list))]
     return [float(i) for i in new_IDL_data_list]
 
-
+assert filenames
 @pytest.mark.parametrize("filename", filenames)
 def test_temperature_response(filename):
     # def test_temperature_response(filename, allclose):
