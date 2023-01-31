@@ -26,7 +26,7 @@ repos:
   - id: pyproject-fmt
 
 - repo: https://github.com/PyCQA/isort
-  rev: 5.11.4
+  rev: 5.12.0
   hooks:
   - id: isort
     name: isort
@@ -51,7 +51,7 @@ repos:
     - --nbqa-mutate
   - id: nbqa-isort
     additional_dependencies:
-    - isort==5.10.1
+    - isort==5.12.0
     args:
     - --nbqa-mutate
 

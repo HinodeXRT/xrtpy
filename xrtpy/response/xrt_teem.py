@@ -74,15 +74,18 @@ def xrt_teem(
     --------
     T_e : 2-dimensional float array
         log10 of the derived electron temperature [K].
+
     EM : 2-dimensional float array
         log10 of the derived volume emission measure [cm^-3].
+
     T_error : 2-dimensional float array
         error of log10 temperature [K].
+
     EM_error : 2-dimensional float array
         error of log10 volume emission measure [cm^-3].
 
-    Examples
-    --------
+    Examples:
+    ---------
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
@@ -144,32 +147,11 @@ def xrt_teem(
     data2 = data2.astype(float)
     data1 = np.ma.masked_where(mask, data1)
     data2 = np.ma.masked_where(mask, data2)
+
     if binfac > 1:
-        s = data1.shape
-        ns = (s[0] // binfac, s[1] // binfac)
-        rbs = (ns[0], binfac, ns[1], binfac)
-        # sums the data in binfac x binfac sized regions
-        d1 = data1.reshape(rbs).sum(-1).sum(1)
-        d2 = data2.reshape(rbs).sum(-1).sum(1)
-        # this makes a pixel masked if any of the summed pixels is masked
-        # if we want to mask only if all the pixels are masked then we could
-        # use prod in place of sum here
-        msk = mask.reshape(rbs).sum(-1).sum(1)
-        # need to convert back to bool after summing
-        msk = msk.astype(bool)
-        # This restores the image to the size of the original images as in the
-        # IDL code:
-        d1tmp = np.zeros_like(data1)
-        d2tmp = np.zeros_like(data2)
-        mtmp = np.zeros_like(mask, dtype=bool)
-        for i in range(binfac):
-            for j in range(binfac):
-                d1tmp[i::binfac, j::binfac] = d1[:]
-                d2tmp[i::binfac, j::binfac] = d2[:]
-                mtmp[i::binfac, j::binfac] = msk[:]
-        data1 = d1tmp
-        data2 = d2tmp
-        mask = mtmp
+        data1 = rebin_image(data1, binfac)
+        data2 = rebin_image(data2, binfac)
+        mask = rebin_image(mask, binfac)
 
     # input mask for data should be False in parts of the images to be used and
     # True in places we want to mask out
@@ -178,8 +160,7 @@ def xrt_teem(
     dmask = (data1 <= 0.0) | (data2 <= 0.0)
     mask = mask | dmask
 
-    fw1 = hdr1["EC_FW1_"]
-    fw2 = hdr1["EC_FW2_"]
+    fw1, fw2 = map1.measurement.replace(" ", "_").split("-")
     if fw1 != "Open":
         filt1 = fw1
         if fw2 != "Open":
@@ -190,8 +171,7 @@ def xrt_teem(
         raise ValueError("Invalid filter values, both fw1 and fw2 are Open")
     date_obs1 = hdr1["DATE_OBS"]
     tresp1 = TemperatureResponseFundamental(filt1, date_obs1)
-    fw1 = hdr2["EC_FW1_"]
-    fw2 = hdr2["EC_FW2_"]
+    fw1, fw2 = map2.measurement.replace(" ", "_").split("-")
     if fw1 != "Open":
         filt2 = fw1
         if fw2 != "Open":
@@ -206,8 +186,212 @@ def xrt_teem(
     if filt1 == filt2:
         raise ValueError("Filters for the two images cannot be the same")
 
+    T_e, EM, model_ratio, ok_pixel = derive_temperature(
+        data1, data2, hdr1, hdr2, mask, tresp1, tresp2, binfac=binfac, Trange=Trange
+    )
+
+    T_error, EMerror, K1, K2 = calculate_TE_errors(
+        data1, data2, T_e, EM, model_ratio, tresp1, tresp2, Trange=Trange
+    )
+
+    T_e = T_e.filled(0.0)
+    EM = EM.filled(0.0)
+    T_error = T_error.filled(0.0)
+    EMerror = EMerror.filled(0.0)
+
+    if not no_threshold:
+        ok_wothr = ok_pixel.copy()
+        Kd1 = np.sqrt(K1 / data1)
+        Kd1 = Kd1.filled(0.0)
+        Kd2 = np.sqrt(K2 / data2)
+        Kd2 = Kd2.filled(0.0)
+        tthr = (T_error - T_e) <= np.log10(Te_err_threshold)
+        k1thr = Kd1 <= photon_noise_threshold
+        k2thr = Kd2 <= photon_noise_threshold
+        ok_pixel = (
+            ok_pixel
+            & ((T_error - T_e) <= np.log10(Te_err_threshold))
+            & (Kd1 <= photon_noise_threshold)
+            & (Kd2 <= photon_noise_threshold)
+        )
+        if verbose:
+            print(f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}")
+            print(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
+            print(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
+            print(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
+            print(f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}")
+        mask = mask | ~ok_pixel
+        T_e[mask] = 0.0
+        EM[mask] = 0.0
+        T_error[mask] = 0.0
+        EMerror[mask] = 0.0
+
+        if verbose:
+            print("from xrt_teem:")
+            Tmodel = tresp1.CHIANTI_temperature.value
+            if Trange:
+                Tmodel = Tmodel[
+                    (np.log10(Tmodel) >= Trange[0]) & (np.log10(Tmodel) <= Trange[1])
+                ]
+            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
+            print(f"Applied thresholds: - T_e error < {Te_err_threshold*100.} %")
+            print(
+                f"                    - Photon noise < "
+                f"{photon_noise_threshold*100.} %"
+            )
+    else:
+        if verbose:
+            print("from xrt_teem:")
+            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
+            print("No thresholds applied")
+    return T_e, EM, T_error, EMerror
+
+
+def rebin_image(data, binfac=1):
+    """
+    Given a data array and a binning factor return the data array rebinned by
+    the binning factor. Note: the size of the original data array is
+    preserved, despite the adding up of adjacent pixels. Thus the sum of all
+    the pixels will be increased by the factor binfac.
+    """
+
+    s = data.shape
+    ns = (s[0] // binfac, s[1] // binfac)
+    rbs = (ns[0], binfac, ns[1], binfac)
+    # sums the data in binfac x binfac sized regions
+    drbin = data.reshape(rbs).sum(-1).sum(1)
+    # for a boolean mask, this makes a pixel masked if any of the summed
+    # pixels is masked. If we want to mask only if all the pixels are masked
+    # then we could use prod in place of sum above
+
+    if data.dtype == bool:
+        # need to convert back to bool after summing
+        drbin = drbin.astype(bool)
+    # This restores the image to the size of the original images as in the
+    # IDL code:
+    if data.dtype == bool:
+        dtmp = np.zeros_like(data, dtype=bool)
+    else:
+        dtmp = np.zeros_like(data)
+    for i in range(binfac):
+        for j in range(binfac):
+            dtmp[i::binfac, j::binfac] = drbin[:]
+    data = dtmp
+    return data
+
+
+def deriv(x, y):
+    """
+    Use three-point Lagrangian interpolation to compute the first derivative
+    of an array of data
+
+    Method taken from IDL routine of the same name.
+
+    Parameters:
+    -----------
+    x : float array
+        abscissa of the data
+    y : float array
+        ordinate of the data
+
+    Returns:
+    --------
+    float array :
+        first derivative at the data points
+    """
+    x0 = x[:-2]
+    x1 = x[1:-1]
+    x2 = x[2:]
+    y0 = y[:-2]
+    y1 = y[1:-1]
+    y2 = y[2:]
+    x01 = x0 - x1
+    x02 = x0 - x2
+    x12 = x1 - x2
+    dydx1 = (
+        y0 * x12 / (x01 * x02) + y1 * (1.0 / x12 - 1.0 / x01) - y2 * x01 / (x02 * x12)
+    )
+    dydx0 = (
+        y0[0] * (x01[0] + x02[0]) / (x01[0] * x02[0])
+        - y1[0] * x02[0] / (x01[0] * x12[0])
+        + y2[0] * x01[0] / (x02[0] * x12[0])
+    )
+    dydxN = (
+        -y0[-1] * x12[-1] / (x01[-1] * x02[-1])
+        + y1[-1] * x02[-1] / (x01[-1] * x12[-1])
+        - y2[-1] * (x02[-1] + x12[-1]) / (x02[-1] * x12[-1])
+    )
+    return np.append(np.insert(dydx1, 0, dydx0), dydxN)
+
+
+def derive_temperature(
+    data1, data2, hdr1, hdr2, mask, tresp1, tresp2, binfac=1, Trange=None
+):
+    """
+    Given two XRT Level 1 images, their associated metadata and the
+    TemperatureResponseFundamental objects associated with them, derive the
+    temperatures and emission measures in the image using the filter ratio
+    method.
+
+    Parameters:
+    -----------
+    data1 : float array
+        image array for first image
+
+    data2 : float array
+        image array for second image
+
+    hdr1 : dictionary
+        meta data dictionary for first image (could be
+        sunpy.util.metadata.MetaDict object or fits file header)
+
+    hdr2 : dictionary
+        meta data dictionary for second image
+
+    mask : Boolean array of the same shape as the images
+        pixels to be masked out should be True, unmasked should be False
+        If no masking is to be done then image should be all False.
+
+    tresp1 : TemperatureResponseFundamental object
+        temperature response for first image
+
+    tresp2 : TemperatureResponseFundamental object
+        temperature response for second image
+
+    binfac : integer, optional (default = 1)
+        spatial binning factor
+
+    Trange : 2 element sequence containing floats [Optional]
+        Range of log10(temperature) values to examine. Must be in order from
+        lower to higher. (Passed from xrt_teem.)
+
+
+    Returns:
+    --------
+    T_e : 2D float array
+        derived temperatures for the images
+
+    EM : 2D float array
+        derived emission measures for the images
+
+    model_ratio : 1D float array
+        emission ratios for the filters for the images as a function of
+        temperature
+
+    ok_pixel : 2D boolean array
+        indicates which pixels are okay (True) and which aren't (False) based
+        on whether the derived T_e corresponds to one (and not more than one)
+        model temperature based on the flux ratio
+    """
+
+    Tmodel = tresp1.CHIANTI_temperature.value
+    logTmodel = np.log10(Tmodel)
+
     flux1 = tresp1.temperature_response().value
     flux2 = tresp2.temperature_response().value
+    ratio = flux1 / flux2
+    t2mk = np.argmin(np.abs(Tmodel - 2.0e6))
+    rev_ratio = ratio[t2mk] > 1.0
 
     # Need to convert column emission measure to volume emission measure - to
     # do that we multiply the EM by the area (in cm^2) of a sky pixel
@@ -216,15 +400,6 @@ def xrt_teem(
     em2vem = (plate_scale * lsun) ** 2
     flux1 /= em2vem
     flux2 /= em2vem
-    ratio = flux1 / flux2
-    Tmodel = tresp1.CHIANTI_temperature.value
-    t2mk = np.argmin(np.abs(Tmodel - 2.0e6))
-    logTmodel = np.log10(Tmodel)
-    rev_ratio = ratio[t2mk] > 1.0
-    spect1 = tresp1.spectra().value
-    spect2 = tresp2.spectra().value
-    effarea1 = tresp1.effective_area().value  # in cm^2
-    effarea2 = tresp2.effective_area().value  # in cm^2
 
     # Note: this requires Trange to be a 2 element iterable ordered low to
     # high (Trange is log10 of temperature limits).
@@ -235,8 +410,6 @@ def xrt_teem(
             logTmodel = np.log10(Tmodel)
             flux1 = flux1[in_trange]
             flux2 = flux2[in_trange]
-            spect1 = spect1[in_trange, :]
-            spect2 = spect2[in_trange, :]
         else:
             raise ValueError(
                 "The temperature response does not include"
@@ -284,11 +457,60 @@ def xrt_teem(
     DN = np.ma.masked_where(((DN <= 0.0) | (T_e <= 0.0)), DN)
     EM = np.ma.log10(data1 / (DN * hdr1["EXPTIME"])) - np.log10(binfac**2)
     EM[~ok_pixel] = 0.0
+    return T_e, EM, model_ratio, ok_pixel
 
-    # derive T_e error, EM error:
-    dlnR_dlnT_mod = np.abs(deriv(np.log(Tmodel), np.log(model_ratio)))
-    dlnR_dlnT = np.interp(T_e, logTmodel, dlnR_dlnT_mod, left=0.0, right=0.0)
-    dlnR_dlnT = np.ma.masked_where(((dlnR_dlnT == 0.0) | (T_e <= 0.0)), dlnR_dlnT)
+
+def calculate_TE_errors(
+    data1, data2, T_e, EM, model_ratio, tresp1, tresp2, Trange=None
+):
+    """
+    Given values for T_e and EM derived via the filter ratio method and the
+    values of the temperature and model flux ratio, return the errors (i.e.
+    uncertainties) in T_e and EM.
+
+    Parameters:
+    -----------
+    data1 : float array
+        image array for first image
+
+    data2 : float array
+        image array for second image
+
+    T_e : 2D float array
+        Previously derived temperatures for an image pair
+
+    EM : 2D float array
+        Previously derived volume emission measures for an image pair
+
+    model_ratio : 1D float array
+        emission ratios for the filters for the images as a function of
+        temperature
+
+    tresp1: TemperatureResponseFundamental object
+        container for model data for the filters for image 1
+
+    tresp2: TemperatureResponseFundamental object
+        container for model data for the filters for image 2
+
+    Trange : 2 element sequence containing floats [Optional]
+        Range of log10(temperature) values to examine. Must be in order from
+        lower to higher. (Passed from xrt_teem.)
+
+    Returns:
+    --------
+    T_error : 2D float array
+        Estimate of the statistical errors in the temperature determination
+
+    EMerror : 2D float array
+        Estimate of the statistical errors in the volume emission measure
+        determination
+
+    K1 : 2D float array
+        Narukage's K factor (K(2)) for image 1
+
+    K2 : 2D float array
+        Narukage's K factor for image 2
+    """
 
     wvl = tresp1.channel_wavelength
     eVe = tresp1.ev_per_electron
@@ -298,6 +520,32 @@ def xrt_teem(
     dwvl = wvl[1:] - wvl[:-1]
     dwvl = np.append(dwvl, dwvl[-1]).value
 
+    Tmodel = tresp1.CHIANTI_temperature.value
+    logTmodel = np.log10(Tmodel)
+    effarea1 = tresp1.effective_area().value  # in cm^2
+    effarea2 = tresp2.effective_area().value  # in cm^2
+    spect1 = tresp1.spectra().value
+    spect2 = tresp2.spectra().value
+    flux1 = tresp1.temperature_response().value
+    flux2 = tresp2.temperature_response().value
+    if Trange:
+        in_trange = (logTmodel >= Trange[0]) & (logTmodel <= Trange[1])
+        if np.any(in_trange):
+            Tmodel = Tmodel[in_trange]
+            logTmodel = np.log10(Tmodel)
+            spect1 = spect1[in_trange, :]
+            spect2 = spect2[in_trange, :]
+            flux1 = flux1[in_trange]
+            flux2 = flux2[in_trange]
+        else:
+            raise ValueError(
+                "The temperature response does not include"
+                " any of the input temperatures in Trange"
+            )
+
+    dlnR_dlnT_mod = np.abs(deriv(np.log(Tmodel), np.log(model_ratio)))
+    dlnR_dlnT = np.interp(T_e, logTmodel, dlnR_dlnT_mod, left=0.0, right=0.0)
+    dlnR_dlnT = np.ma.masked_where(((dlnR_dlnT == 0.0) | (T_e <= 0.0)), dlnR_dlnT)
     # These sums should be converted to integrals if the spectrum includes
     # line broadening (as is the default in ChiantiPy).
     K1_mod = np.array(
@@ -336,93 +584,4 @@ def xrt_teem(
         )
         + EM
     )
-    T_e = T_e.filled(0.0)
-    EM = EM.filled(0.0)
-    T_error = T_error.filled(0.0)
-    EMerror = EMerror.filled(0.0)
-
-    if not no_threshold:
-        ok_wothr = ok_pixel.copy()
-        Kd1 = np.sqrt(K1 / data1)
-        Kd1 = Kd1.filled(0.0)
-        Kd2 = np.sqrt(K2 / data2)
-        Kd2 = Kd2.filled(0.0)
-        tthr = (T_error - T_e) <= np.log10(Te_err_threshold)
-        k1thr = Kd1 <= photon_noise_threshold
-        k2thr = Kd2 <= photon_noise_threshold
-        ok_pixel = (
-            ok_pixel
-            & ((T_error - T_e) <= np.log10(Te_err_threshold))
-            & (Kd1 <= photon_noise_threshold)
-            & (Kd2 <= photon_noise_threshold)
-        )
-        if verbose:
-            print(f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}")
-            print(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
-            print(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
-            print(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
-            print(f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}")
-        mask = mask | ~ok_pixel
-        T_e[mask] = 0.0
-        EM[mask] = 0.0
-        T_error[mask] = 0.0
-        EMerror[mask] = 0.0
-
-        if verbose:
-            print("from xrt_teem:")
-            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
-            print(f"Applied thresholds: - T_e error < {Te_err_threshold*100.} %")
-            print(
-                f"                    - Photon noise < "
-                f"{photon_noise_threshold*100.} %"
-            )
-    else:
-        if verbose:
-            print("from xrt_teem:")
-            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
-            print("No thresholds applied")
-    return T_e, EM, T_error, EMerror
-
-
-def deriv(x, y):
-    """
-    Use three-point Lagrangian interpolation to compute the first derivative
-    of an array of data
-
-    Method taken from IDL routine of the same name.
-
-    Parameters:
-    -----------
-    x : float array
-        abscissa of the data
-    y : float array
-        ordinate of the data
-
-    Returns:
-    --------
-    float array :
-        first derivative at the data points
-    """
-    x0 = x[:-2]
-    x1 = x[1:-1]
-    x2 = x[2:]
-    y0 = y[:-2]
-    y1 = y[1:-1]
-    y2 = y[2:]
-    x01 = x0 - x1
-    x02 = x0 - x2
-    x12 = x1 - x2
-    dydx1 = (
-        y0 * x12 / (x01 * x02) + y1 * (1.0 / x12 - 1.0 / x01) - y2 * x01 / (x02 * x12)
-    )
-    dydx0 = (
-        y0[0] * (x01[0] + x02[0]) / (x01[0] * x02[0])
-        - y1[0] * x02[0] / (x01[0] * x12[0])
-        + y2[0] * x01[0] / (x02[0] * x12[0])
-    )
-    dydxN = (
-        -y0[-1] * x12[-1] / (x01[-1] * x02[-1])
-        + y1[-1] * x02[-1] / (x01[-1] * x12[-1])
-        - y2[-1] * (x02[-1] + x12[-1]) / (x02[-1] * x12[-1])
-    )
-    return np.append(np.insert(dydx1, 0, dydx0), dydxN)
+    return T_error, EMerror, K1, K2
