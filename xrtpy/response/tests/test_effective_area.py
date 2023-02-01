@@ -100,6 +100,7 @@ def test_EffectiveArea_exception_is_raised(name, date):
 
 
 def get_IDL_data_files():
+    """
     files = []
     data_root = "data/effective_area_IDL_testing_files/"
     for top_dir in get_pkg_data_filenames(
@@ -120,7 +121,6 @@ def get_IDL_data_files():
     )
     filter_data_files = directory.glob("**/*.txt")
     return sorted(filter_data_files)
-    """
 
 
 filenames = get_IDL_data_files()
