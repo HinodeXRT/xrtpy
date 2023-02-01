@@ -1,4 +1,5 @@
 import astropy.units as u
+import numpy as np
 
 from astropy.utils.data import get_pkg_data_filenames
 from datetime import datetime
@@ -75,7 +76,6 @@ def IDL_test_date(IDL_data_list):
     hour = int(obs_time[:2])
     minute = int(obs_time[3:5])
     second = int(obs_time[6:8])
-
     return datetime(year, month, day, hour, minute, second)
 
 
@@ -109,7 +109,6 @@ def test_temperature_response(filename):
 
     instance = TemperatureResponseFundamental(filter_name, filter_obs_date)
     actual_temperature_response = instance.temperature_response()
-
     assert u.allclose(
-        actual_temperature_response.value, IDL_temperature_response, rtol=1e-1
+        actual_temperature_response.value, IDL_temperature_response, rtol=1e-3
     ), filter_name
