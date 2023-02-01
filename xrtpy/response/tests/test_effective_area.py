@@ -70,7 +70,6 @@ def test_channel_name(channel_name):
 
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_filter_name(name):
-
     instance = EffectiveAreaFundamental(
         name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0)
     )
@@ -128,9 +127,7 @@ filenames = get_IDL_data_files()
 
 
 def _IDL_raw_data_list(filename):
-
     with open(filename) as filter_file:
-
         list_of_IDL_effective_area_data = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -163,9 +160,7 @@ def IDL_test_date(list_of_lists):
 
 
 def _IDL_effective_area_raw_data(filename):
-
     with open(filename) as filter_file:
-
         list_of_lists = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -180,7 +175,6 @@ def _IDL_effective_area_raw_data(filename):
 
 @pytest.mark.parametrize("filename", filenames)
 def test_EffectiveAreaPreparatory_effective_area(filename, allclose):
-
     data_list = _IDL_raw_data_list(filename)
 
     filter_name = IDL_test_filter_name(data_list)
