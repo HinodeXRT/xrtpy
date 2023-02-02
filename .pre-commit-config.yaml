@@ -1,6 +1,6 @@
 ci:
   autofix_prs: false
-  autoupdate_schedule: quarterly
+  autoupdate_schedule: monthly
 
 repos:
 
@@ -21,7 +21,7 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: 0.4.1
+  rev: 0.6.0
   hooks:
   - id: pyproject-fmt
 
@@ -37,7 +37,7 @@ repos:
     - python
 
 - repo: https://github.com/psf/black
-  rev: 22.12.0
+  rev: 23.1.0
   hooks:
   - id: black
 
@@ -46,7 +46,7 @@ repos:
   hooks:
   - id: nbqa-black
     additional_dependencies:
-    - black==22.3.0
+    - black==23.1.0
     args:
     - --nbqa-mutate
   - id: nbqa-isort
@@ -56,17 +56,12 @@ repos:
     - --nbqa-mutate
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.5.0
+  rev: v2.6.0
   hooks:
   - id: pretty-format-ini
     args: [--autofix]
   - id: pretty-format-yaml
     args: [--autofix]
-
-- repo: https://github.com/pre-commit/mirrors-csslint
-  rev: v1.0.5
-  hooks:
-  - id: csslint
 
 - repo: https://github.com/MarcoGorelli/absolufy-imports
   rev: v0.3.1
@@ -90,7 +85,7 @@ repos:
     files: ^xrtpy/
 
 - repo: https://github.com/pre-commit/pygrep-hooks
-  rev: v1.9.0
+  rev: v1.10.0
   hooks:
   - id: rst-directive-colons
   - id: rst-inline-touching-normal
