@@ -154,6 +154,23 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
+    def coronal_CHIANTI_temperature(self):
+        """Coronal HIANTI temperatures in kelvin."""
+        return u.Quantity(coronal_CHIANTI_file["logged_temperature"] * u.K)
+
+    @property
+    def coronal_CHIANTI_file_spectra(self):
+        """Coronal CHIANTI file spectra."""
+        return coronal_CHIANTI_file["corona_solar_spectra"]
+
+    @property
+    @u.quantity_input
+    def coronal_CHIANTI_wavelength(self):
+        """Coronal CHIANTI file wavelength values in Å."""
+        return u.Quantity(coronal_CHIANTI_file["wavelength"] * u.Angstrom)
+
+    @property
+    @u.quantity_input
     def channel_wavelength(self):
         """Array of wavelengths for every X-ray channel in Å."""
         return u.Quantity((Channel(self.name).wavelength[:3993]) * u.photon)
