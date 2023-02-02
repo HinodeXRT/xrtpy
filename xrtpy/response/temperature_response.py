@@ -42,6 +42,13 @@ CHIANTI_file = {
     "wavelength_units": _XRT_emiss_model_file["WAVE_UNITS"][0],
 }
 
+_list_of_abundance = {
+    "chianti": _XRT_emiss_model_file,
+    "coronal": _XRT_coronal_chianti_emiss_model,
+    "hybrid": 2,
+    "photospheric": 3,
+}
+
 _corona_CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
 )
@@ -49,13 +56,6 @@ _corona_CHIANTI_filename = (
 _XRT_coronal_chianti_emiss_model = sunpy.io.special.genx.read_genx(
     _corona_CHIANTI_filename
 )
-
-coronal_CHIANTI_file = {
-    "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
-    "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
-    "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
-    "spectra_generated_information": _XRT_coronal_chianti_emiss_model["HEADER"]["TEXT"],
-}
 
 
 def resolve_abundance_model_type(abundance_type):
@@ -70,7 +70,6 @@ def resolve_abundance_model_type(abundance_type):
             "Available abundance models:\n"
             "Coronal, Hybrid and Photospheric.\n"
         )
-
     return abundance_name
 
 
