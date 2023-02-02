@@ -49,6 +49,13 @@ _list_of_abundance = {
     "photospheric": 3,
 }
 
+coronal_CHIANTI_file = {
+    "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
+    "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
+    "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
+    "spectra_generated_information": _XRT_coronal_chianti_emiss_model["HEADER"]["TEXT"],
+}
+
 _corona_CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
 )
