@@ -42,6 +42,16 @@ CHIANTI_file = {
     "wavelength_units": _XRT_emiss_model_file["WAVE_UNITS"][0],
 }
 
+
+_corona_CHIANTI_filename = (
+    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
+)
+
+_XRT_coronal_chianti_emiss_model = sunpy.io.special.genx.read_genx(
+    _corona_CHIANTI_filename
+)
+
+
 _list_of_abundance = {
     "chianti": _XRT_emiss_model_file,
     "coronal": _XRT_coronal_chianti_emiss_model,
@@ -55,14 +65,6 @@ coronal_CHIANTI_file = {
     "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
     "spectra_generated_information": _XRT_coronal_chianti_emiss_model["HEADER"]["TEXT"],
 }
-
-_corona_CHIANTI_filename = (
-    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
-)
-
-_XRT_coronal_chianti_emiss_model = sunpy.io.special.genx.read_genx(
-    _corona_CHIANTI_filename
-)
 
 
 def resolve_abundance_model_type(abundance_type):
@@ -205,6 +207,21 @@ class TemperatureResponseFundamental:
         for i in range(61):
             interpolater = interpolate.interp1d(
                 self.CHIANTI_wavelength, CHIANTI_file["spectra"][0][i], kind="linear"
+            )
+            spectra_interpolate.append(interpolater(self.channel_wavelength))
+        return spectra_interpolate * (
+            u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
+        )
+
+    @u.quantity_input
+    def coronal_spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
+        """Interpolation between the spectra wavelength onto the channel wavelength."""
+        spectra_interpolate = []
+        for i in range(61):
+            interpolater = interpolate.interp1d(
+                self.coronal_CHIANTI_wavelength,
+                coronal_CHIANTI_file["corona_solar_spectra"][0][i],
+                kind="linear",
             )
             spectra_interpolate.append(interpolater(self.channel_wavelength))
         return spectra_interpolate * (
