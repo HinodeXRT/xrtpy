@@ -220,7 +220,7 @@ class TemperatureResponseFundamental:
         for i in range(61):
             interpolater = interpolate.interp1d(
                 self.coronal_CHIANTI_wavelength,
-                coronal_CHIANTI_file["corona_solar_spectra"][0][i],
+                coronal_CHIANTI_file["corona_solar_spectra"][i],
                 kind="linear",
             )
             spectra_interpolate.append(interpolater(self.channel_wavelength))
