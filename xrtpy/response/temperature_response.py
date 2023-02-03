@@ -9,8 +9,10 @@ import sunpy.time
 from astropy import units as u
 from astropy.constants import c, h
 from datetime import datetime
+from numbers import Real
 from pathlib import Path
 from scipy import integrate, interpolate
+from typing import Dict
 
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.response.effective_area import effective_area
@@ -47,6 +49,21 @@ _corona_CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
 )
 
+_abundance_files = {
+    "CHIANTI_v_10": Path(__file__).parent.absolute()
+    / "data"
+    / "XRT_emiss_model.default_CHIANTI.geny",
+    "coronal": Path(__file__).parent.absolute()
+    / "data"
+    / "solspec_ch1000_corona_chianti.genx",
+    "hybrid": Path(__file__).parent.absolute()
+    / "data"
+    / "solspec_ch1000_corona_chianti.genx",
+    "photospheric": Path(__file__).parent.absolute()
+    / "data"
+    / "solspec_ch1000_corona_chianti.genx",
+}
+
 _XRT_coronal_chianti_emiss_model = sunpy.io.special.genx.read_genx(
     _corona_CHIANTI_filename
 )
@@ -65,6 +82,18 @@ coronal_CHIANTI_file = {
     "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
     "spectra_generated_information": _XRT_coronal_chianti_emiss_model["HEADER"]["TEXT"],
 }
+
+{
+    "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
+    "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
+    "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
+    "spectra_generated_information": _XRT_coronal_chianti_emiss_model["HEADER"]["TEXT"],
+}
+
+
+def _get_abundance_file(abundance_type):
+    """Coronal wavelength value."""
+    return coronal_CHIANTI_file["wavelength"]
 
 
 def resolve_abundance_model_type(abundance_type):
@@ -90,6 +119,24 @@ class TemperatureResponseFundamental:
         self.observation_date = observation_date
         self._channel = Channel(self.name)
         self._abundance_type = resolve_abundance_model_type(abundance_type)
+
+    @property
+    def abundances(self) -> Dict[str, Real]:
+        return self._abundances
+
+    @abundances.setter
+    def abundances(self, abundance_type: str):
+        if abundance_type == "coronal":
+            self._abundances = {
+                "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
+                "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
+                "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
+                "spectra_generated_information": _XRT_coronal_chianti_emiss_model[
+                    "HEADER"
+                ]["TEXT"],
+            }
+        elif abundance_type == "photospheric":
+            self._abundances = {"C": 1.4e-3}
 
     @property
     def abundance_type(self):
