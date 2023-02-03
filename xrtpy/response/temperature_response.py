@@ -64,6 +64,14 @@ _abundance_files = {
     / "solspec_ch1000_corona_chianti.genx",
 }
 
+
+_abundance_model_to_path = {
+    "CHIANTI_v_10": scipy.io.readsav(_CHIANTI_filename)["p0"],
+    "coronal": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
+    "hybrid": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
+    "photospheric": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
+}
+
 _XRT_coronal_chianti_emiss_model = sunpy.io.special.genx.read_genx(
     _corona_CHIANTI_filename
 )
@@ -77,13 +85,6 @@ _list_of_abundance = {
 }
 
 coronal_CHIANTI_file = {
-    "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
-    "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
-    "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
-    "spectra_generated_information": _XRT_coronal_chianti_emiss_model["HEADER"]["TEXT"],
-}
-
-{
     "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
     "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
     "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
