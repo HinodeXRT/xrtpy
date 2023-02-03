@@ -30,7 +30,7 @@ _XRT_emiss_model_file = _CHIANTI_file["p0"]
 
 
 CHIANTI_file = {
-    "abundance_model": _XRT_emiss_model_file["ABUND_MODEL"][0],
+    "CHIANTI_abundance_model": _XRT_emiss_model_file["ABUND_MODEL"][0],
     "dens_model": _XRT_emiss_model_file["DENS_MODEL"][0],
     "ioneq_model": _XRT_emiss_model_file["IONEQ_MODEL"][0],
     "name": _XRT_emiss_model_file["NAME"][0],
@@ -49,7 +49,7 @@ _corona_CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
 )
 
-_abundance_files = {
+_abundance_model_file_path = {
     "CHIANTI_v_10": Path(__file__).parent.absolute()
     / "data"
     / "XRT_emiss_model.default_CHIANTI.geny",
@@ -65,7 +65,7 @@ _abundance_files = {
 }
 
 
-_abundance_model_to_path = {
+_abundance_model_data = {
     "CHIANTI_v_10": scipy.io.readsav(_CHIANTI_filename)["p0"],
     "coronal": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
     "hybrid": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
@@ -92,16 +92,16 @@ coronal_CHIANTI_file = {
 }
 
 
-def _get_abundance_file(abundance_type):
+def _get_abundance_wave(abundance_model):
     """Coronal wavelength value."""
     return coronal_CHIANTI_file["wavelength"]
 
 
-def resolve_abundance_model_type(abundance_type):
+def resolve_abundance_model_type(abundance_model):
     """Formats users abundance_model name."""
-    if not isinstance(abundance_type, str):
+    if not isinstance(abundance_model, str):
         raise TypeError("Abundance model name must be a string")
-    abundance_name = abundance_type.lower()
+    abundance_name = abundance_model.lower()
     list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
     if abundance_name not in list_of_abundance_name:
         raise ValueError(
@@ -115,19 +115,19 @@ def resolve_abundance_model_type(abundance_type):
 class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
 
-    def __init__(self, filter_name, observation_date, abundance_type):
+    def __init__(self, filter_name, observation_date, abundance_model):
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
         self._channel = Channel(self.name)
-        self._abundance_type = resolve_abundance_model_type(abundance_type)
+        self._abundance_model = resolve_abundance_model_type(abundance_model)
 
     @property
     def abundances(self) -> Dict[str, Real]:
         return self._abundances
 
     @abundances.setter
-    def abundances(self, abundance_type: str):
-        if abundance_type == "coronal":
+    def abundances(self, abundance_model: str):
+        if abundance_model == "coronal":
             self._abundances = {
                 "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
                 "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
@@ -136,18 +136,37 @@ class TemperatureResponseFundamental:
                     "HEADER"
                 ]["TEXT"],
             }
-        elif abundance_type == "photospheric":
+        elif abundance_model == "photospheric":
             self._abundances = {"C": 1.4e-3}
 
     @property
-    def abundance_type(self):
+    def abundance_model(self):
         """Name of abundance model."""
-        return self._abundance_type
+        return self._abundance_model
 
     @property
     def name(self):
         """Name of searched filter."""
         return self._name
+
+    @property
+    def get_abundance_path(self: str) -> Path:
+        # import pdb; pdb.set_trace()
+        return _abundance_model_file_path[self.abundance_model]
+
+    @property
+    def get_abundance_data(self):
+        data = _abundance_model_data[self.abundance_model]
+        return {
+            "temperature": data["LOGTE"],
+            "wavelength": data["LMBDA"],
+            "spectra": data["SOLSPEC"],
+            "header_information": data["HEADER"]["TEXT"],
+        }
+
+    @property
+    def test_abundance_data(self):
+        return self.get_abundance_data["temperature"]
 
     @property
     def observation_date(self):
@@ -171,9 +190,9 @@ class TemperatureResponseFundamental:
         return CHIANTI_file["name"]
 
     @property
-    def abundance_model(self):
+    def CHIANTI_abundance_model(self):
         """A brief description of what abundance model was used in the creation of the emission spectra."""
-        return CHIANTI_file["abundance_model"]
+        return CHIANTI_file["CHIANTI_abundance_model"]
 
     @property
     def density_model(self):
