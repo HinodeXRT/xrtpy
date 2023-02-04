@@ -84,18 +84,6 @@ _list_of_abundance = {
     "photospheric": 3,
 }
 
-coronal_CHIANTI_file = {
-    "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
-    "wavelength": _XRT_coronal_chianti_emiss_model["LMBDA"],
-    "corona_solar_spectra": _XRT_coronal_chianti_emiss_model["SOLSPEC"],
-    "spectra_generated_information": _XRT_coronal_chianti_emiss_model["HEADER"]["TEXT"],
-}
-
-
-def _get_abundance_wave(abundance_model):
-    """Coronal wavelength value."""
-    return coronal_CHIANTI_file["wavelength"]
-
 
 def resolve_abundance_model_type(abundance_model):
     """Formats users abundance_model name."""
@@ -125,6 +113,7 @@ class TemperatureResponseFundamental:
     def abundances(self) -> Dict[str, Real]:
         return self._abundances
 
+    """
     @abundances.setter
     def abundances(self, abundance_model: str):
         if abundance_model == "coronal":
@@ -138,6 +127,7 @@ class TemperatureResponseFundamental:
             }
         elif abundance_model == "photospheric":
             self._abundances = {"C": 1.4e-3}
+    """
 
     @property
     def abundance_model(self):
@@ -151,7 +141,6 @@ class TemperatureResponseFundamental:
 
     @property
     def get_abundance_path(self: str) -> Path:
-        # import pdb; pdb.set_trace()
         return _abundance_model_file_path[self.abundance_model]
 
     @property
@@ -165,8 +154,27 @@ class TemperatureResponseFundamental:
         }
 
     @property
-    def test_abundance_data(self):
-        return self.get_abundance_data["temperature"]
+    @u.quantity_input
+    def get_abundance_temperature(self):
+        """Logged temperatures in kelvin."""
+        return u.Quantity(self.get_abundance_data["temperature"] * u.K)
+
+    @property
+    @u.quantity_input
+    def get_abundance_wavelength(self):
+        """Wavelength values in Å."""
+        return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
+
+    @property
+    def get_abundance_spectra(self):
+        """Spectra."""
+        return self.get_abundance_data["spectra"]
+
+    @property
+    @u.quantity_input
+    def get_abundance_header_information(self):
+        """File header information."""
+        return self.get_abundance_data["header_information"]
 
     @property
     def observation_date(self):
@@ -223,23 +231,6 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def coronal_CHIANTI_temperature(self):
-        """Coronal HIANTI temperatures in kelvin."""
-        return u.Quantity(coronal_CHIANTI_file["logged_temperature"] * u.K)
-
-    @property
-    def coronal_CHIANTI_file_spectra(self):
-        """Coronal CHIANTI file spectra."""
-        return coronal_CHIANTI_file["corona_solar_spectra"]
-
-    @property
-    @u.quantity_input
-    def coronal_CHIANTI_wavelength(self):
-        """Coronal CHIANTI file wavelength values in Å."""
-        return u.Quantity(coronal_CHIANTI_file["wavelength"] * u.Angstrom)
-
-    @property
-    @u.quantity_input
     def channel_wavelength(self):
         """Array of wavelengths for every X-ray channel in Å."""
         return u.Quantity((Channel(self.name).wavelength[:3993]) * u.photon)
@@ -281,21 +272,6 @@ class TemperatureResponseFundamental:
         )
 
     @u.quantity_input
-    def coronal_spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
-        """Interpolation between the spectra wavelength onto the channel wavelength."""
-        spectra_interpolate = []
-        for i in range(61):
-            interpolater = interpolate.interp1d(
-                self.coronal_CHIANTI_wavelength,
-                coronal_CHIANTI_file["corona_solar_spectra"][i],
-                kind="linear",
-            )
-            spectra_interpolate.append(interpolater(self.channel_wavelength))
-        return spectra_interpolate * (
-            u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
-        )
-
-    @u.quantity_input
     def effective_area(self) -> u.cm**2:
         return effective_area(self.name, self.observation_date)
 
@@ -312,17 +288,16 @@ class TemperatureResponseFundamental:
         # which then makes the previous version that uses Simpson's method
         # to integrate more appropriate (10/05/2022)
 
-        """
         temp_resp_w_u_c = (
             self.spectra().value * effective_area * constants * factors * dwvl
         ).sum(axis=1)
-        """
 
+        """
         # Coronal temperature response
         temp_resp_w_u_c = (
-            self.coronal_spectra().value * effective_area * constants * factors * dwvl
+            (self.abundance_spectra()).value * effective_area * constants * factors * dwvl
         ).sum(axis=1)
-
+        """
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
     @property
