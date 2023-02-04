@@ -302,7 +302,7 @@ class TemperatureResponseFundamental:
         # spectrum file. More recent versions of Chianti include the line width,
         # which then makes the previous version that uses Simpson's method
         # to integrate more appropriate (10/05/2022)
-
+        """
         temp_resp_w_u_c = (
             self.spectra().value * effective_area * constants * factors * dwvl
         ).sum(axis=1)
@@ -310,9 +310,13 @@ class TemperatureResponseFundamental:
         """
         # Coronal temperature response
         temp_resp_w_u_c = (
-            (self.abundance_spectra()).value * effective_area * constants * factors * dwvl
+            (self.abundance_spectra()).value
+            * effective_area
+            * constants
+            * factors
+            * dwvl
         ).sum(axis=1)
-        """
+
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
     @property
