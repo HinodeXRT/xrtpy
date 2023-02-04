@@ -272,6 +272,21 @@ class TemperatureResponseFundamental:
         )
 
     @u.quantity_input
+    def abundance_spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
+        """Interpolation between the spectra wavelength onto the channel wavelength."""
+        spectra_interpolate = []
+        for i in range(61):
+            interpolater = interpolate.interp1d(
+                self.get_abundance_wavelength,
+                self.get_abundance_spectra[i],
+                kind="linear",
+            )
+            spectra_interpolate.append(interpolater(self.channel_wavelength))
+        return spectra_interpolate * (
+            u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
+        )
+
+    @u.quantity_input
     def effective_area(self) -> u.cm**2:
         return effective_area(self.name, self.observation_date)
 
