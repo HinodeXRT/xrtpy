@@ -3,7 +3,10 @@ import sys
 
 from astropy import units as u
 from astropy.constants import c, h
-from sunpy.coordinates.sun import angular_radius
+from datetime import datetime
+from sunpy.coordinates.sun import angular_radius, B0
+from sunpy.image.resample import reshape_image_to_4d_superpixel
+from sunpy.map import Map
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
@@ -30,7 +33,7 @@ def xrt_teem(
 
     Parameters:
     -----------
-    map1 : XRTMap object (i.e. sunpy.map.sources.hinode.XRTMap)
+    map1 : ~sunpy.map.sources.hinode.XRTMap
         map for the first XRT level 1 data image.  If the image is
         normalized, then it is assumed that the un-normalized image can be
         recovered by multiplying by the exposure time (exposure time must be
@@ -38,7 +41,7 @@ def xrt_teem(
         history will contain the string XRT_RENORMALIZE if the image has been
         normalized.
 
-    map2 : XRTMap object
+    map2 : ~sunpy.map.sources.hinode.XRTMap
         map for the second image (must use different filters from the first
         image). The image shape should match that in map1. The same
         considerations apply as for map1.
@@ -72,41 +75,44 @@ def xrt_teem(
 
     Returns:
     --------
-    T_e : 2-dimensional float array
-        log10 of the derived electron temperature [K].
+    T_e : ~sunpy.map.sources.hinode.XRTMap
+        image and metadata for log10 of the derived electron temperature [K].
 
-    EM : 2-dimensional float array
-        log10 of the derived volume emission measure [cm^-3].
+    EM : ~sunpy.map.sources.hinode.XRTMap
+        image and metadata for log10 of the derived volume emission measure [cm^-3].
 
-    T_error : 2-dimensional float array
-        error of log10 temperature [K].
+    T_error : ~sunpy.map.sources.hinode.XRTMap
+        image and metadata for uncertainty in log10 temperature [K].
 
-    EM_error : 2-dimensional float array
-        error of log10 volume emission measure [cm^-3].
+    EM_error : ~sunpy.map.sources.hinode.XRTMap
+        image and metadata for uncertainty in log10 volume emission measure [cm^-3].
 
     Examples:
     ---------
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
-    >>> T_e, EM, Terror, EMerror = xrt_teem(map1, map2) # doctest: +SKIP
+    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2) # doctest: +SKIP
 
     If you want to bin the image data in space to reduce photon noise, set
     binfac to the factor by which you want to bin.  For example to bin the
     data by a factor of 3 do:
 
-    >>> T_e, EM, Terror, EMerror = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
+    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
 
     The data is binned first and then the temperature is derived. Note that
-    the image size is not reduced, but pixels within 3×3 squares are set to
-    the same value, which results from averaging over those pixels.
+    the image size is reduced by the factor binfac in each dimension, which
+    contrasts with the behavior of the IDL routine xrt_teem.pro.
 
     Notes
     -----
     The returned values of pixels where the temperature cannot be derived
     or the error is greater than the threshold or the photon noise is
     greater than the threshold are set to 0. The EM for those pixels is
-    also set to 0.
+    also set to 0. The masks included in the output maps mask out pixels for
+    which the data for either image is 0 or for which temperature cannot be
+    determined, as well as for those masked out by an input mask (if
+    provided).
 
     The details of the coronal-temperature-diagnostic capability of
     Hinode/XRT is described in
@@ -119,47 +125,64 @@ def xrt_teem(
 
     Modification History:
 
-    IDL routine written by N.Narukage (NAOJ). Converted to python by Jonathan
-    D. Slavin (SAO). See original IDL code for more details.
+    IDL routine written by N.Narukage (NAOJ). See original IDL code for more details.
     """
 
     hdr1 = map1.meta
     hdr2 = map2.meta
     data1 = map1.data
     data2 = map2.data
+    if data1.shape != data2.shape:
+        raise ValueError("The input images must be the same size")
+    data1 = data1.astype(float)
+    data2 = data2.astype(float)
+
     n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
     n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
     # This allows use of normalized data (contrary to original IDL code):
-    if n1 or n2:
-        if n1 and n2:
-            data1 = data1 * hdr1["EXPTIME"]
-            data2 = data2 * hdr2["EXPTIME"]
-        elif n1:
-            data1 = data1 * hdr1["EXPTIME"]
-        else:
-            data2 = data2 * hdr2["EXPTIME"]
-    if data1.shape != data2.shape:
-        raise ValueError("The input images must be the same size")
+    if n1:
+        data1 = data1 * hdr1["EXPTIME"]
+    if n2:
+        data2 = data2 * hdr2["EXPTIME"]
 
     if mask is None:
         mask = np.zeros_like(data1, dtype=bool)
-    data1 = data1.astype(float)
-    data2 = data2.astype(float)
-    data1 = np.ma.masked_where(mask, data1)
-    data2 = np.ma.masked_where(mask, data2)
+    # if the input data have already been masked then this preserves those masks
+    if map1.mask is not None:
+        mask1 = mask | map1.mask
+    else:
+        mask1 = mask
+    if map2.mask is not None:
+        mask2 = mask | map2.mask
+    else:
+        mask2 = mask
+    mask = mask1 | mask2
+    map1 = Map(data1, map1.meta, mask=mask)
+    map2 = Map(data2, map2.meta, mask=mask)
 
     if binfac > 1:
-        data1 = rebin_image(data1, binfac)
-        data2 = rebin_image(data2, binfac)
-        mask = rebin_image(mask, binfac)
-
+        map1 = map1.superpixel([binfac, binfac] * u.pix)
+        map2 = map2.superpixel([binfac, binfac] * u.pix)
+        data1 = map1.data
+        data2 = map2.data
+        # fix for issue with binning in superpixel - mask not summed
+        mask = (
+            reshape_image_to_4d_superpixel(mask, [binfac, binfac], [0, 0]).sum(3).sum(1)
+        )
+        mask = mask.astype(bool)
+        map1.mask = mask
+        map2.mask = mask
+        # binning updates header keywords
+        hdr1 = map1.meta
+        hdr2 = map2.meta
     # input mask for data should be False in parts of the images to be used and
     # True in places we want to mask out
     # Here we additionally mask out pixels in which the data in either image
     # is <= 0
     dmask = (data1 <= 0.0) | (data2 <= 0.0)
     mask = mask | dmask
-
+    map1 = Map(data1, map1.meta, mask=mask)
+    map2 = Map(data2, map2.meta, mask=mask)
     fw1, fw2 = map1.measurement.replace(" ", "_").split("-")
     if fw1 != "Open":
         filt1 = fw1
@@ -187,18 +210,17 @@ def xrt_teem(
         raise ValueError("Filters for the two images cannot be the same")
 
     T_e, EM, model_ratio, ok_pixel = derive_temperature(
-        data1, data2, hdr1, hdr2, mask, tresp1, tresp2, binfac=binfac, Trange=Trange
+        map1, map2, tresp1, tresp2, binfac=binfac, Trange=Trange
     )
 
     T_error, EMerror, K1, K2 = calculate_TE_errors(
-        data1, data2, T_e, EM, model_ratio, tresp1, tresp2, Trange=Trange
+        map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange=Trange
     )
 
     T_e = T_e.filled(0.0)
     EM = EM.filled(0.0)
     T_error = T_error.filled(0.0)
     EMerror = EMerror.filled(0.0)
-
     if not no_threshold:
         ok_wothr = ok_pixel.copy()
         Kd1 = np.sqrt(K1 / data1)
@@ -241,10 +263,14 @@ def xrt_teem(
             )
     else:
         if verbose:
+            Tmodel = tresp1.CHIANTI_temperature.value
             print("from xrt_teem:")
             print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
             print("No thresholds applied")
-    return T_e, EM, T_error, EMerror
+    Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
+        hdr1, hdr2, T_e, EM, T_error, EMerror, mask
+    )
+    return Tmap, EMmap, Terrmap, EMerrmap
 
 
 def rebin_image(data, binfac=1):
@@ -324,9 +350,7 @@ def deriv(x, y):
     return np.append(np.insert(dydx1, 0, dydx0), dydxN)
 
 
-def derive_temperature(
-    data1, data2, hdr1, hdr2, mask, tresp1, tresp2, binfac=1, Trange=None
-):
+def derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
     """
     Given two XRT Level 1 images, their associated metadata and the
     TemperatureResponseFundamental objects associated with them, derive the
@@ -335,33 +359,22 @@ def derive_temperature(
 
     Parameters:
     -----------
-    data1 : float array
-        image array for first image
+    map1 : ~sunpy.map.sources.hinode.XRTMap
+        map for the first XRT level 1 data image
 
-    data2 : float array
-        image array for second image
+    map2 : ~sunpy.map.sources.hinode.XRTMap
+        map for the second XRT level 1 data image
 
-    hdr1 : dictionary
-        meta data dictionary for first image (could be
-        sunpy.util.metadata.MetaDict object or fits file header)
-
-    hdr2 : dictionary
-        meta data dictionary for second image
-
-    mask : Boolean array of the same shape as the images
-        pixels to be masked out should be True, unmasked should be False
-        If no masking is to be done then image should be all False.
-
-    tresp1 : TemperatureResponseFundamental object
+    tresp1 : ~xrtpy.response.temperature_response.TemperatureResponseFundamental
         temperature response for first image
 
-    tresp2 : TemperatureResponseFundamental object
+    tresp2 : ~xrtpy.response.temperature_response.TemperatureResponseFundamental
         temperature response for second image
 
-    binfac : integer, optional (default = 1)
+    binfac : integer, Optional (default = 1)
         spatial binning factor
 
-    Trange : 2 element sequence containing floats [Optional]
+    Trange : 2 element sequence containing floats, Optional
         Range of log10(temperature) values to examine. Must be in order from
         lower to higher. (Passed from xrt_teem.)
 
@@ -395,8 +408,8 @@ def derive_temperature(
 
     # Need to convert column emission measure to volume emission measure - to
     # do that we multiply the EM by the area (in cm^2) of a sky pixel
-    plate_scale = hdr1["PLATESCL"]
-    lsun = 6.95700e10 / angular_radius(hdr1["DATE_OBS"]).value
+    plate_scale = map1.meta["PLATESCL"]
+    lsun = 6.95700e10 / angular_radius(map1.meta["DATE_OBS"]).value
     em2vem = (plate_scale * lsun) ** 2
     flux1 /= em2vem
     flux2 /= em2vem
@@ -416,11 +429,17 @@ def derive_temperature(
                 " any of the input temperatures in Trange"
             )
 
+    data1 = np.ma.masked_where(map1.mask, map1.data)
+    data2 = np.ma.masked_where(map2.mask, map2.data)
+    mask = map1.mask
+
+    exptime1 = map1.meta["EXPTIME"]
+    exptime2 = map2.meta["EXPTIME"]
     if rev_ratio:
-        data_ratio = (data2 / hdr2["EXPTIME"]) / (data1 / hdr1["EXPTIME"])
+        data_ratio = (data2 / exptime2) / (data1 / exptime1)
         model_ratio = flux2 / flux1
     else:
-        data_ratio = (data1 / hdr1["EXPTIME"]) / (data2 / hdr2["EXPTIME"])
+        data_ratio = (data1 / exptime1) / (data2 / exptime2)
         model_ratio = flux1 / flux2
     ok_num = np.zeros(data_ratio.shape, dtype=int)
     ok_cnt = np.zeros(data_ratio.shape, dtype=int)
@@ -455,14 +474,12 @@ def derive_temperature(
     # Note that T_e is the log10 of the electron temperature here
     DN = np.interp(T_e, logTmodel, flux1, left=0.0, right=0.0)
     DN = np.ma.masked_where(((DN <= 0.0) | (T_e <= 0.0)), DN)
-    EM = np.ma.log10(data1 / (DN * hdr1["EXPTIME"])) - np.log10(binfac**2)
+    EM = np.ma.log10(data1 / (DN * exptime1)) - np.log10(binfac**2)
     EM[~ok_pixel] = 0.0
     return T_e, EM, model_ratio, ok_pixel
 
 
-def calculate_TE_errors(
-    data1, data2, T_e, EM, model_ratio, tresp1, tresp2, Trange=None
-):
+def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange=None):
     """
     Given values for T_e and EM derived via the filter ratio method and the
     values of the temperature and model flux ratio, return the errors (i.e.
@@ -470,11 +487,11 @@ def calculate_TE_errors(
 
     Parameters:
     -----------
-    data1 : float array
-        image array for first image
+    map1 : ~sunpy.map.sources.hinode.XRTMap
+        map for the first XRT level 1 data image
 
-    data2 : float array
-        image array for second image
+    map2 : ~sunpy.map.sources.hinode.XRTMap
+        map for the second XRT level 1 data image
 
     T_e : 2D float array
         Previously derived temperatures for an image pair
@@ -486,10 +503,10 @@ def calculate_TE_errors(
         emission ratios for the filters for the images as a function of
         temperature
 
-    tresp1: TemperatureResponseFundamental object
+    tresp1: ~xrtpy.response.temperature_response.TemperatureResponseFundamental
         container for model data for the filters for image 1
 
-    tresp2: TemperatureResponseFundamental object
+    tresp2: ~xrtpy.response.temperature_response.TemperatureResponseFundamental
         container for model data for the filters for image 2
 
     Trange : 2 element sequence containing floats [Optional]
@@ -575,6 +592,8 @@ def calculate_TE_errors(
     dlnf2_dlnT = np.interp(T_e, logTmodel, dlnf2_dlnT_mod, left=0.0, right=0.0)
     dlnf2_dlnT = np.ma.masked_where(((dlnf2_dlnT == 0.0) | (T_e <= 0.0)), dlnf2_dlnT)
 
+    data1 = np.ma.masked_where(map1.mask, map1.data)
+    data2 = np.ma.masked_where(map2.mask, map2.data)
     T_error = np.ma.log10(np.sqrt(K1 / data1 + K2 / data2) / dlnR_dlnT) + T_e
 
     EMerror = (
@@ -585,3 +604,132 @@ def calculate_TE_errors(
         + EM
     )
     return T_error, EMerror, K1, K2
+
+
+def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
+    """
+    Create SunPy Map objects from the image metadata and temperature, volume
+    emission measure, temperature uncertainty and emission measure uncertainty
+    data derived for a pair of XRT Level 1 images.
+
+    Parameters:
+    -----------
+    hdr1 : metadata dictionary
+        metadata associated with image 1
+
+    hdr2 : metadata dictionary
+        metadata associated with image 2
+
+    T_e : 2D float array
+        image containing the temperatures (log10(T(K))) derived for images 1 & 2
+
+    EM : 2D float array
+        image containing the volume emission measures (log10(e.m.(cm^-3)))
+        derived for images 1 & 2
+
+    T_error : 2D float array
+        image containing the uncertainties in T_e derived for the images
+
+    EMerror : 2D float array
+        image containing the uncertainties in EM derived for the images
+
+    mask : 2D boolean array
+        image containing the mask for T_e and EM, either provided or derived
+        from the data
+
+    Returns:
+    --------
+    Tmap : ~sunpy.map.sources.hinode.XRTMap
+        Map containing T_e and metadata
+
+    EMmap : ~sunpy.map.sources.hinode.XRTMap
+        Map containing EM and metadata
+
+    Terrmap : ~sunpy.map.sources.hinode.XRTMap
+        Map containing T_error and metadata
+
+    EMerrmap : ~sunpy.map.sources.hinode.XRTMap
+        Map containing EMerror and metadata
+    """
+
+    date_obs1 = hdr1["date_obs"]
+    datename = "".join(date_obs1.split("T")[0].split("-"))
+    timename = "".join(date_obs1.split("T")[1].split(":"))[:8]
+    # This is the data file name associated with the give date_obs
+    filename1 = f"L1_XRT{datename}_{timename}.fits"
+    date_obs2 = hdr2["date_obs"]
+    datename = "".join(date_obs2.split("T")[0].split("-"))
+    timename = "".join(date_obs2.split("T")[1].split(":"))[:8]
+    filename2 = f"L1_XRT{datename}_{timename}.fits"
+
+    rsun_ref = 6.95700e08
+    rsun_obs = angular_radius(hdr1["DATE_OBS"]).value
+    dsun = rsun_ref / np.sin(rsun_obs * np.pi / 6.48e5)
+    solarb0 = B0(hdr1["DATE_OBS"]).value
+    hdr1["RSUN_REF"] = hdr1.get("RSUN_REF", rsun_ref)
+    hdr1["RSUN_OBS"] = hdr1.get("RSUN_OBS", rsun_obs)
+    hdr1["DSUN_OBS"] = hdr1.get("DSUN_OBS", dsun)
+    hdr1["SOLAR_B0"] = hdr1.get("SOLAR_B0", solarb0)
+    new_hdr = {}
+    kw_to_copy = [
+        "naxis",
+        "naxis1",
+        "naxis2",
+        "date_obs",
+        "time-obs",
+        "ctime",
+        "date_end",
+        "crpix1",
+        "crpix2",
+        "crval1",
+        "crval2",
+        "cdelt1",
+        "cdelt2",
+        "cunit1",
+        "cunit2",
+        "ctype1",
+        "ctype2",
+        "dsun_obs",
+        "rsun_ref",
+        "rsun_obs",
+        "solar_b0",
+        "crota1",
+        "crota2",
+        "platescl",
+    ]
+    for kw in kw_to_copy:
+        new_hdr[kw] = hdr1[kw]
+    new_hdr["L1_data_file1"] = filename1
+    new_hdr["L1_data_file2"] = filename2
+    create_date = datetime.now().ctime()
+    new_hdr["history"] = f"Created by xrt_teem {create_date}\n"
+    Thdr = new_hdr.copy()
+    Thdr["BUNIT"] = "log10(K)"
+    Thdr["history"] = (
+        new_hdr["history"] + "Temperature derived using filter ratio method"
+    )
+    Tmap = Map(T_e, Thdr)
+    Tmap.nickname = "Log Derived Temperature (K)"
+    EMhdr = new_hdr.copy()
+    EMhdr["BUNIT"] = r"log10(cm$^{-3}$)"
+    EMhdr["history"] = (
+        new_hdr["history"] + "Volume emission measure derived using filter ratio method"
+    )
+    EMmap = Map(EM, EMhdr)
+    EMmap.nickname = r"Log Derived Volume E.M. (cm$^{-3}$)"
+    Terrhdr = new_hdr.copy()
+    Terrhdr["BUNIT"] = "log10(K)"
+    Terrhdr["history"] = (
+        new_hdr["history"] + "Temperature uncertainty derived using filter ratio method"
+    )
+    Terrmap = Map(T_error, Terrhdr)
+    Terrmap.nickname = "Log Derived Temperature Errors (K)"
+    EMerrhdr = new_hdr.copy()
+    EMerrhdr["BUNIT"] = r"log10(cm$^{-3}$)"
+    EMerrhdr["history"] = (
+        new_hdr["history"]
+        + "Volume emission measure uncertainty derived using filter ratio method"
+    )
+    EMerrmap = Map(EMerror, EMerrhdr)
+    EMerrmap.nickname = r"Log Derived V.E.M. Errors (cm$^{-3}$)"
+    return Tmap, EMmap, Terrmap, EMerrmap
