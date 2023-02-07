@@ -124,11 +124,11 @@ def test_binning_case():
     goodT = (T_e.data > 0.0) & (idlTe > 0.0)
     goodE = (EM.data > 0.0) & (idlEM > 0.0)
 
-    delta = 10.0 ** T_e.data[goodT] - 10.0 ** idlTE[goodT]
-    x = 10.0 ** idlTE[goodT]
+    delta = 10.0 ** T_e.data[goodT] - 10.0 ** idlTe[goodT]
+    x = 10.0 ** idlTe[goodT]
 
     assert np.allclose(
-        10.0 ** T_e.data[goodT], 10.0 ** idlTE[goodT], atol=2.0e5, rtol=0.02
+        10.0 ** T_e.data[goodT], 10.0 ** idlTe[goodT], atol=2.0e5, rtol=0.02
     )
     assert np.allclose(
         10.0 ** EM.data[goodE], 10.0 ** idlEM[goodE], atol=1.0e44, rtol=0.05
