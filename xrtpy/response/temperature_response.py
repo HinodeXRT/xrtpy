@@ -25,6 +25,8 @@ _h_eV_s = h.to(u.eV * u.s).value
 _CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
 )
+
+
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
 
@@ -47,6 +49,14 @@ CHIANTI_file = {
 
 _corona_CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
+)
+
+_photos_CHIANTI_filename = (
+    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_hybrid_chianti.genx"
+)
+
+_photos_CHIANTI_filename = (
+    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_photos_chianti.genx"
 )
 
 _abundance_model_file_path = {
