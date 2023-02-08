@@ -52,27 +52,33 @@ _corona_CHIANTI_filename = (
 )
 
 _hybrid_CHIANTI_filename = (
-    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_hybrid_chianti.genx"
+    Path(__file__).parent.absolute()
+    / "data/chianti_emission_models"
+    / "solspec_ch1000_hybrid_chianti.genx"
 )
 
 _photos_CHIANTI_filename = (
-    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_photos_chianti.genx"
+    Path(__file__).parent.absolute()
+    / "data/chianti_emission_models"
+    / "solspec_ch1000_photos_chianti.genx"
 )
 
+"""
 _abundance_model_file_path = {
     "CHIANTI_v_10": Path(__file__).parent.absolute()
     / "data"
     / "XRT_emiss_model.default_CHIANTI.geny",
     "coronal": Path(__file__).parent.absolute()
-    / "data"
+    / "data/chianti_emission_models"
     / "solspec_ch1000_corona_chianti.genx",
     "hybrid": Path(__file__).parent.absolute()
-    / "data"
+    / "data/chianti_emission_models"
     / "solspec_ch1000_hybrid_chianti.genx",
     "photospheric": Path(__file__).parent.absolute()
-    / "data"
+    / "data/chianti_emission_models"
     / "solspec_ch1000_photos_chianti.genx",
 }
+"""
 
 
 _abundance_model_data = {
@@ -82,17 +88,11 @@ _abundance_model_data = {
     "photospheric": sunpy.io.special.genx.read_genx(_photos_CHIANTI_filename),
 }
 
+"""
 _XRT_coronal_chianti_emiss_model = sunpy.io.special.genx.read_genx(
     _corona_CHIANTI_filename
 )
-
-
-_list_of_abundance = {
-    "chianti": _XRT_emiss_model_file,
-    "coronal": _XRT_coronal_chianti_emiss_model,
-    "hybrid": 2,
-    "photospheric": 3,
-}
+"""
 
 
 def resolve_abundance_model_type(abundance_model):
