@@ -51,7 +51,7 @@ _corona_CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
 )
 
-_photos_CHIANTI_filename = (
+_hybrid_CHIANTI_filename = (
     Path(__file__).parent.absolute() / "data" / "solspec_ch1000_hybrid_chianti.genx"
 )
 
@@ -68,10 +68,10 @@ _abundance_model_file_path = {
     / "solspec_ch1000_corona_chianti.genx",
     "hybrid": Path(__file__).parent.absolute()
     / "data"
-    / "solspec_ch1000_corona_chianti.genx",
+    / "solspec_ch1000_hybrid_chianti.genx",
     "photospheric": Path(__file__).parent.absolute()
     / "data"
-    / "solspec_ch1000_corona_chianti.genx",
+    / "solspec_ch1000_photos_chianti.genx",
 }
 
 
