@@ -66,12 +66,12 @@ def resolve_abundance_model_type(abundance_model):
     if not isinstance(abundance_model, str):
         raise TypeError("Abundance model name must be a string")
     abundance_name = abundance_model.lower()
-    list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
+    list_of_abundance_name = ["chianti", "coronal", "hybrid", "photospheric"]
     if abundance_name not in list_of_abundance_name:
         raise ValueError(
             f"\n{abundance_name} is not a current model for XRTpy.\n"
             "Available abundance models:\n"
-            "Coronal, Hybrid and Photospheric.\n"
+            "Chianti, Coronal, Hybrid and Photospheric.\n"
         )
     return abundance_name
 
@@ -114,12 +114,6 @@ class TemperatureResponseFundamental:
     def name(self):
         """Name of searched filter."""
         return self._name
-
-    """
-    @property
-    def get_abundance_path(self: str) -> Path:
-        return _abundance_model_file_path[self.abundance_model]
-    """
 
     @property
     def get_abundance_data(self):
