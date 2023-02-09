@@ -40,7 +40,7 @@ def xrt_teem(
         normalized, then it is assumed that the un-normalized image can be
         recovered by multiplying by the exposure time (exposure time must be
         available in the metadata). It is also assumed that the metadata
-        history will contain the string XRT_RENORMALIZE if the image has been
+        history will contain the string ``"XRT_RENORMALIZE"`` if the image has been
         normalized.
 
     map2 : ~sunpy.map.sources.hinode.XRTMap
