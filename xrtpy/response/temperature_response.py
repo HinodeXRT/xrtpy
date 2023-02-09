@@ -21,7 +21,6 @@ from xrtpy.util.time import epoch
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
 
-
 _abundance_model_file_path = {
     "chianti": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
@@ -37,28 +36,6 @@ _abundance_model_file_path = {
     / "solspec_ch1000_photos_chianti.genx",
 }
 
-_CHIANTI_file = scipy.io.readsav(_abundance_model_file_path["chianti"])["p0"]
-
-
-CHIANTI_file = {
-    "CHIANTI_abundance_model": _CHIANTI_file["ABUND_MODEL"][0],
-    "dens_model": _CHIANTI_file["DENS_MODEL"][0],
-    "ioneq_model": _CHIANTI_file["IONEQ_MODEL"][0],
-    "name": _CHIANTI_file["NAME"][0],
-    "spectra": _CHIANTI_file["SPEC"],
-    "spectra_units": _CHIANTI_file["SPEC_UNITS"][0],
-    "temperature": _CHIANTI_file["TEMP"][0],
-    "temp_units": _CHIANTI_file["TEMP_UNITS"][0],
-    "tlength": _CHIANTI_file["TLENGTH"][0],
-    "wlength": _CHIANTI_file["WLENGTH"][0],
-    "wavelength": _CHIANTI_file["WAVE"][0],
-    "wavelength_units": _CHIANTI_file["WAVE_UNITS"][0],
-}
-
-import pdb
-
-pdb.set_trace()
-
 _abundance_model_data = {
     "chianti": scipy.io.readsav(_abundance_model_file_path["chianti"])["p0"],
     "coronal": sunpy.io.special.genx.read_genx(_abundance_model_file_path["coronal"]),
@@ -66,6 +43,21 @@ _abundance_model_data = {
     "photospheric": sunpy.io.special.genx.read_genx(
         _abundance_model_file_path["photospheric"]
     ),
+}
+
+CHIANTI_file = {
+    "CHIANTI_abundance_model": _abundance_model_data["chianti"]["ABUND_MODEL"][0],
+    "dens_model": _abundance_model_data["chianti"]["DENS_MODEL"][0],
+    "ioneq_model": _abundance_model_data["chianti"]["IONEQ_MODEL"][0],
+    "name": _abundance_model_data["chianti"]["NAME"][0],
+    "spectra": _abundance_model_data["chianti"]["SPEC"],
+    "spectra_units": _abundance_model_data["chianti"]["SPEC_UNITS"][0],
+    "temperature": _abundance_model_data["chianti"]["TEMP"][0],
+    "temp_units": _abundance_model_data["chianti"]["TEMP_UNITS"][0],
+    "tlength": _abundance_model_data["chianti"]["TLENGTH"][0],
+    "wlength": _abundance_model_data["chianti"]["WLENGTH"][0],
+    "wavelength": _abundance_model_data["chianti"]["WAVE"][0],
+    "wavelength_units": _abundance_model_data["chianti"]["WAVE_UNITS"][0],
 }
 
 
