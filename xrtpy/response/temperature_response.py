@@ -22,60 +22,8 @@ _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
 
 
-_CHIANTI_filename = (
-    Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "XRT_emiss_model.default_CHIANTI.geny"
-)
-
-_CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
-_XRT_emiss_model_file = _CHIANTI_file["p0"]
-
-CHIANTI_file = {
-    "CHIANTI_abundance_model": _XRT_emiss_model_file["ABUND_MODEL"][0],
-    "dens_model": _XRT_emiss_model_file["DENS_MODEL"][0],
-    "ioneq_model": _XRT_emiss_model_file["IONEQ_MODEL"][0],
-    "name": _XRT_emiss_model_file["NAME"][0],
-    "spectra": _XRT_emiss_model_file["SPEC"],
-    "spectra_units": _XRT_emiss_model_file["SPEC_UNITS"][0],
-    "temperature": _XRT_emiss_model_file["TEMP"][0],
-    "temp_units": _XRT_emiss_model_file["TEMP_UNITS"][0],
-    "tlength": _XRT_emiss_model_file["TLENGTH"][0],
-    "wlength": _XRT_emiss_model_file["WLENGTH"][0],
-    "wavelength": _XRT_emiss_model_file["WAVE"][0],
-    "wavelength_units": _XRT_emiss_model_file["WAVE_UNITS"][0],
-}
-
-"""
-
-_corona_CHIANTI_filename = (
-    Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "solspec_ch1000_corona_chianti.genx"
-)
-
-_hybrid_CHIANTI_filename = (
-    Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "solspec_ch1000_hybrid_chianti.genx"
-)
-
-_photos_CHIANTI_filename = (
-    Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "solspec_ch1000_photos_chianti.genx"
-)
-
-_abundance_model_data = {
-    "CHIANTI_v_10": scipy.io.readsav(_CHIANTI_filename)["p0"],
-    "coronal": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
-    "hybrid": sunpy.io.special.genx.read_genx(_hybrid_CHIANTI_filename),
-    "photospheric": sunpy.io.special.genx.read_genx(_photos_CHIANTI_filename),
-}
-"""
-
 _abundance_model_file_path = {
-    "CHIANTI_v_10": Path(__file__).parent.absolute()
+    "chianti": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
     / "XRT_emiss_model.default_CHIANTI.geny",
     "coronal": Path(__file__).parent.absolute()
@@ -89,8 +37,30 @@ _abundance_model_file_path = {
     / "solspec_ch1000_photos_chianti.genx",
 }
 
+_CHIANTI_file = scipy.io.readsav(_abundance_model_file_path["chianti"])["p0"]
+
+
+CHIANTI_file = {
+    "CHIANTI_abundance_model": _CHIANTI_file["ABUND_MODEL"][0],
+    "dens_model": _CHIANTI_file["DENS_MODEL"][0],
+    "ioneq_model": _CHIANTI_file["IONEQ_MODEL"][0],
+    "name": _CHIANTI_file["NAME"][0],
+    "spectra": _CHIANTI_file["SPEC"],
+    "spectra_units": _CHIANTI_file["SPEC_UNITS"][0],
+    "temperature": _CHIANTI_file["TEMP"][0],
+    "temp_units": _CHIANTI_file["TEMP_UNITS"][0],
+    "tlength": _CHIANTI_file["TLENGTH"][0],
+    "wlength": _CHIANTI_file["WLENGTH"][0],
+    "wavelength": _CHIANTI_file["WAVE"][0],
+    "wavelength_units": _CHIANTI_file["WAVE_UNITS"][0],
+}
+
+import pdb
+
+pdb.set_trace()
+
 _abundance_model_data = {
-    "CHIANTI_v_10": scipy.io.readsav(_abundance_model_file_path["CHIANTI_v_10"])["p0"],
+    "chianti": scipy.io.readsav(_abundance_model_file_path["chianti"])["p0"],
     "coronal": sunpy.io.special.genx.read_genx(_abundance_model_file_path["coronal"]),
     "hybrid": sunpy.io.special.genx.read_genx(_abundance_model_file_path["hybrid"]),
     "photospheric": sunpy.io.special.genx.read_genx(
