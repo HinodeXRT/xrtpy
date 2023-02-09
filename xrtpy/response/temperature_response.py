@@ -23,13 +23,13 @@ _h_eV_s = h.to(u.eV * u.s).value
 
 
 _CHIANTI_filename = (
-    Path(__file__).parent.absolute() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
+    Path(__file__).parent.absolute()
+    / "data/chianti_emission_models"
+    / "XRT_emiss_model.default_CHIANTI.geny"
 )
-
 
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
-
 
 CHIANTI_file = {
     "CHIANTI_abundance_model": _XRT_emiss_model_file["ABUND_MODEL"][0],
@@ -46,9 +46,12 @@ CHIANTI_file = {
     "wavelength_units": _XRT_emiss_model_file["WAVE_UNITS"][0],
 }
 
+"""
 
 _corona_CHIANTI_filename = (
-    Path(__file__).parent.absolute() / "data" / "solspec_ch1000_corona_chianti.genx"
+    Path(__file__).parent.absolute()
+    / "data/chianti_emission_models"
+    / "solspec_ch1000_corona_chianti.genx"
 )
 
 _hybrid_CHIANTI_filename = (
@@ -63,10 +66,17 @@ _photos_CHIANTI_filename = (
     / "solspec_ch1000_photos_chianti.genx"
 )
 
+_abundance_model_data = {
+    "CHIANTI_v_10": scipy.io.readsav(_CHIANTI_filename)["p0"],
+    "coronal": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
+    "hybrid": sunpy.io.special.genx.read_genx(_hybrid_CHIANTI_filename),
+    "photospheric": sunpy.io.special.genx.read_genx(_photos_CHIANTI_filename),
+}
 """
+
 _abundance_model_file_path = {
     "CHIANTI_v_10": Path(__file__).parent.absolute()
-    / "data"
+    / "data/chianti_emission_models"
     / "XRT_emiss_model.default_CHIANTI.geny",
     "coronal": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
@@ -78,21 +88,15 @@ _abundance_model_file_path = {
     / "data/chianti_emission_models"
     / "solspec_ch1000_photos_chianti.genx",
 }
-"""
-
 
 _abundance_model_data = {
-    "CHIANTI_v_10": scipy.io.readsav(_CHIANTI_filename)["p0"],
-    "coronal": sunpy.io.special.genx.read_genx(_corona_CHIANTI_filename),
-    "hybrid": sunpy.io.special.genx.read_genx(_hybrid_CHIANTI_filename),
-    "photospheric": sunpy.io.special.genx.read_genx(_photos_CHIANTI_filename),
+    "CHIANTI_v_10": scipy.io.readsav(_abundance_model_file_path["CHIANTI_v_10"])["p0"],
+    "coronal": sunpy.io.special.genx.read_genx(_abundance_model_file_path["coronal"]),
+    "hybrid": sunpy.io.special.genx.read_genx(_abundance_model_file_path["hybrid"]),
+    "photospheric": sunpy.io.special.genx.read_genx(
+        _abundance_model_file_path["photospheric"]
+    ),
 }
-
-"""
-_XRT_coronal_chianti_emiss_model = sunpy.io.special.genx.read_genx(
-    _corona_CHIANTI_filename
-)
-"""
 
 
 def resolve_abundance_model_type(abundance_model):
@@ -149,9 +153,11 @@ class TemperatureResponseFundamental:
         """Name of searched filter."""
         return self._name
 
+    """
     @property
     def get_abundance_path(self: str) -> Path:
         return _abundance_model_file_path[self.abundance_model]
+    """
 
     @property
     def get_abundance_data(self):
