@@ -8,6 +8,7 @@
 .. |Quantity| replace:: :class:`~astropy.units.Quantity`
 .. |TimeDelta| replace:: :class:`~astropy.time.TimeDelta`
 .. |Time| replace:: :class:`~astropy.time.Time`
+.. |XRTMap| replace:: `~sunpy.map.sources.hinode.XRTMap`
 .. |Channel| replace:: :class:`~xrtpy.response.channel.Channel`
 .. |EffectiveAreaFundamental| replace:: :class:`~xrtpy.response.effective_area.EffectiveAreaFundamental`
 .. |TemperatureResponseFundamental| replace:: :class:`~xrtpy.response.temperature_response.TemperatureResponseFundamental`
