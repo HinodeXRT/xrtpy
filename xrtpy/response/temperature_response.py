@@ -152,15 +152,15 @@ class TemperatureResponseFundamental:
                 "header_information": data["HEADER"]["TEXT"],
             }
 
-    @property
     @u.quantity_input
+    @property
     def get_abundance_temperature(self):
         """Logged temperatures in kelvin."""
         return u.Quantity(self.get_abundance_data["temperature"] * u.K)
 
     @property
     @u.quantity_input
-    def get_abundance_wavelength(self):
+    def get_abundance_wavelength(self) -> u.Angstrom:
         """Wavelength values in Å."""
         return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
 
@@ -239,7 +239,7 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def get_chianti_temperature(self):
+    def get_chianti_temperature(self) -> u.K:
         """CHIANTI temperatures in kelvin."""
         return u.Quantity(self.get_abundance_data["temperature"] * u.K)
 
