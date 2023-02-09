@@ -239,7 +239,7 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def get_chianti_temperature(self):
+    def get_chianti_temperature(self) -> u.K:
         """CHIANTI temperatures in kelvin."""
         return u.Quantity(self.get_abundance_data["temperature"] * u.K)
 
