@@ -71,7 +71,7 @@ def resolve_abundance_model_type(abundance_model):
         raise ValueError(
             f"\n{abundance_name} is not a current model for XRTpy.\n"
             "Available abundance models:\n"
-            "Chianti, Coronal, Hybrid and Photospheric.\n"
+            "Chianti, Coronal, Hybrid, and Photospheric.\n"
         )
     return abundance_name
 
@@ -85,9 +85,10 @@ class TemperatureResponseFundamental:
         self._channel = Channel(self.name)
         self._abundance_model = resolve_abundance_model_type(abundance_model)
 
+    # We we need this property?
     @property
     def abundances(self) -> Dict[str, Real]:
-        return self._abundances
+        return self._abundance_model
 
     """
     @abundances.setter
@@ -116,7 +117,6 @@ class TemperatureResponseFundamental:
     @property
     def abundance_model(self):
         """Name of abundance model."""
-
         return self._abundance_model
 
     @property
@@ -127,14 +127,15 @@ class TemperatureResponseFundamental:
     @property
     def get_abundance_data(self):
         abundance_type = self.abundance_model
+        data = _abundance_model_data[self.abundance_model]
+        # import pdb; pdb.set_trace()
         if abundance_type == "chianti":
-            data = _abundance_model_data[self.abundance_model]
             return {
                 "CHIANTI_abundance_model": data["ABUND_MODEL"][0],
                 "dens_model": data["DENS_MODEL"][0],
                 "ioneq_model": data["IONEQ_MODEL"][0],
                 "name": data["NAME"][0],
-                "spectra": data["SPEC"][0],
+                "spectra": data["SPEC"],
                 "spectra_units": data["SPEC_UNITS"][0],
                 "temperature": data["TEMP"][0],
                 "temp_units": data["TEMP_UNITS"][0],
@@ -144,7 +145,6 @@ class TemperatureResponseFundamental:
                 "wavelength_units": data["WAVE_UNITS"][0],
             }
         else:
-            data = _abundance_model_data[self.abundance_model]
             return {
                 "temperature": data["LOGTE"],
                 "wavelength": data["LMBDA"],
@@ -331,10 +331,12 @@ class TemperatureResponseFundamental:
         abundance_type = self.abundance_model
         if abundance_type == "chianti":
             spectra_interpolate = []
-            for i in range(61):  # CHIANTI_file["spectra"][0]
+            for i in range(
+                61
+            ):  # CHIANTI_file["spectra"][0] self.get_chianti_file_spectra()[0]
                 interpolater = interpolate.interp1d(
                     self.CHIANTI_wavelength,
-                    self.get_chianti_file_spectra()[i],
+                    CHIANTI_file["spectra"][0][i],
                     kind="linear",
                 )
                 spectra_interpolate.append(interpolater(self.channel_wavelength))
@@ -417,7 +419,7 @@ class TemperatureResponseFundamental:
                 * dwvl
             ).sum(axis=1)
             return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
-        else:  # .value in line 423
+        else:
             temp_resp_w_u_c = (
                 self.get_abundance_spectra()
                 * effective_area
