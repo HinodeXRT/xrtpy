@@ -160,7 +160,7 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def get_abundance_wavelength(self):
+    def get_abundance_wavelength(self) -> u.Angstrom:
         """Wavelength values in Å."""
         return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
 
