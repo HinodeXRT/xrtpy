@@ -66,7 +66,7 @@ def xrt_teem(
 
     mask : Boolean array of the same shape as the images [Optional]
         If provided, masks out parts of the images from the analysis. Note:
-        pixels to be masked out should be True, unmasked should be False
+        pixels to be masked out should be `True`, unmasked should be `False`.
 
     no_threshold : Boolean [Optional]
         If True, no thresholds are set. (default = False)
