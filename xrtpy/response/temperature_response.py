@@ -294,6 +294,7 @@ class TemperatureResponseFundamental:
         """This quantity represents the solid angle, which is given in units of steradians over pixel."""
         return (self.pixel_size / self.focal_len) ** 2 * (u.sr / u.pix)
 
+    '''
     @u.quantity_input
     def spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
         """Interpolation between the spectra wavelength onto the channel wavelength."""
@@ -306,6 +307,7 @@ class TemperatureResponseFundamental:
         return spectra_interpolate * (
             u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
         )
+
 
     @u.quantity_input
     def abundance_spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
@@ -321,11 +323,42 @@ class TemperatureResponseFundamental:
         return spectra_interpolate * (
             u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
         )
+    '''
+
+    @u.quantity_input
+    def abundance_spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
+        """Interpolation between the spectra wavelength onto the channel wavelength."""
+        abundance_type = self.abundance_model
+        if abundance_type == "chianti":
+            spectra_interpolate = []
+            for i in range(61):  # CHIANTI_file["spectra"][0]
+                interpolater = interpolate.interp1d(
+                    self.CHIANTI_wavelength,
+                    self.get_chianti_file_spectra()[i],
+                    kind="linear",
+                )
+                spectra_interpolate.append(interpolater(self.channel_wavelength))
+            return spectra_interpolate * (
+                u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
+            )
+        else:
+            spectra_interpolate = []
+            for i in range(61):
+                interpolater = interpolate.interp1d(
+                    self.get_abundance_wavelength,
+                    self.get_abundance_spectra[i],
+                    kind="linear",
+                )
+                spectra_interpolate.append(interpolater(self.channel_wavelength))
+            return spectra_interpolate * (
+                u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
+            )
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
         return effective_area(self.name, self.observation_date)
 
+    '''
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
         wavelength = (self.channel_wavelength).value
@@ -340,7 +373,11 @@ class TemperatureResponseFundamental:
         # to integrate more appropriate (10/05/2022)
         """
         temp_resp_w_u_c = (
-            self.spectra().value * effective_area * constants * factors * dwvl
+            self.spectra().value
+            * effective_area
+            * constants
+            * factors
+            * dwvl
         ).sum(axis=1)
 
         """
@@ -354,6 +391,41 @@ class TemperatureResponseFundamental:
         ).sum(axis=1)
 
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
+    '''
+
+    @u.quantity_input
+    def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
+        wavelength = (self.channel_wavelength).value
+        constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
+        factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
+        effective_area = (self.effective_area()).value
+        dwvl = wavelength[1:] - wavelength[:-1]
+        dwvl = np.append(dwvl, dwvl[-1])
+        # Simple summing like this is appropriate for binned data like in the current
+        # spectrum file. More recent versions of Chianti include the line width,
+        # which then makes the previous version that uses Simpson's method
+        # to integrate more appropriate (10/05/2022)
+        abundance_type = self.abundance_model
+        # import pdb; pdb.set_trace()
+        if abundance_type == "chianti":
+            # Coronal temperature response
+            temp_resp_w_u_c = (
+                self.get_chianti_file_spectra()
+                * effective_area
+                * constants
+                * factors
+                * dwvl
+            ).sum(axis=1)
+            return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
+        else:  # .value in line 423
+            temp_resp_w_u_c = (
+                self.get_abundance_spectra()
+                * effective_area
+                * constants
+                * factors
+                * dwvl
+            ).sum(axis=1)
+            return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
     @property
     @u.quantity_input
