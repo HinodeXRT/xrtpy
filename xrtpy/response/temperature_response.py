@@ -152,8 +152,8 @@ class TemperatureResponseFundamental:
                 "header_information": data["HEADER"]["TEXT"],
             }
 
-    @u.quantity_input
     @property
+    @u.quantity_input
     def get_abundance_temperature(self):
         """Logged temperatures in kelvin."""
         return u.Quantity(self.get_abundance_data["temperature"] * u.K)
