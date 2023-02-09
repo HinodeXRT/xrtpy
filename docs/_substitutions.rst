@@ -23,9 +23,6 @@
    nitpick_ignore_regex in docs/conf.py so that it doesn't get counted
    as an error in a nitpicky doc build (e.g., tox -e doc_build_nitpicky).
 
-.. _`docs/_static`: https://github.com/HinodeXRT/xrtpy/tree/main/docs/_static
-.. |docs/_static| replace:: :file:`docs/_static`
-
 .. _`docs/api_static`: https://github.com/HinodeXRT/xrtpy/tree/main/docs/api_static
 .. |docs/api_static| replace:: :file:`docs/api_static`
 
@@ -37,6 +34,3 @@
 
 .. _`docs/bibliography.bib`: https://github.com/HinodeXRT/xrtpy/blob/main/docs/bibliography.bib
 .. |docs/bibliography.bib| replace:: :file:`docs/bibliography.bib`
-
-.. _`setup.cfg`: https://github.com/HinodeXRT/xrtpy/blob/main/setup.cfg
-.. |setup.cfg| replace:: :file:`setup.cfg`
