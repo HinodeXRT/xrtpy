@@ -92,6 +92,14 @@ class TemperatureResponseFundamental:
     """
     @abundances.setter
     def abundances(self, abundance_model: str):
+        if abundance_model == "chianti":
+            print('abundance type: ', abundance_model)
+        else:
+            print('abundance type: ', abundance_model)
+
+
+    @abundances.setter
+    def abundances(self, abundance_model: str):
         if abundance_model == "coronal":
             self._abundances = {
                 "logged_temperature": _XRT_coronal_chianti_emiss_model["LOGTE"],
@@ -108,6 +116,7 @@ class TemperatureResponseFundamental:
     @property
     def abundance_model(self):
         """Name of abundance model."""
+
         return self._abundance_model
 
     @property
@@ -117,13 +126,33 @@ class TemperatureResponseFundamental:
 
     @property
     def get_abundance_data(self):
-        data = _abundance_model_data[self.abundance_model]
-        return {
-            "temperature": data["LOGTE"],
-            "wavelength": data["LMBDA"],
-            "spectra": data["SOLSPEC"],
-            "header_information": data["HEADER"]["TEXT"],
-        }
+        abundance_type = self.abundance_model
+
+        if abundance_type == "chianti":
+            print("Abundance type: ", abundance_type)
+            data = _abundance_model_data[self.abundance_model]
+            return {
+                "CHIANTI_abundance_model": data["ABUND_MODEL"][0],
+                "dens_model": data["DENS_MODEL"][0],
+                "ioneq_model": data["IONEQ_MODEL"][0],
+                "name": data["NAME"][0],
+                "spectra": data["SPEC"][0],
+                "spectra_units": data["SPEC_UNITS"][0],
+                "temperature": data["TEMP"][0],
+                "temp_units": data["TEMP_UNITS"][0],
+                "tlength": data["TLENGTH"][0],
+                "wlength": data["WLENGTH"][0],
+                "wavelength": data["WAVE"][0],
+                "wavelength_units": data["WAVE_UNITS"][0],
+            }
+        else:
+            data = _abundance_model_data[self.abundance_model]
+            return {
+                "temperature": data["LOGTE"],
+                "wavelength": data["LMBDA"],
+                "spectra": data["SOLSPEC"],
+                "header_information": data["HEADER"]["TEXT"],
+            }
 
     @property
     @u.quantity_input
@@ -168,6 +197,11 @@ class TemperatureResponseFundamental:
     def CHIANTI_version(self):
         """Name of the emission model."""
         return CHIANTI_file["name"]
+
+    @property
+    def get_chianti_version(self):
+        """Name of the emission model."""
+        return self.get_abundance_data["name"]
 
     @property
     def CHIANTI_abundance_model(self):
