@@ -1,4 +1,6 @@
 .. |bibliography| replace:: :ref:`bibliography`\
+.. |Channel| replace:: :class:`~xrtpy.response.channel.Channel`
+.. |EffectiveAreaFundamental| replace:: :class:`~xrtpy.response.effective_area.EffectiveAreaFundamental`
 .. |glossary| replace:: :ref:`glossary`\
 .. |inf| replace:: `~numpy.inf`
 .. |Map| replace:: `sunpy.map.Map`
@@ -6,12 +8,10 @@
 .. |nan| replace:: `~numpy.nan`
 .. |ndarray| replace:: :class:`~numpy.ndarray`
 .. |Quantity| replace:: :class:`~astropy.units.Quantity`
+.. |TemperatureResponseFundamental| replace:: :class:`~xrtpy.response.temperature_response.TemperatureResponseFundamental`
 .. |TimeDelta| replace:: :class:`~astropy.time.TimeDelta`
 .. |Time| replace:: :class:`~astropy.time.Time`
 .. |XRTMap| replace:: `~sunpy.map.sources.hinode.XRTMap`
-.. |Channel| replace:: :class:`~xrtpy.response.channel.Channel`
-.. |EffectiveAreaFundamental| replace:: :class:`~xrtpy.response.effective_area.EffectiveAreaFundamental`
-.. |TemperatureResponseFundamental| replace:: :class:`~xrtpy.response.temperature_response.TemperatureResponseFundamental`
 
 .. A workaround for nested inline literals so that the filename will get
    formatted like a file but will be a link. In the text, these get used
