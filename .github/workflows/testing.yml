@@ -36,6 +36,11 @@ jobs:
           python: '3.11'
           noxenv: import_package
 
+        - name: Documentation
+          os: ubuntu-latest
+          python: '3.10'
+          noxenv: build_docs_nitpicky
+
     steps:
 
     - name: Checkout code
