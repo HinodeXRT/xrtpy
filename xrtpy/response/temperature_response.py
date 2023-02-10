@@ -67,13 +67,29 @@ class TemperatureResponseFundamental:
     def __init__(self, filter_name, observation_date, abundance_model):
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
-        self._channel = Channel(self.name)
+        self._channel = Channel(self.filter_name)
         self._abundance_model = resolve_abundance_model_type(abundance_model)
 
-    # We we need this property?
     @property
-    def abundances(self) -> Dict[str, Real]:
-        return self._abundance_model
+    def filter_name(self):
+        """Name of searched filter."""
+        return self._name
+
+    @property
+    def observation_date(self):
+        """Users date of observation."""
+        return self._observation_date
+
+    @observation_date.setter
+    def observation_date(self, date):
+        """Validating users requested observation date."""
+        astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
+        observation_date = astropy_time.datetime
+        if observation_date <= epoch:
+            raise ValueError(
+                rf"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
+            )
+        self._observation_date = observation_date
 
     """
     @abundances.setter
@@ -82,7 +98,6 @@ class TemperatureResponseFundamental:
             print('abundance type: ', abundance_model)
         else:
             print('abundance type: ', abundance_model)
-
 
     @abundances.setter
     def abundances(self, abundance_model: str):
@@ -99,15 +114,15 @@ class TemperatureResponseFundamental:
             self._abundances = {"C": 1.4e-3}
     """
 
+    # We we need this property?
+    @property
+    def abundances(self) -> Dict[str, Real]:
+        return self._abundance_model
+
     @property
     def abundance_model(self):
         """Name of abundance model."""
         return self._abundance_model
-
-    @property
-    def name(self):
-        """Name of searched filter."""
-        return self._name
 
     @property
     def get_abundance_data(self):
@@ -116,18 +131,14 @@ class TemperatureResponseFundamental:
         # import pdb; pdb.set_trace()
         if abundance_type == "chianti":
             return {
-                "CHIANTI_abundance_model": data["ABUND_MODEL"][0],
-                "dens_model": data["DENS_MODEL"][0],
-                "ioneq_model": data["IONEQ_MODEL"][0],
-                "name": data["NAME"][0],
-                "spectra": data["SPEC"],
-                "spectra_units": data["SPEC_UNITS"][0],
+                "header_information": data["NAME"][0]
+                + data["ABUND_MODEL"][0]
+                + data["ABUND_MODEL"][0]
+                + data["IONEQ_MODEL"][0]
+                + data["DENS_MODEL"][0],
+                "spectra": data["SPEC"][0],
                 "temperature": data["TEMP"][0],
-                "temp_units": data["TEMP_UNITS"][0],
-                "tlength": data["TLENGTH"][0],
-                "wlength": data["WLENGTH"][0],
                 "wavelength": data["WAVE"][0],
-                "wavelength_units": data["WAVE_UNITS"][0],
             }
         else:
             return {
@@ -152,87 +163,41 @@ class TemperatureResponseFundamental:
     @property
     def get_abundance_spectra(self):
         """Spectra."""
-        return self.get_abundance_data["spectra"][0]
+        return self.get_abundance_data["spectra"]
 
     @property
     def get_abundance_header_information(self):
         """File header information."""
         return self.get_abundance_data["header_information"]
 
-    @property
-    def observation_date(self):
-        """Users date of observation."""
-        return self._observation_date
-
-    @observation_date.setter
-    def observation_date(self, date):
-        """Validating users requested observation date."""
-        astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
-        observation_date = astropy_time.datetime
-        if observation_date <= epoch:
-            raise ValueError(
-                rf"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
-            )
-        self._observation_date = observation_date
-
-    @property
-    def get_chianti_version(self):
-        """Name of the emission model."""
-        return self.get_abundance_data["name"]
-
-    @property
-    def get_chianti_abundance_model(self):
-        """A brief description of what abundance model was used in the creation of the emission spectra."""
-        return self.get_abundance_data["CHIANTI_abundance_model"]
-
-    @property
-    def get_chianti_density_model(self):
-        """A brief description of the plasma density, emission measure,or differential emission measure that was used in the creation of the emission spectra."""
-        return self.get_abundance_data["dens_model"]
-
-    @property
-    def get_chianti_ionization_model(self):
-        """A brief description of that ionization equilibrium model was used in the creation of the emission spectra."""
-        return self.get_abundance_data["ioneq_model"]
-
-    @property
-    @u.quantity_input
-    def get_chianti_temperature(self) -> u.K:
-        """CHIANTI temperatures in kelvin."""
-        return u.Quantity(self.get_abundance_data["temperature"] * u.K)
-
+    '''
     @property
     def get_chianti_file_spectra(self):
         """CHIANTI file spectra."""
         return self.get_abundance_data["spectra"]
-
-    @property
-    @u.quantity_input
-    def get_chianti_wavelength(self) -> u.Angstrom:
-        """CHIANTI file wavelength values in Å."""
-        return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
+    '''
 
     @property
     @u.quantity_input
     def channel_wavelength(self) -> u.Angstrom:
         """Array of wavelengths for every X-ray channel in Å."""
-        return u.Quantity(Channel(self.name).wavelength[:3993])
+        return u.Quantity(Channel(self.filter_name).wavelength[:3993])
 
     @property
     def focal_len(self):
         """Focal length of the telescope in units of cm."""
-        return Channel(self.name).geometry.geometry_focal_len
+        return Channel(self.filter_name).geometry.geometry_focal_len
 
     @property
     def ev_per_electron(self):
         """Amount of energy it takes to dislodge 1 electron in the CCD."""
-        return Channel(self.name).ccd.ccd_energy_per_electron
+        return Channel(self.filter_name).ccd.ccd_energy_per_electron
 
     @property
     @u.quantity_input
     def pixel_size(self) -> u.cm:
         """CCD pixel size. Units converted from μm to cm."""
-        ccd_pixel_size = Channel(self.name).ccd.ccd_pixel_size
+        ccd_pixel_size = Channel(self.filter_name).ccd.ccd_pixel_size
         return ccd_pixel_size.to(u.cm)
 
     @property
@@ -241,7 +206,6 @@ class TemperatureResponseFundamental:
         """This quantity represents the solid angle, which is given in units of steradians over pixel."""
         return (self.pixel_size / self.focal_len) ** 2 * (u.sr / u.pix)
 
-    '''
     @u.quantity_input
     def spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
         """Interpolation between the spectra wavelength onto the channel wavelength."""
@@ -255,7 +219,7 @@ class TemperatureResponseFundamental:
             u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
         )
 
-
+    '''
     @u.quantity_input
     def abundance_spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
         """Interpolation between the spectra wavelength onto the channel wavelength."""
@@ -270,7 +234,7 @@ class TemperatureResponseFundamental:
         return spectra_interpolate * (
             u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
         )
-    '''
+
 
     def _use_interpolator(self, spectra_value):
         interpolater = interpolate.interp1d(
@@ -296,9 +260,9 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        return effective_area(self.name, self.observation_date)
+        return effective_area(self.filter_name, self.observation_date)
 
-    '''
+
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
         wavelength = (self.channel_wavelength).value
@@ -371,7 +335,7 @@ class TemperatureResponseFundamental:
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
         """Provide the camera gain in electrons per data number."""
-        return Channel(self.name).ccd.ccd_gain_right
+        return Channel(self.filter_name).ccd.ccd_gain_right
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
