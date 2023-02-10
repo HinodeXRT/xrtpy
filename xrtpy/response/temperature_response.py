@@ -212,7 +212,9 @@ class TemperatureResponseFundamental:
         spectra_interpolate = []
         for i in range(61):
             interpolater = interpolate.interp1d(
-                self.CHIANTI_wavelength, (self.get_abundance_data)[i], kind="linear"
+                self.get_abundance_wavelength,
+                (self.get_abundance_spectra)[i],
+                kind="linear",
             )
             spectra_interpolate.append(interpolater(self.channel_wavelength))
         return spectra_interpolate * (
@@ -315,20 +317,12 @@ class TemperatureResponseFundamental:
         if abundance_type == "chianti":
             # Coronal temperature response
             temp_resp_w_u_c = (
-                self.get_chianti_file_spectra()
-                * effective_area
-                * constants
-                * factors
-                * dwvl
+                self.get_abundance_spectra * effective_area * constants * factors * dwvl
             ).sum(axis=1)
             return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
         else:
             temp_resp_w_u_c = (
-                self.get_abundance_spectra()
-                * effective_area
-                * constants
-                * factors
-                * dwvl
+                self.get_abundance_spectra * effective_area * constants * factors * dwvl
             ).sum(axis=1)
             return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
