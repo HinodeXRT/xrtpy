@@ -400,7 +400,7 @@ class Channel:
         return self._ccd
 
     def __str__(self):
-        """Reable printout."""
+        """Readable printout."""
         return f"XRT Channel for {self.name}"
 
     def __repr__(self):
@@ -432,7 +432,7 @@ class Channel:
 
     @property
     def observatory(self) -> str:
-        """Spacecraft: Hinode satellite."""
+        """The spacecraft name."""
         return self._channel_data["OBSERVATORY"]
 
     @property
