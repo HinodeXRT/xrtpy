@@ -154,7 +154,7 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def get_abundance_temperature(self):
+    def get_abundance_temperature(self) -> u.K:
         """Logged temperatures in kelvin."""
         return u.Quantity(self.get_abundance_data["temperature"] * u.K)
 
@@ -170,7 +170,6 @@ class TemperatureResponseFundamental:
         return self.get_abundance_data["spectra"]
 
     @property
-    @u.quantity_input
     def get_abundance_header_information(self):
         """File header information."""
         return self.get_abundance_data["header_information"]
@@ -233,7 +232,7 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def CHIANTI_temperature(self):
+    def CHIANTI_temperature(self) -> u.K:
         """CHIANTI temperatures in kelvin."""
         return u.Quantity(CHIANTI_file["temperature"] * u.K)
 
@@ -255,21 +254,21 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def CHIANTI_wavelength(self):
+    def CHIANTI_wavelength(self) -> u.Angstrom:
         """CHIANTI file wavelength values in Å."""
         return u.Quantity(CHIANTI_file["wavelength"] * u.Angstrom)
 
     @property
     @u.quantity_input
-    def get_chianti_wavelength(self):
+    def get_chianti_wavelength(self) -> u.Angstrom:
         """CHIANTI file wavelength values in Å."""
         return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
 
     @property
     @u.quantity_input
-    def channel_wavelength(self):
+    def channel_wavelength(self) -> u.Angstrom:
         """Array of wavelengths for every X-ray channel in Å."""
-        return u.Quantity((Channel(self.name).wavelength[:3993]) * u.photon)
+        return u.Quantity(Channel(self.name).wavelength[:3993])
 
     @property
     def focal_len(self):
@@ -325,36 +324,27 @@ class TemperatureResponseFundamental:
         )
     '''
 
+    def _use_interpolator(self, spectra_value):
+        interpolater = interpolate.interp1d(
+            self.CHIANTI_wavelength,
+            spectra_value,
+            kind="linear",
+        )
+        return interpolater(self.channel_wavelength)
+
     @u.quantity_input
     def abundance_spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
         """Interpolation between the spectra wavelength onto the channel wavelength."""
         abundance_type = self.abundance_model
-        if abundance_type == "chianti":
-            spectra_interpolate = []
-            for i in range(
-                61
-            ):  # CHIANTI_file["spectra"][0] self.get_chianti_file_spectra()[0]
-                interpolater = interpolate.interp1d(
-                    self.CHIANTI_wavelength,
-                    CHIANTI_file["spectra"][0][i],
-                    kind="linear",
-                )
-                spectra_interpolate.append(interpolater(self.channel_wavelength))
-            return spectra_interpolate * (
-                u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
-            )
-        else:
-            spectra_interpolate = []
-            for i in range(61):
-                interpolater = interpolate.interp1d(
-                    self.get_abundance_wavelength,
-                    self.get_abundance_spectra[i],
-                    kind="linear",
-                )
-                spectra_interpolate.append(interpolater(self.channel_wavelength))
-            return spectra_interpolate * (
-                u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
-            )
+        spectra = (
+            CHIANTI_file["spectra"][0]
+            if abundance_type == "chianti"
+            else self.get_abundance_spectra()
+        )
+
+        return [self._use_interpolator(spectra_value) for spectra_value in spectra] * (
+            u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
+        )
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
