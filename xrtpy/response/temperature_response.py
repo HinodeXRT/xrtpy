@@ -45,21 +45,6 @@ _abundance_model_data = {
     ),
 }
 
-CHIANTI_file = {
-    "CHIANTI_abundance_model": _abundance_model_data["chianti"]["ABUND_MODEL"][0],
-    "dens_model": _abundance_model_data["chianti"]["DENS_MODEL"][0],
-    "ioneq_model": _abundance_model_data["chianti"]["IONEQ_MODEL"][0],
-    "name": _abundance_model_data["chianti"]["NAME"][0],
-    "spectra": _abundance_model_data["chianti"]["SPEC"],
-    "spectra_units": _abundance_model_data["chianti"]["SPEC_UNITS"][0],
-    "temperature": _abundance_model_data["chianti"]["TEMP"][0],
-    "temp_units": _abundance_model_data["chianti"]["TEMP_UNITS"][0],
-    "tlength": _abundance_model_data["chianti"]["TLENGTH"][0],
-    "wlength": _abundance_model_data["chianti"]["WLENGTH"][0],
-    "wavelength": _abundance_model_data["chianti"]["WAVE"][0],
-    "wavelength_units": _abundance_model_data["chianti"]["WAVE_UNITS"][0],
-}
-
 
 def resolve_abundance_model_type(abundance_model):
     """Formats users abundance_model name."""
@@ -167,7 +152,7 @@ class TemperatureResponseFundamental:
     @property
     def get_abundance_spectra(self):
         """Spectra."""
-        return self.get_abundance_data["spectra"]
+        return self.get_abundance_data["spectra"][0]
 
     @property
     def get_abundance_header_information(self):
@@ -300,7 +285,7 @@ class TemperatureResponseFundamental:
         """Interpolation between the spectra wavelength onto the channel wavelength."""
         abundance_type = self.abundance_model
         spectra = (
-            CHIANTI_file["spectra"][0]
+            self.get_abundance_spectra()
             if abundance_type == "chianti"
             else self.get_abundance_spectra()
         )
