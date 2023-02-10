@@ -212,7 +212,7 @@ class TemperatureResponseFundamental:
         spectra_interpolate = []
         for i in range(61):
             interpolater = interpolate.interp1d(
-                self.CHIANTI_wavelength, CHIANTI_file["spectra"][0][i], kind="linear"
+                self.CHIANTI_wavelength, (self.get_abundance_data)[i], kind="linear"
             )
             spectra_interpolate.append(interpolater(self.channel_wavelength))
         return spectra_interpolate * (
@@ -257,12 +257,13 @@ class TemperatureResponseFundamental:
         return [self._use_interpolator(spectra_value) for spectra_value in spectra] * (
             u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
         )
+    '''
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
         return effective_area(self.filter_name, self.observation_date)
 
-
+    '''
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
         wavelength = (self.channel_wavelength).value
