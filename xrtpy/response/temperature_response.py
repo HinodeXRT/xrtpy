@@ -191,29 +191,14 @@ class TemperatureResponseFundamental:
         self._observation_date = observation_date
 
     @property
-    def CHIANTI_version(self):
-        """Name of the emission model."""
-        return CHIANTI_file["name"]
-
-    @property
     def get_chianti_version(self):
         """Name of the emission model."""
         return self.get_abundance_data["name"]
 
     @property
-    def CHIANTI_abundance_model(self):
-        """A brief description of what abundance model was used in the creation of the emission spectra."""
-        return CHIANTI_file["CHIANTI_abundance_model"]
-
-    @property
     def get_chianti_abundance_model(self):
         """A brief description of what abundance model was used in the creation of the emission spectra."""
         return self.get_abundance_data["CHIANTI_abundance_model"]
-
-    @property
-    def density_model(self):
-        """A brief description of the plasma density, emission measure,or differential emission measure that was used in the creation of the emission spectra."""
-        return CHIANTI_file["dens_model"]
 
     @property
     def get_chianti_density_model(self):
@@ -226,37 +211,15 @@ class TemperatureResponseFundamental:
         return self.get_abundance_data["ioneq_model"]
 
     @property
-    def ionization_model(self):
-        """A brief description of that ionization equilibrium model was used in the creation of the emission spectra."""
-        return CHIANTI_file["ioneq_model"]
-
-    @property
-    @u.quantity_input
-    def CHIANTI_temperature(self) -> u.K:
-        """CHIANTI temperatures in kelvin."""
-        return u.Quantity(CHIANTI_file["temperature"] * u.K)
-
-    @property
     @u.quantity_input
     def get_chianti_temperature(self) -> u.K:
         """CHIANTI temperatures in kelvin."""
         return u.Quantity(self.get_abundance_data["temperature"] * u.K)
 
     @property
-    def CHIANTI_file_spectra(self):
-        """CHIANTI file spectra."""
-        return CHIANTI_file["spectra"]
-
-    @property
     def get_chianti_file_spectra(self):
         """CHIANTI file spectra."""
         return self.get_abundance_data["spectra"]
-
-    @property
-    @u.quantity_input
-    def CHIANTI_wavelength(self) -> u.Angstrom:
-        """CHIANTI file wavelength values in Å."""
-        return u.Quantity(CHIANTI_file["wavelength"] * u.Angstrom)
 
     @property
     @u.quantity_input
