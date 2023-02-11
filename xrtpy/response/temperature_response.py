@@ -52,6 +52,22 @@ _abundance_model_data = {
     )["p0"],
 }
 
+
+def resolve_abundance_model_type(abundance_model):
+    """Formats users abundance_model name."""
+    if not isinstance(abundance_model, str):
+        raise TypeError("Abundance model name must be a string")
+    abundance_name = abundance_model.lower()
+    list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
+    if abundance_name not in list_of_abundance_name:
+        raise ValueError(
+            f"\n{abundance_name} is not a current model for XRTpy.\n"
+            "Available abundance models:\n"
+            "Chianti, Coronal, Hybrid, and Photospheric.\n"
+        )
+    return abundance_name
+
+
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
 
@@ -78,10 +94,10 @@ class TemperatureResponseFundamental:
     def __init__(self, filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
-        self._channel = Channel(self.name)
+        self._channel = Channel(self.filter_name)
 
     @property
-    def name(self):
+    def filter_name(self):
         """Name of searched filter."""
         return self._name
 
@@ -142,23 +158,23 @@ class TemperatureResponseFundamental:
     @u.quantity_input
     def channel_wavelength(self):
         """Array of wavelengths for every X-ray channel in Å."""
-        return u.Quantity((Channel(self.name).wavelength[:3993]) * u.photon)
+        return u.Quantity((Channel(self.filter_name).wavelength[:3993]) * u.photon)
 
     @property
     def focal_len(self):
         """Focal length of the telescope in units of cm."""
-        return Channel(self.name).geometry.geometry_focal_len
+        return Channel(self.filter_name).geometry.geometry_focal_len
 
     @property
     def ev_per_electron(self):
         """Amount of energy it takes to dislodge 1 electron in the CCD."""
-        return Channel(self.name).ccd.ccd_energy_per_electron
+        return Channel(self.filter_name).ccd.ccd_energy_per_electron
 
     @property
     @u.quantity_input
     def pixel_size(self) -> u.cm:
         """CCD pixel size. Units converted from μm to cm."""
-        ccd_pixel_size = Channel(self.name).ccd.ccd_pixel_size
+        ccd_pixel_size = Channel(self.filter_name).ccd.ccd_pixel_size
         return ccd_pixel_size.to(u.cm)
 
     @property
@@ -182,7 +198,7 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        return effective_area(self.name, self.observation_date)
+        return effective_area(self.filter_name, self.observation_date)
 
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
@@ -206,7 +222,7 @@ class TemperatureResponseFundamental:
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
         """Provide the camera gain in electrons per data number."""
-        return Channel(self.name).ccd.ccd_gain_right
+        return Channel(self.filter_name).ccd.ccd_gain_right
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
