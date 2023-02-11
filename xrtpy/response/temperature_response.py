@@ -23,7 +23,9 @@ _h_eV_s = h.to(u.eV * u.s).value
 
 
 _CHIANTI_filename = (
-    Path(__file__).parent.absolute() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
+    Path(__file__).parent.absolute()
+    / "data/chianti_emission_models"
+    / "XRT_emiss_model.default_CHIANTI.geny"
 )
 
 _abundance_model_file_path = {
@@ -39,13 +41,13 @@ _abundance_model_file_path = {
 }
 
 _abundance_model_data = {
-    "coronal": sunpy.io.special.genx.read_genx(
-        _abundance_model_file_path["coronal_abundance_path"]
-    )["p0"],
-    "hybrid": sunpy.io.special.genx.read_genx(
-        _abundance_model_file_path["hybrid_abundance_path"]
-    )["p0"],
-    "photospheric": sunpy.io.special.genx.read_genx(
+    "coronal": scipy.io.readsav(_abundance_model_file_path["coronal_abundance_path"])[
+        "p0"
+    ],
+    "hybrid": scipy.io.readsav(_abundance_model_file_path["hybrid_abundance_path"])[
+        "p0"
+    ],
+    "photospheric": scipy.io.readsav(
         _abundance_model_file_path["photospheric_abundance_path"]
     )["p0"],
 }
