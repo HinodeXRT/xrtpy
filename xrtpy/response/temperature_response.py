@@ -38,6 +38,17 @@ _abundance_model_file_path = {
     / "XRT_emiss_model.default_CHIANTI_hybrid.geny",
 }
 
+_abundance_model_data = {
+    "coronal": sunpy.io.special.genx.read_genx(
+        _abundance_model_file_path["coronal_abundance_path"]
+    )["p0"],
+    "hybrid": sunpy.io.special.genx.read_genx(
+        _abundance_model_file_path["hybrid_abundance_path"]
+    )["p0"],
+    "photospheric": sunpy.io.special.genx.read_genx(
+        _abundance_model_file_path["photospheric_abundance_path"]
+    )["p0"],
+}
 
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
