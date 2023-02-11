@@ -9,8 +9,10 @@ import sunpy.time
 from astropy import units as u
 from astropy.constants import c, h
 from datetime import datetime
+from numbers import Real
 from pathlib import Path
 from scipy import integrate, interpolate
+from typing import Dict
 
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.response.effective_area import effective_area
@@ -25,13 +27,13 @@ _CHIANTI_filename = (
 )
 
 _abundance_model_file_path = {
-    "coronal": Path(__file__).parent.absolute()
+    "coronal_abundance_path": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
     / "XRT_emiss_model.default_CHIANTI.geny",
-    "hybrid": Path(__file__).parent.absolute()
+    "hybrid_abundance_path": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
     / "XRT_emiss_model.default_CHIANTI_photospheric.geny",
-    "photospheric": Path(__file__).parent.absolute()
+    "photospheric_abundance_path": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
     / "XRT_emiss_model.default_CHIANTI_hybrid.geny",
 }
