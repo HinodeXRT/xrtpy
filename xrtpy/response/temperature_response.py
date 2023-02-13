@@ -57,7 +57,7 @@ def resolve_abundance_model_type(abundance_model):
         raise ValueError(
             f"\n{abundance_name} is not a current model for XRTpy.\n"
             "Available abundance models:\n"
-            "Chianti, Coronal, Hybrid, and Photospheric.\n"
+            "Coronal, Hybrid, and Photospheric.\n"
         )
     return abundance_name
 
@@ -81,15 +81,24 @@ CHIANTI_file = {
 class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
 
-    def __init__(self, filter_name, observation_date):
+    def __init__(self, filter_name, observation_date, abundance_model):
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
         self._channel = Channel(self.filter_name)
+        self._abundance_model = resolve_abundance_model_type(abundance_model)
 
     @property
     def filter_name(self):
         """Name of searched filter."""
         return self._name
+
+    def abundances(self) -> Dict[str, Real]:
+        return self._abundance_model
+
+    @property
+    def abundance_model(self):
+        """A brief description of what abundance model was used in the creation of the emission spectra."""
+        return self._abundance_model
 
     @property
     def observation_date(self):
@@ -106,6 +115,12 @@ class TemperatureResponseFundamental:
                 rf"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
             )
         self._observation_date = observation_date
+
+    @property
+    def get_abundance_data(self):
+        abundance_type = self.abundances
+        data = _abundance_model_data[abundance_type]
+        return data
 
     @property
     def CHIANTI_version(self):
