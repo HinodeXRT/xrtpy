@@ -22,3 +22,11 @@ Computing response functions
   :glob:
 
   notebooks/computing_functions/*
+
+Data analysis
+-------------
+
+.. nbgallery::
+   :glob:
+
+   Using_xrt_teem
