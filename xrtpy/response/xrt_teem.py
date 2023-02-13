@@ -739,7 +739,7 @@ def measurement_to_filtername(measurement):
     if fw1 != "Open":
         filtername = fw1
         if fw2 != "Open":
-            filt = f"{fw1}/{fw2}"
+            filtername = f"{fw1}/{fw2}"
     elif fw2 != "Open":
         filtername = fw2
     else:
