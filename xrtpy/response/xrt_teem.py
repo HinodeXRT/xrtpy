@@ -42,7 +42,7 @@ def xrt_teem(
     Parameters:
     -----------
     map1 : ~sunpy.map.sources.hinode.XRTMap
-        map for the first XRT level 1 data image.  If the image is
+        |Map| for the first XRT level 1 data image.  If the image is
         normalized, then it is assumed that the un-normalized image can be
         recovered by multiplying by the exposure time (exposure time must be
         available in the metadata). It is also assumed that the metadata
