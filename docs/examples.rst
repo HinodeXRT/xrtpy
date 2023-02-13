@@ -30,4 +30,4 @@ Data analysis
 .. nbgallery::
    :glob:
 
-   Using_xrt_teem
+   notebooks/data_analysis/*
