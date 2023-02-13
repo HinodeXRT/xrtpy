@@ -92,15 +92,14 @@ class TemperatureResponseFundamental:
         """Name of searched filter."""
         return self._name
 
+    @property
     def abundances(self) -> Dict[str, Real]:
         return self._abundance_model
 
-    '''
     @property
     def abundance_model(self):
         """A brief description of what abundance model was used in the creation of the emission spectra."""
         return self._abundance_model
-    '''
 
     @property
     def observation_date(self):
@@ -122,12 +121,35 @@ class TemperatureResponseFundamental:
     def get_abundance_data(self):
         abundance_type = self.abundances
         data = _abundance_model_data[abundance_type]
-        return data
+        if abundance_type == "coronal":
+            # print(f'Requested data: {abundance_type}')
+            return {
+                "CHIANTI_abundance_model": data["ABUND_MODEL"][0],
+                "dens_model": data["DENS_MODEL"][0],
+                "ioneq_model": data["IONEQ_MODEL"][0],
+                "name": data["NAME"][0],
+                "spectra": data["SPEC"],
+                "spectra_units": data["SPEC_UNITS"][0],
+                "temperature": data["TEMP"][0],
+                "temp_units": data["TEMP_UNITS"][0],
+                "tlength": data["TLENGTH"][0],
+                "wlength": data["WLENGTH"][0],
+                "wavelength": data["WAVE"][0],
+                "wavelength_units": data["WAVE_UNITS"][0],
+            }
+        else:
+            ValueError("Unable to process data")
+            # import pdb; pdb.set_trace()
 
     @property
     def CHIANTI_version(self):
         """Name of the emission model."""
         return CHIANTI_file["name"]
+
+    @property
+    def version(self):
+        """Name of the emission model."""
+        return self.get_abundance_data["name"]
 
     @property
     def abundance_model(self):
