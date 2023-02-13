@@ -547,8 +547,8 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
 
     Tmodel = tresp1.CHIANTI_temperature.value
     logTmodel = np.log10(Tmodel)
-    effarea1 = tresp1.effective_area().value  # in cm^2
-    effarea2 = tresp2.effective_area().value  # in cm^2
+    effarea1 = tresp1.effective_area().value
+    effarea2 = tresp2.effective_area().value
     spect1 = tresp1.spectra().value
     spect2 = tresp2.spectra().value
     flux1 = tresp1.temperature_response().value
