@@ -191,33 +191,19 @@ def xrt_teem(
     mask = mask | dmask
     map1 = Map(data1, map1.meta, mask=mask)
     map2 = Map(data2, map2.meta, mask=mask)
-    fw1, fw2 = map1.measurement.replace(" ", "_").split("-")
-    if fw1 != "Open":
-        filt1 = fw1
-        if fw2 != "Open":
-            filt1 = f"{fw1}/{fw2}"
-    elif fw2 != "Open":
-        filt1 = fw2
-    else:
-        raise ValueError("Invalid filter values, both fw1 and fw2 are Open")
+
+    filt1 = measurement_to_filtername(map1.measurement)
     date_obs1 = hdr1["DATE_OBS"]
     tresp1 = TemperatureResponseFundamental(filt1, date_obs1)
-    fw1, fw2 = map2.measurement.replace(" ", "_").split("-")
-    if fw1 != "Open":
-        filt2 = fw1
-        if fw2 != "Open":
-            filt2 = f"{fw1}/{fw2}"
-    elif fw2 != "Open":
-        filt2 = fw2
-    else:
-        raise ValueError("Invalid filter values, both fw1 and fw2 are Open")
+
+    filt2 = measurement_to_filtername(map2.measurement)
     date_obs2 = hdr2["DATE_OBS"]
     tresp2 = TemperatureResponseFundamental(filt2, date_obs2)
 
     if filt1 == filt2:
         raise ValueError("Filters for the two images cannot be the same")
 
-    T_e, EM, model_ratio, ok_pixel = derive_temperature(
+    T_e, EM, model_ratio, ok_pixel = _derive_temperature(
         map1, map2, tresp1, tresp2, binfac=binfac, Trange=Trange
     )
 
@@ -358,7 +344,7 @@ def deriv(x, y):
     return np.append(np.insert(dydx1, 0, dydx0), dydxN)
 
 
-def derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
+def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
     """
     Given two XRT Level 1 images, their associated metadata and the
     TemperatureResponseFundamental objects associated with them, derive the
@@ -741,3 +727,21 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
     EMerrmap = Map(EMerror, EMerrhdr)
     EMerrmap.nickname = r"Log Derived V.E.M. Errors (cm$^{-3}$)"
     return Tmap, EMmap, Terrmap, EMerrmap
+
+
+def measurement_to_filtername(measurement):
+    """
+    Convert filter combination as formatted in the measurement attribute for a
+    SunPy |Map| to the filtername format as required for input to
+    TemperatureResponseFundamental
+    """
+    fw1, fw2 = measurement.replace(" ", "_").split("-")
+    if fw1 != "Open":
+        filtername = fw1
+        if fw2 != "Open":
+            filt = f"{fw1}/{fw2}"
+    elif fw2 != "Open":
+        filtername = fw2
+    else:
+        raise ValueError("Invalid filter values, both fw1 and fw2 are Open")
+    return filtername
