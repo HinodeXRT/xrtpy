@@ -50,9 +50,9 @@ def xrt_teem(
         normalized.
 
     map2 : ~sunpy.map.sources.hinode.XRTMap
-        map for the second image (must use different filters from the first
-        image). The image shape should match that in map1. The same
-        considerations apply as for map1.
+        |Map| for the second image (must use different filters from the first
+        image). The image shape should match that in ``map1``. The same
+        considerations apply as for ``map1``.
 
     binfac : integer, optional (default = 1)
         spatial binning factor
