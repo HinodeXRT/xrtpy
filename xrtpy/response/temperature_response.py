@@ -22,12 +22,6 @@ _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
 
 
-_CHIANTI_filename = (
-    Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "XRT_emiss_model.default_CHIANTI.geny"
-)
-
 _abundance_model_file_path = {
     "coronal_abundance_path": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
@@ -68,23 +62,19 @@ def resolve_abundance_model_type(abundance_model):
     return abundance_name
 
 
-_CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
-_XRT_emiss_model_file = _CHIANTI_file["p0"]
-
-
 CHIANTI_file = {
-    "abundance_model": _XRT_emiss_model_file["ABUND_MODEL"][0],
-    "dens_model": _XRT_emiss_model_file["DENS_MODEL"][0],
-    "ioneq_model": _XRT_emiss_model_file["IONEQ_MODEL"][0],
-    "name": _XRT_emiss_model_file["NAME"][0],
-    "spectra": _XRT_emiss_model_file["SPEC"],
-    "spectra_units": _XRT_emiss_model_file["SPEC_UNITS"][0],
-    "temperature": _XRT_emiss_model_file["TEMP"][0],
-    "temp_units": _XRT_emiss_model_file["TEMP_UNITS"][0],
-    "tlength": _XRT_emiss_model_file["TLENGTH"][0],
-    "wlength": _XRT_emiss_model_file["WLENGTH"][0],
-    "wavelength": _XRT_emiss_model_file["WAVE"][0],
-    "wavelength_units": _XRT_emiss_model_file["WAVE_UNITS"][0],
+    "abundance_model": _abundance_model_data["coronal"]["ABUND_MODEL"][0],
+    "dens_model": _abundance_model_data["coronal"]["DENS_MODEL"][0],
+    "ioneq_model": _abundance_model_data["coronal"]["IONEQ_MODEL"][0],
+    "name": _abundance_model_data["coronal"]["NAME"][0],
+    "spectra": _abundance_model_data["coronal"]["SPEC"],
+    "spectra_units": _abundance_model_data["coronal"]["SPEC_UNITS"][0],
+    "temperature": _abundance_model_data["coronal"]["TEMP"][0],
+    "temp_units": _abundance_model_data["coronal"]["TEMP_UNITS"][0],
+    "tlength": _abundance_model_data["coronal"]["TLENGTH"][0],
+    "wlength": _abundance_model_data["coronal"]["WLENGTH"][0],
+    "wavelength": _abundance_model_data["coronal"]["WAVE"][0],
+    "wavelength_units": _abundance_model_data["coronal"]["WAVE_UNITS"][0],
 }
 
 
