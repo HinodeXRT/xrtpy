@@ -95,10 +95,12 @@ class TemperatureResponseFundamental:
     def abundances(self) -> Dict[str, Real]:
         return self._abundance_model
 
+    '''
     @property
     def abundance_model(self):
         """A brief description of what abundance model was used in the creation of the emission spectra."""
         return self._abundance_model
+    '''
 
     @property
     def observation_date(self):
