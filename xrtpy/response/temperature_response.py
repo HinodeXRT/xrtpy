@@ -154,34 +154,34 @@ class TemperatureResponseFundamental:
     @property
     def abundance_model(self):
         """A brief description of what abundance model was used in the creation of the emission spectra."""
-        return CHIANTI_file["abundance_model"]
+        return self.get_abundance_data["abundance_model"]
 
     @property
     def density_model(self):
         """A brief description of the plasma density, emission measure,or differential emission measure that was used in the creation of the emission spectra."""
-        return CHIANTI_file["dens_model"]
+        return self.get_abundance_data["dens_model"]
 
     @property
     def ionization_model(self):
         """A brief description of that ionization equilibrium model was used in the creation of the emission spectra."""
-        return CHIANTI_file["ioneq_model"]
+        return self.get_abundance_data["ioneq_model"]
 
     @property
     @u.quantity_input
-    def CHIANTI_temperature(self):
+    def temperature(self):
         """CHIANTI temperatures in kelvin."""
-        return u.Quantity(CHIANTI_file["temperature"] * u.K)
+        return u.Quantity(self.get_abundance_data["temperature"] * u.K)
 
     @property
-    def CHIANTI_file_spectra(self):
+    def file_spectra(self):
         """CHIANTI file spectra."""
-        return CHIANTI_file["spectra"]
+        return self.get_abundance_data["spectra"]
 
     @property
     @u.quantity_input
-    def CHIANTI_wavelength(self):
+    def wavelength(self):
         """CHIANTI file wavelength values in Å."""
-        return u.Quantity(CHIANTI_file["wavelength"] * u.Angstrom)
+        return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
 
     @property
     @u.quantity_input
@@ -218,7 +218,9 @@ class TemperatureResponseFundamental:
         spectra_interpolate = []
         for i in range(61):
             interpolater = interpolate.interp1d(
-                self.CHIANTI_wavelength, CHIANTI_file["spectra"][0][i], kind="linear"
+                self.wavelength,
+                CHIANTI_file["spectra"][0][i],
+                kind="linear",  ##########Correct##########
             )
             spectra_interpolate.append(interpolater(self.channel_wavelength))
         return spectra_interpolate * (
