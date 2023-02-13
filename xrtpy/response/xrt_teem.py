@@ -42,7 +42,7 @@ def xrt_teem(
     Parameters:
     -----------
     map1 : ~sunpy.map.sources.hinode.XRTMap
-        map for the first XRT level 1 data image.  If the image is
+        |Map| for the first XRT level 1 data image.  If the image is
         normalized, then it is assumed that the un-normalized image can be
         recovered by multiplying by the exposure time (exposure time must be
         available in the metadata). It is also assumed that the metadata
@@ -50,9 +50,9 @@ def xrt_teem(
         normalized.
 
     map2 : ~sunpy.map.sources.hinode.XRTMap
-        map for the second image (must use different filters from the first
-        image). The image shape should match that in map1. The same
-        considerations apply as for map1.
+        |Map| for the second image (must use different filters from the first
+        image). The image shape should match that in ``map1``. The same
+        considerations apply as for ``map1``.
 
     binfac : integer, optional (default = 1)
         spatial binning factor
@@ -533,8 +533,8 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
 
     Tmodel = tresp1.CHIANTI_temperature.value
     logTmodel = np.log10(Tmodel)
-    effarea1 = tresp1.effective_area().value  # in cm^2
-    effarea2 = tresp2.effective_area().value  # in cm^2
+    effarea1 = tresp1.effective_area().value
+    effarea2 = tresp2.effective_area().value
     spect1 = tresp1.spectra().value
     spect2 = tresp2.spectra().value
     flux1 = tresp1.temperature_response().value
