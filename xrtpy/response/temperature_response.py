@@ -46,13 +46,14 @@ _abundance_model_data = {
     )["p0"],
 }
 
+list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
+
 
 def resolve_abundance_model_type(abundance_model):
     """Formats users abundance_model name."""
     if not isinstance(abundance_model, str):
         raise TypeError("Abundance model name must be a string")
     abundance_name = abundance_model.lower()
-    list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
     if abundance_name not in list_of_abundance_name:
         raise ValueError(
             f"\n{abundance_name} is not a current model for XRTpy.\n"
@@ -60,22 +61,6 @@ def resolve_abundance_model_type(abundance_model):
             "Coronal, Hybrid, and Photospheric.\n"
         )
     return abundance_name
-
-
-CHIANTI_file = {
-    "abundance_model": _abundance_model_data["coronal"]["ABUND_MODEL"][0],
-    "dens_model": _abundance_model_data["coronal"]["DENS_MODEL"][0],
-    "ioneq_model": _abundance_model_data["coronal"]["IONEQ_MODEL"][0],
-    "name": _abundance_model_data["coronal"]["NAME"][0],
-    "spectra": _abundance_model_data["coronal"]["SPEC"],
-    "spectra_units": _abundance_model_data["coronal"]["SPEC_UNITS"][0],
-    "temperature": _abundance_model_data["coronal"]["TEMP"][0],
-    "temp_units": _abundance_model_data["coronal"]["TEMP_UNITS"][0],
-    "tlength": _abundance_model_data["coronal"]["TLENGTH"][0],
-    "wlength": _abundance_model_data["coronal"]["WLENGTH"][0],
-    "wavelength": _abundance_model_data["coronal"]["WAVE"][0],
-    "wavelength_units": _abundance_model_data["coronal"]["WAVE_UNITS"][0],
-}
 
 
 class TemperatureResponseFundamental:
@@ -119,12 +104,11 @@ class TemperatureResponseFundamental:
 
     @property
     def get_abundance_data(self):
-        abundance_type = self.abundances
-        data = _abundance_model_data[abundance_type]
-        if abundance_type == "coronal":
-            # print(f'Requested data: {abundance_type}')
+        abundance_type_name = self.abundances
+        data = _abundance_model_data[abundance_type_name]
+        if abundance_type_name in list_of_abundance_name:
             return {
-                "CHIANTI_abundance_model": data["ABUND_MODEL"][0],
+                "abundance_model_info": data["ABUND_MODEL"][0],
                 "dens_model": data["DENS_MODEL"][0],
                 "ioneq_model": data["IONEQ_MODEL"][0],
                 "name": data["NAME"][0],
@@ -139,12 +123,6 @@ class TemperatureResponseFundamental:
             }
         else:
             ValueError("Unable to process data")
-            # import pdb; pdb.set_trace()
-
-    @property
-    def CHIANTI_version(self):
-        """Name of the emission model."""
-        return CHIANTI_file["name"]
 
     @property
     def version(self):
@@ -152,9 +130,9 @@ class TemperatureResponseFundamental:
         return self.get_abundance_data["name"]
 
     @property
-    def abundance_model(self):
+    def abundance_model_information(self):
         """A brief description of what abundance model was used in the creation of the emission spectra."""
-        return self.get_abundance_data["abundance_model"]
+        return self.get_abundance_data["abundance_model_info"]
 
     @property
     def density_model(self):
@@ -175,7 +153,7 @@ class TemperatureResponseFundamental:
     @property
     def file_spectra(self):
         """CHIANTI file spectra."""
-        return self.get_abundance_data["spectra"]
+        return self.get_abundance_data["spectra"][0]
 
     @property
     @u.quantity_input
@@ -219,8 +197,8 @@ class TemperatureResponseFundamental:
         for i in range(61):
             interpolater = interpolate.interp1d(
                 self.wavelength,
-                CHIANTI_file["spectra"][0][i],
-                kind="linear",  ##########Correct##########
+                self.file_spectra[i],
+                kind="linear",
             )
             spectra_interpolate.append(interpolater(self.channel_wavelength))
         return spectra_interpolate * (
