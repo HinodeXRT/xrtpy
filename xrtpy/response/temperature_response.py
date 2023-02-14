@@ -50,7 +50,7 @@ list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
 
 
 def resolve_abundance_model_type(abundance_model):
-    """Formats users abundance_model name."""
+    """Formats and checks users abundance model input name."""
     if not isinstance(abundance_model, str):
         raise TypeError("Abundance model name must be a string")
     abundance_name = abundance_model.lower()
@@ -79,11 +79,12 @@ class TemperatureResponseFundamental:
 
     @property
     def abundances(self) -> Dict[str, Real]:
+        """Defined the name of the requested abundance model as a string."""
         return self._abundance_model
 
     @property
     def abundance_model(self):
-        """A brief description of what abundance model was used in the creation of the emission spectra."""
+        """Defined the name of the requested abundance model as a string."""
         return self._abundance_model
 
     @property
@@ -104,6 +105,7 @@ class TemperatureResponseFundamental:
 
     @property
     def get_abundance_data(self):
+        """Returning the requested abundance data that is used to calculate the temperature response."""
         abundance_type_name = self.abundances
         data = _abundance_model_data[abundance_type_name]
         if abundance_type_name in list_of_abundance_name:
@@ -122,11 +124,11 @@ class TemperatureResponseFundamental:
                 "wavelength_units": data["WAVE_UNITS"][0],
             }
         else:
-            ValueError("Unable to process data")
+            ValueError("Unable to process data. ")
 
     @property
     def version(self):
-        """Name of the emission model."""
+        """Version of the abundance emission model."""
         return self.get_abundance_data["name"]
 
     @property
@@ -147,18 +149,18 @@ class TemperatureResponseFundamental:
     @property
     @u.quantity_input
     def temperature(self):
-        """CHIANTI temperatures in kelvin."""
+        """Emission model temperatures in kelvin."""
         return u.Quantity(self.get_abundance_data["temperature"] * u.K)
 
     @property
     def file_spectra(self):
-        """CHIANTI file spectra."""
+        """Emission model file spectra."""
         return self.get_abundance_data["spectra"][0]
 
     @property
     @u.quantity_input
     def wavelength(self):
-        """CHIANTI file wavelength values in Å."""
+        """Emission model file wavelength values in Å."""
         return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
 
     @property
