@@ -243,7 +243,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_attributes(self):
-        """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
+        """(Diethylhexylphthalate) Wavelength (nm), Delta, Beta."""
         _n_DEHP_filename = get_pkg_data_filename(
             "data/n_DEHP.txt", package="xrtpy.response"
         )
@@ -259,7 +259,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_wavelength(self):
-        """Diethylhexylphthalate: Wavelength given in Angstrom (Å)."""
+        """(Diethylhexylphthalate) Wavelength given in Angstrom (Å)."""
 
         # Convert wavelength values from nanometers to Angstroms
         wavelength_str = [
@@ -270,7 +270,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_delta(self):
-        """Diethylhexylphthalate: Delta."""
+        """(Diethylhexylphthalate) Delta."""
 
         delta_str = [
             self.n_DEHP_attributes[i][1] for i in range(2, len(self.n_DEHP_attributes))
@@ -288,7 +288,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_beta(self):
-        """Diethylhexylphthalate: Beta."""
+        """(Diethylhexylphthalate) Beta."""
 
         beta_str = [
             self.n_DEHP_attributes[i][2] for i in range(2, len(self.n_DEHP_attributes))
