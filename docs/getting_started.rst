@@ -74,3 +74,4 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
 
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
 .. _xrt-cfa-harvard: https://xrt.cfa.harvard.edu/index.php
+.. _XRT temperature response with other choice of abundances: http://solar.physics.montana.edu/takeda/xrt_response/xrt_resp.html
