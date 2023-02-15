@@ -35,7 +35,7 @@ Additional Abundances
 --------------------
 The standard XRT temperature response routines are calculated assuming coronal abundances :cite:t:`feldman:1992`.
 In addition, XRTpy offers the ability to choose two additional abundances i.e. Hybrid and Photospheric abundances.
-The Hybrid abundances is base on :cite:t:`Fludra:1999` and Photospheric abundances base on :cite:t:`Grevesse:2007`.
+The Hybrid abundances are base on :cite:t:`Fludra:1999` and Photospheric abundances are base on :cite:t:`Grevesse:2007`.
 Visit `XRT temperature response with other choice of abundances`_ for future detailed information.
 
 .. note::
