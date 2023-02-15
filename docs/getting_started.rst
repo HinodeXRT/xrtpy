@@ -28,13 +28,15 @@ Refer to the `SolarSoft XRT Analysis Guide`_ for more information about the inst
 Temperature Response
 --------------------
 XRTpy produces the temperature response for each XRT filter channel, assuming a spectral emission model, refer to :cite:t:`narukage:2011` and :cite:t:`narukage:2014`.
-XRTpy default emission model is from CHIANTI. This structure contains data and information about a plasma emission model, as a function of wavelength and temperature.
-The default model assumes coronal abundances :cite:t:`feldman:1992`.
+The XRT default emission model is `CHIANTI`_ atomic database version 10.0 with coronal abundances :cite:t:`feldman:1992`. This structure contains data and information about a plasma emission model, as a function of wavelength and temperature.
 
-Addition Abundances
+
+Additional Abundances
 --------------------
-XRTpy default model assumes coronal abundances :cite:t:`feldman:1992`. Furthermore, XRTpy offers Hybrid abundances base on :cite:t:`Fludra:1999` and
-Photospheric abundances base on :cite:t:`Grevesse:2007`.
+The standard XRT temperature response routines are calculated assuming coronal abundances :cite:t:`feldman:1992`.
+In addition, XRTpy offers the ability to choose two additional abundances i.e. Hybrid and Photospheric abundances.
+The Hybrid abundances is base on :cite:t:`Fludra:1999` and Photospheric abundances base on :cite:t:`Grevesse:2007`.
+Visit `XRT temperature response with other choice of abundances`_ for future detailed information.
 
 .. note::
    XRTpy has future plans to accept other plasma emission spectra models.
@@ -72,6 +74,8 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
     that selects the titanium-on-polyimide filter, then the string would be ``'Ti-poly'``. The process is the same for all XRT
     filter channels.
 
+
+.. _CHIANTI: https://www.chiantidatabase.org/chianti_database_history.html
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
 .. _xrt-cfa-harvard: https://xrt.cfa.harvard.edu/index.php
 .. _XRT temperature response with other choice of abundances: http://solar.physics.montana.edu/takeda/xrt_response/xrt_resp.html
