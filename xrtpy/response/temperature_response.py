@@ -162,7 +162,6 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
-
         wavelength = (self.channel_wavelength).value
         constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value

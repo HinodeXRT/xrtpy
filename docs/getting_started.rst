@@ -34,6 +34,10 @@ The default model assumes coronal abundances :cite:t:`feldman:1992`.
 .. note::
    XRTpy has future plans to accept other plasma emission spectra models.
 
+Deriving Temperature and Emission Measure for a Pair of Images
+--------------------------------------------------------------
+XRTpy provides a routine, xrt_teem, that employs the objects listed above to derive the temperature and emission measure in for a given pair of images using the filter ratio method. This uses the same methods as in the SolarSoft IDL routine of the same name.
+
 
 X-Ray Filter Channel
 *********************

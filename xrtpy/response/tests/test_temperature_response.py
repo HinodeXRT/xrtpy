@@ -21,9 +21,7 @@ filenames = get_IDL_data_files()
 
 
 def _IDL_raw_data_list(filename):
-
     with open(filename) as filter_file:
-
         IDL_data_list = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -56,9 +54,7 @@ def IDL_test_date(IDL_data_list):
 
 
 def _IDL_temperature_response_raw_data(filename):
-
     with open(filename) as filter_file:
-
         IDL_data_list = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -71,7 +67,6 @@ def _IDL_temperature_response_raw_data(filename):
 
 @pytest.mark.parametrize("filename", filenames)
 def test_temperature_response(filename, allclose):
-
     IDL_data = _IDL_raw_data_list(filename)
 
     filter_name = IDL_test_filter_name(IDL_data)
