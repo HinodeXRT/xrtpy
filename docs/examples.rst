@@ -23,3 +23,11 @@ Computing response functions
   :glob:
 
   notebooks/computing_functions/*
+
+Data analysis
+-------------
+
+.. nbgallery::
+   :glob:
+
+   notebooks/data_analysis/*
