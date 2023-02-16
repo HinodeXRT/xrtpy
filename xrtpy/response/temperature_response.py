@@ -78,7 +78,7 @@ class TemperatureResponseFundamental:
         return self._name
 
     @property
-    def abundances(self) -> Dict[str, Real]:
+    def abundances(self) -> str:
         """Defined the name of the requested abundance model as a string."""
         return self._abundance_model
 
