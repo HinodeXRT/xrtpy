@@ -46,7 +46,6 @@ class TemperatureResponseFundamental:
 
     def __init__(self, filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
-        # self.observation_date = observation_date
         self._effective_area_fundamental = EffectiveAreaFundamental(
             self.name, observation_date
         )
