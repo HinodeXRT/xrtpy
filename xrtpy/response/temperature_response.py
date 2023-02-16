@@ -108,23 +108,24 @@ class TemperatureResponseFundamental:
         """Returning the requested abundance data that is used to calculate the temperature response."""
         abundance_type_name = self.abundances
         data = _abundance_model_data[abundance_type_name]
-        if abundance_type_name in list_of_abundance_name:
-            return {
-                "abundance_model_info": data["ABUND_MODEL"][0],
-                "dens_model": data["DENS_MODEL"][0],
-                "ioneq_model": data["IONEQ_MODEL"][0],
-                "name": data["NAME"][0],
-                "spectra": data["SPEC"],
-                "spectra_units": data["SPEC_UNITS"][0],
-                "temperature": data["TEMP"][0],
-                "temp_units": data["TEMP_UNITS"][0],
-                "tlength": data["TLENGTH"][0],
-                "wlength": data["WLENGTH"][0],
-                "wavelength": data["WAVE"][0],
-                "wavelength_units": data["WAVE_UNITS"][0],
-            }
-        else:
+        if abundance_type_name not in list_of_abundance_name:
             ValueError("Unable to process data. ")
+                    
+        return {
+            "abundance_model_info": data["ABUND_MODEL"][0],
+            "dens_model": data["DENS_MODEL"][0],
+            "ioneq_model": data["IONEQ_MODEL"][0],
+            "name": data["NAME"][0],
+            "spectra": data["SPEC"],
+            "spectra_units": data["SPEC_UNITS"][0],
+            "temperature": data["TEMP"][0],
+            "temp_units": data["TEMP_UNITS"][0],
+            "tlength": data["TLENGTH"][0],
+            "wlength": data["WLENGTH"][0],
+            "wavelength": data["WAVE"][0],
+            "wavelength_units": data["WAVE_UNITS"][0],
+        }
+
 
     @property
     def version(self):
