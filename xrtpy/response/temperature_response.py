@@ -58,7 +58,7 @@ def resolve_abundance_model_type(abundance_model):
         raise ValueError(
             f"\n{abundance_name} is not a current model for XRTpy.\n"
             "Available abundance models:\n"
-            "Coronal, Hybrid, and Photospheric.\n"
+            "'coronal', 'hybrid', and 'photospheric'.\n"
         )
     return abundance_name
 
