@@ -142,7 +142,6 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        # return effective_area(self.name, self.observation_date)
         return self._effective_area_fundamental.effective_area()
 
     @u.quantity_input
