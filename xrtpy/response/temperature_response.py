@@ -83,7 +83,7 @@ class TemperatureResponseFundamental:
         return self._abundance_model
 
     @property
-    def abundance_model(self):
+    def abundance_model(self) -> str:
         """Defined the name of the requested abundance model as a string."""
         return self._abundance_model
 
