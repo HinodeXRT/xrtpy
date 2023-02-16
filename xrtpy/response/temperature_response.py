@@ -49,7 +49,7 @@ _abundance_model_data = {
 list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
 
 
-def resolve_abundance_model_type(abundance_model):
+def _resolve_abundance_model_type(abundance_model):
     """Formats and checks users abundance model input name."""
     if not isinstance(abundance_model, str):
         raise TypeError("Abundance model name must be a string")
@@ -66,11 +66,11 @@ def resolve_abundance_model_type(abundance_model):
 class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
 
-    def __init__(self, filter_name, observation_date, abundance_model):
+    def __init__(self, filter_name, observation_date, abundance_model="coronal"):
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
         self._channel = Channel(self.filter_name)
-        self._abundance_model = resolve_abundance_model_type(abundance_model)
+        self._abundance_model = _resolve_abundance_model_type(abundance_model)
 
     @property
     def filter_name(self):
@@ -105,7 +105,7 @@ class TemperatureResponseFundamental:
         data = _abundance_model_data[abundance_type_name]
         if abundance_type_name not in list_of_abundance_name:
             ValueError("Unable to process data. ")
-                    
+
         return {
             "abundance_model_info": data["ABUND_MODEL"][0],
             "dens_model": data["DENS_MODEL"][0],
@@ -120,7 +120,6 @@ class TemperatureResponseFundamental:
             "wavelength": data["WAVE"][0],
             "wavelength_units": data["WAVE_UNITS"][0],
         }
-
 
     @property
     def version(self):
