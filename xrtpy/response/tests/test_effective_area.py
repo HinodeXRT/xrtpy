@@ -1,9 +1,9 @@
+import pytest
+
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filenames
 from datetime import datetime
 from pathlib import Path
-
-import pytest
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
