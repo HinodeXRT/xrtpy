@@ -61,7 +61,6 @@ class TemperatureResponseFundamental:
     def observation_date(self):
         """Date of observation."""
         return self._effective_area_fundamental.observation_date
-        # return self._observation_date
 
     @property
     def CHIANTI_version(self):
