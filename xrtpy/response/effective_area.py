@@ -64,6 +64,17 @@ _filter_contamination_file_time = astropy.time.Time(
 _filter_contamination = _filter_contam_file["p2"]
 
 
+def resolve_filter_names(name):
+    """Formats users filter name."""
+    if not isinstance(name, str):
+        raise TypeError("name must be a string")
+    name = name.replace("_", "-")
+    parts: list = name.split("/")
+    new_parts: list = [part.capitalize() for part in parts]
+    name: str = "/".join(new_parts)
+    return name
+
+
 class EffectiveAreaFundamental:
     """
     Class for calculating the effective area.
@@ -78,15 +89,55 @@ class EffectiveAreaFundamental:
         `sunpy.time.parse_time`.
     """
 
+    """
     def __init__(self, filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
         self._channel = Channel(self.name)
+    """
+
+    def __init__(self, filterwheel1, filterwheel2, observation_date):
+        self._fw1_name = resolve_filter_names(filterwheel1)
+        self._fw2_name = resolve_filter_names(filterwheel2)
+        self._name = resolve_filter_names(filterwheel1)
+        self.observation_date = observation_date
+        self._channel = Channel("al-poly")  # self.name
+
+    @property
+    def filterwheel1_name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
+        if self._fw1_name not in index_mapping_to_fw1_name:
+            raise ValueError(
+                f"\nInvalid filter: {self._fw1_name}.\n"
+                f"Available filters in filter-wheel 2 {index_mapping_to_fw1_name}."
+            )
+
+        return self._fw1_name
+
+    @property
+    def filterwheel2_name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
+        if self._fw2_name not in index_mapping_to_fw2_name:
+            raise ValueError(
+                f"\nInvalid filter: {self._fw2_name}.\n"
+                f"Available filters in filter-wheel 1 {index_mapping_to_fw1_name}."
+            )
+
+        return self._fw2_name
 
     @property
     def name(self) -> str:
         """Name of XRT X-Ray channel filter."""
+        print(self.filterwheel1_name.replace("-", "_"))
+        print(self.filterwheel2_name.replace("-", "_"))
         return self._name
+
+    '''
+    @property
+    def name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
+        return self._name
+    '''
 
     @property
     def observation_date(self) -> str:
