@@ -122,8 +122,8 @@ class TemperatureResponseFundamental:
         }
 
     @property
-    def version(self):
-        """Version of the abundance emission model."""
+    def chianti_abundance_version(self):
+        """Version of the chianti abundance model."""
         return self.get_abundance_data["name"]
 
     @property
