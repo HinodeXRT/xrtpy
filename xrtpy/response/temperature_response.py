@@ -71,7 +71,7 @@ class TemperatureResponseFundamental:
         self._channel = Channel(self.filter_name)
         self._abundance_model = _resolve_abundance_model_type(abundance_model)
         self._effective_area_fundamental = EffectiveAreaFundamental(
-            filter_name, observation_date
+            self.filter_name, observation_date
         )
 
     @property
