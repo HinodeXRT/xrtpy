@@ -32,7 +32,7 @@ The XRT default emission model is `CHIANTI`_ atomic database version 10.0 with c
 
 
 Additional Abundances
---------------------
+---------------------
 The standard XRT temperature response routines are calculated assuming `CHIANTI`_ coronal abundances :cite:t:`feldman:1992`.
 In addition, XRTpy offers the ability to choose two additional `CHIANTI`_ abundances i.e. Hybrid and Photospheric.
 The Hybrid abundances are base on :cite:t:`Fludra:1999` and Photospheric abundances are base on :cite:t:`Grevesse:2007`.
