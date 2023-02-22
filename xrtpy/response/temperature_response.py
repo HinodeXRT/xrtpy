@@ -67,11 +67,11 @@ class TemperatureResponseFundamental:
 
     def __init__(self, filter_name, observation_date, abundance_model="coronal"):
         self._name = resolve_filter_name(filter_name)
-        self.observation_date = observation_date
         self._channel = Channel(self.filter_name)
+        # self.observation_date = self.observation_date
         self._abundance_model = _resolve_abundance_model_type(abundance_model)
         self._effective_area_fundamental = EffectiveAreaFundamental(
-            self.filter_name, observation_date
+            self._name, observation_date
         )
 
     @property
