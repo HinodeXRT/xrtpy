@@ -49,6 +49,8 @@ def resolve_filter_name(name):
     parts: list = name.split("/")
     new_parts: list = [part.capitalize() for part in parts]
     name: str = "/".join(new_parts)
+    filter1 = new_parts[0]
+    filter2 = new_parts[1]
     return name
 
 
