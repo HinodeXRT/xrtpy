@@ -35,6 +35,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "nbsphinx",
+    "sphinx_changelog",
     "sphinx_copybutton",
     "sphinx_gallery.load_style",
     "IPython.sphinxext.ipython_console_highlighting",
