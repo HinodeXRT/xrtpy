@@ -40,7 +40,30 @@ The `CHIANTI`_ files contain data and information about a plasma emission model,
 Visit `XRT temperature response with other choice of abundances`_ for future detailed information.
 
 .. note::
+    XRTpy has future plans to accept other plasma emission spectra models.
+
+XRTpy defaults to using CHIANTI's coronal abundance. You are able to specify the other abundances by defining
+your `abundance_model` of interest. For example:
+
+.. code-block:: bash
+
+   xrtpy.response.TemperatureResponseFundamental('Al-poly', '2022/07/04T23:43:12', abundance_model = 'Hybrid')
+
+
+.. tip::
+    An abundance file is reference by setting . If `abundance_model` is not defined then XRTpy will default to
+    tr = xrtpy.response.TemperatureResponseFundamental('al-poly','2022/07/10T23:43:12',abundance_model = 'Hybrid')
    XRTpy has future plans to accept other plasma emission spectra models.
+
+
+
+To install all Python dependencies required to develop PlasmaPy on your
+local computer, enter the top-level directory of the cloned repository
+and run:
+
+
+
+
 
 Deriving Temperature and Emission Measure for a Pair of Images
 --------------------------------------------------------------
