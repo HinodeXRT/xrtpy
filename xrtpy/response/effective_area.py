@@ -72,9 +72,9 @@ def resolve_filter_names(name):
     parts: list = name.split("/")
     new_parts: list = [part.capitalize() for part in parts]
     name: str = "/".join(new_parts)
-    filter1_name = new_parts[0]
-    filter2_name = new_parts[1]
-    return name, filter1_name, filter2_name
+    # filter1_name = new_parts[0]
+    # filter2_name = new_parts[1]
+    return name
 
 
 class EffectiveAreaFundamental:
@@ -99,12 +99,11 @@ class EffectiveAreaFundamental:
     #import pdb; pdb.set_trace()
     """
 
-    def __init__(self, filterwheel, observation_date):
-        self._name_resolve = resolve_filter_names(filterwheel)
-        self._name = self._name_resolve[0]
-        self._fw1_name = self._name_resolve[1]
-        self._fw2_name = self._name_resolve[2]
+    def __init__(self, filter1_name, filter2_name, observation_date):
+        self._fw1_name = resolve_filter_names(filter1_name)
+        self._fw2_name = resolve_filter_names(filter2_name)
         self.observation_date = observation_date
+        self._name = f"{self._fw1_name}/{self._fw2_name}"
         self._channel = Channel("al-poly")  # self.name
 
     @property
