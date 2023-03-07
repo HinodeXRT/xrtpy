@@ -109,11 +109,10 @@ class EffectiveAreaFundamental:
     @property
     def filterwheel1_name(self) -> str:
         """Name of XRT X-Ray channel filter."""
-        print("filterwheel1_name: ", self._fw1_name)
         if self._fw1_name not in index_mapping_to_fw1_name:
             raise ValueError(
                 f"\nInvalid filter: {self._fw1_name}.\n"
-                f"Available filters in filter-wheel 2 {index_mapping_to_fw1_name}."
+                f"Available filters in filter-wheel 1 {index_mapping_to_fw1_name}."
             )
 
         return self._fw1_name
@@ -125,7 +124,7 @@ class EffectiveAreaFundamental:
         if self._fw2_name not in index_mapping_to_fw2_name:
             raise ValueError(
                 f"\nInvalid filter: {self._fw2_name}.\n"
-                f"Available filters in filter-wheel 1 {index_mapping_to_fw2_name}."
+                f"Available filters in filter-wheel 2 {index_mapping_to_fw2_name}."
             )
 
         return self._fw2_name
@@ -133,8 +132,6 @@ class EffectiveAreaFundamental:
     @property
     def name(self) -> str:
         """Name of XRT X-Ray channel filter."""
-        print(self.filterwheel1_name.replace("-", "_"))
-        print(self.filterwheel2_name.replace("-", "_"))
         return self._name
 
     '''
