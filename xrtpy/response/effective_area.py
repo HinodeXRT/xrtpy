@@ -249,7 +249,7 @@ class EffectiveAreaFundamental:
                 self.filter1_wheel_number
             ]
         else:
-            return "Open"
+            return self.filter_index_mapping_to_name_filter1
 
     @property
     def combo_filter2_data(self):
@@ -263,9 +263,10 @@ class EffectiveAreaFundamental:
 
     @property
     def contamination_on_filter1_combo(self) -> u.angstrom:
-        """
-        Thickness of the contamination layer on a filter-1."""
+        """Thickness of the contamination layer on a filter-1."""
 
+        if self.combo_filter1_data != int:
+            return self.combo_filter1_data
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
         )
@@ -273,9 +274,9 @@ class EffectiveAreaFundamental:
 
     @property
     def contamination_on_filter2_combo(self) -> u.angstrom:
-        """
-        Thickness of the contamination layer on a filter-2."""
-
+        """Thickness of the contamination layer on a filter-2."""
+        if self.combo_filter2_data != int:
+            return self.combo_filter1_data
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
         )
