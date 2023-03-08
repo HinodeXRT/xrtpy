@@ -131,7 +131,7 @@ class EffectiveAreaFundamental:
         if self._fw1_name not in index_mapping_to_fw1_name:
             raise ValueError(
                 f"\nInvalid filter: {self._fw1_name}.\n"
-                f"Available filters in filter-wheel 1 {index_mapping_to_fw1_name}."
+                f"Available filters in XRT filter-wheel 1 {index_mapping_to_fw1_name}."
             )
         return self._fw1_name
 
@@ -141,7 +141,7 @@ class EffectiveAreaFundamental:
         if self._fw2_name not in index_mapping_to_fw2_name:
             raise ValueError(
                 f"\nInvalid filter: {self._fw2_name}.\n"
-                f"Available filters in filter-wheel 2 {index_mapping_to_fw2_name}."
+                f"Available filters in XRT filter-wheel 2 {index_mapping_to_fw2_name}."
             )
         return self._fw2_name
 
@@ -193,6 +193,25 @@ class EffectiveAreaFundamental:
         return interpolater(self.observation_date.utime)
 
     @property
+    def filter_wheel_number(self):
+        """Defining chosen filter to its corresponding filter wheel."""
+        return 0 if self.name in index_mapping_to_fw1_name else 1
+
+    @property
+    def filter1_wheel_number(self):
+        """Defining chosen filter to its corresponding filter wheel."""
+        filter1 = self.filter1_name
+        if filter1 != "Open":
+            return 0 if filter1 in index_mapping_to_fw1 else 1
+
+    @property
+    def filter2_wheel_number(self):
+        """Defining chosen filter to its corresponding filter wheel."""
+        filter2 = self.filter2_name
+        if filter2 != "Open":
+            return 0 if filter2 in index_mapping_to_fw2 else 1
+
+    @property
     def filter_index_mapping_to_name(self):
         """Returns filter's corresponding number value."""
         if self.name in index_mapping_to_fw1_name:
@@ -201,58 +220,35 @@ class EffectiveAreaFundamental:
             return index_mapping_to_fw2_name.get(self.name)
 
     @property
-    def filter_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        return 0 if self.name in index_mapping_to_fw1_name else 1
-
-    @property
-    def combo_filter1_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
+    def filter_index_mapping_to_name_filter1(self):
+        """Returns filter's corresponding number value."""
         filter1 = self.filter1_name
-
-        if filter1 != "Open":
-            return 0 if filter1 in index_mapping_to_fw1 else 1
-
-    @property
-    def combo_filter2_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        filter2 = self.filter2_name
-
-        if filter2 != "Open":
-            return 0 if filter2 in index_mapping_to_fw2 else 1
-
-    @property
-    def combo_filter_index_mapping_to_name_filter1(self):
-        """Returns filter's corresponding number value."""
-        filter1, _ = self.combo_filter_name_split
-
-        if filter1 in index_mapping_to_fw1_name:
+        if filter1 in index_mapping_to_fw1:
             return index_mapping_to_fw1_name.get(filter1)
-        elif filter1 in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(filter1)
+        else:
+            return filter1
 
     @property
-    def combo_filter_index_mapping_to_name_filter2(self):
+    def filter_index_mapping_to_name_filter2(self):
         """Returns filter's corresponding number value."""
-        filter1, filter2 = self.combo_filter_name_split
-
-        if filter2 in index_mapping_to_fw1_name:
+        filter2 = self.filter2_name
+        if filter2 in index_mapping_to_fw2:
             return index_mapping_to_fw1_name.get(filter2)
-        elif filter2 in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(filter2)
+        else:
+            return filter2
 
     @property
     def combo_filter1_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter1][
-            self.combo_filter1_wheel_number
+        return _filter_contamination[self.filter_index_mapping_to_name_filter1][
+            self.filter1_wheel_number
         ]
 
     @property
     def combo_filter2_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter2][
-            self.combo_filter2_wheel_number
+        return _filter_contamination[self.filter_index_mapping_to_name_filter2][
+            self.filter2_wheel_number
         ]
 
     @property
