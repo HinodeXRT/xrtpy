@@ -192,10 +192,12 @@ class EffectiveAreaFundamental:
         )
         return interpolater(self.observation_date.utime)
 
+    '''
     @property
     def filter_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
         return 0 if self.name in index_mapping_to_fw1_name else 1
+    '''
 
     @property
     def filter1_wheel_number(self):
@@ -211,6 +213,7 @@ class EffectiveAreaFundamental:
         if filter2 != "Open":
             return 0 if filter2 in index_mapping_to_fw2 else 1
 
+    '''
     @property
     def filter_index_mapping_to_name(self):
         """Returns filter's corresponding number value."""
@@ -218,6 +221,7 @@ class EffectiveAreaFundamental:
             return index_mapping_to_fw1_name.get(self.name)
         elif self.name in index_mapping_to_fw2_name:
             return index_mapping_to_fw2_name.get(self.name)
+    '''
 
     @property
     def filter_index_mapping_to_name_filter1(self):
@@ -240,16 +244,22 @@ class EffectiveAreaFundamental:
     @property
     def combo_filter1_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.filter_index_mapping_to_name_filter1][
-            self.filter1_wheel_number
-        ]
+        if self.filter_index_mapping_to_name_filter1 == int:
+            return _filter_contamination[self.filter_index_mapping_to_name_filter1][
+                self.filter1_wheel_number
+            ]
+        else:
+            return "Open"
 
     @property
     def combo_filter2_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.filter_index_mapping_to_name_filter2][
-            self.filter2_wheel_number
-        ]
+        if self.filter_index_mapping_to_name_filter2 == int:
+            return _filter_contamination[self.filter_index_mapping_to_name_filter2][
+                self.filter2_wheel_number
+            ]
+        else:
+            return self.filter_index_mapping_to_name_filter2
 
     @property
     def contamination_on_filter1_combo(self) -> u.angstrom:
