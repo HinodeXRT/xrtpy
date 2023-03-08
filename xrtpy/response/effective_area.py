@@ -40,6 +40,22 @@ index_mapping_to_fw2_name = {
     "Be-thick": 5,
 }
 
+index_mapping_to_fw1 = {
+    "Al-poly": 1,
+    "C-poly": 2,
+    "Be-thin": 3,
+    "Be-med": 4,
+    "Al-med": 5,
+}
+
+index_mapping_to_fw2 = {
+    "Al-mesh": 1,
+    "Ti-poly": 2,
+    "G-band": 3,
+    "Al-thick": 4,
+    "Be-thick": 5,
+}
+
 _ccd_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
 )
@@ -72,8 +88,6 @@ def resolve_filter_names(name):
     parts: list = name.split("/")
     new_parts: list = [part.capitalize() for part in parts]
     name: str = "/".join(new_parts)
-    # filter1_name = new_parts[0]
-    # filter2_name = new_parts[1]
     return name
 
 
@@ -107,39 +121,29 @@ class EffectiveAreaFundamental:
         self._channel = Channel("al-poly")  # self.name
 
     @property
-    def filterwheel1_name(self) -> str:
+    def name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
+        return self._name
+
+    @property
+    def filter1_name(self) -> str:
         """Name of XRT X-Ray channel filter."""
         if self._fw1_name not in index_mapping_to_fw1_name:
             raise ValueError(
                 f"\nInvalid filter: {self._fw1_name}.\n"
                 f"Available filters in filter-wheel 1 {index_mapping_to_fw1_name}."
             )
-
         return self._fw1_name
 
     @property
-    def filterwheel2_name(self) -> str:
+    def filter2_name(self) -> str:
         """Name of XRT X-Ray channel filter."""
-        print("filterwheel2_name: ", self._fw2_name)
         if self._fw2_name not in index_mapping_to_fw2_name:
             raise ValueError(
                 f"\nInvalid filter: {self._fw2_name}.\n"
                 f"Available filters in filter-wheel 2 {index_mapping_to_fw2_name}."
             )
-
         return self._fw2_name
-
-    @property
-    def name(self) -> str:
-        """Name of XRT X-Ray channel filter."""
-        return self._name
-
-    '''
-    @property
-    def name(self) -> str:
-        """Name of XRT X-Ray channel filter."""
-        return self._name
-    '''
 
     @property
     def observation_date(self) -> str:
@@ -202,23 +206,20 @@ class EffectiveAreaFundamental:
         return 0 if self.name in index_mapping_to_fw1_name else 1
 
     @property
-    def combo_filter_name_split(self):
-        """Defining chosen filters to its corresponding filter wheel."""
-        name = (self.name).split("/")
-        filter1, filter2 = name[0], name[1]
-        return filter1, filter2
-
-    @property
     def combo_filter1_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        filter1, _ = self.combo_filter_name_split
-        return 0 if filter1 in index_mapping_to_fw1_name else 1
+        filter1 = self.filter1_name
+
+        if filter1 != "Open":
+            return 0 if filter1 in index_mapping_to_fw1 else 1
 
     @property
     def combo_filter2_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        _, filter2 = self.combo_filter_name_split
-        return 0 if filter2 in index_mapping_to_fw1_name else 1
+        filter2 = self.filter2_name
+
+        if filter2 != "Open":
+            return 0 if filter2 in index_mapping_to_fw2 else 1
 
     @property
     def combo_filter_index_mapping_to_name_filter1(self):
