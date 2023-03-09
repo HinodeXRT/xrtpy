@@ -273,36 +273,35 @@ class EffectiveAreaFundamental:
         """Thickness of the contamination layer on a filter-1."""
 
         filter_data = self.combo_filter1_data
-        if type(filter_data) != str:
+        if type(filter_data) == str:
             return filter_data
         interpolater = scipy.interpolate.interp1d(
             _filter_contamination_file_time, filter_data, kind="linear"
         )
-        return interpolater(self.filter_observation_date_to_seconds)
+        return interpolater(_filter_contamination_file_time.utime)
 
     @property
     def contamination_on_filter2_combo(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter-2."""
-        if self.combo_filter2_data != str:
-            return self.combo_filter2_data
+        filter_data = self.combo_filter2_data
+        if type(filter_data) == str:
+            return filter_data
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time, self.combo_filter2_data, kind="linear"
+            _filter_contamination_file_time, filter_data, kind="linear"
         )
-        return interpolater(self.filter_observation_date_to_seconds)
+        return interpolater(_filter_contamination_file_time.utime)
 
     @property
     def contamination_on_filter_combo(self) -> u.angstrom:
         """Combined filter 1 + filter 2 contamination thickness."""
 
-        if self.contamination_on_filter1_combo == "Open":
-            return self.contamination_on_filter1_combo
-        elif self.contamination_on_filter2_combo == "Open":
+        if type(self.contamination_on_filter1_combo) == str:
             return self.contamination_on_filter2_combo
-        else:
-            return (
-                self.contamination_on_filter1_combo
-                + self.contamination_on_filter2_combo
-            )
+
+        if type(self.contamination_on_filter2_combo) == str:
+            return self.contamination_on_filter1_combo
+
+        return self.contamination_on_filter1_combo + self.contamination_on_filter2_combo
 
     @property
     def filter_data(self):
