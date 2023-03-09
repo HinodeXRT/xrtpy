@@ -110,7 +110,7 @@ class EffectiveAreaFundamental:
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
         self._channel = Channel(self.name)
-    #import pdb; pdb.set_trace()
+
     """
 
     def __init__(self, filter1_name, filter2_name, observation_date):
@@ -244,16 +244,23 @@ class EffectiveAreaFundamental:
     @property
     def combo_filter1_data(self):
         """Collecting filter data."""
-        if self.filter_index_mapping_to_name_filter1 == int:
-            return _filter_contamination[self.filter_index_mapping_to_name_filter1][
-                self.filter1_wheel_number
-            ]
+        index_filter_value = self.filter_index_mapping_to_name_filter1
+
+        print(index_filter_value)
+
+        # import pdb; pdb.set_trace()
+
+        if index_filter_value is int:
+            print(index_filter_value)
+            return _filter_contamination[index_filter_value][self.filter1_wheel_number]
         else:
-            return self.filter_index_mapping_to_name_filter1
+            print("NOPE")
+            return index_filter_value
 
     @property
     def combo_filter2_data(self):
         """Collecting filter data."""
+
         if self.filter_index_mapping_to_name_filter2 == int:
             return _filter_contamination[self.filter_index_mapping_to_name_filter2][
                 self.filter2_wheel_number
