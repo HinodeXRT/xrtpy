@@ -204,14 +204,14 @@ class EffectiveAreaFundamental:
         """Defining chosen filter to its corresponding filter wheel."""
         filter1 = self.filter1_name
         if filter1 != "Open":
-            return 0 if filter1 in index_mapping_to_fw1 else 1
+            return 0 if filter1 in index_mapping_to_fw1 else 1  # Update method
 
     @property
     def filter2_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
         filter2 = self.filter2_name
         if filter2 != "Open":
-            return 0 if filter2 in index_mapping_to_fw2 else 1
+            return 1 if filter2 in index_mapping_to_fw2 else 0  # Update method
 
     '''
     @property
@@ -237,7 +237,7 @@ class EffectiveAreaFundamental:
         """Returns filter's corresponding number value."""
         filter2 = self.filter2_name
         if filter2 in index_mapping_to_fw2:
-            return index_mapping_to_fw1_name.get(filter2)
+            return index_mapping_to_fw2_name.get(filter2)
         else:
             return filter2
 
