@@ -205,6 +205,8 @@ class EffectiveAreaFundamental:
         filter1 = self.filter1_name
         if filter1 != "Open":
             return 0 if filter1 in index_mapping_to_fw1 else 1  # Update method
+        else:
+            return filter1
 
     @property
     def filter2_wheel_number(self):
@@ -212,6 +214,8 @@ class EffectiveAreaFundamental:
         filter2 = self.filter2_name
         if filter2 != "Open":
             return 1 if filter2 in index_mapping_to_fw2 else 0  # Update method
+        else:
+            return filter2
 
     '''
     @property
@@ -246,22 +250,18 @@ class EffectiveAreaFundamental:
         """Collecting filter data."""
         index_filter_value = self.filter_index_mapping_to_name_filter1
 
-        print(index_filter_value)
-
         # import pdb; pdb.set_trace()
 
-        if index_filter_value is int:
-            print(index_filter_value)
+        if index_filter_value != "Open":
             return _filter_contamination[index_filter_value][self.filter1_wheel_number]
         else:
-            print("NOPE")
             return index_filter_value
 
     @property
     def combo_filter2_data(self):
         """Collecting filter data."""
 
-        if self.filter_index_mapping_to_name_filter2 == int:
+        if self.filter_index_mapping_to_name_filter2 != "Open":
             return _filter_contamination[self.filter_index_mapping_to_name_filter2][
                 self.filter2_wheel_number
             ]
@@ -272,17 +272,18 @@ class EffectiveAreaFundamental:
     def contamination_on_filter1_combo(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter-1."""
 
-        if self.combo_filter1_data != int:
-            return self.combo_filter1_data
+        filter_data = self.combo_filter1_data
+        if type(filter_data) != str:
+            return filter_data
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time, self.combo_filter1_data, kind="linear"
+            _filter_contamination_file_time, filter_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
 
     @property
     def contamination_on_filter2_combo(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter-2."""
-        if self.combo_filter2_data != int:
+        if self.combo_filter2_data != str:
             return self.combo_filter2_data
         interpolater = scipy.interpolate.interp1d(
             _filter_contamination_file_time, self.combo_filter2_data, kind="linear"
