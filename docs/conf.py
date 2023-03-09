@@ -40,6 +40,7 @@ extensions = [
     "sphinx_gallery.load_style",
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_changelog",
+    "sphinx_issues",
     "sphinxcontrib.bibtex",
     "hoverxref.extension",
 ]
