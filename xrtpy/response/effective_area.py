@@ -268,7 +268,7 @@ class EffectiveAreaFundamental:
         if self.combo_filter1_data != int:
             return self.combo_filter1_data
         interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
+            _filter_contamination_file_time, self.combo_filter1_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
 
@@ -278,7 +278,7 @@ class EffectiveAreaFundamental:
         if self.combo_filter2_data != int:
             return self.combo_filter2_data
         interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
+            _filter_contamination_file_time, self.combo_filter2_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
 
