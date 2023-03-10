@@ -192,13 +192,6 @@ class EffectiveAreaFundamental:
         )
         return interpolater(self.observation_date.utime)
 
-    '''
-    @property
-    def filter_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        return 0 if self.name in index_mapping_to_fw1_name else 1
-    '''
-
     @property
     def filter1_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
@@ -216,16 +209,6 @@ class EffectiveAreaFundamental:
             return 1 if filter2 in index_mapping_to_fw2 else 0  # Update method
         else:
             return filter2
-
-    '''
-    @property
-    def filter_index_mapping_to_name(self):
-        """Returns filter's corresponding number value."""
-        if self.name in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(self.name)
-        elif self.name in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(self.name)
-    '''
 
     @property
     def filter_index_mapping_to_name_filter1(self):
@@ -246,7 +229,7 @@ class EffectiveAreaFundamental:
             return filter2
 
     @property
-    def combo_filter1_data(self):
+    def filter1_contam_data(self):
         """Collecting filter data."""
         index_filter_value = self.filter_index_mapping_to_name_filter1
 
@@ -258,7 +241,7 @@ class EffectiveAreaFundamental:
             return index_filter_value
 
     @property
-    def combo_filter2_data(self):
+    def filter2_contam_data(self):
         """Collecting filter data."""
 
         if self.filter_index_mapping_to_name_filter2 != "Open":
@@ -271,8 +254,8 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_filter1(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter-1."""
+        filter_data = self.filter1_contam_data
 
-        filter_data = self.combo_filter1_data
         if type(filter_data) == str:
             return filter_data
         interpolater = scipy.interpolate.interp1d(
@@ -283,7 +266,8 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_filter2(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter-2."""
-        filter_data = self.combo_filter2_data
+        filter_data = self.filter2_contam_data
+
         if type(filter_data) == str:
             return filter_data
         interpolater = scipy.interpolate.interp1d(
@@ -295,44 +279,11 @@ class EffectiveAreaFundamental:
     def contamination_on_filters(self) -> u.angstrom:
         """Combined filter 1 + filter 2 contamination thickness."""
         if type(self.contamination_on_filter1) == str:
-            print("contamination_on_filter2")
             return self.contamination_on_filter2
         elif type(self.contamination_on_filter2) == str:
-            print("contamination_on_filter1")
             return self.contamination_on_filter1
         else:
-            print("contamination_on_filter1 and contamination_on_filter2")
             return self.contamination_on_filter1 + self.contamination_on_filter2
-
-        """
-        if type(self.contamination_on_filter1) == str:
-            print('contamination_on_filter2')
-            return self.contamination_on_filter2
-
-        if type(self.contamination_on_filter2) == str:
-            print('contamination_on_filter1')
-            return self.contamination_on_filter1
-
-        print('contamination_on_filter1 and contamination_on_filter2')
-        return self.contamination_on_filter1 + self.contamination_on_filter2
-        """
-
-    '''
-    @property
-    def filter_data(self):
-        """Collecting filter contamination data."""
-        return _filter_contamination[self.filter_index_mapping_to_name][
-            self.filter_wheel_number
-        ]
-
-    @property
-    def contamination_on_filter(self) -> u.angstrom:
-        """Thickness of the contamination layer on a filter."""
-        interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self.filter_data, kind="linear"
-        )
-        return interpolater(self.observation_date.utime)
-    '''
 
     @cached_property
     def n_DEHP_attributes(self):
@@ -460,30 +411,6 @@ class EffectiveAreaFundamental:
         )
 
         # Multiply by thickness
-        angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_filter
-
-        real_angular_wavenumber = angular_wavenumber_thickness.real
-        imaginary_angular_wavenumber = angular_wavenumber_thickness.imag
-
-        return [
-            (complex(real_angular_wavenumber[i], imaginary_angular_wavenumber[i]))
-            for i in range(4000)
-        ]
-
-    @cached_property
-    def filterwheel_combo_angular_wavenumber(self):
-        """Define angular wavenumber for a filter."""
-        index, _, cos_a, _, _, _, _ = self.transmission_equation
-
-        # Define wavevector
-        angular_wavenumber = np.array(
-            [
-                (2.0 * math.pi * index[i] * cos_a) / self.n_DEHP_wavelength[i]
-                for i in range(4000)
-            ]
-        )
-
-        # Multiply by thickness
         angular_wavenumber_thickness = (
             angular_wavenumber * self.contamination_on_filters
         )
@@ -536,7 +463,7 @@ class EffectiveAreaFundamental:
     @property
     def channel_wavelength(self):
         """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
-        return Channel(self.name).wavelength
+        return Channel(self.filter1_name).wavelength
 
     @property
     def channel_geometry_aperture_area(self):
@@ -593,46 +520,6 @@ class EffectiveAreaFundamental:
 
         return [abs(transmittance[i] ** 2) for i in range(4000)]
 
-    @cached_property
-    def filter_combo_contamination_transmission(self):
-        """Calculate transmission matrix coefficient and transmittance on a filter."""
-
-        index, _, _, _, n_o, n_t, _ = self.transmission_equation
-
-        i_i = complex(0, 1)  # Define complex number
-
-        # Define transfer matrix
-        M = [
-            [
-                [
-                    np.cos(self.filterwheel_combo_angular_wavenumber[i]),
-                    (-i_i * np.sin(self.filterwheel_combo_angular_wavenumber[i]))
-                    / index[i],
-                ],
-                [
-                    -i_i
-                    * np.sin(self.filterwheel_combo_angular_wavenumber[i])
-                    * index[i],
-                    np.cos(self.filterwheel_combo_angular_wavenumber[i]),
-                ],
-            ]
-            for i in range(4000)
-        ]
-
-        transmittance = [
-            2
-            * n_o
-            / (
-                (M[i][0][0] * n_o)
-                + (M[i][0][1] * n_o * n_t)
-                + (M[i][1][0])
-                + (M[i][1][1] * n_t)
-            )
-            for i in range(4000)
-        ]
-
-        return [abs(transmittance[i] ** 2) for i in range(4000)]
-
     @property
     def interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
@@ -645,7 +532,7 @@ class EffectiveAreaFundamental:
     def interpolated_filter_combo_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         Filter_contam_transmission = interpolate.interp1d(
-            self.n_DEHP_wavelength, self.filter_combo_contamination_transmission
+            self.n_DEHP_wavelength, self.filter_contamination_transmission
         )
         return Filter_contam_transmission(self.channel_wavelength)
 
@@ -659,22 +546,7 @@ class EffectiveAreaFundamental:
             * self.interpolated_filter_contamination_transmission
         )
 
-    @u.quantity_input
-    def effective_area_combo(self) -> u.cm**2:
-        """Calculation of the Effective Area."""
-        return (
-            self.channel_geometry_aperture_area
-            * self.channel_transmission
-            * self.interpolated_CCD_contamination_transmission
-            * self.interpolated_filter_combo_contamination_transmission
-        )
-
 
 def effective_area(filter_name, observation_date):
-    EAP = EffectiveAreaFundamental(filter_name, observation_date)
-    return EAP.effective_area()
-
-
-def effective_area_filter_combo(filter_name, observation_date):
     EAP = EffectiveAreaFundamental(filter_name, observation_date)
     return EAP.effective_area()
