@@ -269,40 +269,41 @@ class EffectiveAreaFundamental:
             return self.filter_index_mapping_to_name_filter2
 
     @property
-    def contamination_on_filter1_combo(self) -> u.angstrom:
+    def contamination_on_filter1(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter-1."""
 
         filter_data = self.combo_filter1_data
         if type(filter_data) == str:
             return filter_data
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time, filter_data, kind="linear"
+            _filter_contamination_file_time.utime, filter_data, kind="linear"
         )
-        return interpolater(_filter_contamination_file_time.utime)
+        return interpolater(self.observation_date.utime)
 
     @property
-    def contamination_on_filter2_combo(self) -> u.angstrom:
+    def contamination_on_filter2(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter-2."""
         filter_data = self.combo_filter2_data
         if type(filter_data) == str:
             return filter_data
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time, filter_data, kind="linear"
+            _filter_contamination_file_time.utime, filter_data, kind="linear"
         )
-        return interpolater(_filter_contamination_file_time.utime)
+        return interpolater(self.observation_date.utime)
 
     @property
-    def contamination_on_filter_combo(self) -> u.angstrom:
+    def contamination_on_filters(self) -> u.angstrom:
         """Combined filter 1 + filter 2 contamination thickness."""
 
-        if type(self.contamination_on_filter1_combo) == str:
-            return self.contamination_on_filter2_combo
+        if type(self.contamination_on_filter1) == str:
+            return self.contamination_on_filter2
 
-        if type(self.contamination_on_filter2_combo) == str:
-            return self.contamination_on_filter1_combo
+        if type(self.contamination_on_filter2) == str:
+            return self.contamination_on_filter1
 
-        return self.contamination_on_filter1_combo + self.contamination_on_filter2_combo
+        return self.contamination_on_filter1 + self.contamination_on_filter2
 
+    '''
     @property
     def filter_data(self):
         """Collecting filter contamination data."""
@@ -317,6 +318,7 @@ class EffectiveAreaFundamental:
             _filter_contamination_file_time.utime, self.filter_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
+    '''
 
     @cached_property
     def n_DEHP_attributes(self):
@@ -469,7 +471,7 @@ class EffectiveAreaFundamental:
 
         # Multiply by thickness
         angular_wavenumber_thickness = (
-            angular_wavenumber * self.contamination_on_filter_combo
+            angular_wavenumber * self.contamination_on_filters
         )
 
         real_angular_wavenumber = angular_wavenumber_thickness.real
