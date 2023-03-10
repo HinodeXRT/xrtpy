@@ -294,14 +294,28 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_filters(self) -> u.angstrom:
         """Combined filter 1 + filter 2 contamination thickness."""
-
         if type(self.contamination_on_filter1) == str:
+            print("contamination_on_filter2")
+            return self.contamination_on_filter2
+        elif type(self.contamination_on_filter2) == str:
+            print("contamination_on_filter1")
+            return self.contamination_on_filter1
+        else:
+            print("contamination_on_filter1 and contamination_on_filter2")
+            return self.contamination_on_filter1 + self.contamination_on_filter2
+
+        """
+        if type(self.contamination_on_filter1) == str:
+            print('contamination_on_filter2')
             return self.contamination_on_filter2
 
         if type(self.contamination_on_filter2) == str:
+            print('contamination_on_filter1')
             return self.contamination_on_filter1
 
+        print('contamination_on_filter1 and contamination_on_filter2')
         return self.contamination_on_filter1 + self.contamination_on_filter2
+        """
 
     '''
     @property
