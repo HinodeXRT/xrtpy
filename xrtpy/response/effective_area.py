@@ -19,7 +19,11 @@ from functools import cached_property
 from pathlib import Path
 from scipy import interpolate
 
-from xrtpy.response.channel import Channel, resolve_filter_name
+from xrtpy.response.channel import (
+    _channel_name_to_index_mapping,
+    Channel,
+    resolve_filter_name,
+)
 from xrtpy.util.time import epoch
 
 index_mapping_to_fw1_name = {
@@ -118,12 +122,7 @@ class EffectiveAreaFundamental:
         self._fw2_name = resolve_filter_names(filter2_name)
         self.observation_date = observation_date
         self._name = f"{self._fw1_name}/{self._fw2_name}"
-        self._channel = Channel("al-poly")  # self.name
-
-    @property
-    def name(self) -> str:
-        """Name of XRT X-Ray channel filter."""
-        return self._name
+        self._channel = Channel(self.name)
 
     @property
     def filter1_name(self) -> str:
@@ -144,6 +143,22 @@ class EffectiveAreaFundamental:
                 f"Available filters in XRT filter-wheel 2 {index_mapping_to_fw2_name}."
             )
         return self._fw2_name
+
+    @property
+    def name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
+        filter_channe_names = _channel_name_to_index_mapping.keys()
+        if self.filter1_name or self.filter2_name != "Open":  # and
+            print(self.filter1_name)
+            print(self.filter2_name)
+            if self._name not in filter_channe_names:
+                raise ValueError(
+                    "\nChosen filter(s) must be from the filter list:\n"
+                    f"{filter_channe_names}.\n "
+                    "If the desired filter combination is not available, please raise an issue at: "
+                    "https://github.com/HinodeXRT/xrtpy/issues/new"
+                )
+        return self._name
 
     @property
     def observation_date(self) -> str:
@@ -232,8 +247,6 @@ class EffectiveAreaFundamental:
     def filter1_contam_data(self):
         """Collecting filter data."""
         index_filter_value = self.filter_index_mapping_to_name_filter1
-
-        # import pdb; pdb.set_trace()
 
         if index_filter_value != "Open":
             return _filter_contamination[index_filter_value][self.filter1_wheel_number]
@@ -463,7 +476,7 @@ class EffectiveAreaFundamental:
     @property
     def channel_wavelength(self):
         """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
-        return Channel(self.filter1_name).wavelength
+        return Channel(self.name).wavelength
 
     @property
     def channel_geometry_aperture_area(self):
