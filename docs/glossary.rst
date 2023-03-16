@@ -9,6 +9,10 @@ Glossary
 .. glossary::
    :sorted:
 
+   CCD
+      Charge-Coupled Device (CCD) camera onboard the XRT instrument.
+      The XRT uses a back-illuminated three-phase CCD with 13.5 µm pixel-size and 2048×2048 array. Refer to Section 3.4 `CCD Camera System` in the `SolarSoft XRT Analysis Guide`_ for more information.
+
    Temperature
       Temperature :math:`T`, is a `~astropy.units.Quantity` with units of temperature (e.g., kelvin).
 
@@ -18,3 +22,7 @@ Glossary
 
    Solar-emission-spectra
       A set of plasma emission spectra for a set of temperature.
+
+
+
+.. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
