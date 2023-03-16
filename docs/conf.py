@@ -12,14 +12,14 @@ from sphinx.application import Sphinx
 # -- Project information -----------------------------------------------------
 
 project = "xrtpy"
-author = "Joy Velasquez and Nick Murphy"
-copyright = f"2015–{datetime.utcnow().year}, {author}"
+author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
+copyright = f"2021–{datetime.utcnow().year}, {author}"
 
 # The full version, including alpha/beta/rc tags
 # from xrtpy import __version__
 # release = __version__
 
-release = "0.1.0dev"
+release = "0.2.0"
 
 # -- General configuration ---------------------------------------------------
 
