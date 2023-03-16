@@ -1,0 +1,1 @@
+Addressed and fixed the temperature response 'NAN' calculations output.
