@@ -19,7 +19,7 @@ copyright = f"2021–{datetime.utcnow().year}, {author}"
 # from xrtpy import __version__
 # release = __version__
 
-release = "0.2.0dev"
+release = "0.2.0"
 
 # -- General configuration ---------------------------------------------------
 
