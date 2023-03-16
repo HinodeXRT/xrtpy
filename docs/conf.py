@@ -128,6 +128,13 @@ linkcheck_anchors_ignore = [
 # Use a code highlighting style that meets the WCAG AA contrast standard
 pygments_style = "default"
 
+
+nbsphinx_thumbnails = {
+    "notebooks/getting_started/units": (
+        "_static/notebook_images/astropy_logo_notext.png"
+    ),  # CC BY-SA
+}
+
 # adapted from sphinx-hoverxref conf.py
 if os.environ.get("READTHEDOCS"):
     # Building on Read the Docs
