@@ -4,7 +4,7 @@
 astropy >= 4.3.1
 cached-property >= 1.5.2
 matplotlib >= 3.3.0
-numpy >= 1.20.0
+numpy >= 1.21
 packaging
 scipy >= 1.5.0
 sunpy >= 2.0.0
