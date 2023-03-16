@@ -1,1 +1,0 @@
-Deriving Temperature and Emission Measure for a Pair of Images, xrt_teem.
