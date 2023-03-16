@@ -1,13 +1,10 @@
 [build-system]
-requires = ["setuptools >= 50.0",
-            "setuptools_scm >= 6.0",
-            "wheel >= 0.34.0"]  # ought to mirror 'requirements/build.txt'
 build-backend = "setuptools.build_meta"
-
-[tool.gilesbot]
-
-[tool.gilesbot.pull_requests]
-enabled = true
+requires = [
+  "setuptools>=50",
+  "setuptools_scm>=6",
+  "wheel>=0.34",
+]  # ought to mirror 'requirements/build.txt'
 
 [tool.isort]
 line_length = 88
@@ -20,3 +17,17 @@ use_parentheses = true
 include_trailing_comma = true
 force_alphabetical_sort_within_sections = true
 lines_between_types = 1
+
+[tool.codespell]
+skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
+ignore-words-list = """
+circularly,
+nd,
+sav,
+te
+"""
+
+[tool.gilesbot]
+
+[tool.gilesbot.pull_requests]
+enabled = true

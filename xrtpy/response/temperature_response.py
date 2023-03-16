@@ -2,24 +2,24 @@ __all__ = [
     "TemperatureResponseFundamental",
 ]
 
-import pkg_resources
+import numpy as np
 import scipy.io
 import sunpy.time
 
 from astropy import units as u
 from astropy.constants import c, h
-from datetime import datetime
-from scipy import integrate, interpolate
+from pathlib import Path
+from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
-from xrtpy.response.effective_area import effective_area
-from xrtpy.util.time import epoch
+from xrtpy.response.effective_area import EffectiveAreaFundamental
 
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
 
-_CHIANTI_filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/XRT_emiss_model.default_CHIANTI.geny"
+
+_CHIANTI_filename = (
+    Path(__file__).parent.absolute() / "data" / "XRT_emiss_model.default_CHIANTI.geny"
 )
 _CHIANTI_file = scipy.io.readsav(_CHIANTI_filename)
 _XRT_emiss_model_file = _CHIANTI_file["p0"]
@@ -46,7 +46,9 @@ class TemperatureResponseFundamental:
 
     def __init__(self, filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
-        self.observation_date = observation_date
+        self._effective_area_fundamental = EffectiveAreaFundamental(
+            self.name, observation_date
+        )
         self._channel = Channel(self.name)
 
     @property
@@ -56,19 +58,8 @@ class TemperatureResponseFundamental:
 
     @property
     def observation_date(self):
-        """Users date of observation."""
-        return self._observation_date
-
-    @observation_date.setter
-    def observation_date(self, date):
-        """Validating users requested observation date."""
-        astropy_time = sunpy.time.parse_time(date)  # Astropy time in utc
-        observation_date = astropy_time.datetime
-        if observation_date <= epoch:
-            raise ValueError(
-                f"Invalid date: {observation_date}.\n Date must be after September 22nd, 2006 21:36:00."
-            )
-        self._observation_date = observation_date
+        """Date of observation."""
+        return self._effective_area_fundamental.observation_date
 
     @property
     def CHIANTI_version(self):
@@ -151,33 +142,33 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        return effective_area(self.name, self.observation_date)
+        return self._effective_area_fundamental.effective_area()
 
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
-
         wavelength = (self.channel_wavelength).value
         constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
         effective_area = (self.effective_area()).value
-
-        temp_resp_w_u_c = [
-            integrate.simpson(
-                self.spectra()[i] * effective_area * constants * factors,
-                wavelength,
-            )
-            for i in range(61)
-        ]
+        dwvl = wavelength[1:] - wavelength[:-1]
+        dwvl = np.append(dwvl, dwvl[-1])
+        # Simple summing like this is appropriate for binned data like in the current
+        # spectrum file. More recent versions of Chianti include the line width,
+        # which then makes the previous version that uses Simpson's method
+        # to integrate more appropriate (10/05/2022)
+        temp_resp_w_u_c = (
+            self.spectra().value * effective_area * constants * factors * dwvl
+        ).sum(axis=1)
 
         return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
     @property
     @u.quantity_input
-    def ccd_gain_right(self) -> 1 / u.DN:
+    def ccd_gain_right(self) -> u.electron / u.DN:
         """Provide the camera gain in electrons per data number."""
-        return Channel(self.name).ccd.ccd_gain_right / u.DN
+        return Channel(self.name).ccd.ccd_gain_right
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
-        """Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
+        r"""Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
         return self.integration() / self.ccd_gain_right

@@ -15,7 +15,7 @@ to explore properties of the XRT. Visit our Example page for detail example guid
 
 Channel
 -------
-Channel is an instrument configuration class that explores properties of the XRT. Channel offers a detailed review of instruments for a chosen
+|Channel| is an instrument configuration class that explores properties of the XRT. Channel offers a detailed review of instruments for a chosen
 filter channel including the Charge-Coupled Device (CCD), Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
 
 
@@ -33,6 +33,10 @@ The default model assumes coronal abundances :cite:t:`feldman:1992`.
 
 .. note::
    XRTpy has future plans to accept other plasma emission spectra models.
+
+Deriving Temperature and Emission Measure for a Pair of Images
+--------------------------------------------------------------
+XRTpy provides a routine, xrt_teem, that employs the objects listed above to derive the temperature and emission measure in for a given pair of images using the filter ratio method. This uses the same methods as in the SolarSoft IDL routine of the same name.
 
 
 X-Ray Filter Channel
