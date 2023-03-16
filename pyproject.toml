@@ -33,7 +33,7 @@ te
 enabled = true
 
 [tool.towncrier]
-package = "XRTpy"
+package = "xrtpy"
 name = "XRTpy"
 filename = "CHANGELOG.rst"
 directory = "changelog/"
