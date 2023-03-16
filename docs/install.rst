@@ -6,7 +6,6 @@ Installing XRTpy
 
 .. contents:: Contents
    :local:
-   :maxdepth: 2
 
 Installing Python
 =================
