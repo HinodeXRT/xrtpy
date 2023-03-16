@@ -25,7 +25,7 @@ for the analysis of observations made by the `X-Ray Telescope`_ (XRT)
    examples
    bibliography
    glossary
-   changelog
+   changelog/index
    feedback_communication
    contributing/index
 
