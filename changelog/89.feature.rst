@@ -1,1 +1,0 @@
-Derived temperature and emission measure for a pair of images, `xrtpy.response.xrt_teem.xrt_teem`.
