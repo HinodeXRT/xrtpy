@@ -1,1 +1,0 @@
-Fixed time handling in contamination calculations using `astropy.time`.

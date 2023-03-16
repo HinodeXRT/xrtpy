@@ -12,3 +12,4 @@ including bug fixes and changes to the application programming interface
    :maxdepth: 1
 
    dev
+   0.2.0
