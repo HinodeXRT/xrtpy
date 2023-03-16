@@ -5,7 +5,7 @@ XRTpy Changelog guide
 
 New Features
 **************
-* Added xrt_teem - port of SolarSoft routine for deriving the electron temperature and emission measure in an image using the filter ratio method for two images taken with different filters
+* Added `xrtpy.response.xrt_teem.xrt_teem` — a port of the SolarSoft routine for deriving the electron temperature and emission measure in an image using the filter ratio method for two images taken with different filters
 
 Resolved Issues
 ***************
