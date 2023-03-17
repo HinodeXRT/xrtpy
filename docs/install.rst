@@ -36,8 +36,8 @@ terminal and run:
    python -m pip install xrtpy
 
 On some systems, it might be necessary to specify the Python_ version
-number by using ``python3``, ``python3.8``, ``python3.9``, or
-``python3.10`` instead of ``python``.
+number by using ``python3``, ``python3.9``, ``python3.10``, or
+``python3.11`` instead of ``python``.
 
 To install XRTpy on Windows, run:
 

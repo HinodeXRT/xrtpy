@@ -1,10 +1,10 @@
 # these are dependencies required to use the package
 # ought to mirror 'install_requires' under 'options' in setup.cfg
 -r build.txt
-astropy >= 4.3.1
+astropy >= 5.0.1
 cached-property >= 1.5.2
-matplotlib >= 3.3.0
-numpy >= 1.21
+matplotlib >= 3.4.0
+numpy >= 1.22
 packaging
-scipy >= 1.5.0
-sunpy >= 2.0.0
+scipy >= 1.7.0
+sunpy >= 3.0.0
