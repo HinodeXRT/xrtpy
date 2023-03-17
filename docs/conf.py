@@ -176,6 +176,9 @@ hoverxref_role_types = {
     "ref": "tooltip",
     "term": "tooltip",
 }
+# Configure sphinx-issues
+
+issues_github_path = "HinodeXRT/xrtpy"
 
 # Specify patterns to ignore when doing a nitpicky documentation build.
 
