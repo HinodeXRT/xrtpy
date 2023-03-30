@@ -118,13 +118,6 @@ def xrt_fft_2dim_convolution(image1, image2, correlation=False):
     """
     Convolve (or optionally correlate) two images
     """
-    sx = image1.shape
-    sy = image2.shape
-
-    nx1 = sx[0]
-    ny1 = sy[0]
-    nx2 = sx[1]
-    ny2 = sy[1]
     if correlation:
         fftres = ifft2(fft2(image1) * np.conj(fft2(image2)))
     else:
