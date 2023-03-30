@@ -53,10 +53,9 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     psf_path = data_dir / used_psf
 
     if not psf_path.is_file():
-        raise ValueError(f"XRT_DECONVOLVE: Cannot find PSF: {psf_file}")
+        raise ValueError(f"XRT_DECONVOLVE: Cannot find PSF: {psf_path}")
 
     psf_map = Map(psf_path)
-    psf_image = psf_map.data
     psf_meta = psf_map.meta
 
     if verbose:
@@ -106,7 +105,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
 
     if extract_data:
         tmp_deconv = tmp_deconv[xcen - ddx : xcen + ddx, ycen - ddy : ycen + ddy]
-    deconv_data = np.minimum(tmp, 2500.0)
+    deconv_data = np.minimum(tmp_deconv, 2500.0)
 
     date = datetime.now().ctime()
     added_hist = f"{__name__}: ({date}) " + deconvolve_hist
@@ -126,8 +125,6 @@ def xrt_fft_2dim_convolution(image1, image2, correlation=False):
     ny1 = sy[0]
     nx2 = sx[1]
     ny2 = sy[1]
-    n1 = max(nx1, nx2)
-    n2 = max(ny1, ny2)
     if correlation:
         fftres = ifft2(fft2(image1) * np.conj(fft2(image2)))
     else:
