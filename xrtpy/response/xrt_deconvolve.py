@@ -41,8 +41,8 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
 
     """
 
-    # data_dir = Path(__file__).parent.absolute() / "data"
-    data_dir = Path(os.getenv("SSW")) / Path("hinode/xrt/idl/util")
+    # data_dir = Path(os.getenv("SSW")) / Path("hinode/xrt/idl/util")
+    data_dir = Path(__file__).parent.absolute() / "data"
     psf0560 = "XRT20170324_151721.0.PSF560.fits"
     psf1000 = "XRT20170324_161721.0.PSF1000.fits"
 
