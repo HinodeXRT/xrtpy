@@ -53,7 +53,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     psf_path = data_dir / used_psf
 
     if not psf_path.is_file():
-        raise ValueError(f"XRT_DECONVOLVE: Cannot find PSF: {psf_file}")
+        raise ValueError(f"XRT_DECONVOLVE: Cannot find PSF: {psf_path}")
 
     psf_map = Map(psf_path)
     psf_image = psf_map.data
