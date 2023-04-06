@@ -4,7 +4,6 @@ __all__ = [
 
 import numpy as np
 import scipy.io
-import sunpy.time
 
 from astropy import units as u
 from astropy.constants import c, h
@@ -16,6 +15,9 @@ from typing import Dict
 
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.response.effective_area import EffectiveAreaFundamental
+
+# import sunpy.time
+
 
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
