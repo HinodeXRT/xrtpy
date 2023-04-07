@@ -1,8 +1,9 @@
 import glob
-import pytest
 
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
@@ -11,7 +12,7 @@ def get_IDL_data_files():
     path = (
         Path(__file__).parent.parent.absolute()
         / "data"
-        / "temperature_response_IDL_testing_files"
+        / "temperature_response_coronal_IDL_testing_files"
     )
     filter_data_files = list(path.glob("**/*.*"))
     return sorted(filter_data_files)
@@ -78,5 +79,6 @@ def test_temperature_response(filename, allclose):
     actual_temperature_response = instance.temperature_response()
 
     assert allclose(
-        actual_temperature_response.value, IDL_temperature_response, rtol=1e-6
-    )
+        actual_temperature_response.value, IDL_temperature_response, rtol=1e-10
+    )  # rtol=1e-6
+    # allclose
