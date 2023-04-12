@@ -7,12 +7,23 @@ import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
+_abundance_model_IDL_test_file_path = {
+    "coronal": Path(__file__).parent.absolute()
+    / "tests/data"
+    / "temperature_response_coronal_IDL_testing_files",
+    "hybrid": Path(__file__).parent.absolute()
+    / "tests/data"
+    / "temperature_response_hybrid_IDL_testing_files",
+    "photospheric": Path(__file__).parent.absolute()
+    / "tests/data"
+    / "temperature_response_photospheric_IDL_testing_files",
+}
+
 
 def get_IDL_data_files():
     path = (
         Path(__file__).parent.parent.absolute()
-        / "tests"
-        / "data"
+        / "tests/data"
         / "temperature_response_coronal_IDL_testing_files"
     )
     filter_data_files = list(path.glob("**/*.txt"))
@@ -65,6 +76,10 @@ def _IDL_temperature_response_raw_data(filename):
 
     new_IDL_data_list = [IDL_data_list[i][1] for i in range(4, len(IDL_data_list))]
     return [float(i) for i in new_IDL_data_list]
+
+
+# @pytest.mark.parametrize("abundance_model", ["coronal", "hybrid", "photospheric"])
+# def test_abundance_reading_in_stuff(abundance_model)
 
 
 @pytest.mark.parametrize("filename", filenames)
