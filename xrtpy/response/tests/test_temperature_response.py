@@ -26,6 +26,7 @@ def get_IDL_data_files():
         / "tests/data"
         / "temperature_response_coronal_IDL_testing_files"
     )
+
     filter_data_files = list(path.glob("**/*.txt"))
     return sorted(filter_data_files)
 
@@ -79,7 +80,19 @@ def _IDL_temperature_response_raw_data(filename):
 
 
 # @pytest.mark.parametrize("abundance_model", ["coronal", "hybrid", "photospheric"])
-# def test_abundance_reading_in_stuff(abundance_model)
+# def test_abundance_reading_in_stuff(abundance_model): #allclose
+
+# IDL_data = _IDL_raw_data_list(abundance_model)
+
+# filter_name = IDL_test_filter_name(IDL_data)
+# filter_obs_date = IDL_test_date(IDL_data)
+
+# IDL_temperature_response = _IDL_temperature_response_raw_data(filename)
+
+# instance = TemperatureResponseFundamental( filter_name, filter_obs_date, abundance_model="coronal")
+# actual_temperature_response = instance.temperature_response()
+
+# assert allclose(actual_temperature_response.value, IDL_temperature_response, rtol=1e-6)
 
 
 @pytest.mark.parametrize("filename", filenames)
