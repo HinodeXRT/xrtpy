@@ -20,6 +20,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 def xrt_teem(
     map1,
     map2,
+    abundance_model="coronal",
     binfac=1,
     Trange=None,
     no_threshold=False,
@@ -194,11 +195,11 @@ def xrt_teem(
 
     filt1 = measurement_to_filtername(map1.measurement)
     date_obs1 = hdr1["DATE_OBS"]
-    tresp1 = TemperatureResponseFundamental(filt1, date_obs1)
+    tresp1 = TemperatureResponseFundamental(filt1, date_obs1, abundance_model)
 
     filt2 = measurement_to_filtername(map2.measurement)
     date_obs2 = hdr2["DATE_OBS"]
-    tresp2 = TemperatureResponseFundamental(filt2, date_obs2)
+    tresp2 = TemperatureResponseFundamental(filt2, date_obs2, abundance_model)
 
     if filt1 == filt2:
         raise ValueError("Filters for the two images cannot be the same")
