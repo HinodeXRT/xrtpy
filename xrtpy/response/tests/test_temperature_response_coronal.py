@@ -15,7 +15,7 @@ def get_IDL_data_files():
         / "data"
         / "temperature_response_coronal_IDL_testing_files"
     )
-    filter_data_files = list(path.glob("**/*.*"))
+    filter_data_files = list(path.glob("**/*.txt"))
     return sorted(filter_data_files)
 
 
