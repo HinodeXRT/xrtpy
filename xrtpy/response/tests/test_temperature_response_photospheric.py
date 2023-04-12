@@ -9,20 +9,6 @@ import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
-"""
-_abundance_model_file_path = {
-    "coronal": Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "XRT_emiss_model.default_CHIANTI.geny",
-    "hybrid": Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "XRT_emiss_model.default_CHIANTI_photospheric.geny",
-    "photospheric": Path(__file__).parent.absolute()
-    / "data/chianti_emission_models"
-    / "XRT_emiss_model.default_CHIANTI_hybrid.geny",
-}
-"""
-
 
 def get_IDL_data_files():
     path = (
@@ -86,10 +72,6 @@ def _IDL_temperature_response_raw_data(filename):
 
     new_IDL_data_list = [IDL_data_list[i][1] for i in range(5, len(IDL_data_list))]
     return [float(i) for i in new_IDL_data_list]
-
-
-# @pytest.mark.parametrize("abundance_model", ["coronal", "hybrid", "photospheric"])
-# def test_abundance_reading_in_stuff(abundance_model)
 
 
 @pytest.mark.parametrize("filename", filenames)
