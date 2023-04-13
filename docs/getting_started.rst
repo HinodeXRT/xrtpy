@@ -49,10 +49,11 @@ i.e. `"hybrid"` or `"photospheric"` in `abundance_model`. For example:
 
    xrtpy.response.TemperatureResponseFundamental('Al-poly', '2022/07/04T23:43:12', abundance_model = 'Hybrid')
 
+The `abundance_model` method is used in the same format in `xrt_teem`.
 
 Deriving Temperature and Emission Measure for a Pair of Images
 --------------------------------------------------------------
-XRTpy provides a routine, xrt_teem, that employs the objects listed above to derive the temperature and emission measure in for a given pair of images using the filter ratio method. This uses the same methods as in the SolarSoft IDL routine of the same name.
+XRTpy provides a routine, `xrt_teem`, that employs the objects listed above to derive the temperature and emission measure in for a given pair of images using the filter ratio method. This uses the same methods as in the SolarSoft IDL routine of the same name.
 
 
 X-Ray Filter Channel
