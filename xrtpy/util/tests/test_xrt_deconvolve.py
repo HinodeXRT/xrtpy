@@ -5,25 +5,21 @@ import pytest
 from pathlib import Path
 from sunpy.map import Map
 
-from xrtpy.response.xrt_deconvolve import xrt_deconvolve
+from xrtpy.util.xrt_deconvolve import xrt_deconvolve
 
 test_file = "L1_XRT20120605_215839.9.fits"
 idl_result_file = "L1_XRT20120605_215839.9.deconv.fits"
 
 
 def get_observed_data():
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/xrt_deconvolve_testing_files"
-    )
+    directory = pkg_resources.resource_filename("xrtpy", "util/tests/data")
     data_file = Path(directory) / test_file
 
     return data_file
 
 
 def get_IDL_results_data():
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/xrt_deconvolve_testing_files"
-    )
+    directory = pkg_resources.resource_filename("xrtpy", "util/tests/data")
     results_file = Path(directory) / idl_result_file
 
     return results_file
