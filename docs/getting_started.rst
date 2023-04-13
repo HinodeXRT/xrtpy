@@ -31,7 +31,7 @@ XRTpy produces the temperature response for each XRT filter channel, assuming a 
 The XRT default emission model is `CHIANTI`_ atomic database version 10.0 with coronal abundances :cite:t:`feldman:1992`. This structure contains data and information about a plasma emission model, as a function of wavelength and temperature.
 
 
-Additional Abundances
+Abundance Model
 ---------------------
 The standard XRT temperature response routines are calculated assuming `CHIANTI`_ coronal abundances, :cite:t:`feldman:1992`.
 In addition, XRTpy offers the ability to choose two additional `CHIANTI`_ abundances i.e. Hybrid and Photospheric.
@@ -42,7 +42,7 @@ Visit `XRT temperature response with other choice of abundances`_ for future det
 .. note::
     XRTpy has future plans to accept other plasma emission spectra models.
 
-XRTpy defaults to using CHIANTI coronal abundance. You are able to specify the other abundances by defining the abundance type name
+XRTpy defaults to using CHIANTI `"coronal"` abundance. You are able to specify the other abundances by defining the abundance type name
 i.e. `"hybrid"` or `"photospheric"` in `abundance_model`. For example:
 
 .. code-block:: bash
