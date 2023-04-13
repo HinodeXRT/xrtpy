@@ -7,17 +7,11 @@ import scipy.io
 
 from astropy import units as u
 from astropy.constants import c, h
-from datetime import datetime
-from numbers import Real
 from pathlib import Path
-from scipy import integrate, interpolate
-from typing import Dict
+from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.response.effective_area import EffectiveAreaFundamental
-
-# import sunpy.time
-
 
 _c_Å_per_s = c.to(u.angstrom / u.second).value
 _h_eV_s = h.to(u.eV * u.s).value
@@ -57,7 +51,7 @@ def _resolve_abundance_model_type(abundance_model):
     abundance_name = abundance_model.lower()
     if abundance_name not in list_of_abundance_name:
         raise ValueError(
-            f"\n{abundance_name} is not a current model for XRTpy.\n"
+            f"\n{abundance_name} is not a current abundance model for XRTpy.\n"
             "Available abundance models:\n"
             "'coronal', 'hybrid', and 'photospheric'.\n"
         )
