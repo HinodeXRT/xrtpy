@@ -6,5 +6,6 @@ cached-property >= 1.5.2
 matplotlib >= 3.3.0
 numpy >= 1.20.0
 packaging
+scikit-image >= 0.18.0
 scipy >= 1.5.0
 sunpy >= 2.0.0
