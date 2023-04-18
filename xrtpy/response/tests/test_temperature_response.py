@@ -8,25 +8,26 @@ import pytest
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 _abundance_model_IDL_test_file_path = {
-    "coronal": Path(__file__).parent.absolute()
-    / "tests/data"
-    / "temperature_response_coronal_IDL_testing_files",
-    "hybrid": Path(__file__).parent.absolute()
-    / "tests/data"
-    / "temperature_response_hybrid_IDL_testing_files",
-    "photospheric": Path(__file__).parent.absolute()
-    / "tests/data"
-    / "temperature_response_photospheric_IDL_testing_files",
+    "coronal": (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_response_coronal_IDL_testing_files"
+    ),
+    "hybrid": (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_response_hybrid_IDL_testing_files"
+    ),
+    "photospheric": (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_response_photospheric_IDL_testing_files"
+    ),
 }
 
 
 def get_IDL_data_files():
-    path = (
-        Path(__file__).parent.parent.absolute()
-        / "tests/data"
-        / "temperature_response_coronal_IDL_testing_files"
-    )
-
+    path = _abundance_model_IDL_test_file_path["coronal"]
     filter_data_files = list(path.glob("**/*.txt"))
     return sorted(filter_data_files)
 
