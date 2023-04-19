@@ -6,6 +6,18 @@ requires = [
   "wheel>=0.34",
 ]  # ought to mirror 'requirements/build.txt'
 
+[tool.isort]
+line_length = 88
+wrap_length = 80
+sections = ["FUTURE", "STDLIB", "FIRSTPARTY", "LOCALFOLDER"]
+known_first_party = ["xrtpy"]
+default_section = "STDLIB"
+multi_line_output = 3
+use_parentheses = true
+include_trailing_comma = true
+force_alphabetical_sort_within_sections = true
+lines_between_types = 1
+
 [tool.codespell]
 skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
 ignore-words-list = """
@@ -20,14 +32,41 @@ te
 [tool.gilesbot.pull_requests]
 enabled = true
 
-[tool.isort]
-line_length = 88
-wrap_length = 80
-sections = ["FUTURE", "STDLIB", "FIRSTPARTY", "LOCALFOLDER"]
-known_first_party = ["xrtpy"]
-default_section = "STDLIB"
-multi_line_output = 3
-use_parentheses = true
-include_trailing_comma = true
-force_alphabetical_sort_within_sections = true
-lines_between_types = 1
+[tool.towncrier]
+package = "xrtpy"
+name = "XRTpy"
+filename = "CHANGELOG.rst"
+directory = "changelog/"
+title_format = "{name} v{version} ({project_date})"
+issue_format = ":pr:`{issue}`"  # Despite the name mismatch, we use this for linking to PRs
+wrap = true
+
+[[tool.towncrier.type]]
+directory = "breaking"
+name = "Backwards Incompatible Changes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removal"
+name = "Deprecations and Removals"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "Features"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "bugfix"
+name = "Bug Fixes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "doc"
+name = "Improved Documentation"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "trivial"
+name = "Trivial/Internal Changes"
+showcontent = true

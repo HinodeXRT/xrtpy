@@ -706,12 +706,12 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
     Tmap = Map(T_e, Thdr)
     Tmap.nickname = "Log Derived Temperature (K)"
     EMhdr = new_hdr.copy()
-    EMhdr["BUNIT"] = r"log10(cm$^{-3}$)"
+    EMhdr["BUNIT"] = r"log10(cm$^{{-3}}$)"
     EMhdr["history"] = (
         new_hdr["history"] + "Volume emission measure derived using filter ratio method"
     )
     EMmap = Map(EM, EMhdr)
-    EMmap.nickname = r"Log Derived Volume E.M. (cm$^{-3}$)"
+    EMmap.nickname = r"Log Derived Volume E.M. (cm$^{{-3}}$)"
     Terrhdr = new_hdr.copy()
     Terrhdr["BUNIT"] = "log10(K)"
     Terrhdr["history"] = (
@@ -720,13 +720,13 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
     Terrmap = Map(T_error, Terrhdr)
     Terrmap.nickname = "Log Derived Temperature Errors (K)"
     EMerrhdr = new_hdr.copy()
-    EMerrhdr["BUNIT"] = r"log10(cm$^{-3}$)"
+    EMerrhdr["BUNIT"] = r"log10(cm$^{{-3}}$)"
     EMerrhdr["history"] = (
         new_hdr["history"]
         + "Volume emission measure uncertainty derived using filter ratio method"
     )
     EMerrmap = Map(EMerror, EMerrhdr)
-    EMerrmap.nickname = r"Log Derived V.E.M. Errors (cm$^{-3}$)"
+    EMerrmap.nickname = r"Log Derived V.E.M. Errors (cm$^{{-3}}$)"
     return Tmap, EMmap, Terrmap, EMerrmap
 
 
