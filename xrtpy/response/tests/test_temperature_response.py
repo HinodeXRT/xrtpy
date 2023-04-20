@@ -80,32 +80,6 @@ def _IDL_temperature_response_raw_data(filename):
     return [float(i) for i in new_IDL_data_list]
 
 
-@pytest.mark.parametrize("abundance_model", ["coronal", "hybrid", "photospheric"])
-def test_abundance_reading_in_stuff(abundance_model):  # allclose
-    abundance_model_type = abundance_model
-    import pdb
-
-    pdb.set_trace()
-
-    IDL_temperature_response = _IDL_temperature_response_raw_data(filename)
-
-    IDL_data = _IDL_raw_data_list(filename)
-    filter_name = IDL_test_filter_name(IDL_data)
-    filter_obs_date = IDL_test_date(IDL_data)
-
-    # abundance_mode = str()
-
-    instance = TemperatureResponseFundamental(
-        filter_name, filter_obs_date, abundance_model="coronal"
-    )
-
-    actual_temperature_response = instance.temperature_response()
-
-    assert allclose(
-        actual_temperature_response.value, IDL_temperature_response, rtol=1e-6
-    )
-
-
 @pytest.mark.parametrize("filename", filenames)
 def test_temperature_response(filename, allclose):
     IDL_data = _IDL_raw_data_list(filename)
