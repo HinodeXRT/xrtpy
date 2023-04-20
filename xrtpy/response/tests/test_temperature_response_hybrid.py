@@ -1,11 +1,10 @@
 import glob
 import numpy as np
 import os
+import pytest
 
 from datetime import datetime
 from pathlib import Path
-
-import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
