@@ -57,8 +57,8 @@ def xrt_teem(
     abundance_model : string, optional
         Chianti abundance model for the spectrum assumed when deriving the
         plasma temperatures and emission measures. The default is coronal
-        abundances. Other currently available choices are ``"photospheric"'' and
-        ''"hybrid"''.
+        abundances. Other currently available choices are ``"photospheric"`` and
+        ``"hybrid"``.
 
     binfac : integer, optional (default = 1)
         spatial binning factor
