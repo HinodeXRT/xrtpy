@@ -1,5 +1,4 @@
 import numpy as np
-import pkg_resources
 import pytest
 import sunpy.map
 
@@ -11,18 +10,14 @@ from xrtpy.response.xrt_teem import xrt_teem
 
 
 def get_observed_data():
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/xrt_teem_testing_files"
-    )
+    directory = Path(__file__).parent.absolute() / "data" / "xrt_teem_testing_files"
     data_files = sorted(Path(directory).glob("L1_XRT20110128_*.*.fits"))
 
     return data_files
 
 
 def get_IDL_results_data():
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/xrt_teem_testing_files"
-    )
+    directory = Path(__file__).parent.absolute() / "data" / "xrt_teem_testing_files"
     results_files = sorted(Path(directory).glob("IDL_results_*.sav"))
 
     return results_files
@@ -64,6 +59,11 @@ def test_standard_case():
     map2 = sunpy.map.Map(file2)
 
     T_e, EM, Terr, EMerr = xrt_teem(map1, map2)
+    T_EM = xrt_teem(map1, map2)
+    T_e = T_EM.Tmap
+    Terr = T_EM.Terrmap
+    EM = T_EM.EMmap
+    EMerr = T_EM.EMerrmap
 
     testdata = get_IDL_results_data()
 
@@ -107,7 +107,11 @@ def test_binning_case():
     map1 = sunpy.map.Map(file1)
     map2 = sunpy.map.Map(file2)
 
-    T_e, EM, Terr, EMerr = xrt_teem(map1, map2, binfac=2)
+    T_EM = xrt_teem(map1, map2, binfac=2)
+    T_e = T_EM.Tmap
+    Terr = T_EM.Terrmap
+    EM = T_EM.EMmap
+    EMerr = T_EM.EMerrmap
 
     testdata = get_IDL_results_data()
 

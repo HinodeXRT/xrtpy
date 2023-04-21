@@ -9,12 +9,15 @@ import sys
 
 from astropy import units as u
 from astropy.constants import c, h
+from collections import namedtuple
 from datetime import datetime
 from sunpy.coordinates.sun import angular_radius, B0
 from sunpy.image.resample import reshape_image_to_4d_superpixel
 from sunpy.map import Map
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
+
+TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")
 
 
 def xrt_teem(
@@ -270,7 +273,7 @@ def xrt_teem(
     Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
         hdr1, hdr2, T_e, EM, T_error, EMerror, mask
     )
-    return Tmap, EMmap, Terrmap, EMerrmap
+    return TempEMdata(Tmap, EMmap, Terrmap, EMerrmap)
 
 
 def rebin_image(data, binfac=1):
