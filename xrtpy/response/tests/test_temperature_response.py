@@ -1,8 +1,9 @@
 import glob
-import pytest
 
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
@@ -30,6 +31,14 @@ def get_IDL_data_files():
     filter_data_files = list(path.glob("**/*.txt"))
     return sorted(filter_data_files)
 
+
+"""
+def get_IDL_data_abundance_files():
+
+    path = _abundance_model_IDL_test_file_path["coronal"]
+    filter_data_files = list(path.glob("**/*.txt"))
+    return sorted(filter_data_files)
+"""
 
 filenames = get_IDL_data_files()
 
@@ -75,8 +84,37 @@ def _IDL_temperature_response_raw_data(filename):
             line_list = stripped_line.split()
             IDL_data_list.append(line_list)
 
-    new_IDL_data_list = [IDL_data_list[i][1] for i in range(4, len(IDL_data_list))]
+    new_IDL_data_list = [
+        IDL_data_list[i][1] for i in range(4, len(IDL_data_list))
+    ]  # update line 4 to 5 for new data
     return [float(i) for i in new_IDL_data_list]
+
+
+"""
+@pytest.mark.parametrize("abundance_model", ["coronal", "hybrid", "photospheric"])
+def test_abundance_temperature_response(abundance_model,allclose):
+    abundance_model_type = abundance_model
+    #import pdb
+    #pdb.set_trace()
+
+    IDL_temperature_response = _IDL_temperature_response_raw_data(filename)
+
+    IDL_data = _IDL_raw_data_list(filename)
+    filter_name = IDL_test_filter_name(IDL_data)
+    filter_obs_date = IDL_test_date(IDL_data)
+
+    # abundance_mode = str()
+
+    instance = TemperatureResponseFundamental(
+        filter_name, filter_obs_date, abundance_model="coronal"
+    )
+
+    actual_temperature_response = instance.temperature_response()
+
+    assert allclose(
+        actual_temperature_response.value, IDL_temperature_response, rtol=1e-6
+    )
+"""
 
 
 @pytest.mark.parametrize("filename", filenames)
