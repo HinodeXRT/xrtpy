@@ -9,12 +9,15 @@ import sys
 
 from astropy import units as u
 from astropy.constants import c, h
+from collections import namedtuple
 from datetime import datetime
 from sunpy.coordinates.sun import angular_radius, B0
 from sunpy.image.resample import reshape_image_to_4d_superpixel
 from sunpy.map import Map
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
+
+TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")
 
 
 def xrt_teem(
@@ -89,30 +92,25 @@ def xrt_teem(
 
     Returns:
     --------
-    T_e : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for log10 of the derived electron temperature [K].
-
-    EM : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for log10 of the derived volume emission measure [cm^-3].
-
-    T_error : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for uncertainty in log10 temperature [K].
-
-    EM_error : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for uncertainty in log10 volume emission measure [cm^-3].
+    TempEMdata : namedtuple of ~sunpy.map.sources.hinode.XRTMap objects
+        namedtuple containing the attributes Tmap, EMmap, Terrmap and EMerrmap
+        where the maps correspond to images and metadata with:
+        log10 of the derived electron temperature [K], log10 of the derived
+        volume emission measure [cm^-3], uncertainty in log10 temperature [K],
+        and uncertainty in log10 volume emission measure [cm^-3].
 
     Examples:
     ---------
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
-    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2) # doctest: +SKIP
+    >>> T_EM = xrt_teem(map1, map2) # doctest: +SKIP
 
     If you want to bin the image data in space to reduce photon noise, set
     binfac to the factor by which you want to bin.  For example to bin the
     data by a factor of 3 do:
 
-    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
+    >>> T_EM = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
 
     The data is binned first and then the temperature is derived. Note that
     the image size is reduced by the factor binfac in each dimension, which
@@ -270,7 +268,7 @@ def xrt_teem(
     Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
         hdr1, hdr2, T_e, EM, T_error, EMerror, mask
     )
-    return Tmap, EMmap, Terrmap, EMerrmap
+    return TempEMdata(Tmap, EMmap, Terrmap, EMerrmap)
 
 
 def rebin_image(data, binfac=1):
