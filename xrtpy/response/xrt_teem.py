@@ -92,30 +92,25 @@ def xrt_teem(
 
     Returns:
     --------
-    T_e : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for log10 of the derived electron temperature [K].
-
-    EM : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for log10 of the derived volume emission measure [cm^-3].
-
-    T_error : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for uncertainty in log10 temperature [K].
-
-    EM_error : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for uncertainty in log10 volume emission measure [cm^-3].
+    TempEMdata : namedtuple of ~sunpy.map.sources.hinode.XRTMap objects
+        namedtuple containing the attributes Tmap, EMmap, Terrmap and EMerrmap
+        where the maps correspond to images and metadata with:
+        log10 of the derived electron temperature [K], log10 of the derived
+        volume emission measure [cm^-3], uncertainty in log10 temperature [K],
+        and uncertainty in log10 volume emission measure [cm^-3].
 
     Examples:
     ---------
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
-    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2) # doctest: +SKIP
+    >>> T_EM = xrt_teem(map1, map2) # doctest: +SKIP
 
     If you want to bin the image data in space to reduce photon noise, set
     binfac to the factor by which you want to bin.  For example to bin the
     data by a factor of 3 do:
 
-    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
+    >>> T_EM = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
 
     The data is binned first and then the temperature is derived. Note that
     the image size is reduced by the factor binfac in each dimension, which
