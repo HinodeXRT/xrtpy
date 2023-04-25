@@ -1,4 +1,5 @@
 Temperature Response: IDL Results
+Abundance_model coronal
 Filter Ti-poly
 observation_date 22-Sept-2013 22:45:45
 Temperature Temperature Response
