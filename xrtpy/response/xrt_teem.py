@@ -271,39 +271,6 @@ def xrt_teem(
     return TempEMdata(Tmap, EMmap, Terrmap, EMerrmap)
 
 
-def rebin_image(data, binfac=1):
-    """
-    Given a data array and a binning factor return the data array rebinned by
-    the binning factor. Note: the size of the original data array is
-    preserved, despite the adding up of adjacent pixels. Thus the sum of all
-    the pixels will be increased by the factor binfac.
-    """
-
-    s = data.shape
-    ns = (s[0] // binfac, s[1] // binfac)
-    rbs = (ns[0], binfac, ns[1], binfac)
-    # sums the data in binfac x binfac sized regions
-    drbin = data.reshape(rbs).sum(-1).sum(1)
-    # for a boolean mask, this makes a pixel masked if any of the summed
-    # pixels is masked. If we want to mask only if all the pixels are masked
-    # then we could use prod in place of sum above
-
-    if data.dtype == bool:
-        # need to convert back to bool after summing
-        drbin = drbin.astype(bool)
-    # This restores the image to the size of the original images as in the
-    # IDL code:
-    if data.dtype == bool:
-        dtmp = np.zeros_like(data, dtype=bool)
-    else:
-        dtmp = np.zeros_like(data)
-    for i in range(binfac):
-        for j in range(binfac):
-            dtmp[i::binfac, j::binfac] = drbin[:]
-    data = dtmp
-    return data
-
-
 def deriv(x, y):
     """
     Use three-point Lagrangian interpolation to compute the first derivative
