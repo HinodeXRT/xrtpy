@@ -1,3 +1,8 @@
+"""
+Functionality for removing the visible light leak from XRT composite image data.
+"""
+__all__ = ["xrt_remove_lightleak"]
+
 import numpy as np
 
 from datetime import datetime
@@ -35,58 +40,57 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         |Map| of input image with the light leak removed. The metadata HISTORY
         is also updated to reflect the fact that the light leak was removed.
 
-    >>> file = 'comp_XRT20200220_061539.6.fits'  # sample Al_mesh image
-    >>> in_map = Map(file)
-    >>> out_map =xrt_remove_lightleak(in_map)
+    Example:
+    --------
+    >>> file = 'comp_XRT20200220_061539.6.fits' # doctest: +SKIP
+    >>> in_map = Map(file) # doctest: +SKIP
+    >>> out_map =xrt_remove_lightleak(in_map) # doctest: +SKIP
 
-    NOTES: (from IDL routine)
+    Notes:
+    ------
+    (Taken from the IDL routine xrt_synleaksub.pro)
+    1) XRT images obtained after 9-May-2021 suffer visible stray light
+    contamination (light leak) due to the pre-filter failure, i.e.  tiny
+    rupture development occurred multiple times as follows:
+        phase 1 :  9-May-2012 12:00
+        phase 2 : 14-Jun-2015 12:30
+        phase 3 : 27-May-2017 11:00
+        phase 4 : 29-May-2018 00:00
+        phase 5 :  8-Jun-2022 12:40
 
-      1) XRT images obtained after 9-May-2021 suffer visible stray light
-         contamination (light leak) due to the pre-filter failure, i.e.
-         tiny rupture development occurred multiple times as follows.
-            phase 1 :  9-May-2012 12:00
-            phase 2 : 14-Jun-2015 12:30
-            phase 3 : 27-May-2017 11:00
-            phase 4 : 29-May-2018 00:00
-            phase 5 :  8-Jun-2022 12:40
+    2) The light leak correction is done by simply subtracting the light leak
+    image (visible stray light component included in each X-ray filter pair)
+    obtained during the Hinode satellite's eclipse season, which occurs
+    roughly May to August each year.  The light leak image has the following
+    characteristics:
+    - Leak pattern and intensity differ with each filter and also with the
+      satellite pointing.
+    - Leak pattern and intensity of the same filter and pointing are roughly
+      constant during each stray light phase (above), but vary by ~10%
+      depending on the growth of the contamination layer on the CCD (that
+      repeats gradual increase and jump down after CCD bakeouts).
 
-      2) The light leak correction is done by simply subtracting the
-         light leak image (visible stray light component included in
-         each X-ray filter pair) obtained during the Hinode satellite's
-         eclipse season, which occurs roughly May to August each year.
-         The light leak image has the following characteristics:
-       - Leak pattern and intensity differ with each filter and also
-         with the satellite pointing.
-       - Leak pattern and intensity of the same filter and pointing
-         are roughly constant during each stray light phase (above),
-         but vary by ~10% depending on the growth of the contamination
-         layer on the CCD (that repeats gradual increase and jump down
-         after CCD bakeouts).
+    3) The image for the light leak correction should therefore be selected
+    for the same filter, same satellite pointing, same stray light phase then
+    ideally be adjusted for the level of CCD contamination at the time of
+    observation.  However, as a practical matter, preparing the leak image for
+    every possible pointing is hard to achieve, while we have good amount of
+    light leak measurements at the disk center pointing. The full-disk
+    composite images are therefore corrected most reliably for the light leak.
 
-      3) The image for the light leak correction should therefore be
-         selected for the same filter, same satellite pointing, same
-         stray light phase then ideally be adjusted for the level of
-         CCD contamination at the time of observation.
-         However, as a practical matter, preparing the leak image
-         for every possible pointing is hard to achieve, while we
-         have good amount of light leak measurements at the disk
-         center pointing. The full-disk composite images are therefore
-         corrected most reliably for the light leak.
-
-      4) Intensity variation of the leak image due to the growth of CCD
-         contamination layer is well determined for Ti_poly at the
-         stray light phase 1 by using the intensity correlation between
-         Ti_poly and Al_mesh images (cg. Takeda et al. 2016, SolPhys.
-         291, p.317). The resulting k-factor is obtained with the
-         function GET_SLCORFACT_RAW.PRO, and the leak image subtraction
-         has been already performed only for the Ti_poly SCIA images at
-         the phase 1 (as of Feb-2022).
+    4) Intensity variation of the leak image due to the growth of CCD
+    contamination layer is well determined for Ti_poly at the stray light
+    phase 1 by using the intensity correlation between Ti_poly and Al_mesh
+    images (cg. Takeda et al. 2016, SolPhys.  291, p.317). The resulting
+    k-factor is obtained with the function GET_SLCORFACT_RAW.PRO, and the leak
+    image subtraction has been already performed only for the Ti_poly SCIA
+    images at the phase 1 (as of Feb-2022).
 
     """
 
     # ********* select leak image from the archive *********
     if leak_image is None:
-        dir_leak = Path("/proj/DataCenter/ssw/hinode/xrt/idl/util/leak_fits/")
+        dir_leak = Path(__file__).parent.absolute() / "data" / "leak_fits"
         filt1 = in_map.meta["EC_FW1"]
         filt2 = in_map.meta["EC_FW2"]
         fpair = str(filt1) + str(filt2)
