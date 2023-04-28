@@ -196,6 +196,7 @@ def check_sl_phase(date_obs):
     phase 4 : 29-May-2018 00:00
     phase 5 :  8-Jun-2022 12:40
     """
+
     time_p1 = datetime.strptime("09-May-2012 12:00", "%d-%b-%Y %H:%M")
     time_p2 = datetime.strptime("14-Jun-2015 12:30", "%d-%b-%Y %H:%M")
     time_p3 = datetime.strptime("27-May-2017 11:00", "%d-%b-%Y %H:%M")
@@ -220,6 +221,8 @@ def check_sl_phase(date_obs):
 
 
 def my_rebin(image, newdims):
+    """Rebin an array to a new shape"""
+
     newimage = np.zeros(newdims)
     origdims = image.shape
     ifac = newdims[0] // origdims[0]
@@ -251,6 +254,7 @@ def rebin(image, newshape):
     newimage : 2D numpy array
         rebinned image
     """
+
     assert len(image.shape) == len(newshape)
 
     slices = [
