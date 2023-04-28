@@ -11,7 +11,7 @@ from sunpy.map import Map
 
 
 def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
-    """
+    r"""
     Subtract light leak (visible stray light) image from XRT synoptic
     composite images.
 
@@ -42,7 +42,7 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
 
     Example:
     --------
-    >>> file = 'comp_XRT20200220_061539.6.fits' # doctest: +SKIP
+    >>> file = ``"comp_XRT20200220_061539.6.fits"`` # doctest: +SKIP
     >>> in_map = Map(file) # doctest: +SKIP
     >>> out_map =xrt_remove_lightleak(in_map) # doctest: +SKIP
 
