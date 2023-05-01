@@ -841,7 +841,7 @@ def test_CCD_wavelength(channel_name):
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
-def test_channel_name(channel_name):
+def test_channel_name2(channel_name):
     channel_filter = Channel(channel_name)
     name = channel_filter.name
 

@@ -32,6 +32,15 @@ te
 [tool.gilesbot.pull_requests]
 enabled = true
 
+[tool.ruff]
+target-version = "py39"
+extend-select = [
+  "UP",
+]
+ignore = [
+  "E501",
+]
+
 [tool.towncrier]
 package = "xrtpy"
 name = "XRTpy"
