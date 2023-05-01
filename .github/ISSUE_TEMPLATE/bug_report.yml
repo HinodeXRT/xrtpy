@@ -1,5 +1,5 @@
 name: 🐛 Bug Report
-description: Report a problem that you encountered when using PlasmaPy
+description: Report a problem that you encountered when using XRTpy
 labels: [Bug]
 body:
 
@@ -38,14 +38,6 @@ body:
     render: Python
   validations:
     required: false
-
-- type: textarea
-  id: package-versions
-  attributes:
-    label: Package versions
-    description: >
-      What version of PlasmaPy (`plasmapy.__version__`) were you using
-      when the problem occurred? (optional)
 
 - type: textarea
   id: context
