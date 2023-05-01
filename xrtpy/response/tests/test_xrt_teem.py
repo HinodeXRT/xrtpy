@@ -1,8 +1,6 @@
 import numpy as np
-import pytest
 import sunpy.map
 
-from astropy.io import fits
 from pathlib import Path
 from scipy.io import readsav
 
@@ -128,8 +126,8 @@ def test_binning_case():
     goodT = (T_e.data > 0.0) & (idlTe > 0.0)
     goodE = (EM.data > 0.0) & (idlEM > 0.0)
 
-    delta = 10.0 ** T_e.data[goodT] - 10.0 ** idlTe[goodT]
-    x = 10.0 ** idlTe[goodT]
+    10.0 ** T_e.data[goodT] - 10.0 ** idlTe[goodT]
+    10.0 ** idlTe[goodT]
 
     assert np.allclose(
         10.0 ** T_e.data[goodT], 10.0 ** idlTe[goodT], atol=2.0e5, rtol=0.02
