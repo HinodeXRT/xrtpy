@@ -1,6 +1,5 @@
 import numpy as np
 import pkg_resources
-import pytest
 
 from pathlib import Path
 from sunpy.map import Map

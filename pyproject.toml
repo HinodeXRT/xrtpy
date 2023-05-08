@@ -32,6 +32,31 @@ te
 [tool.gilesbot.pull_requests]
 enabled = true
 
+[tool.ruff]
+target-version = "py39"
+show-fixes = true
+extend-select = [
+  "UP", # pyupgrade
+]
+ignore = [
+  "E501",
+]
+extend-exclude = [
+  ".jupyter",
+  "__pycache__",
+  "_build",
+  "_dev",
+]
+
+[tool.ruff.flake8-import-conventions.aliases]
+"astropy.units" = "u"
+"matplotlib.pyplot" = "plt"
+numpy = "np"
+pandas = "pd"
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["E402", "F401", "F402", "F403"]  # ignore import errors
+
 [tool.towncrier]
 package = "xrtpy"
 name = "XRTpy"

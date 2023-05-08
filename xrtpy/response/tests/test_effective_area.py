@@ -1,4 +1,3 @@
-import glob
 import pytest
 
 from astropy import units as u

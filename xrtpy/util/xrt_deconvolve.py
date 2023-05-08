@@ -4,9 +4,7 @@ Functionality for deconvolving XRT image data with the point spread function.
 __all__ = ["xrt_deconvolve"]
 
 import numpy as np
-import os
 
-from astropy.io import fits
 from datetime import datetime
 from numpy.fft import fft2, fftshift, ifft2
 from pathlib import Path

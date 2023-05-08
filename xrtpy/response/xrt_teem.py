@@ -5,7 +5,6 @@ ratio technique.
 __all__ = ["xrt_teem"]
 
 import numpy as np
-import sys
 
 from astropy import units as u
 from astropy.constants import c, h
