@@ -13,7 +13,7 @@ from sphinx.application import Sphinx
 
 project = "xrtpy"
 author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
-copyright = f"2021–{datetime.utcnow().year}, {author}"
+copyright = f"2021–{datetime.utcnow().year}, {author}"  # noqa: A001
 
 # The full version, including alpha/beta/rc tags
 # from xrtpy import __version__
@@ -205,11 +205,11 @@ nitpick_ignore_regex = [
 # be used globally.
 rst_epilog = ""
 for epilog_file in ["_links.rst", "_substitutions.rst"]:
-    with open(epilog_file) as file:
+    with open(epilog_file) as file:  # noqa: PTH123
         rst_epilog += file.read()
 
 
 def setup(app: Sphinx) -> None:
-    app.add_config_value("revision", "", True)
+    app.add_config_value("revision", "", rebuild=True)
     app.add_css_file("css/admonition_color_contrast.css")
     app.add_css_file("css/plasmapy.css", priority=600)

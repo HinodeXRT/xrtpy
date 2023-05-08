@@ -18,8 +18,8 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     Use the XRT mirror model point spread function (PSF) to deconvolve an XRT
     image
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     image_map : ~sunpy.map.sources.hinode.XRTMap
         |Map| for the input XRT image
 
@@ -32,8 +32,8 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     psf1keV : boolean, optional
         if True, use the 1.0 keV PSF instead of the default 560 eV PSF.
 
-    Returns:
-    --------
+    Returns
+    -------
     deconv_map : ~sunpy.map.sources.hinode.XRTMap
         |Map| for the output deconvolved image
 
@@ -44,10 +44,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     psf0560 = "XRT20170324_151721.0.PSF560.fits"
     psf1000 = "XRT20170324_161721.0.PSF1000.fits"
 
-    if psf1keV:
-        used_psf = psf1000
-    else:
-        used_psf = psf0560
+    used_psf = psf1000 if psf1keV else psf0560
     psf_path = data_dir / used_psf
 
     if not psf_path.is_file():
@@ -90,7 +87,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     ):
         extract_data = True
         if verbose:
-            print("Input data not same size as PSF. Dropping image" " in zero array.")
+            print("Input data not same size as PSF. Dropping image in zero array.")
         tmp_data = np.zeros((psf_naxis1, psf_naxis2))
         ddx = naxis1 // 2
         ddy = naxis2 // 2
@@ -129,7 +126,7 @@ def richardson_lucy_deconvolution(image, psf, num_iter=5):
     """
     psfnorm = xrt_fft_2dim_convolution(psf, np.ones_like(psf))
     ohat = np.cdouble(image)
-    for i in range(num_iter):
+    for _ in range(num_iter):  # noqa: B007
         ihat = xrt_fft_2dim_convolution(psf, ohat)
         ohat *= xrt_fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
     return np.abs(ohat)
@@ -140,16 +137,16 @@ def rebin_psf(psf_map, image_meta):
     Rebin the point spread function (psf) to match the dimensions of an image.
     It's assumed that the image is smaller than the psf array
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     psf_map : ~sunpy.map.sources.hinode.XRTMap
         |Map| for the point spread function
 
     image_meta : ~sunpy.util.metadata.MetaDict
         meta data for an image
 
-    Returns:
-    --------
+    Returns
+    -------
     downsampled map : ~sunpy.map.sources.hinode.XRTMap
         |Map| for the psf that has been binned to match the pixel size of the
         data

@@ -9,7 +9,7 @@ import warnings
 from xrtpy import response
 
 try:
-    from xrtpy.version import __version__  # noqa
+    from xrtpy.version import __version__  # noqa: PGH004
 except ImportError:
     warnings.warn("version not found.")
 

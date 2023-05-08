@@ -41,8 +41,8 @@ def xrt_teem(
         10.0 (density: :math:`10^9` cm\ :sup:`-3`\ , ionization
         equilibrium: ``chianti.ioneq``)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     map1 : ~sunpy.map.sources.hinode.XRTMap
         |Map| for the first XRT level 1 data image.  If the image is
         normalized, then it is assumed that the un-normalized image can be
@@ -89,8 +89,8 @@ def xrt_teem(
         If True, information is printed
 
 
-    Returns:
-    --------
+    Returns
+    -------
     TempEMdata : namedtuple of ~sunpy.map.sources.hinode.XRTMap objects
         namedtuple containing the attributes Tmap, EMmap, Terrmap and EMerrmap
         where the maps correspond to images and metadata with:
@@ -98,8 +98,8 @@ def xrt_teem(
         volume emission measure [cm^-3], uncertainty in log10 temperature [K],
         and uncertainty in log10 volume emission measure [cm^-3].
 
-    Examples:
-    ---------
+    Examples
+    --------
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
@@ -159,14 +159,8 @@ def xrt_teem(
     if mask is None:
         mask = np.zeros_like(data1, dtype=bool)
     # if the input data have already been masked then this preserves those masks
-    if map1.mask is not None:
-        mask1 = mask | map1.mask
-    else:
-        mask1 = mask
-    if map2.mask is not None:
-        mask2 = mask | map2.mask
-    else:
-        mask2 = mask
+    mask1 = mask | map1.mask if map1.mask is not None else mask
+    mask2 = mask | map2.mask if map2.mask is not None else mask
     mask = mask1 | mask2
     map1 = Map(data1, map1.meta, mask=mask)
     map2 = Map(data2, map2.meta, mask=mask)
@@ -234,11 +228,11 @@ def xrt_teem(
             & (Kd2 <= photon_noise_threshold)
         )
         if verbose:
-            print(f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}")
+            print(f"number of pixels ruled out by threshold = {np.sum(~ok_pixel)}")
             print(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
             print(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
             print(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
-            print(f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}")
+            print(f"number of bad pixels before threshold   = {np.sum(~ok_wothr)}")
         mask = mask | ~ok_pixel
         T_e[mask] = 0.0
         EM[mask] = 0.0
@@ -277,15 +271,15 @@ def deriv(x, y):
 
     Method taken from IDL routine of the same name.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : float array
         abscissa of the data
     y : float array
         ordinate of the data
 
-    Returns:
-    --------
+    Returns
+    -------
     float array :
         first derivative at the data points
     """
@@ -321,8 +315,8 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
     temperatures and emission measures in the image using the filter ratio
     method.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     map1 : ~sunpy.map.sources.hinode.XRTMap
         map for the first XRT level 1 data image
 
@@ -343,8 +337,8 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
         lower to higher. (Passed from xrt_teem.)
 
 
-    Returns:
-    --------
+    Returns
+    -------
     T_e : 2D float array
         derived temperatures for the images
 
@@ -449,8 +443,8 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
     values of the temperature and model flux ratio, return the errors (i.e.
     uncertainties) in T_e and EM.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     map1 : ~sunpy.map.sources.hinode.XRTMap
         map for the first XRT level 1 data image
 
@@ -477,8 +471,8 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
         Range of log10(temperature) values to examine. Must be in order from
         lower to higher. (Passed from xrt_teem.)
 
-    Returns:
-    --------
+    Returns
+    -------
     T_error : 2D float array
         Estimate of the statistical errors in the temperature determination
 
@@ -570,14 +564,14 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
     return T_error, EMerror, K1, K2
 
 
-def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
+def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):  # noqa: ARG001
     """
     Create SunPy Map objects from the image metadata and temperature, volume
     emission measure, temperature uncertainty and emission measure uncertainty
     data derived for a pair of XRT Level 1 images.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     hdr1 : metadata dictionary
         metadata associated with image 1
 
@@ -601,8 +595,8 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
         image containing the mask for T_e and EM, either provided or derived
         from the data
 
-    Returns:
-    --------
+    Returns
+    -------
     Tmap : ~sunpy.map.sources.hinode.XRTMap
         Map containing T_e and metadata
 

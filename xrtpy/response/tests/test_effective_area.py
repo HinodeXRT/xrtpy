@@ -70,7 +70,7 @@ def test_EffectiveArea_filter_name(name):
     instance = EffectiveAreaFundamental(
         name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0)
     )
-    actual_attr_value = getattr(instance, "name")
+    actual_attr_value = instance.name
 
     assert actual_attr_value == name
 
@@ -110,7 +110,7 @@ filenames = get_IDL_data_files()
 
 
 def _IDL_raw_data_list(filename):
-    with open(filename) as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         list_of_IDL_effective_area_data = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -143,7 +143,7 @@ def IDL_test_date(list_of_lists):
 
 
 def _IDL_effective_area_raw_data(filename):
-    with open(filename) as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         list_of_lists = []
         for line in filter_file:
             stripped_line = line.strip()

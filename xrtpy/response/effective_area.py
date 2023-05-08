@@ -69,7 +69,7 @@ class EffectiveAreaFundamental:
     Class for calculating the effective area.
 
     Parameters
-    -----------
+    ----------
     filter_name : str
         The name of the filter.
 
@@ -243,7 +243,7 @@ class EffectiveAreaFundamental:
             "data/n_DEHP.txt", package="xrtpy.response"
         )
 
-        with open(_n_DEHP_filename) as n_DEHP:
+        with open(_n_DEHP_filename) as n_DEHP:  # noqa: PTH123
             list_of_DEHP_attributes = []
             for line in n_DEHP:
                 stripped_line = line.strip()
