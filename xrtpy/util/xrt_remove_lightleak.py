@@ -97,46 +97,36 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         filt2 = in_map.meta["EC_FW2"]
         fpair = str(filt1) + str(filt2)
         sl_phase = check_sl_phase(in_map.meta["date_obs"])
-        leak_fn = None
 
     if fpair == "01":  # Open/Al_mesh
-        if sl_phase == 2:
-            leak_fn = "term_p2am_20150718_160913.fits"
-        elif sl_phase == 3:
-            leak_fn = "term_p3am_20170808_180126.fits"
-        elif sl_phase == 4:
-            leak_fn = "term_p4am_20180712_171919.fits"
-        elif sl_phase == 5:
-            leak_fn = "term_p5am_20220709_180901.fits"
-        else:
-            print(f"No leak image available for the phase {sl_phase}")
-            return
-
-    if fpair == "10":  # Al_poly/Open
-        if sl_phase == 2:
-            leak_fn = "term_p2ap_20150620_172818.fits"
-        elif sl_phase == 3:
-            leak_fn = "term_p3ap_20170809_183821.fits"
-        elif sl_phase == 4:
-            leak_fn = "term_p4ap_20180712_171928.fits"
-        elif sl_phase == 5:
-            leak_fn = "term_p5ap_20220709_180910.fits"
-        else:
-            print(f"No leak image available for the phase {sl_phase}")
-
-    if fpair == "20":  # C_poly/Open
-        if sl_phase == 2:
-            leak_fn = "term_p2cp_20150620_190645.fits"
-        else:
-            print(f"No leak image available for the phase {sl_phase}")
-            return in_map
-
-    if fpair == "02":  # Open/Ti_poly
+        sl_phase_dict = {
+            2: "term_p2am_20150718_160913.fits",
+            3: "term_p3am_20170808_180126.fits",
+            4: "term_p4am_20180712_171919.fits",
+            5: "term_p5am_20220709_180901.fits",
+        }
+    elif fpair == "10":  # Al_poly/Open
+        sl_phase_dict = {
+            2: "term_p2ap_20150620_172818.fits",
+            3: "term_p3ap_20170809_183821.fits",
+            4: "term_p4ap_20180712_171928.fits",
+            5: "term_p5ap_20220709_180910.fits",
+        }
+    elif fpair == "20":  # C_poly/Open
+        sl_phase_dict = {2: "term_p2cp_20150620_190645.fits"}
+    elif fpair == "02":  # Open/Ti_poly
+        sl_phase_dict = {}
+        # Is this really true? Need to check
         print(
             "Stray light component has already been subtracted from the "
             "Open/Ti_poly synoptic composite images."
         )
-        return in_map
+
+    try:
+        leak_fn = sl_phase_dict[sl_phase]
+    except KeyError:
+        print(f"No leak image available for the phase {sl_phase}")
+        leak_fn = None
 
     if (fpair != "01") and (fpair != "10") and (fpair != "20") and (fpair != "02"):
         print("No leak image available for this filter pair.")
@@ -153,12 +143,11 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         leak_map = Map(dir_leak / leak_fn)
 
     leak_image = leak_map.data
-    leak_image2 = leak_image * kfact
     if in_map.meta["naxis1"] == 2048:
         # assumes leak_image is 1024 x 1024 (I think)
         leak_image2 = rebin(leak_image, (2048, 2048)) * 0.25 * kfact
-    # if verbose:
-    #    help(leak_image2)
+    else:
+        leak_image2 = leak_image * kfact
 
     out_image = in_map.data - leak_image2
 
@@ -207,19 +196,19 @@ def check_sl_phase(date_obs):
 
     intime = datetime.fromisoformat(date_obs)
     if intime >= time_p5:
-        p = 5
+        phase = 5
     elif intime >= time_p4:
-        p = 4
+        phase = 4
     elif intime >= time_p3:
-        p = 3
+        phase = 3
     elif intime >= time_p2:
-        p = 2
+        phase = 2
     elif intime >= time_p1:
-        p = 1
+        phase = 1
     else:
-        p = 0
+        phase = 0
 
-    return p
+    return phase
 
 
 def my_rebin(image, newdims):
