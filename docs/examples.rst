@@ -13,6 +13,7 @@ Getting started
 .. nbgallery::
   :glob:
   notebooks/getting_started/*
+  notebooks/channel
 
 Computing response functions
 ----------------------------
@@ -20,6 +21,12 @@ Computing response functions
 .. nbgallery::
   :glob:
 
-  notebooks/*
-  notebooks/computing_functions/effective_area.ipynb
-  notebooks/computing_functions/temperature_response.ipynb
+  notebooks/computing_functions/*
+
+Data analysis
+-------------
+
+.. nbgallery::
+   :glob:
+
+   notebooks/data_analysis/*
