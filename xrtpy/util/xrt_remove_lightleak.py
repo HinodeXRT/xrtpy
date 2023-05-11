@@ -96,6 +96,9 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         filt1 = in_map.meta["EC_FW1"]
         filt2 = in_map.meta["EC_FW2"]
         fpair = str(filt1) + str(filt2)
+        sfilt1 = in_map.meta["EC_FW1_"]
+        sfilt2 = in_map.meta["EC_FW2_"]
+        sfpair = f"{sfilt1}/{sfilt2}"
         sl_phase = check_sl_phase(in_map.meta["date_obs"])
 
     if fpair == "01":  # Open/Al_mesh
@@ -121,26 +124,28 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
             "Stray light component has already been subtracted from the "
             "Open/Ti_poly synoptic composite images."
         )
+    else:
+        sl_phase_dict = {}
+        print(f"No leak image available for this filter pair {sfpair}.")
+        if verbose:
+            info = (
+                f"{in_map.meta['date_obs']}   {in_map.measurement}   "
+                + f"{in_map.meta['naxis1']}x{in_map.meta['naxis2']}"
+            )
+            print(info)
+        print("Output data are identical with the input")
+        return in_map
 
     try:
         leak_fn = sl_phase_dict[sl_phase]
     except KeyError:
-        print(f"No leak image available for the phase {sl_phase}")
-        leak_fn = None
-
-    if (fpair != "01") and (fpair != "10") and (fpair != "20") and (fpair != "02"):
-        print("No leak image available for this filter pair.")
-        info = (
-            f"{in_map.meta['date_obs']}   {in_map.measurement}   "
-            + f"{in_map.meta['naxis1']}x{in_map.meta['naxis2']}"
-        )
-        print(info)
-
-    if leak_fn is None:
+        print(f"No leak image available for phase {sl_phase}")
+        if verbose:
+            print(f"Filter pair used: {sfpair}")
         print("Output data are identical with the input")
         return in_map
-    else:
-        leak_map = Map(dir_leak / leak_fn)
+
+    leak_map = Map(dir_leak / leak_fn)
 
     leak_image = leak_map.data
     if in_map.meta["naxis1"] == 2048:
