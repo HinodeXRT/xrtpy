@@ -100,6 +100,12 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         sfilt2 = in_map.meta["EC_FW2_"]
         sfpair = f"{sfilt1}/{sfilt2}"
         sl_phase = check_sl_phase(in_map.meta["date_obs"])
+        if sl_phase == 6:
+            print(
+                "Warning: light leak images for this period are not yet"
+                " available. Defaulting to previous phase."
+            )
+            sl_phase = 5
 
     if fpair == "01":  # Open/Al_mesh
         sl_phase_dict = {
@@ -191,6 +197,7 @@ def check_sl_phase(date_obs):
     phase 3 : 27-May-2017 11:00
     phase 4 : 29-May-2018 00:00
     phase 5 :  8-Jun-2022 12:40
+    phase 6 :  5-May-2023  4:39
     """
 
     time_p1 = datetime.strptime("09-May-2012 12:00", "%d-%b-%Y %H:%M")
@@ -198,9 +205,12 @@ def check_sl_phase(date_obs):
     time_p3 = datetime.strptime("27-May-2017 11:00", "%d-%b-%Y %H:%M")
     time_p4 = datetime.strptime("29-May-2018 00:00", "%d-%b-%Y %H:%M")
     time_p5 = datetime.strptime("08-Jun-2022 12:40", "%d-%b-%Y %H:%M")
+    time_p6 = datetime.strptime("05-May-2023 04:39", "%d-%b-%Y %H:%M")
 
     intime = datetime.fromisoformat(date_obs)
-    if intime >= time_p5:
+    if intime >= time_p6:
+        phase = 6
+    elif intime >= time_p5:
         phase = 5
     elif intime >= time_p4:
         phase = 4
