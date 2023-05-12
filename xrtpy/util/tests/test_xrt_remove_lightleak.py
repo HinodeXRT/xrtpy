@@ -28,7 +28,11 @@ def get_observed_data():
     return data_file[0]
 
 
-def get_comp_data_files():
+def get_composite_data_files():
+    """
+    The XRT composite fits file are no corrected in IDL.
+    These files will be corrected using XRTpy.
+    """
     directory = (
         Path(__file__).parent.absolute()
         / "data"
@@ -39,7 +43,7 @@ def get_comp_data_files():
     return sorted(data_file)
 
 
-comp_filenames = get_comp_data_files()
+composite_filenames = get_composite_data_files()
 
 
 def get_IDL_results_data(date_time):
