@@ -28,6 +28,20 @@ def get_observed_data():
     return data_file[0]
 
 
+def get_comp_data_files():
+    directory = (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "light_leak_testing_data_files"
+        / "xrtpy_lightleak_data_test_files"
+    )
+    data_file = directory.glob("comp_XRT*.fits")
+    return sorted(data_file)
+
+
+comp_filenames = get_comp_data_files()
+
+
 def get_IDL_results_data(date_time):
     directory = Path(__file__).parent.absolute() / "data"
     # We give the IDL results data file have the same name as the input
