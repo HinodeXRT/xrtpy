@@ -1,6 +1,8 @@
 from pathlib import Path
 from sunpy.map import Map
 
+import pytest
+
 from xrtpy.util.xrt_remove_lightleak import xrt_remove_lightleak
 
 
@@ -22,12 +24,6 @@ def get_IDL_data_file():
 IDL_filenames = get_IDL_data_file()
 
 
-def get_observed_data():
-    directory = Path(__file__).parent.absolute() / "data"
-    data_file = list(directory.glob("comp_XRT*.fits"))
-    return data_file[0]
-
-
 def get_composite_data_files():
     """
     The XRT composite fits file are no corrected in IDL.
@@ -45,7 +41,21 @@ def get_composite_data_files():
 
 composite_filenames = get_composite_data_files()
 
+# Using zip as an iterator to pair the data files together. Trouble-free method to use in pytest-parametrize
+data_files = list(zip(IDL_filenames, composite_filenames))
 
+
+@pytest.mark.parametrize(["idlfile", "compfile"], data_files)
+def test_lightleak(idlfile, compfile, allclose):
+    IDL_map = Map(idlfile)
+    input_map = Map(compfile)
+
+    ll_removed_map_xrtpy = xrt_remove_lightleak(input_map)
+
+    assert allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=1e-5)
+
+
+"""
 def get_IDL_results_data(date_time):
     directory = Path(__file__).parent.absolute() / "data"
     # We give the IDL results data file have the same name as the input
@@ -53,6 +63,10 @@ def get_IDL_results_data(date_time):
     data_file = list(directory.glob(f"llfixed_XRT{date_time}.fits"))
     return data_file[0]
 
+def get_observed_data():
+    directory = Path(__file__).parent.absolute() / "data"
+    data_file = list(directory.glob("comp_XRT*.fits"))
+    return data_file[0]
 
 def test_one_case():
     input_data = get_observed_data()
@@ -69,3 +83,4 @@ def test_one_case():
     import numpy as np
 
     assert np.allclose(ll_removed_map.data, IDL_map.data)
+"""
