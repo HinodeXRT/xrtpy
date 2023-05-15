@@ -90,6 +90,14 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
 
     """
 
+    # Check to see if the lightleak has already been subtracted
+    history = in_map.meta["HISTORY"]
+    if "Light leak subtraction: DONE" in history:
+        print(
+            "HISTORY indicates light leak subtraction already done on image"
+            ", returning input map"
+        )
+        return in_map
     # ********* select leak image from the archive *********
     if leak_image is None:
         dir_leak = Path(__file__).parent.absolute() / "data" / "leak_fits"
@@ -124,12 +132,10 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
     elif fpair == "20":  # C_poly/Open
         sl_phase_dict = {2: "term_p2cp_20150620_190645.fits"}
     elif fpair == "02":  # Open/Ti_poly
-        sl_phase_dict = {}
-        # Is this really true? Need to check
-        print(
-            "Stray light component has already been subtracted from the "
-            "Open/Ti_poly synoptic composite images."
-        )
+        sl_phase_dict = {
+            1: "term_p1tp_20140515_182503.fits",
+            2: "term_p2tp_20150718_160921.fits",
+        }
     else:
         sl_phase_dict = {}
         print(f"No leak image available for this filter pair {sfpair}.")
