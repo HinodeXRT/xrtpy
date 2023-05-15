@@ -1,7 +1,7 @@
+import pytest
+
 from pathlib import Path
 from sunpy.map import Map
-
-import pytest
 
 from xrtpy.util.xrt_remove_lightleak import xrt_remove_lightleak
 
