@@ -93,11 +93,9 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
     # Check to see if the lightleak has already been subtracted
     history = in_map.meta["HISTORY"]
     if "Light leak subtraction: DONE" in history:
-        print(
-            "HISTORY indicates light leak subtraction already done on image"
-            ", returning input map"
+        raise ValueError(
+            "HISTORY indicates light leak subtraction already done on image."
         )
-        return in_map
     # ********* select leak image from the archive *********
     if leak_image is None:
         dir_leak = Path(__file__).parent.absolute() / "data" / "leak_fits"
