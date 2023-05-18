@@ -83,7 +83,7 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
     4. Intensity variation of the leak image due to the growth of CCD
     contamination layer is well determined for Ti_poly at the stray light
     phase 1 by using the intensity correlation between Ti_poly and Al_mesh
-    images (cg. Takeda et al. 2016, SolPhys.  291, p.317). The resulting
+    images (cg. :cite:p:`Takeda:2016`, p.317). The resulting
     k-factor is obtained with the function GET_SLCORFACT_RAW.PRO, and the leak
     image subtraction has been already performed only for the Ti_poly SCIA
     images at the phase 1 (as of Feb-2022).
