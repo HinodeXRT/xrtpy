@@ -182,7 +182,7 @@ def check_sl_phase(date_obs):
 
     Parameters:
     -----------
-    obs_date : string
+    obs_date : `str`
         Observation date string formatted in ISO format: YYYY-MM-DDTHH:mm
         where YYYY is the year, MM is the month number (zero-padded), DD is
         the day of the month (zero-padded), HH is the hour and mm is the
