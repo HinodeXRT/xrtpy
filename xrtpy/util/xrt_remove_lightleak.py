@@ -31,8 +31,8 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         It's assumed that the image is 1024x1024, prepped and exposure
         normalized.
 
-    verbose : boolean, optional
-        If True, print out extra messages.
+    verbose : `bool`, default: `False`
+        If `True`, print out extra messages.
 
     Returns:
     --------
