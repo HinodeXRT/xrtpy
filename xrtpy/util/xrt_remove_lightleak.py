@@ -4,6 +4,7 @@ Functionality for removing the visible light leak from XRT composite image data.
 __all__ = ["xrt_remove_lightleak"]
 
 import numpy as np
+import warnings
 
 from datetime import datetime
 from pathlib import Path
