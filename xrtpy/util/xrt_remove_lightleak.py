@@ -21,10 +21,10 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         |Map| for the synoptic composite image which the visible stray light
         will be subtracted from
 
-    kfact : float, optional
+    kfact : float, default: 1.0
         k-factor to apply when subtracting the light leak image:
-        out_data = in_data - k * [leak_img]
-        1.0 is the default value.
+        ``out_data = in_data - k * [leak_img]``
+
 
     leak_image : float array, dimensions 1024x1024,  optional
         A leak image to subtract, if a non-default image is desired.
