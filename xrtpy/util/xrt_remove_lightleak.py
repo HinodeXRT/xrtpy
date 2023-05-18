@@ -192,7 +192,7 @@ def check_sl_phase(date_obs):
 
     Returns:
     --------
-    phase no. : integer
+    phase no. : `int`
         The phase of the light leak as follows:
 
     phase 0 : 23-Oct-2006 10:00
