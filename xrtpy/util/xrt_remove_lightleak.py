@@ -48,7 +48,7 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
 
     Notes:
     ------
-    (Taken from the IDL routine xrt_synleaksub.pro)
+    (Taken from the IDL routine :file:`xrt_synleaksub.pro`)
     1. XRT images obtained after 9-May-2021 suffer visible stray light
     contamination (light leak) due to the pre-filter failure, i.e.  tiny
     rupture development occurred multiple times as follows:
