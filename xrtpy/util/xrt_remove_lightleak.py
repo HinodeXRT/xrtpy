@@ -107,8 +107,8 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
         sfpair = f"{sfilt1}/{sfilt2}"
         sl_phase = check_sl_phase(in_map.meta["date_obs"])
         if sl_phase == 6:
-            print(
-                "Warning: light leak images for this period are not yet"
+            warnings.warn(
+                "light leak images for this period are not yet"
                 " available. Defaulting to previous phase."
             )
             sl_phase = 5
