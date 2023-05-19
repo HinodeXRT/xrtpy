@@ -231,19 +231,6 @@ def check_sl_phase(date_obs):
     return phase
 
 
-def my_rebin(image, newdims):
-    """Rebin an array to a new shape"""
-
-    newimage = np.zeros(newdims)
-    origdims = image.shape
-    ifac = newdims[0] // origdims[0]
-    jfac = newdims[1] // origdims[1]
-    for i in range(ifac):
-        for j in range(jfac):
-            newimage[i::ifac, j::jfac] = image[:]
-    return newimage
-
-
 def rebin(image, newshape):
     """
     Rebin an array to a new shape. Copied from:
