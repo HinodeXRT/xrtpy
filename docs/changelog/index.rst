@@ -13,3 +13,4 @@ including bug fixes and changes to the application programming interface
 
    dev
    0.2.0
+   0.3.0
