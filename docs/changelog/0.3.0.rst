@@ -11,5 +11,5 @@ Features
 Improved Documentation
 ----------------------
 
+- Redevelop the XRTpy GitHub issue templates site. (:pr:`154`)
 - Updated the bibliography and xrt_teem example notebook. (:pr:`158`)
-- Redevelop XRTpy GitHub issue templates site. (:pr:`154`)
