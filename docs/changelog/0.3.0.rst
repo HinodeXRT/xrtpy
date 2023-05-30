@@ -1,0 +1,7 @@
+ XRTpy v0.3.0 (2023-03-31)
+=========================
+
+Features
+--------
+- New routine ``xrt_remove_lightleak`` for subtracting light leak (visible stray light)
+  image from XRT synoptic composite images.(:pr:`151`)
