@@ -3,5 +3,11 @@
 
 Features
 --------
+
 - New routine ``xrt_remove_lightleak`` for subtracting light leak (visible stray light)
   image from XRT synoptic composite images.(:pr:`151`)
+
+Improved Documentation
+----------------------
+
+- Updated the bibliography and xrt_teem example notebook. (:pr:`158`)
