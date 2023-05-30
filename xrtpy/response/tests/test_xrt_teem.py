@@ -1,9 +1,6 @@
 import numpy as np
-import pkg_resources
-import pytest
 import sunpy.map
 
-from astropy.io import fits
 from pathlib import Path
 from scipy.io import readsav
 
@@ -11,18 +8,14 @@ from xrtpy.response.xrt_teem import xrt_teem
 
 
 def get_observed_data():
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/xrt_teem_testing_files"
-    )
+    directory = Path(__file__).parent.absolute() / "data" / "xrt_teem_testing_files"
     data_files = sorted(Path(directory).glob("L1_XRT20110128_*.*.fits"))
 
     return data_files
 
 
 def get_IDL_results_data():
-    directory = pkg_resources.resource_filename(
-        "xrtpy", "response/tests/data/xrt_teem_testing_files"
-    )
+    directory = Path(__file__).parent.absolute() / "data" / "xrt_teem_testing_files"
     results_files = sorted(Path(directory).glob("IDL_results_*.sav"))
 
     return results_files
@@ -64,6 +57,11 @@ def test_standard_case():
     map2 = sunpy.map.Map(file2)
 
     T_e, EM, Terr, EMerr = xrt_teem(map1, map2)
+    T_EM = xrt_teem(map1, map2)
+    T_e = T_EM.Tmap
+    Terr = T_EM.Terrmap
+    EM = T_EM.EMmap
+    EMerr = T_EM.EMerrmap
 
     testdata = get_IDL_results_data()
 
@@ -107,7 +105,11 @@ def test_binning_case():
     map1 = sunpy.map.Map(file1)
     map2 = sunpy.map.Map(file2)
 
-    T_e, EM, Terr, EMerr = xrt_teem(map1, map2, binfac=2)
+    T_EM = xrt_teem(map1, map2, binfac=2)
+    T_e = T_EM.Tmap
+    Terr = T_EM.Terrmap
+    EM = T_EM.EMmap
+    EMerr = T_EM.EMerrmap
 
     testdata = get_IDL_results_data()
 
@@ -124,8 +126,8 @@ def test_binning_case():
     goodT = (T_e.data > 0.0) & (idlTe > 0.0)
     goodE = (EM.data > 0.0) & (idlEM > 0.0)
 
-    delta = 10.0 ** T_e.data[goodT] - 10.0 ** idlTe[goodT]
-    x = 10.0 ** idlTe[goodT]
+    delta = 10.0 ** T_e.data[goodT] - 10.0 ** idlTe[goodT]  # noqa
+    x = 10.0 ** idlTe[goodT]  # noqa
 
     assert np.allclose(
         10.0 ** T_e.data[goodT], 10.0 ** idlTe[goodT], atol=2.0e5, rtol=0.02

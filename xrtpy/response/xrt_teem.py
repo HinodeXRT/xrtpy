@@ -5,10 +5,10 @@ ratio technique.
 __all__ = ["xrt_teem"]
 
 import numpy as np
-import sys
 
 from astropy import units as u
 from astropy.constants import c, h
+from collections import namedtuple
 from datetime import datetime
 from sunpy.coordinates.sun import angular_radius, B0
 from sunpy.image.resample import reshape_image_to_4d_superpixel
@@ -16,10 +16,13 @@ from sunpy.map import Map
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
+TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")
+
 
 def xrt_teem(
     map1,
     map2,
+    abundance_model="coronal",
     binfac=1,
     Trange=None,
     no_threshold=False,
@@ -34,10 +37,9 @@ def xrt_teem(
 
     .. note::
 
-        Currently this program uses the solar spectrum calculated with CHIANTI
-        database ver. 6.0.1 (density: :math:`10^9` cm\ :sup:`-3`\ , ionization
-        equilibrium: ``chianti.ioneq``, abundance: ``sun_coronal_ext``), because this
-        is the only spectrum available in ``xrtpy``. We expect this to change.
+        The program uses solar spectra calculated with CHIANTI database ver.
+        10.0 (density: :math:`10^9` cm\ :sup:`-3`\ , ionization
+        equilibrium: ``chianti.ioneq``)
 
     Parameters:
     -----------
@@ -53,6 +55,12 @@ def xrt_teem(
         |Map| for the second image (must use different filters from the first
         image). The image shape should match that in ``map1``. The same
         considerations apply as for ``map1``.
+
+    abundance_model : string, optional
+        Chianti abundance model for the spectrum assumed when deriving the
+        plasma temperatures and emission measures. The default is coronal
+        abundances. Other currently available choices are ``"photospheric"`` and
+        ``"hybrid"``.
 
     binfac : integer, optional (default = 1)
         spatial binning factor
@@ -83,30 +91,25 @@ def xrt_teem(
 
     Returns:
     --------
-    T_e : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for log10 of the derived electron temperature [K].
-
-    EM : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for log10 of the derived volume emission measure [cm^-3].
-
-    T_error : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for uncertainty in log10 temperature [K].
-
-    EM_error : ~sunpy.map.sources.hinode.XRTMap
-        image and metadata for uncertainty in log10 volume emission measure [cm^-3].
+    TempEMdata : namedtuple of ~sunpy.map.sources.hinode.XRTMap objects
+        namedtuple containing the attributes Tmap, EMmap, Terrmap and EMerrmap
+        where the maps correspond to images and metadata with:
+        log10 of the derived electron temperature [K], log10 of the derived
+        volume emission measure [cm^-3], uncertainty in log10 temperature [K],
+        and uncertainty in log10 volume emission measure [cm^-3].
 
     Examples:
     ---------
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
-    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2) # doctest: +SKIP
+    >>> T_EM = xrt_teem(map1, map2) # doctest: +SKIP
 
     If you want to bin the image data in space to reduce photon noise, set
     binfac to the factor by which you want to bin.  For example to bin the
     data by a factor of 3 do:
 
-    >>> T_e, EM, T_error, EMerror = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
+    >>> T_EM = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
 
     The data is binned first and then the temperature is derived. Note that
     the image size is reduced by the factor binfac in each dimension, which
@@ -194,11 +197,11 @@ def xrt_teem(
 
     filt1 = measurement_to_filtername(map1.measurement)
     date_obs1 = hdr1["DATE_OBS"]
-    tresp1 = TemperatureResponseFundamental(filt1, date_obs1)
+    tresp1 = TemperatureResponseFundamental(filt1, date_obs1, abundance_model)
 
     filt2 = measurement_to_filtername(map2.measurement)
     date_obs2 = hdr2["DATE_OBS"]
-    tresp2 = TemperatureResponseFundamental(filt2, date_obs2)
+    tresp2 = TemperatureResponseFundamental(filt2, date_obs2, abundance_model)
 
     if filt1 == filt2:
         raise ValueError("Filters for the two images cannot be the same")
@@ -264,40 +267,7 @@ def xrt_teem(
     Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
         hdr1, hdr2, T_e, EM, T_error, EMerror, mask
     )
-    return Tmap, EMmap, Terrmap, EMerrmap
-
-
-def rebin_image(data, binfac=1):
-    """
-    Given a data array and a binning factor return the data array rebinned by
-    the binning factor. Note: the size of the original data array is
-    preserved, despite the adding up of adjacent pixels. Thus the sum of all
-    the pixels will be increased by the factor binfac.
-    """
-
-    s = data.shape
-    ns = (s[0] // binfac, s[1] // binfac)
-    rbs = (ns[0], binfac, ns[1], binfac)
-    # sums the data in binfac x binfac sized regions
-    drbin = data.reshape(rbs).sum(-1).sum(1)
-    # for a boolean mask, this makes a pixel masked if any of the summed
-    # pixels is masked. If we want to mask only if all the pixels are masked
-    # then we could use prod in place of sum above
-
-    if data.dtype == bool:
-        # need to convert back to bool after summing
-        drbin = drbin.astype(bool)
-    # This restores the image to the size of the original images as in the
-    # IDL code:
-    if data.dtype == bool:
-        dtmp = np.zeros_like(data, dtype=bool)
-    else:
-        dtmp = np.zeros_like(data)
-    for i in range(binfac):
-        for j in range(binfac):
-            dtmp[i::binfac, j::binfac] = drbin[:]
-    data = dtmp
-    return data
+    return TempEMdata(Tmap, EMmap, Terrmap, EMerrmap)
 
 
 def deriv(x, y):
@@ -705,12 +675,12 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
     Tmap = Map(T_e, Thdr)
     Tmap.nickname = "Log Derived Temperature (K)"
     EMhdr = new_hdr.copy()
-    EMhdr["BUNIT"] = r"log10(cm$^{-3}$)"
+    EMhdr["BUNIT"] = r"log10(cm$^{{-3}}$)"
     EMhdr["history"] = (
         new_hdr["history"] + "Volume emission measure derived using filter ratio method"
     )
     EMmap = Map(EM, EMhdr)
-    EMmap.nickname = r"Log Derived Volume E.M. (cm$^{-3}$)"
+    EMmap.nickname = r"Log Derived Volume E.M. (cm$^{{-3}}$)"
     Terrhdr = new_hdr.copy()
     Terrhdr["BUNIT"] = "log10(K)"
     Terrhdr["history"] = (
@@ -719,13 +689,13 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
     Terrmap = Map(T_error, Terrhdr)
     Terrmap.nickname = "Log Derived Temperature Errors (K)"
     EMerrhdr = new_hdr.copy()
-    EMerrhdr["BUNIT"] = r"log10(cm$^{-3}$)"
+    EMerrhdr["BUNIT"] = r"log10(cm$^{{-3}}$)"
     EMerrhdr["history"] = (
         new_hdr["history"]
         + "Volume emission measure uncertainty derived using filter ratio method"
     )
     EMerrmap = Map(EMerror, EMerrhdr)
-    EMerrmap.nickname = r"Log Derived V.E.M. Errors (cm$^{-3}$)"
+    EMerrmap.nickname = r"Log Derived V.E.M. Errors (cm$^{{-3}}$)"
     return Tmap, EMmap, Terrmap, EMerrmap
 
 
