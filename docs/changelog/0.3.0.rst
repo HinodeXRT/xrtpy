@@ -4,7 +4,7 @@ XRTpy v0.3.0 (2023-03-31)
 Deprecations and Removals
 -------------------------
 
-- Modified ``xrt_teem``` to return a namedtuple of SunPy maps. (:pr:`148`)
+- Modified ``xrt_teem``` to return a `~collections.namedtuple` of SunPy maps. (:pr:`148`)
 
 Features
 --------
