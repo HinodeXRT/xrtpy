@@ -18,6 +18,7 @@ Features
 Improved Documentation
 ----------------------
 
-- Updated the XRT contam on ccd geny file, date up till 2023-05-20. (:pr:`160`)
+- Updated Python requirements for packages used in XRTpy.(:pr:`139`)
 - Redevelop the XRTpy GitHub issue templates site. (:pr:`154`)
 - Updated the bibliography and xrt_teem example notebook. (:pr:`158`)
+- Updated the XRT contam on ccd geny file, date up till 2023-05-20. (:pr:`160`)
