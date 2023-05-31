@@ -17,5 +17,5 @@ Improved Documentation
 
 - Updated Python requirements for packages used in XRTpy.(:pr:`139,137`)
 - Redeveloped the XRTpy GitHub issue templates. (:pr:`154`)
-- Updated the bibliography and xrt_teem example notebook. (:pr:`158`)
+- Updated the bibliography and `~xrtpy.response.xrt_teem.xrt_teem` example notebook. (:pr:`158`)
 - Updated the XRT contamination data file, which is now up-to-date through 2023-05-20. (:pr:`160`)
