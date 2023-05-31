@@ -9,7 +9,10 @@ Deprecations and Removals
 Features
 --------
 
-- New routine ``xrt_remove_lightleak`` for subtracting light leak (visible stray light)
+- New routine ``xrt_deconvolve``, uses the Hinode XRT point spread function and the Richardson-Lucy
+  algorithm to deconvolve (sharpen) an XRT image.(:pr:`145`)
+
+- New functionality, ``xrt_remove_lightleak`` for subtracting light leak (visible stray light)
   image from XRT synoptic composite images.(:pr:`151`)
 
 Improved Documentation
