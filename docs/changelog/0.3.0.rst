@@ -1,12 +1,16 @@
  XRTpy v0.3.0 (2023-03-31)
 =========================
 
+Deprecations and Removals
+-------------------------
+
+- Modified ``xrt_teem``` to return a namedtuple of SunPy maps. (:pr:`148`)
+
 Features
 --------
 
 - New routine ``xrt_remove_lightleak`` for subtracting light leak (visible stray light)
   image from XRT synoptic composite images.(:pr:`151`)
-
 
 Improved Documentation
 ----------------------
