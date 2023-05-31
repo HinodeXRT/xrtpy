@@ -18,4 +18,4 @@ Improved Documentation
 - Updated Python requirements for packages used in XRTpy.(:pr:`139,137`)
 - Redevelop the XRTpy GitHub issue templates site. (:pr:`154`)
 - Updated the bibliography and xrt_teem example notebook. (:pr:`158`)
-- Updated the XRT contam on ccd geny file, date up till 2023-05-20. (:pr:`160`)
+- Updated the XRT contamination data file, which is now up-to-date through 2023-05-20. (:pr:`160`)
