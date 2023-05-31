@@ -1,4 +1,4 @@
- XRTpy v0.3.0 (2023-03-31)
+XRTpy v0.3.0 (2023-03-31)
 =========================
 
 Deprecations and Removals
@@ -9,16 +9,13 @@ Deprecations and Removals
 Features
 --------
 
-- New routine ``xrt_deconvolve``, uses the Hinode XRT point spread function and the Richardson-Lucy
-  algorithm to deconvolve (sharpen) an XRT image.(:pr:`145`)
-
-- New functionality, ``xrt_remove_lightleak`` for subtracting light leak (visible stray light)
-  image from XRT synoptic composite images.(:pr:`151`)
+- New routine ``xrt_deconvolve``, uses the Hinode XRT point spread function and the Richardson-Lucy algorithm to deconvolve (sharpen) an XRT image. (:pr:`145`)
+- New functionality, ``xrt_remove_lightleak`` for subtracting light leak (visible stray light) image from XRT synoptic composite images. (:pr:`151`)
 
 Improved Documentation
 ----------------------
 
-- Updated Python requirements for packages used in XRTpy.(:pr:`139`)
+- Updated Python requirements for packages used in XRTpy.(:pr:`139,137`)
 - Redevelop the XRTpy GitHub issue templates site. (:pr:`154`)
 - Updated the bibliography and xrt_teem example notebook. (:pr:`158`)
 - Updated the XRT contam on ccd geny file, date up till 2023-05-20. (:pr:`160`)
