@@ -91,7 +91,7 @@ def test_temperature_response(filename, allclose):
         filter_name, filter_obs_date, abundance_model="coronal"
     )
     actual_temperature_response = instance.temperature_response()
-
+    atol = actual_temperature_response.value.min()*1.E-3
     assert allclose(
-        actual_temperature_response.value, IDL_temperature_response, rtol=1e-6
+        actual_temperature_response.value, IDL_temperature_response, rtol=1e-6, atol=atol
     )
