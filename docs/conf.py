@@ -12,14 +12,14 @@ from sphinx.application import Sphinx
 # -- Project information -----------------------------------------------------
 
 project = "xrtpy"
-author = "Joy Velasquez and Nick Murphy"
-copyright = f"2015–{datetime.utcnow().year}, {author}"
+author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
+copyright = f"2021–{datetime.utcnow().year}, {author}"
 
 # The full version, including alpha/beta/rc tags
 # from xrtpy import __version__
 # release = __version__
 
-release = "0.1.0dev"
+release = "0.3.0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -35,10 +35,12 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "nbsphinx",
+    "sphinx_changelog",
     "sphinx_copybutton",
     "sphinx_gallery.load_style",
     "IPython.sphinxext.ipython_console_highlighting",
     "sphinx_changelog",
+    "sphinx_issues",
     "sphinxcontrib.bibtex",
     "hoverxref.extension",
 ]
@@ -126,6 +128,12 @@ linkcheck_anchors_ignore = [
 # Use a code highlighting style that meets the WCAG AA contrast standard
 pygments_style = "default"
 
+nbsphinx_thumbnails = {
+    "notebooks/getting_started/units": (
+        "_static/notebook_images/astropy_logo_notext.png"
+    ),  # CC BY-SA
+}
+
 # adapted from sphinx-hoverxref conf.py
 if os.environ.get("READTHEDOCS"):
     # Building on Read the Docs
@@ -168,6 +176,9 @@ hoverxref_role_types = {
     "ref": "tooltip",
     "term": "tooltip",
 }
+# Configure sphinx-issues
+
+issues_github_path = "HinodeXRT/xrtpy"
 
 # Specify patterns to ignore when doing a nitpicky documentation build.
 

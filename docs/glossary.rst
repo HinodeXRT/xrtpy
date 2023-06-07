@@ -19,13 +19,12 @@ Glossary
    Temperature (units)
       Temperature :math:`T`, is a `~astropy.units.Quantity` in unit of 'K'(e.g., degrees kelvin).
 
+
    Temperature response
       Instrument temperature response function, for a filter-channel. Units are
       DN cm\ :sup:`5` s\ :sup:`−1` pix\ :sup:`-1`\ .
 
    Solar-emission-spectra
       A set of plasma emission spectra for a set of temperature.
-
-
 
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf

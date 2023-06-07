@@ -4,19 +4,6 @@
 Installing XRTpy
 ****************
 
-.. important::
-
-   These instructions were written in preparation for the initial
-   release of `xrtpy` which has not yet happened. At present, `xrtpy` is
-   not able to be installed via ``pip`` from PyPI_, ``conda``, or
-   Anaconda Navigator. No official releases are available on Zenodo or
-   GitHub.
-
-.. .. note::
-   If you would like to contribute to XRTpy, please refer to the
-   instructions on :ref:`installing XRTpy for development
-   <install-xrtpy-dev>`.
-
 .. contents:: Contents
    :local:
 
@@ -32,7 +19,7 @@ install it.
    New versions of Python_ are released annually in October, and it can
    take a few months for the scientific Python ecosystem to catch up. If
    you have trouble installing `xrtpy` on the most recent Python_
-   version between October and ∼December, then try installing it on the
+   version between October and ∼March, then try installing it on the
    second most recent version.
 
 .. _install-pip:
@@ -49,8 +36,8 @@ terminal and run:
    python -m pip install xrtpy
 
 On some systems, it might be necessary to specify the Python_ version
-number by using ``python3``, ``python3.8``, ``python3.9``, or
-``python3.10`` instead of ``python``.
+number by using ``python3``, ``python3.9``, ``python3.10``, or
+``python3.11`` instead of ``python``.
 
 To install XRTpy on Windows, run:
 
@@ -138,9 +125,6 @@ First, go to the :guilabel:`Environments` tab and select
 :guilabel:`Add`, enter ``https://conda.anaconda.org/conda-forge``, and
 click on :guilabel:`Update channels` and then :guilabel:`Update index`.
 
-.. Is conda-forge now being added by default?
-.. Is clicking on `Update index` actually necessary?
-
 Next, while on the :guilabel:`Environments` tab, select the environment
 that you would like to install `xrtpy` in. The default is generally
 ``base (root)``. Optionally, you may select :guilabel:`Create` to start
@@ -211,11 +195,6 @@ will be installed.
    If you noticed any places where the installation instructions could
    be improved or have become out of date, please create an issue on
    `XRTpy's GitHub repository`_. It would really help!
-
-.. .. tip::
-   The :ref:`contributing-to-xrtpy` guide has instructions on how to
-   fork a repository and create branches so that you may make
-   contributions via pull requests.
 
 .. _Anaconda Navigator: https://www.anaconda.com/products/individual
 .. _clone a repository using SSH: https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-ssh-urls
