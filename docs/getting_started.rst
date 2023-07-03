@@ -32,7 +32,7 @@ The XRT default emission model is `CHIANTI`_ atomic database version 10.0 with c
 
 
 Abundance Model
----------------------
+---------------
 The standard XRT temperature response routines are calculated assuming `CHIANTI`_ coronal abundances, :cite:t:`feldman:1992`.
 In addition, XRTpy offers the ability to choose two other sets of `CHIANTI`_ abundances i.e. Hybrid and Photospheric.
 The Hybrid abundances are base on :cite:t:`Fludra:1999` and Photospheric abundances are base on :cite:t:`Grevesse:2007`.
@@ -54,6 +54,22 @@ The `abundance_model` method is used in the same format in `xrt_teem`.
 Deriving Temperature and Emission Measure for a Pair of Images
 --------------------------------------------------------------
 XRTpy provides a routine, `xrt_teem`, that employs the objects listed above to derive the temperature and emission measure in for a given pair of images using the filter ratio method. This uses the same methods as in the SolarSoft IDL routine of the same name.
+
+
+Data Products
+*************
+The XRT website provides readily available `XRT data products`_, including both Level 1 and Level 2 data.
+
+The `Level 1 Data`_ section contains an extensive archive of all Level 1 XRT data that has been calibrated using the `xrt_prep`_ routine, with units expressed in instrumental Data Numbers.
+Additionally, for users interested in synoptic images, `Level 2 Synoptics`_ data is available, which consists of composite images from the twice-daily synoptic program. These images have been processed and are available in the archive.
+
+For more detailed information about our XRT data products, please visit the `XRT data products`_ site, where you can find comprehensive data resources and references.
+
+
+.. _Level 1 Data: https://xrt.cfa.harvard.edu/level1/
+.. _Level 2 Synoptics: https://xrt.cfa.harvard.edu/data_products/Level2_Synoptics/
+.. _XRT data products: https://xrt.cfa.harvard.edu/data_products/index.php
+.. _xrt_prep: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
 
 
 X-Ray Filter Channel
