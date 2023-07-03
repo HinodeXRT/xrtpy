@@ -16,8 +16,7 @@ Visit our Example page for detail notebook example guides on how to use the XRTp
 
 Channel
 -------
-|Channel| is an instrument configuration class that explores properties of the XRT. It provides a detailed review of the instruments for a chosen filter channel,
- including the Charge-Coupled Device (CCD), Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
+|Channel| is an instrument configuration class that explores properties of the XRT. It provides a detailed review of the instruments for a chosen filter channel, including the Charge-Coupled Device (CCD), Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
 
 
 Effective Area
@@ -43,11 +42,11 @@ Enhancing Images Sharpness with Point Spread Function - Deconvolution
 ---------------------------------------------------------------------
 Deconvolution is a powerful technique used to enhance image sharpness by mitigating the blurring effect
 caused by the telescope's point spread function (PSF). It is particularly useful for removing the blurring
-around sharp objects or features in the XRT image. To learn how to use this function, refer to the notebook examples provided on our Example page.
+around sharp objects or features in the XRT image. To learn how to use `xrt_deconvolve`, refer to the notebook examples provided on our Example page.
 
 Subtracting Light Leak from XRT Synoptic Composite Images
 ---------------------------------------------------------
-We have developed a specialized function designed to subtract light leak, which refers to visible stray
+We have developed a specialized function designed to subtract light leak, `xrt_remove_lightleak`, which refers to visible stray
 light, from XRT synoptic composite images. By applying this function, you can effectively remove the
 unwanted artifacts caused by light leak, resulting in cleaner and more accurate images for further analysis and interpretation.
 Explore our Example page for a notebook example that demonstrate the usage of this function.
