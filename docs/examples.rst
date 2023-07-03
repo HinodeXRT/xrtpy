@@ -1,8 +1,10 @@
 Examples
 ========
-
-Here we catalog the example Jupyter notebooks that have been created for
-the various functionality contained in `XRTpy`.
+In this section, we provide a catalog of example Jupyter notebooks that
+demonstrate the various functionalities offered by `XRTpy`. These notebooks
+serve as practical guides for utilizing the features and capabilities of XRTpy
+in different scenarios. By exploring these examples, users can gain a better
+understanding of how to effectively use XRTpy for their analysis tasks.
 
 .. contents::
    :local:
