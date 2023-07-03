@@ -59,10 +59,8 @@ XRTpy provides a routine, `xrt_teem`, that employs the objects listed above to d
 Data Products
 *************
 The XRT website provides readily available `XRT data products`_, including both Level 1 and Level 2 data.
-
 The `Level 1 Data`_ section contains an extensive archive of all Level 1 XRT data that has been calibrated using the `xrt_prep`_ routine, with units expressed in instrumental Data Numbers.
 Additionally, for users interested in synoptic images, `Level 2 Synoptics`_ data is available, which consists of composite images from the twice-daily synoptic program. These images have been processed and are available in the archive.
-
 For more detailed information about our XRT data products, please visit the `XRT data products`_ site, where you can find comprehensive data resources and references.
 
 
