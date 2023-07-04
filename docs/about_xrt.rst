@@ -18,7 +18,7 @@ sun-synchronous orbit, enabling continuous observations of the Sun. Further info
 The X-Ray Telescope
 ====================
 The X-Ray Telescope (XRT) is an instrument onboard the Hinode spacecraft. With its remarkable capabilities, the XRT provides high-resolution
- images of the solar corona's hottest material, ranging from 1,000,000 to 10,000,000 Kelvin. Visit the official `xrt-cfa-harvard`_ website for mission overview information about the XRT.
+images of the solar corona's hottest material, ranging from 1,000,000 to 10,000,000 Kelvin. Visit the official `xrt-cfa-harvard`_ website for mission overview information about the XRT.
 
 .. tip::
    Visit the `XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for captivating visual content showcasing the XRT's solar observations.
