@@ -33,7 +33,7 @@ The XRT default emission model is `CHIANTI`_ atomic database version 10.0 with c
 
 Deriving Temperature and Emission Measure for a Pair of Images
 --------------------------------------------------------------
-XRTpy provides a routine, `xrt_teem`, that employs the objects listed above to derive the temperature and emission
+XRTpy provides a routine, |xrt_teem|, that employs the objects listed above to derive the temperature and emission
 measure in for a given pair of images using the filter ratio method. This uses the same methods as in the SolarSoft IDL
 routine of the same name. Familiarize yourself with the utilization of this function through the notebook example provided on our Example page.
 
@@ -42,11 +42,11 @@ Enhancing Images Sharpness with Point Spread Function - Deconvolution
 ---------------------------------------------------------------------
 Deconvolution is a powerful technique used to enhance image sharpness by mitigating the blurring effect
 caused by the telescope's point spread function (PSF). It is particularly useful for removing the blurring
-around sharp objects or features in the XRT image. To learn how to use `xrt_deconvolve`, refer to the notebook examples provided on our Example page.
+around sharp objects or features in the XRT image. To learn how to use |xrt_deconvolve|, refer to the notebook examples provided on our Example page.
 
 Subtracting Light Leak from XRT Synoptic Composite Images
 ---------------------------------------------------------
-We have developed a specialized function designed to subtract light leak, `xrt_remove_lightleak`, which refers to visible stray
+We have developed a specialized function designed to subtract light leak, |xrt_remove_lightleak|, which refers to visible stray
 light, from XRT synoptic composite images. By applying this function, you can effectively remove the
 unwanted artifacts caused by light leak, resulting in cleaner and more accurate images for further analysis and interpretation.
 Explore our Example page for a notebook example that demonstrate the usage of this function.
