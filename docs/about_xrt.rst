@@ -26,7 +26,7 @@ images of the solar corona's hottest material, ranging from 1,000,000 to 10,000,
 
 SolarSoft XRT Analysis Guide
 ============================
-The `SolarSoft XRT Analysis Guide`_ is a comprehensive resource for analyze the XRT data.
+The `SolarSoft XRT Analysis Guide`_ is a comprehensive resource for analysis of XRT data.
 It includes both an Instrument Guide and an overview of the X-Ray telescope's hardware components.
 The XRT software was originally created in Interactive Data Language (IDL).
 IDL is a software programming language used to analyze and create meaningful information from numerical data.
@@ -34,7 +34,7 @@ IDL is a software programming language used to analyze and create meaningful inf
 
 .. note::
    Please note that the `SolarSoft XRT Analysis Guide`_ does not serve as a guide for using XRTpy.
-   It focuses solely on the analysis of XRT data and the associated software tools.
+   It focuses solely on the analysis of XRT data using the IDL software.
 
 
 .. _formerly known as Solar-B: https://www.esa.int/Science_Exploration/Space_Science/Solar-B_renamed_Hinode_after_launch#:~:text=Solar%2DB%2C%20JAXA's%20mission%20to,'sunrise'%2C%20after%20launch.

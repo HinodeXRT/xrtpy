@@ -9,14 +9,14 @@ on the board Hinode spacecraft. This page is intended for new users of `xrtpy`. 
 XRTpy Objects:
 **************
 XRTpy currently offers *Channel*, *Effective Area*, and *Temperature Response* classes. We have also introduced new functionality, including
-the ablility to deriving temperature and emission measure for a pair of images, sharpen images using the point spread function derived, and
-a function built to subtract light leak (visible stray light) image from XRT synoptic composite images.
+the ablility to derive temperatures and emission measures for a pair of images, sharpen images using the point spread function, and
+a function to correct synoptic images for the light leak (visible stray light) that XRT has developed.
 Visit our Example page for detail notebook example guides on how to use the XRTpy classes and functions.
 
 
 Channel
 -------
-|Channel| is an instrument configuration class that explores properties of the XRT. It provides a detailed review of the instruments for a chosen filter channel, including the Charge-Coupled Device (CCD), Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
+|Channel| is an instrument configuration class that contains the properties of particular XRT filters. It provides a detailed information on the filter channel, including the Charge-Coupled Device (CCD), Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
 
 
 Effective Area
