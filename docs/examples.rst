@@ -14,7 +14,6 @@ Getting started
   :glob:
 
   notebooks/getting_started/*
-  notebooks/channel
 
 Computing response functions
 ----------------------------
