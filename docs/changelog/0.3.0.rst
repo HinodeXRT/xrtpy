@@ -1,0 +1,21 @@
+XRTpy v0.3.0 (2023-03-31)
+=========================
+
+Deprecations and Removals
+-------------------------
+
+- Modified `~xrtpy.response.xrt_teem.xrt_teem` to return a `~collections.namedtuple` of SunPy maps. (:pr:`148`)
+
+Features
+--------
+
+- New routine `~xrtpy.util.xrt_deconvolve.xrt_deconvolve`, uses the Hinode XRT point spread function and the Richardson-Lucy algorithm to deconvolve (sharpen) an XRT image. (:pr:`145`)
+- New functionality, `~xrtpy.util.xrt_remove_lightleak.xrt_remove_lightleak` for subtracting light leak (visible stray light) image from XRT synoptic composite images. (:pr:`151`)
+
+Improved Documentation
+----------------------
+
+- Updated Python requirements for packages used in XRTpy. (:pr:`139,137`)
+- Redeveloped the XRTpy GitHub issue templates. (:pr:`154`)
+- Updated the bibliography and `~xrtpy.response.xrt_teem.xrt_teem` example notebook. (:pr:`158`)
+- Updated the XRT contamination data file, which is now up-to-date through 2023-05-20. (:pr:`160`)
