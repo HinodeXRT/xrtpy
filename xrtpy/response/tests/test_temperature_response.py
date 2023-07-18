@@ -1,5 +1,9 @@
+
 import astropy.units as u
 import numpy as np
+
+import pytest
+
 
 from astropy.utils.data import get_pkg_data_filenames
 from datetime import datetime
@@ -8,6 +12,24 @@ from pathlib import Path
 import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
+
+_abundance_model_IDL_test_file_path = {
+    "coronal": (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_response_coronal_IDL_testing_files"
+    ),
+    "hybrid": (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_response_hybrid_IDL_testing_files"
+    ),
+    "photospheric": (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_response_photospheric_IDL_testing_files"
+    ),
+}
 
 
 def get_IDL_data_files():
@@ -36,6 +58,7 @@ def get_IDL_data_files_older():
     assert path.exists()
     filter_data_files = list(path.glob("**/*.txt"))
     # import pdb; pdb.set_trace()
+
     return sorted(filter_data_files)
 
 
@@ -100,10 +123,24 @@ def test_temperature_response(filename):  # allclose
 
     IDL_temperature_response = _IDL_temperature_response_raw_data(filename)
 
-    instance = TemperatureResponseFundamental(filter_name, filter_obs_date)
+    instance = TemperatureResponseFundamental(
+        filter_name, filter_obs_date, abundance_model="coronal"
+    )
     actual_temperature_response = instance.temperature_response()
+
     assert u.allclose(
         actual_temperature_response.value, IDL_temperature_response, rtol=1e-6
     ), filter_name
 
     # rtol=1e-1
+
+    '''
+    atol = actual_temperature_response.value.max() * 0.013
+    assert allclose(
+        actual_temperature_response.value,
+        IDL_temperature_response,
+        rtol=0.028,
+        atol=atol,
+    )
+    '''
+
