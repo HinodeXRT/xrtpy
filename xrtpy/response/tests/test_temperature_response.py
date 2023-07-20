@@ -1,9 +1,4 @@
-
 import astropy.units as u
-import numpy as np
-
-import pytest
-
 
 from astropy.utils.data import get_pkg_data_filenames
 from datetime import datetime
@@ -62,9 +57,9 @@ def get_IDL_data_files_older():
     return sorted(filter_data_files)
 
 
-filenames = get_IDL_data_files_older()
+# filenames = get_IDL_data_files_older()
 
-# filenames = get_IDL_data_files()
+filenames = get_IDL_data_files()
 
 
 def _IDL_raw_data_list(filename):
@@ -131,16 +126,3 @@ def test_temperature_response(filename):  # allclose
     assert u.allclose(
         actual_temperature_response.value, IDL_temperature_response, rtol=1e-6
     ), filter_name
-
-    # rtol=1e-1
-
-    '''
-    atol = actual_temperature_response.value.max() * 0.013
-    assert allclose(
-        actual_temperature_response.value,
-        IDL_temperature_response,
-        rtol=0.028,
-        atol=atol,
-    )
-    '''
-
