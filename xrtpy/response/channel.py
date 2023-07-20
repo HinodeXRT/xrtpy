@@ -10,7 +10,6 @@ __all__ = [
     "resolve_filter_name",
 ]
 
-import numpy as np
 import sunpy.io.special
 import sunpy.time
 
@@ -20,20 +19,20 @@ from pathlib import Path
 filename = Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 _channel_name_to_index_mapping = {
-    "Al-mesh": 0,
-    "Al-poly": 1,
-    "C-poly": 2,
-    "Ti-poly": 3,
-    "Be-thin": 4,
-    "Be-med": 5,
-    "Al-med": 6,
-    "Al-thick": 7,
-    "Be-thick": 8,
-    "Al-poly/Al-mesh": 9,
-    "Al-poly/Ti-poly": 10,
-    "Al-poly/Al-thick": 11,
-    "Al-poly/Be-thick": 12,
-    "C-poly/Ti-poly": 13,
+    "Open/Al_mesh": 0,
+    "Al_poly/Open": 1,
+    "C_poly/Open": 2,
+    "Open/Ti_poly": 3,
+    "Be_thin/Open": 4,
+    "Be_med/Open": 5,
+    "Al_med/Open": 6,
+    "Open/Al_thick": 7,
+    "Open/Be_thick": 8,
+    "Al_poly/Al_mesh": 9,
+    "Al_poly/Ti_poly": 10,
+    "Al_poly/Al_thick": 11,
+    "Al_poly/Be_thick": 12,
+    "C_poly/Ti_poly": 13,
 }
 
 
@@ -41,13 +40,53 @@ _genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
 
 
 def resolve_filter_name(name):
-    """Formats users filter name."""
+    """
+    Parses user provided filter name and converts it to a standard format used
+    by XRTpy.
+
+    Input filter name can be in standard XRT fits header format, e.g.
+    Ti_poly or Open/Ti_poly, or in Sunpy standard, e.g. Open-Ti poly. The name
+    may contain the names for both filter wheels or just one (but not "Open").
+    If both filter wheel names are given they should be separated by either a
+    dash (-) or a slash (/).  If there is dash or a slash in the name it
+    should only be to separate the filter names. The filter wheel names may
+    contain a space ( ) or an underscore (_).
+
+    Returned has two filter names separated by a slash (/) and each filter
+    wheel name will contain only letters and (in most cases) an underscore (no
+    spaces).
+    """
     if not isinstance(name, str):
         raise TypeError("name must be a string")
-    name = name.replace("_", "-")
-    parts: list = name.split("/")
-    new_parts: list = [part.capitalize() for part in parts]
-    name: str = "/".join(new_parts)
+    filters1 = ["Al_poly", "C_poly", "Be_thin", "Be_med", "Al_med"]
+    filters2 = ["Al_mesh", "Ti_poly", "Al_thick", "Be_thick"]
+    if "-" in name:
+        fw1, fw2 = name.split("-")
+        fw1 = fw1.capitalize().replace(" ", "_")
+        if fw1 not in filters1 and fw1 != "Open":
+            raise ValueError("Cannot interpret name of filter1")
+        fw2 = fw2.capitalize().replace(" ", "_")
+        if fw2 not in filters2 and fw2 != "Open":
+            raise ValueError("Cannot interpret name of filter2")
+        name = f"{fw1}/{fw2}"
+    elif "/" in name:
+        fw1, fw2 = name.split("/")
+        fw1 = fw1.capitalize().replace(" ", "_")
+        if fw1 not in filters1 and fw1 != "Open":
+            raise ValueError("Cannot interpret name of filter1")
+        fw2 = fw2.capitalize().replace(" ", "_")
+        if fw2 not in filters2 and fw2 != "Open":
+            raise ValueError("Cannot interpret name of filter2")
+        name = f"{fw1}/{fw2}"
+    else:
+        # only one filter wheel name given
+        name = name.capitalize().replace(" ", "_")
+        if name in filters1:
+            name = f"{name}/Open"
+        elif name in filters2:
+            name = f"Open/{name}"
+        else:
+            raise ValueError("Cannot interpret filter name")
     return name
 
 
@@ -339,8 +378,10 @@ class Channel:
     """
     XRTpy
 
-    Available channels: ``"Al-mesh"``, ``"Al-poly"``,  ``"C-poly"``, ``"Ti-poly"``, ``"Be-thin"``, ``"Be-med"``, ``"Al-med"``, ``"Al-thick"``,  ``"Be-thick"`` ,
-    ``"Al-poly/Al-mesh"``, ``"Al-poly/Ti-poly"``, ``"Al-poly/Al-thick"``, ``"Al-poly/Be-thick"`` , ``"C-poly/Ti-poly"``
+    Available channels: ``"Al_mesh"``, ``"Al_poly"``,  ``"C_poly"``,
+    ``"Ti_poly"``, ``"Be_thin"``, ``"Be_med"``, ``"Al_med"``, ``"Al_thick"``,
+    ``"Be_thick"`` , ``"Al_poly/Al_mesh"``, ``"Al_poly/Ti_poly"``,
+    ``"Al_poly/Al_thick"``, ``"Al_poly/Be_thick"`` , ``"C_poly/Ti_poly"``
     """
 
     _genx_file = _genx_file
@@ -357,17 +398,10 @@ class Channel:
             self._filter_1 = Filter(self._channel_index, 1)
             self._filter_2 = Filter(self._channel_index, 2)
             self._ccd = CCD(self._channel_index)
-        elif name.lower() == "open":  # Complete by adding remaining indices
-            self._sample_channel_data = _genx_file[1]
-            self._geometry = Geometry(1)
-            self._channel_data = {
-                "WAVE": self._sample_channel_data["WAVE"],
-                "TRANS": np.ones_like(self._sample_channel_data["TRANS"]),
-                "LENGTH": self._sample_channel_data["LENGTH"],
-            }
         else:
             raise ValueError(
-                f"{name} is not a valid channel. The available channels are: {list(_channel_name_to_index_mapping.keys())}"
+                f"{name} is not a valid channel. The available channels are:"
+                f" {list(_channel_name_to_index_mapping.keys())}"
             )
 
     @property
@@ -409,7 +443,10 @@ class Channel:
     @property
     def name(self) -> str:
         """Name of XRT X-Ray channel."""
-        return self._channel_data["NAME"]
+        name = self._channel_data["NAME"]
+        name = name.replace("-", "_")
+        name = resolve_filter_name(name)
+        return name
 
     @property
     @u.quantity_input
