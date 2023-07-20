@@ -438,3 +438,5 @@ class Channel:
     def instrument(self) -> str:
         """X-Ray Telescope -XRT."""
         return self._channel_data["INSTRUMENT"]
+
+    # Effective Area object
