@@ -52,12 +52,13 @@ def resolve_filter_name(name):
     should only be to separate the filter names. The filter wheel names may
     contain a space ( ) or an underscore (_).
 
-    Returned has two filter names separated by a slash (/) and each filter
-    wheel name will contain only letters and (in most cases) an underscore (no
-    spaces).
+    Returned value has two filter names separated by a slash (/) and each
+    filter wheel name will contain only letters and (in most cases) an
+    underscore (no spaces).
     """
     if not isinstance(name, str):
         raise TypeError("name must be a string")
+    # Note: not including Gband for now
     filters1 = ["Al_poly", "C_poly", "Be_thin", "Be_med", "Al_med"]
     filters2 = ["Al_mesh", "Ti_poly", "Al_thick", "Be_thick"]
     if "-" in name:
@@ -86,7 +87,7 @@ def resolve_filter_name(name):
         elif name in filters2:
             name = f"Open/{name}"
         else:
-            raise ValueError("Cannot interpret filter name")
+            raise ValueError(f"Cannot interpret filter {name}")
     return name
 
 
@@ -123,13 +124,12 @@ class EntranceFilter:
     """
     Entrance filter properties.
 
-    Thin prefilters cover the narrow annular entrance aperture of the XRT serving two main purposes:
+    Thin prefilters cover the narrow annular entrance aperture of the XRT
+    serving two main purposes:
 
     1. Reduce the visible light entering the instrument.
     2. Reduce the heat load in the instrument.
     """
-
-    _genx_file = _genx_file
 
     def __init__(self, index):
         self._channel_index = index
@@ -193,8 +193,6 @@ class Mirror:
     Since XRT is a two-bounce telescope, there are two mirror reflectivities.
     """
 
-    _genx_file = _genx_file
-
     def __init__(self, index, mirror_number):
         self._channel_index = index
         self._mirror_data = self._genx_file[self._channel_index][
@@ -251,8 +249,6 @@ class Filter:
 
     The corresponding categories are used for both filter 1 and filter 2.
     """
-
-    _genx_file = _genx_file
 
     def __init__(self, index, filter_number):
         self._channel_index = index
@@ -313,8 +309,6 @@ class Filter:
 
 class CCD:
     """Charge-coupled device (CCD) on board X-Ray Telescope (XRT) on the Hinode spacecraft."""
-
-    _genx_file = _genx_file
 
     def __init__(self, index):
         self._channel_index = index
@@ -383,8 +377,6 @@ class Channel:
     ``"Be_thick"`` , ``"Al_poly/Al_mesh"``, ``"Al_poly/Ti_poly"``,
     ``"Al_poly/Al_thick"``, ``"Al_poly/Be_thick"`` , ``"C_poly/Ti_poly"``
     """
-
-    _genx_file = _genx_file
 
     def __init__(self, name):
         name = resolve_filter_name(name)
