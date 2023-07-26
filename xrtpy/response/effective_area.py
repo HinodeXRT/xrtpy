@@ -24,20 +24,20 @@ from xrtpy.util.time import epoch
 
 index_mapping_to_fw1_name = {
     "Open": 0,
-    "Al-poly": 1,
-    "C-poly": 2,
-    "Be-thin": 3,
-    "Be-med": 4,
-    "Al-med": 5,
+    "Al_poly": 1,
+    "C_poly": 2,
+    "Be_thin": 3,
+    "Be_med": 4,
+    "Al_med": 5,
 }
 
 index_mapping_to_fw2_name = {
     "Open": 0,
-    "Al-mesh": 1,
-    "Ti-poly": 2,
-    "G-band": 3,
-    "Al-thick": 4,
-    "Be-thick": 5,
+    "Al_mesh": 1,
+    "Ti_poly": 2,
+    "G_band": 3,
+    "Al_thick": 4,
+    "Be_thick": 5,
 }
 
 _ccd_contam_filename = (
@@ -138,10 +138,10 @@ class EffectiveAreaFundamental:
     @property
     def filter_index_mapping_to_name(self):
         """Returns filter's corresponding number value."""
-        if self.name in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(self.name)
-        elif self.name in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(self.name)
+        fw1, fw2 = self.name.split("/")
+        index1 = index_mapping_to_fw1_name.get(fw1)
+        index2 = index_mapping_to_fw2_name.get(fw2)
+        return index1, index2
 
     @property
     def filter_wheel_number(self):
@@ -224,9 +224,9 @@ class EffectiveAreaFundamental:
     @property
     def filter_data(self):
         """Collecting filter contamination data."""
-        return _filter_contamination[self.filter_index_mapping_to_name][
-            self.filter_wheel_number
-        ]
+        index1, index2 = self.filter_index_mapping_to_name
+        # Not sure if adding these is correct
+        return _filter_contamination[index1][0] + _filter_contamination[index2][1]
 
     @property
     def contamination_on_filter(self) -> u.angstrom:
