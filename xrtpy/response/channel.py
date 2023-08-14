@@ -338,6 +338,8 @@ class CCD:
 class EffectiveArea:
     """Class for calculating the effective area."""
 
+    # Add Obs. date.
+
     # Add a requirement when effective area is call.The observation date is required; it is not required for the Channel
     # observation_date = "2007-09-22T22:59:59"
 
