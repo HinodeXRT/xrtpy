@@ -335,6 +335,24 @@ class CCD:
         ]
 
 
+class EffectiveArea:
+    """Class for calculating the effective area."""
+
+    # Add a requirement when effective area is call.The observation date is required; it is not required for the Channel
+    # observation_date = "2007-09-22T22:59:59"
+
+    def __init__(self, index):  # , observation_date):
+        self._channel_index = index
+        # self._name = resolve_filter_name(filter_name)
+        # self._channel = Channel(self.name)
+        # self.observation_date = observation_date
+
+    def compute_effective_area(self):
+        # Implement the logic to compute effective area
+        print("Passing for testing")
+        pass
+
+
 class Channel:
     """
     XRTpy
@@ -357,6 +375,7 @@ class Channel:
             self._filter_1 = Filter(self._channel_index, 1)
             self._filter_2 = Filter(self._channel_index, 2)
             self._ccd = CCD(self._channel_index)
+            self._effective_area = EffectiveArea(self._channel_index)
         elif name.lower() == "open":  # Complete by adding remaining indices
             self._sample_channel_data = _genx_file[1]
             self._geometry = Geometry(1)
@@ -398,6 +417,10 @@ class Channel:
     def ccd(self) -> CCD:
         return self._ccd
 
+    @property
+    def effective_area(self):
+        return self._effective_area.compute_effective_area()
+
     def __str__(self):
         """Readable printout."""
         return f"XRT Channel for {self.name}"
@@ -438,5 +461,3 @@ class Channel:
     def instrument(self) -> str:
         """X-Ray Telescope -XRT."""
         return self._channel_data["INSTRUMENT"]
-
-    # Effective Area object
