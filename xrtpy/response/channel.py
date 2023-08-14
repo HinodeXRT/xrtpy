@@ -6,6 +6,7 @@ __all__ = [
     "Mirror",
     "Filter",
     "CCD",
+    "EffectiveArea",
     "Channel",
     "resolve_filter_name",
 ]
