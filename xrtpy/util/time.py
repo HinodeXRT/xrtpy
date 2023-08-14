@@ -75,4 +75,5 @@ def observation_date(date):  # observation_date(self, date
             "https://github.com/HinodeXRT/xrtpy/issues/new"
         )
 
-    _observation_date = observation_date
+    # self._observation_date = observation_date
+    observation_date
