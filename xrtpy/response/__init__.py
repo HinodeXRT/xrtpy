@@ -4,6 +4,7 @@ from xrtpy.response import channel, effective_area, temperature_response
 from xrtpy.response.channel import (
     CCD,
     Channel,
+    EffectiveArea,
     EntranceFilter,
     Filter,
     Geometry,
@@ -20,6 +21,7 @@ __all__ = [
     "Mirror",
     "Filter",
     "CCD",
+    "EffectiveArea",
     "Channel",
     "resolve_filter_name",
     "EffectiveAreaFundamental",
