@@ -339,6 +339,8 @@ class CCD:
 class EffectiveArea:
     """Class for calculating the effective area."""
 
+    # from xrtpy.response.EffectiveAreaFundamental import observation_date
+
     # Add Obs. date.
 
     # Add a requirement when effective area is call.The observation date is required; it is not required for the Channel
@@ -352,8 +354,17 @@ class EffectiveArea:
 
     def compute_effective_area(self):
         # Implement the logic to compute effective area
-        print("Passing for testing")
+        print("compute_effective_area \nPassing for testing")
         pass
+
+    def validate_observation_date(self):
+        print("validate_observation_date\nPassing for testing")
+        pass
+
+    #     self.observation_date
+    #     # Implement the logic to compute effective area
+    #     print("Passing for testing")
+    #     pass
 
 
 class Channel:
