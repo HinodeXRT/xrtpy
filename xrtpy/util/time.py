@@ -11,28 +11,35 @@ from datetime import datetime, timedelta
 epoch = astropy.time.Time("2006-09-22 21:36:00")
 
 
-def xrt_data_time_to_dt(data_time, epoch):
+def xrt_data_time_to_dt(data_time: list, epoch: datetime) -> tuple:
     """
-    Converting data time (float64) to a datetime object.
+    Convert data times (float64) to datetime objects and seconds from epoch.
 
     Parameters
     ----------
-    data_time : real number (?)
-        Description...
-    epoch : `datetime.datetime`
-        This function will convert the requested date and time into a datetime
-         object in seconds from the respected launched date to collect the correct date.
+    data_time : list of float
+        A list of float values representing data times.
+    epoch : datetime.datetime
+        The reference datetime representing the mission epoch.
+
+    Returns
+    -------
+    tuple
+        A tuple containing two lists: data dates as datetime objects and
+        data dates as seconds from the epoch.
     """
     data_dates_dt = []
     data_dates_seconds = []
 
+    t0 = data_time[0]  # Initial time
+
     for time in data_time:
-        t0 = data_time[0]
-        t1 = time
-        dt = t1 - t0
-        data_dates_dt.append(epoch + timedelta(0, dt))
-        data_dates_seconds.append(float((epoch + timedelta(0, dt)).strftime("%s")))
-    return (data_dates_dt, data_dates_seconds)
+        dt = time - t0
+        data_date_dt = epoch + timedelta(seconds=dt)
+        data_dates_dt.append(data_date_dt)
+        data_dates_seconds.append(float(data_date_dt.strftime("%s")))
+
+    return data_dates_dt, data_dates_seconds
 
 
 def observation_date(data_time: str) -> datetime:
