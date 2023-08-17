@@ -1,5 +1,7 @@
 __all__ = [
     "epoch",
+    "observation_date",
+    "validating_data_observation_date",
 ]
 
 import astropy.time
