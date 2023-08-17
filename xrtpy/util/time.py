@@ -85,11 +85,6 @@ def observation_date(data_time: str) -> datetime:
     return observation_date
 
 
-###############################################################################
-############* Debating if this function belongs here *#########################
-###############################################################################
-
-
 # Absolute path  - Update method
 _ccd_contam_filename = Path(
     "/Users/jvelasq/Projects/xrtpy/xrtpy/response/data/xrt_contam_on_ccd.geny"
@@ -106,6 +101,7 @@ _ccd_contamination_file_time = astropy.time.Time(
 
 def validating_data_observation_date(observation_date):
     """
+    ############* Debating if this function belongs here *#########################
     Validate the requested observation date against the available data.
 
     This function checks whether there is data available for the requested observation date.
@@ -154,9 +150,3 @@ def validating_data_observation_date(observation_date):
         )
 
     return observation_date
-
-
-###############################################################################
-###############################################################################
-###############################################################################
-##import pdb; pdb.set_trace()
