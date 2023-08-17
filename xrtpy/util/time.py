@@ -1,6 +1,6 @@
 __all__ = [
     "epoch",
-    "observation_date",
+    "validate_observation_date",
     "validating_data_observation_date",
 ]
 
@@ -47,7 +47,7 @@ def xrt_data_time_to_dt(data_time: list, epoch: datetime) -> tuple:
     return data_dates_dt, data_dates_seconds
 
 
-def observation_date(data_time: str) -> datetime:
+def validate_observation_date(data_time: str) -> datetime:
     """
     Validate a user's requested observation date.
 
@@ -126,7 +126,7 @@ def validating_data_observation_date(observation_date):
 
     """
 
-    observation_date = observation_date()
+    observation_date = validate_observation_date()
 
     modified_time_path = os.path.getmtime(_ccd_contam_filename)
     modified_time = astropy.time.Time(modified_time_path, format="unix")
