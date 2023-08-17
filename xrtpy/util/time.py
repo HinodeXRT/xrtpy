@@ -3,8 +3,9 @@ __all__ = [
 ]
 
 import astropy.time
+import sunpy.time
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 # Hinode-XRT mission elapsed time "Epoch" is Sept 22, 2006 21:36:00.
 epoch = astropy.time.Time("2006-09-22 21:36:00")
@@ -34,21 +35,43 @@ def xrt_data_time_to_dt(data_time, epoch):
     return (data_dates_dt, data_dates_seconds)
 
 
-# # @observation_date.setter
-def observation_date(data_time):  # date
-    pass
+def observation_date(data_time: str) -> datetime:
+    """
+    Validate a user's requested observation date.
 
+    Parameters
+    ----------
+    data_time : str
+        A string representing the observation date in a recognized format.
 
-# observation_date(self, date
-#     """Validating users requested observation date."""
+    Returns
+    -------
+    datetime.datetime
+        The validated observation date.
 
-#     observation_date = sunpy.time.parse_time(date)
+    Raises
+    ------
+    ValueError
+        If the observation date is not after the defined epoch.
 
-#     if observation_date <= epoch:
-#         raise ValueError(
-#             f"\nInvalid date: {observation_date.datetime}.\n"
-#             f"Date must be after {epoch}."
-#         )
+    Notes
+    -----
+    This function is used to validate a user's requested observation date before using
+    it in functions related to effective area and temperature response functions.
+
+    The `epoch` used for validation is defined as September 22, 2006 21:36:00.
+    """
+
+    observation_date = sunpy.time.parse_time(data_time)
+
+    if observation_date <= epoch:
+        raise ValueError(
+            f"Invalid date: {observation_date.datetime}. "
+            f"Date must be after {epoch}."
+        )
+
+    return observation_date
+
 
 #     modified_time_path = os.path.getmtime(_ccd_contam_filename)
 #     modified_time = astropy.time.Time(modified_time_path, format="unix")
