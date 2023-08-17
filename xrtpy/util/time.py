@@ -80,6 +80,15 @@ def observation_date(data_time: str) -> datetime:
     return observation_date
 
 
+def validating_data_observation_date():
+    """
+    Validate the requested observation date against the available data.
+
+    This function checks whether there is data available for the requested observation date.
+    """
+    pass
+
+
 #     modified_time_path = os.path.getmtime(_ccd_contam_filename)
 #     modified_time = astropy.time.Time(modified_time_path, format="unix")
 #     latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
