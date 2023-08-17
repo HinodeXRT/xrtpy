@@ -358,7 +358,7 @@ class EffectiveArea:
         return self._channel_index
 
     # @property
-    def validate_observation_date(self):
+    def validating_observation_date(self):
         # observation_date = "2007-09-22T22:59:59"
         print("Validate_observation_date\n Testing")
 
