@@ -361,12 +361,11 @@ class EffectiveArea:
     def validate_observation_date(self):
         # observation_date = "2007-09-22T22:59:59"
         print("Validate_observation_date\n Testing")
-        return self._channel_index
 
-    #     self.observation_date
-    #     # Implement the logic to compute effective area
-    #     print("Passing for testing")
-    #     pass
+        # self.observation_date.utime
+        # self.observation_date
+
+        return self._channel_index
 
 
 class Channel:
