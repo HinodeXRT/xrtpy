@@ -354,12 +354,14 @@ class EffectiveArea:
 
     def compute_effective_area(self):
         # Implement the logic to compute effective area
-        print("compute_effective_area \nPassing for testing")
-        pass
+        print("compute_effective_area \n Testing")
+        return self._channel_index
 
+    # @property
     def validate_observation_date(self):
-        print("validate_observation_date\nPassing for testing")
-        pass
+        # observation_date = "2007-09-22T22:59:59"
+        print("Validate_observation_date\n Testing")
+        return self._channel_index
 
     #     self.observation_date
     #     # Implement the logic to compute effective area
@@ -432,8 +434,8 @@ class Channel:
         return self._ccd
 
     @property
-    def effective_area(self):
-        return self._effective_area.compute_effective_area()
+    def effective_area(self) -> EffectiveArea:
+        return self._effective_area
 
     def __str__(self):
         """Readable printout."""
