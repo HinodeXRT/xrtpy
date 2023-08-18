@@ -341,6 +341,7 @@ class CCD:
 class EffectiveArea:
     """Class for calculating the effective area."""
 
+    # import pdb; pdb.set_trace()
     # from xrtpy.response.EffectiveAreaFundamental import observation_date
 
     # Add Obs. date.
@@ -348,29 +349,40 @@ class EffectiveArea:
     # Add a requirement when effective area is call.The observation date is required; it is not required for the Channel
     # observation_date = "2007-09-22T22:59:59"
 
-    def __init__(self, index):  # , observation_date):
+    def __init__(self, index, observation_date):
         self._channel_index = index
-        # self._name = resolve_filter_name(filter_name)
-        # self._channel = Channel(self.name)
+        self.observation_date = observation_date
+        # self._channel = Channel(name)
+        # self._channel = Channel(filter_name)
         # self.observation_date = observation_date
 
-    def compute_effective_area(self):
-        # Implement the logic to compute effective area
-        print("compute_effective_area \n Testing")
-        return self._channel_index
+    def effective_area_filter(self):
+        # Reverse the dictionary to create an index-to-string mapping
+        index_to_string = {
+            value: key for key, value in _channel_name_to_index_mapping.items()
+        }
+
+        # Get the string associated with an index
+        desired_index = self._channel_index
+        desired_string = index_to_string.get(desired_index)
+
+        if desired_string is not None:
+            pass
+        else:
+            print(f"No string found for index {desired_index}")
+
+        return desired_string
 
     # @property
     def validating_observation_date(self):
-        obs_date = "2007-09-22T22:59:59"
+        obs_date = self.observation_date
+        # obs_date = "2007-09-22T22:59:59"
 
-        validating_data_observation_date(obs_date)
-
+        obs = validating_data_observation_date(obs_date)
+        print(obs)
         # import pdb; pdb.set_trace()
-        # print(vd_od,type(vd_od))
-
         print("Validate_observation_date\n Testing")
-
-        return self._channel_index
+        return obs
 
 
 class Channel:
@@ -383,9 +395,10 @@ class Channel:
 
     _genx_file = _genx_file
 
-    def __init__(self, name):
+    def __init__(self, name, observation_date=None):
         name = resolve_filter_name(name)
         if name in _channel_name_to_index_mapping:
+            self._name = name  # Testing
             self._channel_index = _channel_name_to_index_mapping[name]
             self._channel_data = _genx_file[self._channel_index]
             self._geometry = Geometry(self._channel_index)
@@ -395,7 +408,10 @@ class Channel:
             self._filter_1 = Filter(self._channel_index, 1)
             self._filter_2 = Filter(self._channel_index, 2)
             self._ccd = CCD(self._channel_index)
-            self._effective_area = EffectiveArea(self._channel_index)
+            if observation_date is not None:
+                self._effective_area = EffectiveArea(
+                    self._channel_index, observation_date
+                )
         elif name.lower() == "open":  # Complete by adding remaining indices
             self._sample_channel_data = _genx_file[1]
             self._geometry = Geometry(1)
