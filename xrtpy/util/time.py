@@ -16,6 +16,7 @@ from pathlib import Path
 epoch = astropy.time.Time("2006-09-22 21:36:00")
 
 
+# Adding dat up till today UTC time
 def xrt_data_time_to_dt(data_time: list, epoch: datetime) -> tuple:
     """
     Convert data times (float64) to datetime objects and seconds from epoch.
@@ -76,10 +77,19 @@ def validate_observation_date(data_time: str) -> datetime:
 
     observation_date = sunpy.time.parse_time(data_time)
 
+    current_utc_datetime = datetime.utcnow()
+
+    # import pdb; pdb.set_trace()
     if observation_date <= epoch:
         raise ValueError(
             f"Invalid date: {observation_date.datetime}. "
             f"Date must be after {epoch}."
+        )
+
+    if observation_date > current_utc_datetime:
+        raise ValueError(
+            f"Invalid date: {observation_date.datetime}. "
+            f"Date must not be in the future."
         )
 
     return observation_date
@@ -99,7 +109,7 @@ _ccd_contamination_file_time = astropy.time.Time(
 )
 
 
-def validating_data_observation_date(observation_date):
+def validating_data_observation_date(data_time):
     """
     ############* Debating if this function belongs here *#########################
     Validate the requested observation date against the available data.
@@ -126,7 +136,7 @@ def validating_data_observation_date(observation_date):
 
     """
 
-    observation_date = validate_observation_date()
+    observation_date = validate_observation_date(data_time)
 
     modified_time_path = os.path.getmtime(_ccd_contam_filename)
     modified_time = astropy.time.Time(modified_time_path, format="unix")
@@ -134,11 +144,11 @@ def validating_data_observation_date(observation_date):
         "%Y/%m/%d"
     )
 
-    modified_time_datetime = datetime.datetime.fromtimestamp(
-        modified_time_path
-    ).strftime("%Y/%m/%d")
+    modified_time_datetime = datetime.fromtimestamp(modified_time_path).strftime(
+        "%Y/%m/%d"
+    )
 
-    if observation_date > modified_time:
+    if observation_date.datetime > modified_time:
         raise ValueError(
             "\nNo contamination data is presently available for "
             f"{observation_date.datetime}.\n The latest available data is on "
@@ -149,4 +159,4 @@ def validating_data_observation_date(observation_date):
             "https://github.com/HinodeXRT/xrtpy/issues/new"
         )
 
-    return observation_date
+    return observation_date.datetime

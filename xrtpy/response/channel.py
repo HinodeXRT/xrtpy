@@ -18,6 +18,8 @@ import sunpy.time
 from astropy import units as u
 from pathlib import Path
 
+from xrtpy.util.time import validating_data_observation_date
+
 filename = Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 _channel_name_to_index_mapping = {
@@ -359,11 +361,14 @@ class EffectiveArea:
 
     # @property
     def validating_observation_date(self):
-        # observation_date = "2007-09-22T22:59:59"
-        print("Validate_observation_date\n Testing")
+        obs_date = "2007-09-22T22:59:59"
 
-        # self.observation_date.utime
-        # self.observation_date
+        validating_data_observation_date(obs_date)
+
+        # import pdb; pdb.set_trace()
+        # print(vd_od,type(vd_od))
+
+        print("Validate_observation_date\n Testing")
 
         return self._channel_index
 
