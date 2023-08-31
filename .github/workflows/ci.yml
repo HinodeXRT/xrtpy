@@ -17,7 +17,7 @@ jobs:
         - linux: py311
         - macos: py310
         - windows: py39
-#       - linux: build_docs
+        - linux: build_docs
 #      coverage: 'codecov'
 #    secrets:
 #      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
