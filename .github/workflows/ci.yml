@@ -1,4 +1,4 @@
-name: OACI
+name: CI
 
 on:
   push:
