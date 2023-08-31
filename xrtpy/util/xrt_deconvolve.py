@@ -15,7 +15,7 @@ from sunpy.data import manager
 
 
 @manager.require("XRT20170324_151721.0.PSF560.fits", ["https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/",
-                                                      ""]
+        "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d"])
 def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     """
     Use the XRT mirror model point spread function (PSF) to deconvolve an XRT
