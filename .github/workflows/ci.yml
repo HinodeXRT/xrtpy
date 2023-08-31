@@ -18,6 +18,9 @@ jobs:
         - macos: py310
         - windows: py39
         - linux: build_docs
+          libraries:
+            apt:
+            - pandoc
 #      coverage: 'codecov'
 #    secrets:
 #      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
