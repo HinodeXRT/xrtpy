@@ -1,0 +1,23 @@
+name: OACI
+
+on:
+  push:
+    branches:
+    - main
+    - stable
+    - v*.*.x
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      envs: |
+        - linux: py311
+        - macos: py310
+        - windows: py39
+#       - linux: build_docs
+#      coverage: 'codecov'
+#    secrets:
+#      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
