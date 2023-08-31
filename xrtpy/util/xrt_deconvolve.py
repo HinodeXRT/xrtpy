@@ -54,9 +54,9 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     """
 
     if psf1keV:
-        used_psf = manager.get("PSF560.fits")
-    else:
         used_psf = manager.get("PSF1000.fits")
+    else:
+        used_psf = manager.get("PSF560.fits")
 
     psf_map = Map(used_psf)
     psf_meta = psf_map.meta
