@@ -7,19 +7,26 @@ import numpy as np
 
 from datetime import datetime
 from numpy.fft import fft2, fftshift, ifft2
-from pathlib import Path
+from sunpy.data import manager
 from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
-from sunpy.data import manager
 
 
-@manager.require("PSF560.fits",
-                 ["https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits",
-                 "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d"])
-@manager.require("PSF1000.fits",
-                 ["https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits",
-                 "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1"])
+@manager.require(
+    "PSF560.fits",
+    [
+        "https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits",
+        "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d",
+    ],
+)
+@manager.require(
+    "PSF1000.fits",
+    [
+        "https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits",
+        "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1",
+    ],
+)
 def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     """
     Use the XRT mirror model point spread function (PSF) to deconvolve an XRT
@@ -45,7 +52,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
         |Map| for the output deconvolved image
 
     """
-        
+
     if psf1keV:
         used_psf = manager.get("PSF560.fits")
     else:
