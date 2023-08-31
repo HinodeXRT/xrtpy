@@ -7,12 +7,26 @@ import numpy as np
 
 from datetime import datetime
 from numpy.fft import fft2, fftshift, ifft2
-from pathlib import Path
+from sunpy.data import manager
 from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
 
 
+@manager.require(
+    "PSF560.fits",
+    [
+        "https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits"
+    ],
+    "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d",
+)
+@manager.require(
+    "PSF1000.fits",
+    [
+        "https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits"
+    ],
+    "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1",
+)
 def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     """
     Use the XRT mirror model point spread function (PSF) to deconvolve an XRT
@@ -39,25 +53,16 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
 
     """
 
-    # data_dir = Path(os.getenv("SSW")) / Path("hinode/xrt/idl/util")
-    data_dir = Path(__file__).parent.absolute() / "data"
-    psf0560 = "XRT20170324_151721.0.PSF560.fits"
-    psf1000 = "XRT20170324_161721.0.PSF1000.fits"
-
     if psf1keV:
-        used_psf = psf1000
+        used_psf = manager.get("PSF1000.fits")
     else:
-        used_psf = psf0560
-    psf_path = data_dir / used_psf
+        used_psf = manager.get("PSF560.fits")
 
-    if not psf_path.is_file():
-        raise ValueError(f"XRT_DECONVOLVE: Cannot find PSF: {psf_path}")
-
-    psf_map = Map(psf_path)
+    psf_map = Map(used_psf)
     psf_meta = psf_map.meta
 
     if verbose:
-        print(f"XRT_DECONVOLVE: Using PSF in\n{psf_path}")
+        print(f"XRT_DECONVOLVE: Using PSF in\n{used_psf}")
 
     image_meta = image_map.meta
     data_chip_sum = image_meta["chip_sum"]
