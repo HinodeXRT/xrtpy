@@ -11,8 +11,11 @@ from pathlib import Path
 from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
+from sunpy.data import manager
 
 
+@manager.require("XRT20170324_151721.0.PSF560.fits", ["https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/",
+                                                      ""]
 def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     """
     Use the XRT mirror model point spread function (PSF) to deconvolve an XRT
