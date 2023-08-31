@@ -26,20 +26,20 @@ def tests(session):
     session.run("pytest", *pytest_options)
 
 
-@nox.session(python=python_versions[-1])
+@nox.session
 def linters(session):
     session.install("-r", "requirements/tests.txt")
     flake8_options = ["--count", "--show-source", "--statistics"]
     session.run("flake8", "xrtpy", *flake8_options, *session.posargs)
 
 
-@nox.session(python=python_versions[0])
+@nox.session
 def import_package(session):
     session.install(".")
     session.run("python", "-c", 'import xrtpy')  # fmt: skip
 
 
-@nox.session(python=python_versions[-1])
+@nox.session
 def build_docs(session):
     session.install("-r", "requirements/docs.txt")
     session.install(".")
@@ -50,7 +50,7 @@ def build_docs(session):
     )
 
 
-@nox.session(python=python_versions[-1])
+@nox.session
 def build_docs_nitpicky(session):
     session.install("-r", "requirements/docs.txt")
     session.install(".")
