@@ -4,8 +4,6 @@ Functionality for deconvolving XRT image data with the point spread function.
 __all__ = ["xrt_deconvolve"]
 
 import numpy as np
-from urllib.parse import urljoin
-
 
 from datetime import datetime
 from numpy.fft import fft2, fftshift, ifft2
@@ -13,18 +11,25 @@ from sunpy.data import manager
 from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
+from urllib.parse import urljoin
 
 from xrtpy.util import _SSW_MIRRORS
 
 
 @manager.require(
     "PSF560.fits",
-    [urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits") for mirror in _SSW_MIRRORS],
+    [
+        urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits")
+        for mirror in _SSW_MIRRORS
+    ],
     "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d",
 )
 @manager.require(
     "PSF1000.fits",
-    [urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits") for mirror in _SSW_MIRRORS],
+    [
+        urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits")
+        for mirror in _SSW_MIRRORS
+    ],
     "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1",
 )
 def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
