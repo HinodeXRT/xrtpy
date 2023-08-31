@@ -14,10 +14,10 @@ from sunpy.map import Map
 from sunpy.data import manager
 
 
-@manager.require("PSF560.fits", 
+@manager.require("PSF560.fits",
                  ["https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits",
                  "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d"])
-@manager.require("PSF1000.fits", 
+@manager.require("PSF1000.fits",
                  ["https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits",
                  "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1"])
 def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
@@ -45,8 +45,6 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
         |Map| for the output deconvolved image
 
     """
-
-    data_dir = Path(__file__).parent.absolute() / "data"
         
     if psf1keV:
         used_psf = manager.get("PSF560.fits")
