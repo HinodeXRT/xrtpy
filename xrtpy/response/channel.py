@@ -18,6 +18,7 @@ import sunpy.time
 from astropy import units as u
 from pathlib import Path
 
+# from xrtpy.response.effective_area import EffectiveAreaFundamental
 from xrtpy.util.time import validating_data_observation_date
 
 filename = Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
@@ -356,6 +357,7 @@ class EffectiveArea:
         # self._channel = Channel(filter_name)
         # self.observation_date = observation_date
 
+    @property
     def effective_area_filter(self):
         # Reverse the dictionary to create an index-to-string mapping
         index_to_string = {
@@ -373,16 +375,31 @@ class EffectiveArea:
 
         return desired_string
 
-    # @property
+    @property
     def validating_observation_date(self):
-        obs_date = self.observation_date
-        # obs_date = "2007-09-22T22:59:59"
+        """
+        Validate a user's requested observation date. Furthermore,
+        validate the requested observation date against the available data.
+        """
+        return validating_data_observation_date(self.observation_date)
 
-        obs = validating_data_observation_date(obs_date)
-        print(obs)
-        # import pdb; pdb.set_trace()
-        print("Validate_observation_date\n Testing")
-        return obs
+        # # import pdb; pdb.set_trace()
+        # @u.quantity_input
+        # def effective_area(self):  # -> u.cm**2:
+        #     filter = effective_area_filter()
+        #     obs_date = validating_observation_date()
+        #     print(filter, obs_date)
+        #     EffectiveAreaFundamental(filter, obs_date)
+
+        #     # print(geometry_aperture_area)
+        #     return 1
+        """Calculation of the Effective Area."""
+        # return (
+        #     self.channel_geometry_aperture_area
+        #     * self.channel_transmission
+        #     * self.interpolated_CCD_contamination_transmission
+        #     * self.interpolated_filter_contamination_transmission
+        # )
 
 
 class Channel:
