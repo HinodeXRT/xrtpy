@@ -15,10 +15,10 @@ from sunpy.data import manager
 
 
 @manager.require("PSF560.fits",
-                 ["https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits",
+                 ["https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits",
                  "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d"])
 @manager.require("PSF1000.fits",
-                 ["https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits",
+                 ["https://sohoftp.nascom.nasa.gov/solarsoft/hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits",
                  "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1"])
 def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     """
@@ -55,7 +55,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     psf_meta = psf_map.meta
 
     if verbose:
-        print(f"XRT_DECONVOLVE: Using PSF in\n{psf_path}")
+        print(f"XRT_DECONVOLVE: Using PSF in\n{used_psf}")
 
     image_meta = image_map.meta
     data_chip_sum = image_meta["chip_sum"]
