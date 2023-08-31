@@ -21,6 +21,9 @@ jobs:
           libraries:
             apt:
             - pandoc
+          with:
+            PYDEVD_DISABLE_FILE_VALIDATION: 1
+
 #      coverage: 'codecov'
 #    secrets:
 #      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
