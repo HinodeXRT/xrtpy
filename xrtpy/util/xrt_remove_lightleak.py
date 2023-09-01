@@ -46,13 +46,9 @@ def _get_stray_light_phase(date_obs):
 
     Parameters:
     -----------
-    obs_date : `str`
-        Observation date string formatted in ISO format: YYYY-MM-DDTHH:mm
-        where YYYY is the year, MM is the month number (zero-padded), DD is
-        the day of the month (zero-padded), HH is the hour and mm is the
-        minute (note T separator between date and time; may also include
-        seconds). This is the standard format for the value of date_obs in the
-        FITS headers of XRT images.
+    obs_date : Any parse-time compatible format
+        Observation date. This can be specified in any format understood by
+        `sunpy.time.parse_time`.
 
     Returns:
     --------
@@ -134,27 +130,26 @@ def _select_lightleak_file(filter_wheel_1, filter_wheel_2, date):
     return file_dict[fw_tuple][phase]
 
 
-def xrt_remove_lightleak(in_map, kfact=1.0, leak_map=None):
+def xrt_remove_lightleak(in_map, scale=1.0, leak_map=None):
     r"""
-    Subtract light leak (visible stray light) image from XRT synoptic
-    composite images.
+    Subtract visible stray light image from XRT synoptic composite images.
 
     Parameters:
     -----------
     in_map : ~sunpy.map.sources.hinode.XRTMap
         |Map| for the synoptic composite image which the visible stray light
         will be subtracted from
-    kfact : float, default: 1.0
-        k-factor to apply when subtracting the light leak image:
-        ``out_data = in_data - k * [leak_img]``
-    leak_image : `~sunpy.map.Map`,  optional
+    scale : float, default: 1.0
+        Scaling factor to apply when subtracting the light leak image:
+        ``out_data = in_data - scale * leak_img``
+    leak_map : `~sunpy.map.Map`,  optional
         A leak image to subtract, if a non-default image is desired.
         It's assumed that the image is 1024x1024, prepped and exposure
         normalized.
 
     Returns:
     --------
-    out_map : ~sunpy.map.sources.hinode.XRTMap
+    out_map : `~sunpy.map.sources.hinode.XRTMap`
         |Map| of input image with the light leak removed. The metadata HISTORY
         is also updated to reflect the fact that the light leak was removed.
 
@@ -232,16 +227,17 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_map=None):
 
         leak_map = Map(get_ll_file())
     else:
+        # NOTE: This is to fill in the HISTORY in the resulting file
         leak_filename = "unknown"
 
     if in_map.dimensions != leak_map.dimensions:
         leak_map = leak_map.resample(u.Quantity(in_map.dimensions))
-    leak_map *= kfact
+    leak_map *= scale
 
     out_map = in_map - leak_map.quantity
 
     hist_entry = (
-        f"Light leak subtraction: DONE with {leak_filename} and kfactor:{kfact}"
+        f"Light leak subtraction: DONE with {leak_filename} and kfactor:{scale}"
     )
     out_map.meta["history"] += f"\n{hist_entry}"
 
