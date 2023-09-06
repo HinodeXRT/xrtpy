@@ -232,6 +232,7 @@ def xrt_remove_lightleak(in_map, scale=1.0, leak_map=None):
 
     if in_map.dimensions != leak_map.dimensions:
         leak_map = leak_map.resample(u.Quantity(in_map.dimensions))
+        leak_map *= 0.25
     leak_map *= scale
 
     out_map = in_map - leak_map.quantity
