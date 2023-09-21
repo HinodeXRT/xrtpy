@@ -21,3 +21,6 @@ sphinx_automodapi
 sphinx_rtd_theme >= 1.0.0
 sphinxcontrib-bibtex
 towncrier >= 20.0
+sphinx_copybutton
+sphinx_codeautolink
+sphinx.ext.viewcode
