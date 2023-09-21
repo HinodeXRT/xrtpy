@@ -19,9 +19,8 @@ sphinx-gallery >= 0.12
 sphinx-hoverxref >= 1.1
 sphinx-issues >= 3.0
 sphinx_automodapi
-sphinx_copybutton
 sphinx_codeautolink
-sphinx.ext.viewcode
+sphinx_copybutton
 sphinx_rtd_theme >= 1.2
 sphinxcontrib-bibtex >= 2.5
 towncrier >= 22.12
