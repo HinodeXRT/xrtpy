@@ -141,3 +141,6 @@ version.py
 #ignore mac files
 .DS_store
 .DS_Store
+
+# local directory
+idl_routines/

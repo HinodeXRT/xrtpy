@@ -1,11 +1,11 @@
 import numpy as np
-import pkg_resources
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
 
 from astropy import units as u
+from pathlib import Path
 
 from xrtpy.response.channel import Channel
 
@@ -33,9 +33,7 @@ def test_channel_name(channel_name):
     assert channel.name == channel_name
 
 
-filename = pkg_resources.resource_filename(
-    "xrtpy", "response/data/xrt_channels_v0016.genx"
-)
+filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)
 v6_genx_s = v6_genx["SAVEGEN0"]
@@ -60,7 +58,6 @@ _channel_name_to_index_mapping = {
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_geometry_aperture_area(channel_name):
-
     channel_filter = Channel(channel_name)
     geometry_aperture_area = channel_filter.geometry.geometry_aperture_area
 
@@ -74,7 +71,6 @@ def test_geometry_aperture_area(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_geometry_focal_len(channel_name):
-
     channel_filter = Channel(channel_name)
     geometry_focal_len = channel_filter.geometry.geometry_focal_len
 
@@ -88,7 +84,6 @@ def test_geometry_focal_len(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_geometry_name(channel_name):
-
     channel_filter = Channel(channel_name)
     geometry_name = channel_filter.geometry.geometry_name
 
@@ -101,7 +96,6 @@ def test_geometry_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_density(channel_name):
-
     channel_filter = Channel(channel_name)
     entrancefilter_density = channel_filter.entrancefilter.entrancefilter_density
 
@@ -114,7 +108,6 @@ def test_entrancefilter_density(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_material(channel_name):
-
     channel_filter = Channel(channel_name)
     entrancefilter_material = channel_filter.entrancefilter.entrancefilter_material
 
@@ -128,7 +121,6 @@ def test_entrancefilter_material(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_mesh_transmission(channel_name):
-
     channel_filter = Channel(channel_name)
     entrancefilter_mesh_transmission = (
         channel_filter.entrancefilter.entrancefilter_mesh_transmission
@@ -143,7 +135,6 @@ def test_entrancefilter_mesh_transmission(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_name(channel_name):
-
     channel_filter = Channel(channel_name)
     entrancefilter_name = channel_filter.entrancefilter.entrancefilter_name
 
@@ -156,7 +147,6 @@ def test_entrancefilter_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_wavelength(channel_name):
-
     channel_filter = Channel(channel_name)
     entrancefilter_wavelength_length = int(
         channel_filter.entrancefilter.number_of_wavelengths
@@ -195,7 +185,6 @@ def test_entrancefilter_wavelength(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_substrate(channel_name):
-
     channel_filter = Channel(channel_name)
     entrancefilter_substrate = channel_filter.entrancefilter.entrancefilter_substrate
 
@@ -208,7 +197,6 @@ def test_entrancefilter_substrate(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_entrancefilter_transmission(channel_name):
-
     channel_filter = Channel(channel_name)
     entrancefilter_transmission_length = int(
         channel_filter.entrancefilter.number_of_wavelengths
@@ -232,7 +220,6 @@ def test_entrancefilter_transmission(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_density(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_density = channel_filter.mirror_1.mirror_density
 
@@ -245,7 +232,6 @@ def test_mirror1_density(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_graze_angle(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
 
@@ -265,7 +251,6 @@ def test_mirror1_graze_angle(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_name(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_name = channel_filter.mirror_1.mirror_name
 
@@ -278,7 +263,6 @@ def test_mirror1_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_material(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_material = channel_filter.mirror_1.mirror_material
 
@@ -291,7 +275,6 @@ def test_mirror1_material(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_reflection(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
     mirror_reflection = channel_filter.mirror_1.mirror_reflection[
@@ -314,7 +297,6 @@ def test_mirror1_reflection(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror1_wavelength(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
     mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[
@@ -348,7 +330,6 @@ def test_mirror1_wavelength(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_density(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_density = channel_filter.mirror_1.mirror_density
 
@@ -361,7 +342,6 @@ def test_mirror2_density(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_graze_angle(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_graze_angle = channel_filter.mirror_1.mirror_graze_angle
 
@@ -380,7 +360,6 @@ def test_mirror2_graze_angle(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_name(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_name = channel_filter.mirror_1.mirror_name
 
@@ -393,7 +372,6 @@ def test_mirror2_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_material(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_material = channel_filter.mirror_1.mirror_material
 
@@ -406,7 +384,6 @@ def test_mirror2_material(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_reflection(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
     mirror_reflection = channel_filter.mirror_1.mirror_reflection[
@@ -428,7 +405,6 @@ def test_mirror2_reflection(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_mirror2_wavelength(channel_name):
-
     channel_filter = Channel(channel_name)
     mirror_number_of_length = int(channel_filter.mirror_1.number_of_wavelengths)
     mirror_wavelength = channel_filter.mirror_1.mirror_wavelength[
@@ -465,7 +441,6 @@ def test_mirror2_wavelength(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_density(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_density = channel_filter.filter_1.filter_density
 
@@ -478,7 +453,6 @@ def test_filter1_density(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_material(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_material = channel_filter.filter_1.filter_material
 
@@ -491,7 +465,6 @@ def test_filter1_material(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_mesh_transmission(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_mesh_transmission = channel_filter._filter_1.filter_mesh_transmission
 
@@ -504,7 +477,6 @@ def test_filter1_mesh_transmission(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_name(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_name = channel_filter.filter_1.filter_name
 
@@ -517,7 +489,6 @@ def test_filter1_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_substrate(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_substrate = channel_filter.filter_1.filter_substrate
 
@@ -530,7 +501,6 @@ def test_filter1_substrate(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_thickness(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_thickness = channel_filter.filter_1.filter_thickness
 
@@ -543,7 +513,6 @@ def test_filter1_thickness(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_transmission(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_transmission_length = int(channel_filter.filter_1.number_of_wavelengths)
     filter_transmission = channel_filter.filter_1.filter_transmission[
@@ -562,7 +531,6 @@ def test_filter1_transmission(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter1_wavelength(channel_name):
-
     channel_filter = Channel(channel_name)
 
     filter_wavelength_length = int(channel_filter.filter_1.number_of_wavelengths)
@@ -600,7 +568,6 @@ def test_filter1_wavelength(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_density(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_density = channel_filter.filter_2.filter_density
 
@@ -613,7 +580,6 @@ def test_filter2_density(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_material(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_material = channel_filter.filter_2.filter_material
 
@@ -626,7 +592,6 @@ def test_filter2_material(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_mesh_transmission(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_mesh_transmission = channel_filter.filter_2.filter_mesh_transmission
 
@@ -639,7 +604,6 @@ def test_filter2_mesh_transmission(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_name(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_name = channel_filter.filter_2.filter_name
 
@@ -652,7 +616,6 @@ def test_filter2_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_substrate(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_substrate = channel_filter.filter_2.filter_substrate
 
@@ -665,7 +628,6 @@ def test_filter2_substrate(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_thickness(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_thickness = channel_filter.filter_2.filter_thickness
 
@@ -678,7 +640,6 @@ def test_filter2_thickness(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_transmission(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_transmission_length = int(channel_filter.filter_2.number_of_wavelengths)
     filter_transmission = channel_filter.filter_2.filter_transmission[
@@ -697,7 +658,6 @@ def test_filter2_transmission(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_filter2_wavelength(channel_name):
-
     channel_filter = Channel(channel_name)
     filter_wavelength_length = int(channel_filter.filter_2.number_of_wavelengths)
     filter_wavelength = channel_filter.filter_2.filter_wavelength[
@@ -734,7 +694,6 @@ def test_filter2_wavelength(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_ccd_energy_pre_electron(channel_name):
-
     channel_filter = Channel(channel_name)
     ccd_full_well = channel_filter.ccd.ccd_energy_per_electron
 
@@ -747,7 +706,6 @@ def test_ccd_energy_pre_electron(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_ccd_full_well(channel_name):
-
     channel_filter = Channel(channel_name)
     ccd_full_well = channel_filter.ccd.ccd_full_well
 
@@ -761,35 +719,28 @@ def test_ccd_full_well(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_ccd_gain_left(channel_name):
-
     channel_filter = Channel(channel_name)
     ccd_gain_left = channel_filter.ccd.ccd_gain_left
 
-    idl_ccd_gain_left_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["CCD"]["GAIN_L"]
-        * u.electron
-    )
+    idl_ccd_gain_left_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]][
+        "CCD"
+    ]["GAIN_L"] * (u.electron / u.DN)
 
     assert u.isclose(ccd_gain_left, idl_ccd_gain_left_auto)
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_ccd_gain_right(channel_name):
-
     channel_filter = Channel(channel_name)
     ccd_gain_right = channel_filter.ccd.ccd_gain_right
 
-    idl_ccd_gain_right_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["CCD"]["GAIN_R"]
-        * u.electron
-    )
+    idl_ccd_gain_right_correction = 57.5 * (u.electron / u.DN)
 
-    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_auto)
+    assert u.isclose(ccd_gain_right, idl_ccd_gain_right_correction)
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_ccd_name(channel_name):
-
     channel_filter = Channel(channel_name)
     ccd_name = channel_filter.ccd.ccd_name
 
@@ -802,7 +753,6 @@ def test_ccd_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_CCD_pixel_size(channel_name):
-
     channel_filter = Channel(channel_name)
     ccd_pixel_size = channel_filter.ccd.ccd_pixel_size
 
@@ -816,7 +766,6 @@ def test_CCD_pixel_size(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_CCD_quantum_efficiency(channel_name):
-
     channel_filter = Channel(channel_name)
     ccd_array_length = int(channel_filter.ccd.number_of_wavelengths)
     ccd_quantum_efficiency = channel_filter.ccd.ccd_quantum_efficiency[
@@ -888,8 +837,7 @@ def test_CCD_wavelength(channel_name):
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
-def test_channel_name(channel_name):
-
+def test_channel_name2(channel_name):
     channel_filter = Channel(channel_name)
     name = channel_filter.name
 
@@ -902,7 +850,6 @@ def test_channel_name(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_wavelength(channel_name):
-
     channel_filter = Channel(channel_name)
 
     wavelength_length = int(channel_filter.number_of_wavelengths)
@@ -938,7 +885,6 @@ def test_channel_wavelength(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_transmission(channel_name):
-
     channel_filter = Channel(channel_name)
     transmission_length = int(channel_filter.number_of_wavelengths)
     transmission = channel_filter.transmission[:transmission_length]
@@ -955,7 +901,6 @@ def test_channel_transmission(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_number_of_wavelengths(channel_name):
-
     channel_filter = Channel(channel_name)
     channel_number_of_wavelengths = channel_filter.number_of_wavelengths
 
@@ -966,7 +911,6 @@ def test_channel_number_of_wavelengths(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_observatory(channel_name):
-
     channel_filter = Channel(channel_name)
     observatory = channel_filter.observatory
 
@@ -979,7 +923,6 @@ def test_channel_observatory(channel_name):
 
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_instrument(channel_name):
-
     channel_filter = Channel(channel_name)
     instrument = channel_filter.instrument
 
@@ -992,7 +935,6 @@ def test_channel_instrument(channel_name):
 
 @pytest.mark.parametrize("attr", ["wavelength", "number_of_wavelengths"])
 def test_open_channel(attr):
-
     open_filter = Channel("open")
     sample_filter = Channel("Al-mesh")
 
