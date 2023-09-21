@@ -18,7 +18,6 @@ sphinx-copybutton >= 0.5
 sphinx-gallery >= 0.12
 sphinx-hoverxref >= 1.1
 sphinx-issues >= 3.0
-sphinx.ext.viewcode
 sphinx_automodapi
 sphinx_codeautolink
 sphinx_copybutton
