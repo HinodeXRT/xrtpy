@@ -202,9 +202,7 @@ def xrt_remove_lightleak(in_map, scale=1.0, leak_map=None):
     images at the phase 1 (as of Feb-2022).
     """
     if "Light leak subtraction: DONE" in in_map.meta["HISTORY"]:
-        warnings.warn(
-            "HISTORY indicates light leak subtraction already done on image."
-        )
+        warnings.warn("HISTORY indicates light leak subtraction already done on image.")
 
     if leak_map is None:
         leak_filename = _select_lightleak_file(
@@ -231,7 +229,7 @@ def xrt_remove_lightleak(in_map, scale=1.0, leak_map=None):
 
     # case of 2048 x 2048 input image - for full resolution image, the light leak image flux
     # in each pixel must be split into four pixels each, thus the factor of 0.25 below
-    if in_map.dimensions[0] == 2*leak_map.dimensions[0]:
+    if in_map.dimensions[0] == 2 * leak_map.dimensions[0]:
         leak_map = leak_map.resample(u.Quantity(in_map.dimensions))
         leak_map *= 0.25
     leak_map *= scale
