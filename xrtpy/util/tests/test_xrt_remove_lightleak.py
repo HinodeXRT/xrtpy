@@ -52,4 +52,10 @@ def test_lightleak(idlfile, compfile, allclose):
 
     ll_removed_map_xrtpy = xrt_remove_lightleak(input_map)
 
-    assert allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=1e-5)
+    if input_map.data.shape == (2048, 2048):
+        # Because of rebinning for full resolution images, the match is worse
+        # between IDL created images and XRTpy ones. IDL's method of rebinning
+        # is different from that used by sunpy.
+        assert allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=0.75)
+    else:
+        assert allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=1e-5)
