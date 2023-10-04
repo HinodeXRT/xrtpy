@@ -36,6 +36,6 @@ IDL Testing Data for Effective Area
 The IDL testing data for the effective area is located in `response/test/data/effective_area_testing_files`. This directory contains a folder for each corresponding filter channel, e.g., Al-mesh, Al-med, Al-poly, Al-thick, Be-med, Be-thick, Be-thin, C-poly, Ti-poly. Each filter folder contains text files with header information like Filter, observation_data, and two rows of data: temperature and effective area. Follow "IDL Testing Scripts & IDL Test Files Relocation" to test the effective area. Once files are correctly placed, run `pytest test_effective_area.py` to test. All results should pass for a successful run. The purpose is to add new testing files to the existing ones.
 
 IDL Testing Data for Temperature Responses
------------------------------------------
+------------------------------------------
 
 The IDL testing data for temperature responses is located in `test/data/temperature_responses_testing_files`. This directory contains a folder for each corresponding filter channel, e.g., Al-mesh, Al-med, Al-poly, Al-thick, Be-med, Be-thick, Be-thin, C-poly, Ti-poly. Each filter folder contains text files with header information like Filter, observation_data, and two rows of data: temperature and temperature responses. Follow "IDL Testing Scripts & IDL Test Files Relocation" to test the temperature responses. Run `pytest -v test_temperature_response.py` to test. All results should pass for a successful run. The purpose is to add new testing files to the existing ones.
