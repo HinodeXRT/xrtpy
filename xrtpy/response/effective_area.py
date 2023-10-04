@@ -149,6 +149,79 @@ class EffectiveAreaFundamental:
         return 0 if self.name in index_mapping_to_fw1_name else 1
 
     @property
+    def combo_filter_name_split(self):
+        """Defining chosen filters to its corresponding filter wheel."""
+        name = (self.name).split("/")
+        filter1, filter2 = name[0], name[1]
+        return filter1, filter2
+
+    @property
+    def combo_filter1_wheel_number(self):
+        """Defining chosen filter to its corresponding filter wheel."""
+        filter1, _ = self.combo_filter_name_split
+        return 0 if filter1 in index_mapping_to_fw1_name else 1
+
+    @property
+    def combo_filter2_wheel_number(self):
+        """Defining chosen filter to its corresponding filter wheel."""
+        _, filter2 = self.combo_filter_name_split
+        return 0 if filter2 in index_mapping_to_fw1_name else 1
+
+    @property
+    def combo_filter_index_mapping_to_name_filter1(self):
+        """Returns filter's corresponding number value."""
+        filter1, _ = self.combo_filter_name_split
+
+        if filter1 in index_mapping_to_fw1_name:
+            return index_mapping_to_fw1_name.get(filter1)
+        elif filter1 in index_mapping_to_fw2_name:
+            return index_mapping_to_fw2_name.get(filter1)
+
+    @property
+    def combo_filter_index_mapping_to_name_filter2(self):
+        """Returns filter's corresponding number value."""
+        filter1, filter2 = self.combo_filter_name_split
+
+        if filter2 in index_mapping_to_fw1_name:
+            return index_mapping_to_fw1_name.get(filter2)
+        elif filter2 in index_mapping_to_fw2_name:
+            return index_mapping_to_fw2_name.get(filter2)
+
+    @property
+    def combo_filter1_data(self):
+        """Collecting filter data."""
+        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter1][
+            self.combo_filter1_wheel_number
+        ]
+
+    @property
+    def combo_filter2_data(self):
+        """Collecting filter data."""
+        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter2][
+            self.combo_filter2_wheel_number
+        ]
+
+    @property
+    def contamination_on_filter1_combo(self) -> u.angstrom:
+        """
+        Thickness of the contamination layer on a filter."""
+
+        interpolater = scipy.interpolate.interp1d(
+            self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
+        )
+        return interpolater(self.filter_observation_date_to_seconds)
+
+    @property
+    def contamination_on_filter2_combo(self) -> u.angstrom:
+        """
+        Thickness of the contamination layer on a filter."""
+
+        interpolater = scipy.interpolate.interp1d(
+            self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
+        )
+        return interpolater(self.filter_observation_date_to_seconds)
+
+    @property
     def filter_data(self):
         """Collecting filter contamination data."""
         return _filter_contamination[self.filter_index_mapping_to_name][
@@ -165,7 +238,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_attributes(self):
-        """Diethylhexylphthalate: Wavelength (nm), Delta, Beta."""
+        """(Diethylhexylphthalate) Wavelength (nm), Delta, Beta."""
         _n_DEHP_filename = get_pkg_data_filename(
             "data/n_DEHP.txt", package="xrtpy.response"
         )
@@ -181,7 +254,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_wavelength(self):
-        """Diethylhexylphthalate: Wavelength given in Angstrom (Å)."""
+        """(Diethylhexylphthalate) Wavelength given in Angstrom (Å)."""
 
         # Convert wavelength values from nanometers to Angstroms
         wavelength_str = [
@@ -192,7 +265,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_delta(self):
-        """Diethylhexylphthalate: Delta."""
+        """(Diethylhexylphthalate) Delta."""
 
         delta_str = [
             self.n_DEHP_attributes[i][1] for i in range(2, len(self.n_DEHP_attributes))
@@ -210,7 +283,7 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def n_DEHP_beta(self):
-        """Diethylhexylphthalate: Beta."""
+        """(Diethylhexylphthalate) Beta."""
 
         beta_str = [
             self.n_DEHP_attributes[i][2] for i in range(2, len(self.n_DEHP_attributes))

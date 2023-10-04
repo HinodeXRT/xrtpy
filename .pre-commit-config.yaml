@@ -1,6 +1,6 @@
 ci:
   autofix_prs: false
-  autoupdate_schedule: quarterly
+  autoupdate_schedule: monthly
 
 repos:
 
@@ -21,12 +21,18 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: 0.4.1
+  rev: 1.1.0
   hooks:
   - id: pyproject-fmt
 
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.0.287
+  hooks:
+  - id: ruff
+    args: [--fix]
+
 - repo: https://github.com/PyCQA/isort
-  rev: 5.11.4
+  rev: 5.12.0
   hooks:
   - id: isort
     name: isort
@@ -37,36 +43,31 @@ repos:
     - python
 
 - repo: https://github.com/psf/black
-  rev: 22.12.0
+  rev: 23.7.0
   hooks:
   - id: black
 
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.6.0
+  rev: 1.7.0
   hooks:
   - id: nbqa-black
     additional_dependencies:
-    - black==22.3.0
+    - black==23.3.0
     args:
     - --nbqa-mutate
   - id: nbqa-isort
     additional_dependencies:
-    - isort==5.10.1
+    - isort==5.12.0
     args:
     - --nbqa-mutate
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.5.0
+  rev: v2.10.0
   hooks:
   - id: pretty-format-ini
     args: [--autofix]
   - id: pretty-format-yaml
     args: [--autofix]
-
-- repo: https://github.com/pre-commit/mirrors-csslint
-  rev: v1.0.5
-  hooks:
-  - id: csslint
 
 - repo: https://github.com/MarcoGorelli/absolufy-imports
   rev: v0.3.1
@@ -75,7 +76,7 @@ repos:
     exclude: docs/plasmapy_sphinx
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.2
+  rev: v2.2.5
   hooks:
   - id: codespell
     exclude: .*\.fits
@@ -83,14 +84,14 @@ repos:
     - tomli
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.3.1
+  rev: v3.10.1
   hooks:
   - id: pyupgrade
-    args: [--keep-runtime-typing, --py38-plus]
+    args: [--keep-runtime-typing, --py39-plus]
     files: ^xrtpy/
 
 - repo: https://github.com/pre-commit/pygrep-hooks
-  rev: v1.9.0
+  rev: v1.10.0
   hooks:
   - id: rst-directive-colons
   - id: rst-inline-touching-normal
