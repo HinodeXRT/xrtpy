@@ -1,8 +1,9 @@
 import glob
-import pytest
 
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
@@ -32,13 +33,17 @@ def _IDL_raw_data_list(filename):
     return IDL_data_list
 
 
-def IDL_test_filter_name(IDL_data_list):
+def IDL_test_abundance_name(IDL_data_list):
     return str(IDL_data_list[1][1])
 
 
+def IDL_test_filter_name(IDL_data_list):
+    return str(IDL_data_list[2][1])
+
+
 def IDL_test_date(IDL_data_list):
-    obs_date = str(IDL_data_list[2][1])
-    obs_time = str(IDL_data_list[2][2])
+    obs_date = str(IDL_data_list[3][1])
+    obs_time = str(IDL_data_list[3][2])
 
     day = int(obs_date[:2])
 
@@ -62,7 +67,7 @@ def _IDL_temperature_response_raw_data(filename):
             line_list = stripped_line.split()
             IDL_data_list.append(line_list)
 
-    new_IDL_data_list = [IDL_data_list[i][1] for i in range(4, len(IDL_data_list))]
+    new_IDL_data_list = [IDL_data_list[i][1] for i in range(5, len(IDL_data_list))]
     return [float(i) for i in new_IDL_data_list]
 
 
