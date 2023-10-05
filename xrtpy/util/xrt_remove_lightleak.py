@@ -1,43 +1,155 @@
 """
 Functionality for removing the visible light leak from XRT composite image data.
 """
-__all__ = ["xrt_remove_lightleak"]
-
-import numpy as np
+import astropy.time
+import astropy.units as u
 import warnings
 
-from datetime import datetime
-from pathlib import Path
+from sunpy.data import manager
 from sunpy.map import Map
+from sunpy.time import parse_time
+from urllib.parse import urljoin
+
+from xrtpy.util import _SSW_MIRRORS
+
+__all__ = ["xrt_remove_lightleak"]
+
+LL_FILE_HASHES = {
+    "term_p1cp_20140527_204601.fits": "bdb924a6ae62292980b266cec0fb96c3626d921efe8148a13b26f964513ea533",
+    "term_p1tp_20140515_182503.fits": "0f5211633069cfb6a2d9d95f42d42bf52c4e16e1c47b89d32c567b430cd794b0",
+    "term_p2am_20150718_160913.fits": "b2ba35e7b59d6785b5290900405b82814ebe3ca25c321d55d3853b452844df1f",
+    "term_p2ap_20150620_172818.fits": "f08c96b86a5c2ed6e980d4a565a536476fe941b48877d2b22709b9694c2ce1c7",
+    "term_p2cp_20150620_190645.fits": "0e7f72da2d408894980b8a14ead08e0fcd8706cb94c4aa4e256c60576c0c7678",
+    "term_p2tp_20150718_160921.fits": "9fae8a831c52ecbe3d53d7e4d25caf78702a1aa5a117693d1bf75f0f200b30e6",
+    "term_p3am_20170808_180126.fits": "ab8a92f728bfa7f68837c349923247a744ff5f86f2d996efc2c54b833455e3f3",
+    "term_p3ap_20170809_183821.fits": "069d54e292d070322da0095efb903e79a1605371996a791e16e595420f557734",
+    "term_p4am_20180712_171919.fits": "fd73856d8ea6eee83285ef91f0feb25f8568e6d0b88f77a2c35f4381c888abb3",
+    "term_p4ap_20180712_171928.fits": "d57a92975e708999fabe22dbd4d491a9a10d9491ee4068a62c73ed4555f7e5dd",
+    "term_p5am_20220709_180901.fits": "a052bc352cddfe2e7da69f90de83dd8549a457b8ef52acc18932ad41e255f410",
+    "term_p5ap_20220709_180910.fits": "ab078b4d9573c4b737e7fb41311f824eb540c44c1fd8e3a588cd4e6e0ac2cb39",
+}
 
 
-def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
+def _get_stray_light_phase(date_obs):
+    """
+    Get the stray light phase number.
+
+    The stray light phase is computed according to the date as follows:
+
+    phase 0 : 23-Oct-2006 10:00
+    phase 1 :  9-May-2012 12:00
+    phase 2 : 14-Jun-2015 12:30
+    phase 3 : 27-May-2017 11:00
+    phase 4 : 29-May-2018 00:00
+    phase 5 :  8-Jun-2022 12:40
+    phase 6 :  5-May-2023  4:39
+
+    Parameters:
+    -----------
+    obs_date : Any parse-time compatible format
+        Observation date. This can be specified in any format understood by
+        `sunpy.time.parse_time`.
+
+    Returns:
+    --------
+    phase : `int`
+        The phase of the light leak
+    """
+    phase_periods = astropy.time.Time(
+        [
+            "2012-05-09 12:00",
+            "2015-06-14 12:30",
+            "2017-05-27 11:00",
+            "2018-05-29 00:00",
+            "2022-06-08 12:40",
+            "2023-05-05 04:39",
+        ],
+        format="iso",
+        scale="utc",
+    )
+
+    date_obs = parse_time(date_obs)
+    if date_obs >= phase_periods[5]:
+        phase = 6
+    elif date_obs >= phase_periods[4]:
+        phase = 5
+    elif date_obs >= phase_periods[3]:
+        phase = 4
+    elif date_obs >= phase_periods[2]:
+        phase = 3
+    elif date_obs >= phase_periods[1]:
+        phase = 2
+    elif date_obs >= phase_periods[0]:
+        phase = 1
+    else:
+        phase = 0
+
+    if phase == 6:
+        warnings.warn(
+            "light leak images for this period are not yet"
+            " available. Defaulting to previous phase."
+        )
+        phase = 5
+
+    return phase
+
+
+def _select_lightleak_file(filter_wheel_1, filter_wheel_2, date):
+    phase = _get_stray_light_phase(date)
+    file_dict = {
+        ("open", "al mesh"): {
+            2: "term_p2am_20150718_160913.fits",
+            3: "term_p3am_20170808_180126.fits",
+            4: "term_p4am_20180712_171919.fits",
+            5: "term_p5am_20220709_180901.fits",
+        },
+        ("al poly", "open"): {
+            2: "term_p2ap_20150620_172818.fits",
+            3: "term_p3ap_20170809_183821.fits",
+            4: "term_p4ap_20180712_171928.fits",
+            5: "term_p5ap_20220709_180910.fits",
+        },
+        ("c poly", "open"): {
+            2: "term_p2cp_20150620_190645.fits",
+        },
+        ("open", "ti poly"): {
+            1: "term_p1tp_20140515_182503.fits",
+            2: "term_p2tp_20150718_160921.fits",
+        },
+    }
+    fw_tuple = (filter_wheel_1.lower(), filter_wheel_2.lower())
+    if fw_tuple not in file_dict:
+        raise ValueError(
+            f"No leak image available for {filter_wheel_1}/{filter_wheel_2}."
+        )
+    if phase not in file_dict[fw_tuple]:
+        raise ValueError(
+            f"No leak image available for {date} and {filter_wheel_1}/{filter_wheel_2}"
+        )
+
+    return file_dict[fw_tuple][phase]
+
+
+def xrt_remove_lightleak(in_map, scale=1.0, leak_map=None):
     r"""
-    Subtract light leak (visible stray light) image from XRT synoptic
-    composite images.
+    Subtract visible stray light image from XRT synoptic composite images.
 
     Parameters:
     -----------
     in_map : ~sunpy.map.sources.hinode.XRTMap
         |Map| for the synoptic composite image which the visible stray light
         will be subtracted from
-
-    kfact : float, default: 1.0
-        k-factor to apply when subtracting the light leak image:
-        ``out_data = in_data - k * [leak_img]``
-
-
-    leak_image : float array, dimensions 1024x1024,  optional
+    scale : float, default: 1.0
+        Scaling factor to apply when subtracting the light leak image:
+        ``out_data = in_data - scale * leak_img``
+    leak_map : `~sunpy.map.Map`,  optional
         A leak image to subtract, if a non-default image is desired.
         It's assumed that the image is 1024x1024, prepped and exposure
         normalized.
 
-    verbose : `bool`, default: `False`
-        If `True`, print out extra messages.
-
     Returns:
     --------
-    out_map : ~sunpy.map.sources.hinode.XRTMap
+    out_map : `~sunpy.map.sources.hinode.XRTMap`
         |Map| of input image with the light leak removed. The metadata HISTORY
         is also updated to reflect the fact that the light leak was removed.
 
@@ -88,176 +200,45 @@ def xrt_remove_lightleak(in_map, kfact=1.0, leak_image=None, verbose=False):
     k-factor is obtained with the function :file:`GET_SLCORFACT_RAW.PRO`, and the leak
     image subtraction has been already performed only for the Ti_poly SCIA
     images at the phase 1 (as of Feb-2022).
-
     """
+    if "Light leak subtraction: DONE" in in_map.meta["HISTORY"]:
+        warnings.warn("HISTORY indicates light leak subtraction already done on image.")
 
-    # Check to see if the lightleak has already been subtracted
-    history = in_map.meta["HISTORY"]
-    if "Light leak subtraction: DONE" in history:
-        raise ValueError(
-            "HISTORY indicates light leak subtraction already done on image."
+    if leak_map is None:
+        leak_filename = _select_lightleak_file(
+            *in_map.measurement.split("-"), in_map.date
         )
-    # ********* select leak image from the archive *********
-    if leak_image is None:
-        dir_leak = Path(__file__).parent.absolute() / "data" / "leak_fits"
-        filt1 = in_map.meta["EC_FW1"]
-        filt2 = in_map.meta["EC_FW2"]
-        fpair = str(filt1) + str(filt2)
-        sfilt1 = in_map.meta["EC_FW1_"]
-        sfilt2 = in_map.meta["EC_FW2_"]
-        sfpair = f"{sfilt1}/{sfilt2}"
-        sl_phase = check_sl_phase(in_map.meta["date_obs"])
-        if sl_phase == 6:
-            warnings.warn(
-                "light leak images for this period are not yet"
-                " available. Defaulting to previous phase."
-            )
-            sl_phase = 5
 
-    if fpair == "01":  # Open/Al_mesh
-        sl_phase_dict = {
-            2: "term_p2am_20150718_160913.fits",
-            3: "term_p3am_20170808_180126.fits",
-            4: "term_p4am_20180712_171919.fits",
-            5: "term_p5am_20220709_180901.fits",
-        }
-    elif fpair == "10":  # Al_poly/Open
-        sl_phase_dict = {
-            2: "term_p2ap_20150620_172818.fits",
-            3: "term_p3ap_20170809_183821.fits",
-            4: "term_p4ap_20180712_171928.fits",
-            5: "term_p5ap_20220709_180910.fits",
-        }
-    elif fpair == "20":  # C_poly/Open
-        sl_phase_dict = {2: "term_p2cp_20150620_190645.fits"}
-    elif fpair == "02":  # Open/Ti_poly
-        sl_phase_dict = {
-            1: "term_p1tp_20140515_182503.fits",
-            2: "term_p2tp_20150718_160921.fits",
-        }
+        # NOTE: This function is being defined inline because the filename is only known once
+        # the date and filter wheel combination are known.
+        @manager.require(
+            "ll_file",
+            [
+                urljoin(mirror, f"hinode/xrt/idl/util/leak_fits/{leak_filename}")
+                for mirror in _SSW_MIRRORS
+            ],
+            LL_FILE_HASHES[leak_filename],
+        )
+        def get_ll_file():
+            return manager.get("ll_file")
+
+        leak_map = Map(get_ll_file())
     else:
-        sl_phase_dict = {}
-        print(f"No leak image available for this filter pair {sfpair}.")
-        if verbose:
-            info = (
-                f"{in_map.meta['date_obs']}   {in_map.measurement}   "
-                + f"{in_map.meta['naxis1']}x{in_map.meta['naxis2']}"
-            )
-            print(info)
-        print("Output data are identical with the input")
-        return in_map
+        # NOTE: This is to fill in the HISTORY in the resulting file
+        leak_filename = "unknown"
 
-    try:
-        leak_fn = sl_phase_dict[sl_phase]
-    except KeyError:
-        print(f"No leak image available for phase {sl_phase}")
-        if verbose:
-            print(f"Filter pair used: {sfpair}")
-        print("Output data are identical with the input")
-        return in_map
+    # case of 2048 x 2048 input image - for full resolution image, the light leak image flux
+    # in each pixel must be split into four pixels each, thus the factor of 0.25 below
+    if in_map.dimensions[0] == 2 * leak_map.dimensions[0]:
+        leak_map = leak_map.resample(u.Quantity(in_map.dimensions))
+        leak_map *= 0.25
+    leak_map *= scale
 
-    leak_map = Map(dir_leak / leak_fn)
+    out_map = in_map - leak_map.quantity
 
-    leak_image = leak_map.data
-    if in_map.meta["naxis1"] == 2048:
-        # assumes leak_image is 1024 x 1024 (I think)
-        leak_image2 = rebin(leak_image, (2048, 2048)) * 0.25 * kfact
-    else:
-        leak_image2 = leak_image * kfact
+    hist_entry = (
+        f"Light leak subtraction: DONE with {leak_filename} and kfactor:{scale}"
+    )
+    out_map.meta["history"] += f"\n{hist_entry}"
 
-    out_image = in_map.data - leak_image2
-
-    hist_entry = f"Light leak subtraction: DONE with {leak_fn} and kfactor:{kfact}"
-    out_meta = in_map.meta
-    out_meta["history"] += f"\n{hist_entry}"
-
-    if verbose:
-        print(f"appended to the history : {hist_entry}")
-
-    return Map((out_image, out_meta))
-
-
-def check_sl_phase(date_obs):
-    """
-    Get the stray light phase number
-
-    Parameters:
-    -----------
-    obs_date : `str`
-        Observation date string formatted in ISO format: YYYY-MM-DDTHH:mm
-        where YYYY is the year, MM is the month number (zero-padded), DD is
-        the day of the month (zero-padded), HH is the hour and mm is the
-        minute (note T separator between date and time; may also include
-        seconds). This is the standard format for the value of date_obs in the
-        FITS headers of XRT images.
-
-    Returns:
-    --------
-    phase no. : `int`
-        The phase of the light leak as follows:
-
-    phase 0 : 23-Oct-2006 10:00
-    phase 1 :  9-May-2012 12:00
-    phase 2 : 14-Jun-2015 12:30
-    phase 3 : 27-May-2017 11:00
-    phase 4 : 29-May-2018 00:00
-    phase 5 :  8-Jun-2022 12:40
-    phase 6 :  5-May-2023  4:39
-    """
-
-    time_p1 = datetime.strptime("09-May-2012 12:00", "%d-%b-%Y %H:%M")
-    time_p2 = datetime.strptime("14-Jun-2015 12:30", "%d-%b-%Y %H:%M")
-    time_p3 = datetime.strptime("27-May-2017 11:00", "%d-%b-%Y %H:%M")
-    time_p4 = datetime.strptime("29-May-2018 00:00", "%d-%b-%Y %H:%M")
-    time_p5 = datetime.strptime("08-Jun-2022 12:40", "%d-%b-%Y %H:%M")
-    time_p6 = datetime.strptime("05-May-2023 04:39", "%d-%b-%Y %H:%M")
-
-    intime = datetime.fromisoformat(date_obs)
-    if intime >= time_p6:
-        phase = 6
-    elif intime >= time_p5:
-        phase = 5
-    elif intime >= time_p4:
-        phase = 4
-    elif intime >= time_p3:
-        phase = 3
-    elif intime >= time_p2:
-        phase = 2
-    elif intime >= time_p1:
-        phase = 1
-    else:
-        phase = 0
-
-    return phase
-
-
-def rebin(image, newshape):
-    """
-    Rebin an array to a new shape. Copied from:
-    https://scipy-cookbook.readthedocs.io/items/Rebinning.html
-    Should behave similarly to IDL rebin
-
-    Parameters:
-    -----------
-    image : 2D numpy array
-        image to be rebinned
-
-    newshape : tuple
-        dimensions of rebinned image. Each dimension should be an integer
-        multiple of the corresponding dimension in the input image, though
-        they need not be the same multiple
-
-    Returns:
-    --------
-    newimage : 2D numpy array
-        rebinned image
-    """
-
-    assert len(image.shape) == len(newshape)
-
-    slices = [
-        slice(0, old, float(old) / new) for old, new in zip(image.shape, newshape)
-    ]
-    coordinates = np.mgrid[slices]
-    indices = coordinates.astype("i")
-    return image[tuple(indices)]
+    return out_map
