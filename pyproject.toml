@@ -6,6 +6,31 @@ requires = [
   "wheel>=0.34",
 ]  # ought to mirror 'requirements/build.txt'
 
+[tool.ruff]
+target-version = "py39"
+show-fixes = true
+extend-select = [
+  "UP", # pyupgrade
+]
+ignore = [
+  "E501",
+]
+extend-exclude = [
+  ".jupyter",
+  "__pycache__",
+  "_build",
+  "_dev",
+]
+
+[tool.ruff.flake8-import-conventions.aliases]
+"astropy.units" = "u"
+"matplotlib.pyplot" = "plt"
+numpy = "np"
+pandas = "pd"
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["E402", "F401", "F402", "F403"]  # ignore import errors
+
 [tool.isort]
 line_length = 88
 wrap_length = 80

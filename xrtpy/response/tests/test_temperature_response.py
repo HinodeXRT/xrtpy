@@ -1,8 +1,7 @@
-import glob
-
 from datetime import datetime
 from pathlib import Path
 
+import glob
 import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental

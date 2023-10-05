@@ -23,10 +23,10 @@ _abundance_model_file_path = {
     / "XRT_emiss_model.default_CHIANTI.geny",
     "hybrid_abundance_path": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
-    / "XRT_emiss_model.default_CHIANTI_photospheric.geny",
+    / "XRT_emiss_model.default_CHIANTI_hybrid.geny",
     "photospheric_abundance_path": Path(__file__).parent.absolute()
     / "data/chianti_emission_models"
-    / "XRT_emiss_model.default_CHIANTI_hybrid.geny",
+    / "XRT_emiss_model.default_CHIANTI_photospheric.geny",
 }
 
 _abundance_model_data = {
