@@ -3,7 +3,7 @@
 .. image:: images/hinode_satellite.png
    :alt: Hinode Satellite
    :align: right
-   :scale: 30%
+   :scale: 50%
 
 *******************************
 About the X-Ray Telescope (XRT)
