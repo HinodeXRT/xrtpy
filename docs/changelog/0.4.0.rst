@@ -3,12 +3,16 @@ XRTpy v0.4.0 (2023-10-05)
 
 Deprecations and Removals
 -------------------------
+- Remove the light-leak files from the repository in favor of pulling them from one of two possible SolarSoft mirrors with the goal of reducing the total repository size. (:pr:`178,180`)
 
-Features
---------
+Documentation
+-------------
+- Updated Python example notebooks aimed at ensuring a user-friendly and accessible experience. (:pr:`164`)
+- Revised and improved all the text/documentation sections of XRTpy to ensure the accuracy, clarity, and completeness of the documentation. (:pr:`165`)
 
-Bug Fixes
----------
-
-Improved Documentation
-----------------------
+Internal modifications and improvements
+---------------------------------------
+- Modified `~xrtpy.response.xrt_deconvolve.` to use Sunpy data manager to download the data files. (:pr:`172`)
+- Updated Read the Docs configuration file. (:pr:`173`)
+- Removed psf file after new improvement downloading them as part of the XRTpy package. (:pr:`177`)
+- Updating the xrt_contam_on_ccd.geny file with new CCD contamination values. (:pr:`191`)
