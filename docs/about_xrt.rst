@@ -3,7 +3,7 @@
 .. image:: images/hinode_satellite.png
    :alt: Hinode Satellite
    :align: right
-   :scale: 70%
+   :scale: 64%
 
 
 *******************************
