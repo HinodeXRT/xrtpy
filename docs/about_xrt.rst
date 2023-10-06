@@ -15,7 +15,7 @@ About the X-Ray Telescope (XRT)
 
 Hinode
 ======
-Hinode (`formerly known as Solar-B`_) is a joint mission between the space agencies of Japan, United States, Europe, and the United Kingdom.
+Hinode (``*illustration shown above*``) is a joint mission between the space agencies of Japan, United States, Europe, and the United Kingdom.
 The spacecraft carries three instruments: the Solar Optical Telescope (SOT), the Extreme Ultraviolet Imaging Spectrometer (EIS), and the X-Ray Telescope (XRT). These
 instruments are designed to provide multi-wavelength data from the photosphere to the upper corona. The 875-kg spacecraft was launched on September 23, 2006, into a polar,
 sun-synchronous orbit, enabling continuous observations of the Sun. Further information can be found at `NASA's Hinode space mission to the Sun`_.
@@ -43,7 +43,6 @@ IDL is a software programming language used to analyze and create meaningful inf
    It focuses solely on the analysis of XRT data using the IDL software.
 
 
-.. _formerly known as Solar-B: https://www.esa.int/Science_Exploration/Space_Science/Solar-B_renamed_Hinode_after_launch#:~:text=Solar%2DB%2C%20JAXA's%20mission%20to,'sunrise'%2C%20after%20launch.
 .. _NASA's Hinode space mission to the Sun: https://www.nasa.gov/mission_pages/hinode/mission.html
 .. _Interactive Data Language: https://www.l3harrisgeospatial.com/Software-Technology/IDL
 
