@@ -1,0 +1,14 @@
+XRTpy v0.4.0 (2023-10-05)
+=========================
+
+Deprecations and Removals
+-------------------------
+
+Features
+--------
+
+Bug Fixes
+---------
+
+Improved Documentation
+----------------------
