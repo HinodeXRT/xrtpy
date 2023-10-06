@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 from sunpy.map import Map
 
-from xrtpy.util.xrt_remove_lightleak import xrt_remove_lightleak
+from xrtpy.image_correction.xrt_remove_lightleak import xrt_remove_lightleak
 
 
 def get_IDL_data_file():
