@@ -8,11 +8,11 @@ Deprecations and Removals
 Documentation
 -------------
 - Updated Python example notebooks to ensure a user-friendly and accessible experience. (:pr:`164`)
-- Revised and improved all text/documentation sections of XRTpy to ensure accuracy, clarity, and completeness of the documentation. (:pr:`165`)
+- Revised and improved all text/documentation sections of XRTpy to ensure accuracy, clarity, and completeness. (:pr:`165`)
 
 Internal modifications and improvements
 ---------------------------------------
-- Modified `~xrtpy.response.xrt_deconvolve.` to use the Sunpy data manager to download the data files. (:pr:`172`)
+- Modified `~xrtpy.response.xrt_deconvolve` to use the Sunpy data manager to download the data files. (:pr:`172`)
 - Updated the Read the Docs configuration file. (:pr:`173`)
 - Removed psf files after a new improvement in downloading them as part of the XRTpy package. (:pr:`177`)
-- Updated the xrt_contam_on_ccd.geny file with new CCD contamination values. (:pr:`191`)
+- Updated the `xrt_contam_on_ccd.geny` file with new CCD contamination values. (:pr:`191`)
