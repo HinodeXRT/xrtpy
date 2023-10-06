@@ -13,12 +13,14 @@ About the X-Ray Telescope (XRT)
 .. contents:: Contents
    :local:
 
+
 Hinode
 ======
-Hinode (``*illustration shown above*``) is a joint mission between the space agencies of Japan, United States, Europe, and the United Kingdom.
-The spacecraft carries three instruments: the Solar Optical Telescope (SOT), the Extreme Ultraviolet Imaging Spectrometer (EIS), and the X-Ray Telescope (XRT). These
-instruments are designed to provide multi-wavelength data from the photosphere to the upper corona. The 875-kg spacecraft was launched on September 23, 2006, into a polar,
-sun-synchronous orbit, enabling continuous observations of the Sun. Further information can be found at `NASA's Hinode space mission to the Sun`_.
+Hinode a joint mission involving the space agencies of Japan, the United States, Europe,  and the United Kingdom. It is depicted in the *illustration shown above*.
+The spacecraft is equipped with three instruments: the Solar Optical Telescope (SOT), the Extreme Ultraviolet Imaging Spectrometer (EIS), and the X-Ray Telescope (XRT).
+These instruments are designed to provide multi-wavelength data from the  photosphere to the upper corona. The solar spacecraft spacecraft was launched at 6:36 a.m. on
+September 23, 2006 (Japan Standard Time) and placed into a polar,  sun-synchronous orbit, enabling continuous observations of the Sun. For further information, visit `NASA's Hinode space mission to the Sun`_.
+
 
 
 The X-Ray Telescope
