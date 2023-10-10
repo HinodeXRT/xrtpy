@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 from sunpy.map import Map
 
-from xrtpy.util.xrt_remove_lightleak import xrt_remove_lightleak
+from xrtpy.image_correction.remove_lightleak import remove_lightleak
 
 
 def get_IDL_data_file():
@@ -50,7 +50,7 @@ def test_lightleak(idlfile, compfile, allclose):
     IDL_map = Map(idlfile)
     input_map = Map(compfile)
 
-    ll_removed_map_xrtpy = xrt_remove_lightleak(input_map)
+    ll_removed_map_xrtpy = remove_lightleak(input_map)
 
     if input_map.data.shape == (2048, 2048):
         # Because of rebinning for full resolution images, the match is worse

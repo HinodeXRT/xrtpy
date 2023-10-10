@@ -10,9 +10,9 @@ from sunpy.map import Map
 from sunpy.time import parse_time
 from urllib.parse import urljoin
 
-from xrtpy.util import _SSW_MIRRORS
+from xrtpy.image_correction import _SSW_MIRRORS
 
-__all__ = ["xrt_remove_lightleak"]
+__all__ = ["remove_lightleak"]
 
 LL_FILE_HASHES = {
     "term_p1cp_20140527_204601.fits": "bdb924a6ae62292980b266cec0fb96c3626d921efe8148a13b26f964513ea533",
@@ -130,7 +130,7 @@ def _select_lightleak_file(filter_wheel_1, filter_wheel_2, date):
     return file_dict[fw_tuple][phase]
 
 
-def xrt_remove_lightleak(in_map, scale=1.0, leak_map=None):
+def remove_lightleak(in_map, scale=1.0, leak_map=None):
     r"""
     Subtract visible stray light image from XRT synoptic composite images.
 
@@ -157,7 +157,7 @@ def xrt_remove_lightleak(in_map, scale=1.0, leak_map=None):
     --------
     >>> file = ``"comp_XRT20200220_061539.6.fits"`` # doctest: +SKIP
     >>> in_map = Map(file) # doctest: +SKIP
-    >>> out_map =xrt_remove_lightleak(in_map) # doctest: +SKIP
+    >>> out_map = remove_lightleak(in_map) # doctest: +SKIP
 
     Notes:
     ------
