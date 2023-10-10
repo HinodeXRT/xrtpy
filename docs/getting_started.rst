@@ -73,7 +73,7 @@ such as `"hybrid"` or `"photospheric"` in the `abundance_model` parameter. For e
        abundance_model = 'Hybrid'
        )
 
-The `abundance_model` parameter is used in the same format in `xrt_teem`.
+The `abundance_model` parameter is used in the same format in `temperature_from_filter_ratio`.
 
 
 Data Products
