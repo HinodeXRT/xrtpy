@@ -2,7 +2,7 @@
 Functionality for diagnosing plasma temperature through the filter
 ratio technique.
 """
-__all__ = ["xrt_teem"]
+__all__ = ["temperature_from_filter_ratio"]
 
 import numpy as np
 
@@ -19,7 +19,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")
 
 
-def xrt_teem(
+def temperature_from_filter_ratio(
     map1,
     map2,
     abundance_model="coronal",
@@ -103,13 +103,13 @@ def xrt_teem(
     Using this function, you can derive the coronal temperature using
     filter ratio method.
 
-    >>> T_EM = xrt_teem(map1, map2) # doctest: +SKIP
+    >>> T_EM = temperature_from_filter_ratio(map1, map2) # doctest: +SKIP
 
     If you want to bin the image data in space to reduce photon noise, set
     binfac to the factor by which you want to bin.  For example to bin the
     data by a factor of 3 do:
 
-    >>> T_EM = xrt_teem(map1, map2, binfac=3) # doctest: +SKIP
+    >>> T_EM = temperature_from_filter_ratio(map1, map2, binfac=3) # doctest: +SKIP
 
     The data is binned first and then the temperature is derived. Note that
     the image size is reduced by the factor binfac in each dimension, which
@@ -246,7 +246,7 @@ def xrt_teem(
         EMerror[mask] = 0.0
 
         if verbose:
-            print("from xrt_teem:")
+            print("from temperature_from_filter_ratio:")
             Tmodel = tresp1.CHIANTI_temperature.value
             if Trange:
                 Tmodel = Tmodel[
@@ -261,7 +261,7 @@ def xrt_teem(
     else:
         if verbose:
             Tmodel = tresp1.CHIANTI_temperature.value
-            print("from xrt_teem:")
+            print("from temperature_from_filter_ratio:")
             print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
             print("No thresholds applied")
     Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
@@ -340,7 +340,7 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
 
     Trange : 2 element sequence containing floats, Optional
         Range of log10(temperature) values to examine. Must be in order from
-        lower to higher. (Passed from xrt_teem.)
+        lower to higher. (Passed from temperature_from_filter_ratio.)
 
 
     Returns:
@@ -475,7 +475,7 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
 
     Trange : 2 element sequence containing floats [Optional]
         Range of log10(temperature) values to examine. Must be in order from
-        lower to higher. (Passed from xrt_teem.)
+        lower to higher. (Passed from temperature_from_filter_ratio.)
 
     Returns:
     --------
@@ -666,7 +666,7 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
     new_hdr["L1_data_file1"] = filename1
     new_hdr["L1_data_file2"] = filename2
     create_date = datetime.now().ctime()
-    new_hdr["history"] = f"Created by xrt_teem {create_date}\n"
+    new_hdr["history"] = f"Created by temperature_from_filter_ratio {create_date}\n"
     Thdr = new_hdr.copy()
     Thdr["BUNIT"] = "log10(K)"
     Thdr["history"] = (
