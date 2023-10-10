@@ -16,3 +16,4 @@ Internal modifications and improvements
 - Updated the Read the Docs configuration file. (:pr:`173`)
 - Removed psf files after a new improvement in downloading them as part of the XRTpy package. (:pr:`177`)
 - Updated the `xrt_contam_on_ccd.geny` file with new CCD contamination values. (:pr:`191`)
+- Moved `xrt_deconvolve` and `xrt_remove_lightleak` from the `util` directory to a new directory named `image_correction`, and removed the `xrt_` prefix from their names. Renamed `xrt_teem` to `temperature_from_filter_ratio`.  Updated all tests and notebooks to reflect the name and directory changes. (:pr:`196`)
