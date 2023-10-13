@@ -21,12 +21,12 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: 1.1.0
+  rev: 1.2.0
   hooks:
   - id: pyproject-fmt
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.0.287
+  rev: v0.0.292
   hooks:
   - id: ruff
     args: [--fix]
@@ -43,7 +43,7 @@ repos:
     - python
 
 - repo: https://github.com/psf/black
-  rev: 23.7.0
+  rev: 23.9.1
   hooks:
   - id: black
 
@@ -76,7 +76,7 @@ repos:
     exclude: docs/plasmapy_sphinx
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.5
+  rev: v2.2.6
   hooks:
   - id: codespell
     exclude: .*\.fits
@@ -84,7 +84,7 @@ repos:
     - tomli
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v3.10.1
+  rev: v3.13.0
   hooks:
   - id: pyupgrade
     args: [--keep-runtime-typing, --py39-plus]
