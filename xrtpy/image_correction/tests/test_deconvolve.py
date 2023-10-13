@@ -4,7 +4,7 @@ import pkg_resources
 from pathlib import Path
 from sunpy.map import Map
 
-from xrtpy.image_correction.xrt_deconvolve import xrt_deconvolve
+from xrtpy.image_correction.deconvolve import deconvolve
 
 test_file = "L1_XRT20120605_215839.9.fits"
 idl_result_file = "L1_XRT20120605_215839.9.deconv.fits"
@@ -48,7 +48,7 @@ def test_unbinned():
     in_map = Map(test_data)
     IDL_result_image = get_IDL_results_data()
     IDL_result = Map(IDL_result_image)
-    out_map = xrt_deconvolve(in_map)
+    out_map = deconvolve(in_map)
     assert np.allclose(out_map.data, IDL_result.data, atol=1.0e-7)
 
 
@@ -62,5 +62,5 @@ def test_binned():
     in_map = Map(test_data)
     IDL_result_image = get_IDL_results_binned_data()
     IDL_result = Map(IDL_result_image)
-    out_map = xrt_deconvolve(in_map)
+    out_map = deconvolve(in_map)
     assert np.allclose(out_map.data, IDL_result.data, atol=4.1, rtol=0.008)

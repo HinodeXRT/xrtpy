@@ -1,7 +1,7 @@
 """
 Functionality for deconvolving XRT image data with the point spread function.
 """
-__all__ = ["xrt_deconvolve"]
+__all__ = ["deconvolve"]
 
 import numpy as np
 
@@ -13,7 +13,7 @@ from sunpy.image.transform import affine_transform
 from sunpy.map import Map
 from urllib.parse import urljoin
 
-from xrtpy.util import _SSW_MIRRORS
+from xrtpy.image_correction import _SSW_MIRRORS
 
 
 @manager.require(
@@ -32,7 +32,7 @@ from xrtpy.util import _SSW_MIRRORS
     ],
     "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1",
 )
-def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
+def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     """
     Use the XRT mirror model point spread function (PSF) to deconvolve an XRT
     image
@@ -67,7 +67,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     psf_meta = psf_map.meta
 
     if verbose:
-        print(f"XRT_DECONVOLVE: Using PSF in\n{used_psf}")
+        print(f"DECONVOLVE: Using PSF in\n{used_psf}")
 
     image_meta = image_map.meta
     data_chip_sum = image_meta["chip_sum"]
@@ -76,7 +76,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     if psf_meta["chip_sum"] != data_chip_sum:
         if verbose:
             print(
-                "XRT_DECONVOLVE: Input data and PSF have different"
+                "DECONVOLVE: Input data and PSF have different"
                 " chip sums. Binning PSF..."
             )
         psf_map = rebin_psf(psf_map, image_map.meta)
@@ -84,7 +84,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     data = np.clip(image_map.data, 0.0, None)
 
     deconvolve_hist = (
-        f"(XRT_DECONVOLVE) Deconvolved with {used_psf}, "
+        f"(DECONVOLVE) Deconvolved with {used_psf}, "
         f"bin={data_chip_sum}, niter={niter}."
     )
 
@@ -122,7 +122,7 @@ def xrt_deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     return Map(deconv_data, deconv_meta)
 
 
-def xrt_fft_2dim_convolution(image1, image2, correlation=False):
+def fft_2dim_convolution(image1, image2, correlation=False):
     """
     Convolve (or optionally correlate) two images
     """
@@ -137,11 +137,11 @@ def richardson_lucy_deconvolution(image, psf, num_iter=5):
     """
     Use the Richardson-Lucy algorithm to deconvolve an image.
     """
-    psfnorm = xrt_fft_2dim_convolution(psf, np.ones_like(psf))
+    psfnorm = fft_2dim_convolution(psf, np.ones_like(psf))
     ohat = np.cdouble(image)
     for i in range(num_iter):
-        ihat = xrt_fft_2dim_convolution(psf, ohat)
-        ohat *= xrt_fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
+        ihat = fft_2dim_convolution(psf, ohat)
+        ohat *= fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
     return np.abs(ohat)
 
 

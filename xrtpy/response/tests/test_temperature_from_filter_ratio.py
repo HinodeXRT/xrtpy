@@ -4,18 +4,26 @@ import sunpy.map
 from pathlib import Path
 from scipy.io import readsav
 
-from xrtpy.response.xrt_teem import xrt_teem
+from xrtpy.response.temperature_from_filter_ratio import temperature_from_filter_ratio
 
 
 def get_observed_data():
-    directory = Path(__file__).parent.absolute() / "data" / "xrt_teem_testing_files"
+    directory = (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_from_filter_ratio_testing_files"
+    )
     data_files = sorted(Path(directory).glob("L1_XRT20110128_*.*.fits"))
 
     return data_files
 
 
 def get_IDL_results_data():
-    directory = Path(__file__).parent.absolute() / "data" / "xrt_teem_testing_files"
+    directory = (
+        Path(__file__).parent.absolute()
+        / "data"
+        / "temperature_from_filter_ratio_testing_files"
+    )
     results_files = sorted(Path(directory).glob("IDL_results_*.sav"))
 
     return results_files
@@ -56,8 +64,8 @@ def test_standard_case():
     map1 = sunpy.map.Map(file1)
     map2 = sunpy.map.Map(file2)
 
-    T_e, EM, Terr, EMerr = xrt_teem(map1, map2)
-    T_EM = xrt_teem(map1, map2)
+    T_e, EM, Terr, EMerr = temperature_from_filter_ratio(map1, map2)
+    T_EM = temperature_from_filter_ratio(map1, map2)
     T_e = T_EM.Tmap
     Terr = T_EM.Terrmap
     EM = T_EM.EMmap
@@ -105,7 +113,7 @@ def test_binning_case():
     map1 = sunpy.map.Map(file1)
     map2 = sunpy.map.Map(file2)
 
-    T_EM = xrt_teem(map1, map2, binfac=2)
+    T_EM = temperature_from_filter_ratio(map1, map2, binfac=2)
     T_e = T_EM.Tmap
     Terr = T_EM.Terrmap
     EM = T_EM.EMmap
