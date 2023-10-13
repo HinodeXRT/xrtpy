@@ -16,4 +16,5 @@ prune tests
 prune xrtpy/*/tests
 prune xrtpy/image_correction/data/example_data
 include xrtpy/image_correction/tests/data/*.fits
+include xrtpy/image_correction/data/example_data/comp_XRT20150621_055911.7.fits
 global-exclude *.pyc *.o
