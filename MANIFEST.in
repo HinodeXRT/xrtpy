@@ -15,4 +15,5 @@ prune docs/api
 prune tests
 prune xrtpy/*/tests
 prune xrtpy/image_correction/data/example_data
+prune docs/notebooks/data_analysis
 global-exclude *.pyc *.o
