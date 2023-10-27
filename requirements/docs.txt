@@ -22,5 +22,6 @@ sphinx-issues >= 3.0
 sphinx_automodapi
 sphinx_rtd_theme >= 1.2
 sphinxcontrib-bibtex >= 2.5
+sunpy[all]
 towncrier >= 22.12
 zeep
