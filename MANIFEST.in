@@ -13,5 +13,5 @@ prune build
 prune docs/_build
 prune docs/api
 prune tests
-
+prune xrtpy/*/tests
 global-exclude *.pyc *.o

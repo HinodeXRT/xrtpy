@@ -46,10 +46,17 @@ lines_between_types = 1
 [tool.codespell]
 skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
 ignore-words-list = """
+4rd,
+bu,
 circularly,
+egde,
+fo,
 nd,
+ons,
 sav,
-te
+te,
+tne,
+ue
 """
 
 [tool.gilesbot]
