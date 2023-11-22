@@ -4,6 +4,7 @@ ratio technique.
 """
 __all__ = ["temperature_from_filter_ratio"]
 
+import logging
 import numpy as np
 
 from astropy import units as u
@@ -148,6 +149,9 @@ def temperature_from_filter_ratio(
     data1 = data1.astype(float)
     data2 = data2.astype(float)
 
+    if verbose:
+        logging.basicConfig(format="%(funcName)s: %(message)s", level=logging.INFO)
+
     n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
     n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
     # This allows use of normalized data (contrary to original IDL code):
@@ -233,37 +237,35 @@ def temperature_from_filter_ratio(
             & (Kd1 <= photon_noise_threshold)
             & (Kd2 <= photon_noise_threshold)
         )
-        if verbose:
-            print(f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}")
-            print(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
-            print(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
-            print(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
-            print(f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}")
+        logging.info(
+            f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}"
+        )
+        logging.info(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
+        logging.info(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
+        logging.info(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
+        logging.info(
+            f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}"
+        )
         mask = mask | ~ok_pixel
         T_e[mask] = 0.0
         EM[mask] = 0.0
         T_error[mask] = 0.0
         EMerror[mask] = 0.0
 
-        if verbose:
-            print("from temperature_from_filter_ratio:")
-            Tmodel = tresp1.CHIANTI_temperature.value
-            if Trange:
-                Tmodel = Tmodel[
-                    (np.log10(Tmodel) >= Trange[0]) & (np.log10(Tmodel) <= Trange[1])
-                ]
-            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
-            print(f"Applied thresholds: - T_e error < {Te_err_threshold*100.} %")
-            print(
-                f"                    - Photon noise < "
-                f"{photon_noise_threshold*100.} %"
-            )
+        Tmodel = tresp1.CHIANTI_temperature.value
+        if Trange:
+            Tmodel = Tmodel[
+                (np.log10(Tmodel) >= Trange[0]) & (np.log10(Tmodel) <= Trange[1])
+            ]
+        logging.info(f"Examined T_e range: {Tmodel.min():.3E} - {Tmodel.max():.3E} K")
+        logging.info(f"Applied thresholds: - T_e error < {Te_err_threshold*100.} %")
+        logging.info(
+            f"                    - Photon noise < " f"{photon_noise_threshold*100.} %"
+        )
     else:
-        if verbose:
-            Tmodel = tresp1.CHIANTI_temperature.value
-            print("from temperature_from_filter_ratio:")
-            print(f"Examined T_e range: {Tmodel.min()} - {Tmodel.max()} K")
-            print("No thresholds applied")
+        Tmodel = tresp1.CHIANTI_temperature.value
+        logging.info(f"Examined T_e range: {Tmodel.min():.3E} - {Tmodel.max():.3E} K")
+        logging.info("No thresholds applied")
     Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
         hdr1, hdr2, T_e, EM, T_error, EMerror, mask
     )
@@ -399,6 +401,7 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
 
     exptime1 = map1.meta["EXPTIME"]
     exptime2 = map2.meta["EXPTIME"]
+
     if rev_ratio:
         data_ratio = (data2 / exptime2) / (data1 / exptime1)
         model_ratio = flux2 / flux1
@@ -634,6 +637,8 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
     hdr1["RSUN_OBS"] = hdr1.get("RSUN_OBS", rsun_obs)
     hdr1["DSUN_OBS"] = hdr1.get("DSUN_OBS", dsun)
     hdr1["SOLAR_B0"] = hdr1.get("SOLAR_B0", solarb0)
+    hdr1["HGLN_OBS"] = 0.0
+    hdr1["HGLT_OBS"] = solarb0
     new_hdr = {}
     kw_to_copy = [
         "naxis",
@@ -657,6 +662,8 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
         "rsun_ref",
         "rsun_obs",
         "solar_b0",
+        "hgln_obs",
+        "hglt_obs",
         "crota1",
         "crota2",
         "platescl",
