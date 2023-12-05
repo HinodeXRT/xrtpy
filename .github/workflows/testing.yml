@@ -25,13 +25,13 @@ jobs:
           noxenv: tests-3.11
           python: '3.11'
           noxposargs: --durations=10
-          
+
         - name: Python 3.12 (Windows)
           os: windows-latest
           noxenv: tests-3.12
           python: '3.12'
           noxposargs: --durations=10
-          
+
         - name: Linters
           os: ubuntu-latest
           python: '3.11'
