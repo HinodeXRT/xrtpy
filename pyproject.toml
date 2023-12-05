@@ -59,11 +59,6 @@ tne,
 ue
 """
 
-[tool.gilesbot]
-
-[tool.gilesbot.pull_requests]
-enabled = true
-
 [tool.towncrier]
 package = "xrtpy"
 name = "XRTpy"
@@ -102,3 +97,8 @@ showcontent = true
 directory = "trivial"
 name = "Trivial/Internal Changes"
 showcontent = true
+
+[tool.gilesbot]
+
+[tool.gilesbot.pull_requests]
+enabled = true
