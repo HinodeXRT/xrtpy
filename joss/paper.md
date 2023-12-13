@@ -3,7 +3,7 @@ title: 'XRTpy : A Hinode/X-Ray Telescope Python Package'
 
 tags:
   - Python
-  - Astronomy,
+  - Astronomy
   - X-Ray Telescope
   - Solar Physics
   - Helio
@@ -22,7 +22,7 @@ authors:
     affiliation: "1"
     equal-contrib: true
   - name: Jonathan Slavin
-    ordcid:0000-0002-7597-6935
+    orcid: 0000-0002-7597-6935
     affiliation: "1"
     corresponding: true
   - name: Mark Weber
@@ -51,7 +51,7 @@ The official analysis routines for Hinode are scripted in the Interactive Data L
 A shift towards Python is underway within both NASA and the wider scientific community. With XRTpy, Python users can efficiently analyze and process Hinode-XRT data, bridging the gap between traditional IDL routines and the increasing adoption of Python within the scientific community. This transition not only enhances accessibility but also supports the broader trend in the scientific community toward Python-based data analysis tools, thereby fostering a collaborative and efficient environment for solar researchers.
 
 
-# Statement of Need
+# Package Structure
 
 XRTpy is equipped with a range of capabilities tailored for the comprehensive analysis of XRT (X-Ray Telescope) data. The package is structured into distinct subpackages, each serving a specific purpose:
 
