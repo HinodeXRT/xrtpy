@@ -75,3 +75,8 @@ XRTpy is equipped with a range of capabilities tailored for the comprehensive an
 ![Figure 2: The temperature response is plotted for all XRT filters using XRTpy.  The plot also shows the effects of using different abundance models from Chianti for each filter.. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
 
 ![In Figure 3, the application of the 'temperature_from_filter_ratio' function is illustrated, demonstrating its role in calculating electron temperature and volume emission measure through filter ratios. The dataset, collected on January 28, 2011, between 01:31:55 and 01:32:05 UTC, comprises two images captured with specific filters. These images offer unique insights into solar conditions during the observed moments, as shown by [@Guidoni:2015]. .\label{fig:Figure 3}](xrtpy_temperature_from_filter_ratio_plot.pdf)
+
+
+# Acknowledgements
+
+The development of XRTpy is supported by NASA contract NNM07AB07C to the Smithsonian Astrophysical Observatory. Hinode is a Japanese mission developed and launched by ISAS/JAXA, with NAOJ as domestic partner and NASA and STFC (UK) as international partners. It is operated by these agencies in co-operation with ESA and the NSC (Norway). The XRTpy team would like to extend gratitude to the Python Helio-Physics community at large for their contribution to XRTpy.
