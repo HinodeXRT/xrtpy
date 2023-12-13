@@ -34,7 +34,7 @@ affiliations:
  - name: Center for Astrophysics | Harvard-Smithsonian 60 Garden Street. Cambridge, MA, USA
    index: 1
 
-date: 12 December 2023
+date: 13 December 2023
 bibliography: paper.bib
 ---
 
@@ -67,7 +67,9 @@ XRTpy is equipped with a range of capabilities tailored for the comprehensive an
 
  - Light Leak Correction: The 'remove_lightleak' function is designed to eliminate light leak (visible stray light) from XRT synoptic composite images. This results in cleaner and more precise images suitable for in-depth analysis.
 
- - Abundance Model: XRTpy supports multiple abundance sets, including CHIANTI Coronal abundances, Hybrid abundances (based on Fludra and Schmelz [1999]), and Photospheric abundances (based on [@Grevesse:2007]). Researchers have the flexibility to select the abundance sets model that best aligns with their research requirements.
+ - Abundance Model: XRTpy supports multiple abundance sets, including CHIANTI Coronal abundances, Hybrid abundances (based on [Fludra-and-Schmelz:1999]), and Photospheric abundances (based on [@Grevesse:2007]). Researchers have the flexibility to select the abundance sets model that best aligns with their research requirements.
+
+XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
 
 ![Figure 1: The Effective area for all XRT filters plotted using XRTpy. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
@@ -80,3 +82,5 @@ XRTpy is equipped with a range of capabilities tailored for the comprehensive an
 # Acknowledgements
 
 The development of XRTpy is supported by NASA contract NNM07AB07C to the Smithsonian Astrophysical Observatory. Hinode is a Japanese mission developed and launched by ISAS/JAXA, with NAOJ as domestic partner and NASA and STFC (UK) as international partners. It is operated by these agencies in co-operation with ESA and the NSC (Norway). The XRTpy team would like to extend gratitude to the Python Helio-Physics community at large for their contribution to XRTpy.
+
+# References
