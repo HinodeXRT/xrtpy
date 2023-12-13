@@ -59,11 +59,9 @@ XRTpy is equipped with a range of capabilities tailored for the comprehensive an
 
  - Effective Area: XRTpy's capability to calculate effective areas for various XRT filter channels, combined with CCD contamination layer thickness information, is crucial for understanding instrumental spectral responses, as depicted in \autoref{fig:Figure 1}.
 
- - Temperature Response: XRTpy provides the capability of computing the temperature response of all the XRT filter channels. It does this by relying on a spectral emission model, drawing from [@Narukage:2011] and [@Narukage:2014]. Users can choose from a range of CHIANTI abundance sets, including the default model with coronal abundances detailed by [@Feldman:2014], Hybrid, and
+ - Temperature Response: XRTpy provides the capability of computing the temperature response of all the XRT filter channels. It does this by relying on a spectral emission model, drawing from [@Narukage:2011] and [@Narukage:2014]. Users can choose from a range of CHIANTI abundance sets, including the default model with coronal abundances detailed by [@Feldman:2014], Hybrid, and Photospheric options. \autoref{fig:Figure 2} shows XRTpy's temperature response calculations for all XRT filters across the different CHIANTI  abundance sets.
 
- - Photospheric options. Figure 2 shows XRTpy's temperature response calculations for all XRT filters across the different CHIANTI  abundance sets.
-
- - Deriving Temperature and Emission Measure: With the 'temperature_from_filter_ratio' routine, XRTpy simplifies the process of deriving temperature and emission measure maps for a pair of images using the filter ratio method, Figure 3 illustrates an example of the function application.
+ - Deriving Temperature and Emission Measure: With the 'temperature_from_filter_ratio' routine, XRTpy simplifies the process of deriving temperature and emission measure maps for a pair of images using the filter ratio method, \autoref{fig:Figure 3} illustrates an example of the function application.
 
  - Enhancing Image Sharpness with Point Spread Function (Deconvolution): Deconvolution is a powerful technique for improving image sharpness. This tool applies deconvolution to XRT images, effectively reducing blurring effects caused by the telescope's point spread function.
 
@@ -73,3 +71,7 @@ XRTpy is equipped with a range of capabilities tailored for the comprehensive an
 
 
 ![Figure 1: The Effective area for all XRT filters plotted using XRTpy. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
+
+![Figure 2: The temperature response is plotted for all XRT filters using XRTpy.  The plot also shows the effects of using different abundance models from Chianti for each filter.. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
+
+![In Figure 3, the application of the 'temperature_from_filter_ratio' function is illustrated, demonstrating its role in calculating electron temperature and volume emission measure through filter ratios. The dataset, collected on January 28, 2011, between 01:31:55 and 01:32:05 UTC, comprises two images captured with specific filters. These images offer unique insights into solar conditions during the observed moments, as shown by [@Guidoni:2015]. .\label{fig:Figure 3}](xrtpy_temperature_from_filter_ratio_plot.pdf)
