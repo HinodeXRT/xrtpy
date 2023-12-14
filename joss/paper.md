@@ -72,7 +72,7 @@ The package is structured into distinct modules, each serving a specific purpose
 
  - Temperature Response: XRTpy provides the capability of computing the temperature response of all the XRT filter channels. It does this by relying on a spectral emission model, drawing from [@Narukage:2011] and [@Narukage:2014]. Users can choose from a range of CHIANTI abundance sets, including the default model with coronal abundances, Hybrid, and Photospheric options. \autoref{fig:Figure 2} shows XRTpy's temperature response calculations for all XRT filters across the different CHIANTI  abundance sets.
 
- - Deriving Temperature and Emission Measure: With the 'temperature_from_filter_ratio' routine, XRTpy simplifies the process of deriving temperature and emission measure maps for a pair of images using the filter ratio method, \autoref{fig:Figure 3} illustrates an example of the function application.
+ - `xrtpy.response.temperature_from_filter_ratio`: This module contains the `temperature_from_filter_ratio` function, which derives temperature and emission measure maps for a pair of images using the filter ratio method. \autoref{fig:Figure 3} illustrates an example usage of this function.
 
  - `xrtpy.image_correction.deconvolve`: Deconvolution is a powerful technique for improving image sharpness. The `deconvolve` function applies deconvolution to XRT images, effectively reducing blurring effects caused by the telescope's point spread function.
 
