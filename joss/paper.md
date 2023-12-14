@@ -76,7 +76,7 @@ The package is structured into distinct subpackages, each serving a specific pur
 
  - `xrtpy.image_correction.remove_lightleak.py`: The `remove_lightleak` function in this module eliminates light leak (visible stray light) from XRT synoptic composite images. This results in cleaner and more precise images suitable for in-depth analysis.
 
- - Abundance Model: XRTpy supports multiple abundance sets, including CHIANTI Coronal abundances ([@Feldman:1992], [@Feldman:2014], and  [@Landi:2002]), Hybrid abundances based on [Fludra-and-Schmelz:1999] and [@Schmelz:2012], and Photospheric abundances (based on [@Grevesse:2007]). Researchers have the flexibility to select the abundance sets model that best aligns with their research requirements.
+ - Abundance Model: XRTpy supports multiple abundance sets, including CHIANTI Coronal abundances ([@Feldman:1992], [@Feldman:2014], and  [@Landi:2002]), Hybrid abundances based on [@Fludra-and-Schmelz:1999] and [@Schmelz:2012], and Photospheric abundances (based on [@Grevesse:2007]). Researchers have the flexibility to select the abundance sets model that best aligns with their research requirements.
 
 XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
