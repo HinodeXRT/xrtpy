@@ -66,7 +66,7 @@ This transition not only enhances accessibility but also supports the broader tr
 XRTpy is equipped with a range of capabilities tailored for the comprehensive analysis of XRT observations.
 The package is structured into distinct modules, each serving a specific purpose:
 
- - Channel: This subpackage, managed by the 'Channel' class, offers access to the properties of XRT filters, covering aspects like the CCD, Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
+ - `xrtpy.response.channel`: This module defines the `Channel` class which offers access to the properties of XRT filters, including information on the CCD, Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
 
  - `xrtpy.response.effective_area`: XRTpy's capability to calculate effective areas for various XRT filter channels, combined with CCD contamination layer thickness information, is crucial for understanding instrumental spectral responses, as depicted in \autoref{fig:Figure 1}.
 
