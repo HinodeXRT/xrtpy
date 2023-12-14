@@ -64,7 +64,7 @@ This transition not only enhances accessibility but also supports the broader tr
 # Package Structure
 
 XRTpy is equipped with a range of capabilities tailored for the comprehensive analysis of XRT observations.
-The package is structured into distinct subpackages, each serving a specific purpose:
+The package is structured into distinct modules, each serving a specific purpose:
 
  - Channel: This subpackage, managed by the 'Channel' class, offers access to the properties of XRT filters, covering aspects like the CCD, Entrance Filter, Focus-Filter(s), Geometry, and Mirror(s).
 
