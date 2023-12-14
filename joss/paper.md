@@ -72,7 +72,7 @@ The package is structured into distinct subpackages, each serving a specific pur
 
  - Deriving Temperature and Emission Measure: With the 'temperature_from_filter_ratio' routine, XRTpy simplifies the process of deriving temperature and emission measure maps for a pair of images using the filter ratio method, \autoref{fig:Figure 3} illustrates an example of the function application.
 
- - Enhancing Image Sharpness with Point Spread Function (Deconvolution): Deconvolution is a powerful technique for improving image sharpness. This tool applies deconvolution to XRT images, effectively reducing blurring effects caused by the telescope's point spread function.
+ - `xrtpy.image_correction.deconvolve`: Deconvolution is a powerful technique for improving image sharpness. The `deconvolve` function applies deconvolution to XRT images, effectively reducing blurring effects caused by the telescope's point spread function.
 
  - Light Leak Correction: The 'remove_lightleak' function is designed to eliminate light leak (visible stray light) from XRT synoptic composite images. This results in cleaner and more precise images suitable for in-depth analysis.
 
