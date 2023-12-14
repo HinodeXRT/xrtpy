@@ -96,8 +96,7 @@ XRTpy version `0.4.0`, released on December 5, 2023, represents a significant to
 
 In fostering collaboration within the solar physics community, XRTpy seamlessly integrates with similar packages. Designed towards working in conjunction with aiapy for SDO/AIA observations, EISpack for Hinode-EIS data analysis, and irispy-lmsal for IRIS observations. This integration provides users with a smooth and comprehensive analysis experience. Further building on the SunPy framework (SunPy Project et al., 2020), XRTpy effectively utilizes the `Map` object for handling Hinode-XRT image data.
 
-
-The development of XRTpy is an open and collaborative effort, hosted on [Github](https://github.com/HinodeXRT/xrtpy) to ensure transparency and encourage community involvement. The project's documentation is comprehensive and continuously updated, available online via Read the Docs. To maintain high-quality standards, XRTpy employs a robust testing framework built on  [`pytest`](https://pytest.org). This framework covers a range of aspects including different Python versions, online functionality, documentation integrity, software functionality, and code style checks, ensuring a reliable and effective tool for users.
+The development of XRTpy is an open and collaborative effort, hosted on  [Github](https://github.com/HinodeXRT/xrtpy)  to ensure transparency and encourage community involvement. The project's documentation is comprehensive and continuously updated, available online via Read the Docs. To maintain high-quality standards, XRTpy employs a robust testing framework built on [`pytest`](https://pytest.org) and GitHub Actions. This framework covers a range of aspects including different Python versions, online functionality, documentation integrity, software functionality, and code style checks, ensuring a reliable and effective tool for users.
 
 
 # Acknowledgements
