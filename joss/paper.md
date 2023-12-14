@@ -67,7 +67,7 @@ The package is structured into distinct subpackages, each serving a specific pur
 
  - Effective Area: XRTpy's capability to calculate effective areas for various XRT filter channels, combined with CCD contamination layer thickness information, is crucial for understanding instrumental spectral responses, as depicted in \autoref{fig:Figure 1}.
 
- - Temperature Response: XRTpy provides the capability of computing the temperature response of all the XRT filter channels. It does this by relying on a spectral emission model, drawing from [@Narukage:2011], [@Narukage:2014], and [@Landi:2002]. Users can choose from a range of CHIANTI abundance sets, including the default model with coronal abundances detailed by [@Feldman:1992] and[@Feldman:2014], Hybrid, and Photospheric options. \autoref{fig:Figure 2} shows XRTpy's temperature response calculations for all XRT filters across the different CHIANTI  abundance sets.
+ - Temperature Response: XRTpy provides the capability of computing the temperature response of all the XRT filter channels. It does this by relying on a spectral emission model, drawing from [@Narukage:2011] and [@Narukage:2014]. Users can choose from a range of CHIANTI abundance sets, including the default model with coronal abundances, Hybrid, and Photospheric options. \autoref{fig:Figure 2} shows XRTpy's temperature response calculations for all XRT filters across the different CHIANTI  abundance sets.
 
  - Deriving Temperature and Emission Measure: With the 'temperature_from_filter_ratio' routine, XRTpy simplifies the process of deriving temperature and emission measure maps for a pair of images using the filter ratio method, \autoref{fig:Figure 3} illustrates an example of the function application.
 
@@ -75,7 +75,7 @@ The package is structured into distinct subpackages, each serving a specific pur
 
  - Light Leak Correction: The 'remove_lightleak' function is designed to eliminate light leak (visible stray light) from XRT synoptic composite images. This results in cleaner and more precise images suitable for in-depth analysis.
 
- - Abundance Model: XRTpy supports multiple abundance sets, including CHIANTI Coronal abundances, Hybrid abundances (based on [Fludra-and-Schmelz:1999]), and Photospheric abundances (based on [@Grevesse:2007]). Researchers have the flexibility to select the abundance sets model that best aligns with their research requirements.
+ - Abundance Model: XRTpy supports multiple abundance sets, including CHIANTI Coronal abundances ([@Feldman:1992], [@Feldman:2014], and  [@Landi:2002]), Hybrid abundances based on [Fludra-and-Schmelz:1999] and [@Schmelz:2012], and Photospheric abundances (based on [@Grevesse:2007]). Researchers have the flexibility to select the abundance sets model that best aligns with their research requirements.
 
 XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
