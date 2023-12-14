@@ -13,7 +13,7 @@ authors:
     orcid: 0009-0005-4804-0946
     equal-contrib: true
     affiliation: "1"
-  - name: Nicholas Murphy
+  - name: Nicholas A. Murphy
     orcid: 0000-0001-6628-8033
     affiliation: "1"
     corresponding: true
