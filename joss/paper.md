@@ -42,7 +42,7 @@ bibliography: paper.bib
 
 The XRTpy Python package is a specialized tool developed for the analysis of observations made by the X-Ray Telescope (XRT) [@Golub:2007] aboard the Hinode spacecraft [@Kosugi:2007].
 Hinode, a joint mission involving space agencies from Japan, the United States, Europe, and the United Kingdom, was launched with the primary aim of providing multi-wavelength data from the photosphere to the upper corona, enabling continuous observations of the Sun.
-Within this mission, the XRT instrument stands out as a remarkable piece of technology, capable of capturing high-resolution images of the solar corona's hottest material, spanning temperatures from 1,000,000 to 10,000,000 Kelvin.
+Within this mission, the XRT instrument stands out as a remarkable piece of technology, capable of capturing high-resolution images of the solar corona's hottest material, spanning temperatures from 10<sup>6</sup> to 10<sup>7</sup> K.
 
 # Statement of need
 
