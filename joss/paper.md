@@ -74,7 +74,7 @@ The package is structured into distinct subpackages, each serving a specific pur
 
  - `xrtpy.image_correction.deconvolve`: Deconvolution is a powerful technique for improving image sharpness. The `deconvolve` function applies deconvolution to XRT images, effectively reducing blurring effects caused by the telescope's point spread function.
 
- - Light Leak Correction: The 'remove_lightleak' function is designed to eliminate light leak (visible stray light) from XRT synoptic composite images. This results in cleaner and more precise images suitable for in-depth analysis.
+ - `xrtpy.image_correction.remove_lightleak.py`: The `remove_lightleak` function in this module eliminates light leak (visible stray light) from XRT synoptic composite images. This results in cleaner and more precise images suitable for in-depth analysis.
 
  - Abundance Model: XRTpy supports multiple abundance sets, including CHIANTI Coronal abundances ([@Feldman:1992], [@Feldman:2014], and  [@Landi:2002]), Hybrid abundances based on [Fludra-and-Schmelz:1999] and [@Schmelz:2012], and Photospheric abundances (based on [@Grevesse:2007]). Researchers have the flexibility to select the abundance sets model that best aligns with their research requirements.
 
