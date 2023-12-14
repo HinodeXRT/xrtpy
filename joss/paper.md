@@ -59,7 +59,7 @@ XRTpy is equipped with a range of capabilities tailored for the comprehensive an
 
  - Effective Area: XRTpy's capability to calculate effective areas for various XRT filter channels, combined with CCD contamination layer thickness information, is crucial for understanding instrumental spectral responses, as depicted in \autoref{fig:Figure 1}.
 
- - Temperature Response: XRTpy provides the capability of computing the temperature response of all the XRT filter channels. It does this by relying on a spectral emission model, drawing from [@Narukage:2011] and [@Narukage:2014]. Users can choose from a range of CHIANTI abundance sets, including the default model with coronal abundances detailed by [@Feldman:2014], Hybrid, and Photospheric options. \autoref{fig:Figure 2} shows XRTpy's temperature response calculations for all XRT filters across the different CHIANTI  abundance sets.
+ - Temperature Response: XRTpy provides the capability of computing the temperature response of all the XRT filter channels. It does this by relying on a spectral emission model, drawing from [@Narukage:2011], [@Narukage:2014], and [@Landi:2002]. Users can choose from a range of CHIANTI abundance sets, including the default model with coronal abundances detailed by [@Feldman:1992] and[@Feldman:2014], Hybrid, and Photospheric options. \autoref{fig:Figure 2} shows XRTpy's temperature response calculations for all XRT filters across the different CHIANTI  abundance sets.
 
  - Deriving Temperature and Emission Measure: With the 'temperature_from_filter_ratio' routine, XRTpy simplifies the process of deriving temperature and emission measure maps for a pair of images using the filter ratio method, \autoref{fig:Figure 3} illustrates an example of the function application.
 
