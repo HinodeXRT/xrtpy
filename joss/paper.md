@@ -93,7 +93,7 @@ XRTpy's capabilities are designed to empower researchers and scientists to fully
 The development of XRTpy is supported by NASA contract NNM07AB07C to the Smithsonian Astrophysical Observatory.
 Hinode is a Japanese mission developed and launched by ISAS/JAXA, with NAOJ as domestic partner and NASA and STFC (UK) as international partners.
 It is operated by these agencies in co-operation with ESA and the NSC (Norway).
-The XRTpy team would like to extend gratitude to the Python Helio-Physics community at large for their contribution to XRTpy.
+The XRTpy team would like to extend gratitude to the Python in Heliophysics Community at large for their contribution to XRTpy.
 N.A.M. acknowledges support from NSF CSSI award 1931388.
 
 # References
