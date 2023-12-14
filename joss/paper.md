@@ -50,7 +50,8 @@ XRTpy is a Python package developed for the analysis of observations from the X-
 It offers a comprehensive range of functionalities, including object-oriented representation of instrument configuration, effective area calculations, temperature response computation, light leak subtraction, image sharpening, electron temperature, and emission measure derivation, as well as various abundance model options.
 These capabilities empower researchers to explore and analyze XRT data comprehensively, contributing to a deeper understanding of solar phenomena.
 
-The official analysis routines for Hinode are scripted in the Interactive Data Language (IDL), and the SolarSoft XRT Analysis Guide serves as the official software and instrument guide for XRT data analysis.
+The official analysis routines for Hinode are scripted in the Interactive Data Language (IDL).
+The SolarSoft XRT Analysis Guide serves as the official software and instrument guide for XRT data analysis.
 XRTpy has been carefully written to ensure the consistency and replication of results obtained from the official IDL routines as described in the SolarSoft XRT Analysis Guide.
 Although currently XRTpy does not have all the capabilities of the XRT IDL routines, it is in continual development and will be adding more functionality in the future. This alignment with established practices and standards aims to facilitate a seamless transition for researchers while harnessing the benefits of Python in solar data analysis.
 
