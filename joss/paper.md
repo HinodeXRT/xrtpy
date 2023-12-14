@@ -47,7 +47,7 @@ Within this mission, the XRT instrument stands out as a remarkable piece of tech
 # Statement of need
 
 XRTpy is a Python package developed for the analysis of observations from the X-Ray Telescope (XRT) aboard the Hinode spacecraft.
-It offers a comprehensive range of functionalities, including object-oriented representation of instrument configuration, effective area calculations, temperature response computation, light leak subtraction, image sharpening, electron temperature, and emission measure derivation, as well as various abundance model options.
+It offers a comprehensive range of functionalities, including object-oriented representation of instrument configuration, effective area calculations, temperature response computation, light leak subtraction, image sharpening, estimation of electron temperature, and emission measure derivation, as well as various abundance model options.
 These capabilities empower researchers to explore and analyze XRT data comprehensively, contributing to a deeper understanding of solar phenomena.
 
 The official analysis routines for Hinode are scripted in the Interactive Data Language (IDL).
