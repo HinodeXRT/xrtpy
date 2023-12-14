@@ -56,7 +56,8 @@ XRTpy has been carefully written to ensure the consistency and replication of re
 Although currently XRTpy does not have all the capabilities of the SolarSoft routines for XRT, the package is in continual development and more functionality will be added in the future.
 This alignment with established practices and standards aims to facilitate a seamless transition for researchers while harnessing the benefits of Python in solar data analysis.
 
-A shift towards Python is underway within both NASA and the wider scientific community. With XRTpy, Python users can efficiently analyze and process Hinode-XRT data, bridging the gap between traditional IDL routines and the increasing adoption of Python within the scientific community.
+A shift towards Python is underway within both NASA and the wider scientific community.
+With XRTpy, Python users can efficiently analyze and process Hinode/XRT data, bridging the gap between traditional IDL routines and the increasing adoption of Python within the scientific community.
 This transition not only enhances accessibility but also supports the broader trend in the scientific community toward Python-based data analysis tools, thereby fostering a collaborative and efficient environment for solar researchers.
 
 
