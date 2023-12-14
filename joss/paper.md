@@ -17,7 +17,7 @@ authors:
     orcid: 0000-0001-6628-8033
     affiliation: "1"
     corresponding: true
-  - name: Katharine Reeves
+  - name: Katharine K. Reeves
     orcid: 0000-0002-6903-6832
     affiliation: "1"
     equal-contrib: true
