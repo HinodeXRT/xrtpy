@@ -82,7 +82,6 @@ XRTpy supports multiple elemental abundance sets, including CHIANTI coronal abun
 
 Researchers have the flexibility to select the abundance model that best aligns with their research requirements.
 
-
 XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
 
@@ -98,7 +97,7 @@ XRTpy version `0.4.0` was released on December 5, 2023. This version, available 
 
 In fostering collaboration within the solar physics community, interoperability with other packages as a work in progress, and that we've started on this with the developers of aiapy for SDO/AIA observations, EISpack for Hinode-EIS data analysis, and irispy-lmsal for IRIS observations. This integration provides users with a smooth and comprehensive analysis experience. Further building on the SunPy framework (SunPy Project et al., 2020), XRTpy effectively utilizes the `Map` object for handling Hinode-XRT image data.
 
-The development of XRTpy is an open and collaborative effort, hosted on  [Github](https://github.com/HinodeXRT/xrtpy)  to ensure transparency and encourage community involvement. The project's documentation is comprehensive and continuously updated, available online via Read the Docs. To maintain high-quality standards, XRTpy employs a robust testing framework built on [`pytest`](https://pytest.org) and GitHub Actions. This framework covers a range of aspects including different Python versions, online functionality, documentation integrity, software functionality, and code style checks, ensuring a reliable and effective tool for users.
+The development of XRTpy is an open and collaborative effort, hosted on [Github](https://github.com/HinodeXRT/xrtpy) to ensure transparency and encourage community involvement. The project's documentation is comprehensive and continuously updated, available online via Read the Docs. To maintain high-quality standards, XRTpy employs a robust testing framework built on [`pytest`](https://pytest.org) and GitHub Actions. This framework covers a range of aspects including different Python versions, online functionality, documentation integrity, software functionality, and code style checks, ensuring a reliable and effective tool for users.
 
 
 # Acknowledgements
