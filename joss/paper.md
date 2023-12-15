@@ -29,10 +29,17 @@ authors:
     orcid: 0000-0001-7098-7064
     affiliation: "1"
     corresponding: true
+  - name: Will T. Barnes
+    orcid: 0000-0001-9642-6089
+    affiliation: "2"
 
 affiliations:
- - name: Center for Astrophysics | Harvard & Smithsonian 60 Garden Street. Cambridge, MA, USA
-   index: 1
+ - name: Center for Astrophysics | Harvard-Smithsonian 60 Garden Street, Cambridge, MA, USA
+   index : 1
+ - name: American University, 4400 Massachusetts Avenue NW, Washington, DC 20016, USA
+   index : 2
+ - name : NASA Goddard Space Flight Center, 8800 Greenbelt Road, Greenbelt, MD 20771, USA
+   index : 3
 
 date: 15 December 2023
 bibliography: paper.bib
