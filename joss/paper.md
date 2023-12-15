@@ -31,7 +31,7 @@ authors:
     corresponding: true
   - name: Will T. Barnes
     orcid: 0000-0001-9642-6089
-    affiliation: "2"
+    affiliation: "2,3"
 
 affiliations:
  - name: Center for Astrophysics | Harvard-Smithsonian 60 Garden Street, Cambridge, MA, USA
