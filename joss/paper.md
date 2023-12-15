@@ -91,7 +91,6 @@ Researchers have the flexibility to select the abundance model that best aligns 
 
 XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
-
 ![Figure 1: The Effective area for all XRT filters plotted using XRTpy. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
 
 ![Figure 2: The temperature response is plotted for all XRT filters using XRTpy.  The plot also shows the effects of using different abundance models from CHIANTI for each filter. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
