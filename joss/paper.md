@@ -31,7 +31,7 @@ authors:
     corresponding: true
 
 affiliations:
- - name: Center for Astrophysics | Harvard-Smithsonian 60 Garden Street. Cambridge, MA, USA
+ - name: Center for Astrophysics | Harvard & Smithsonian 60 Garden Street. Cambridge, MA, USA
    index: 1
 
 date: 15 December 2023
