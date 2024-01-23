@@ -1,8 +1,8 @@
 import logging
 import numpy as np
-import requests
 
 from astropy.io import fits
+from astropy.utils.data import download_file
 from pathlib import Path
 
 from xrtpy.util.filename2repo_path import filename2repo_path
@@ -59,11 +59,7 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
     logging.info(f"short exp. file: {short_exp_filepath}")
     short_exp_urlpath = filename2repo_path(short_exp_filepath, join=True)
     logging.info(f"short exp. url: {short_exp_urlpath}")
-    response = requests.get(short_exp_urlpath)
-    if response.status_code != requests.codes.ok:
-        raise requests.exceptions.HTTPError(f"Error downloading {short_exp_urlpath}")
-    with open(short_exp_filepath, "wb") as outfile:
-        outfile.write(response.content)
+    short_exp_filepath = download_file(short_exp_urlpath)
 
     if "MEDFNAME" in comp_header:
         triple = True
@@ -75,13 +71,7 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
             )
             medium_exp_urlpath = filename2repo_path(medium_exp_qualpath, join=True)
             logging.info(f"medium exp. url: {medium_exp_urlpath}")
-            response = requests.get(medium_exp_urlpath)
-            if response.status_code != requests.codes.ok:
-                raise requests.exceptions.HTTPError(
-                    f"Error downloading {medium_exp_urlpath}"
-                )
-            with open(medium_exp_qualpath, "wb") as outfile:
-                outfile.write(response.content)
+            medium_exp_qualpath = download_file(medium_exp_urlpath)
         else:
             medium_exp_qualpath = Path(qualfiles[0])
     else:
@@ -95,11 +85,7 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
             long_exp_filename.stem + ".qual" + long_exp_filename.suffix
         )
         long_exp_urlpath = filename2repo_path(long_exp_qualpath, join=True)
-        response = requests.get(long_exp_urlpath)
-        if response.status_code != requests.codes.ok:
-            raise requests.exceptions.HTTPError(f"Error downloading {long_exp_urlpath}")
-        with open(long_exp_qualpath, "wb") as outfile:
-            outfile.write(response.content)
+        long_exp_qualpath = download_file(long_exp_urlpath)
     else:
         if triple:
             long_exp_qualpath = Path(qualfiles[1])
