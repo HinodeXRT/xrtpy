@@ -2,6 +2,7 @@
 Functionality for diagnosing plasma temperature through the filter
 ratio technique.
 """
+
 __all__ = ["temperature_from_filter_ratio"]
 
 import logging
@@ -534,15 +535,13 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
     # line broadening (as is the default in ChiantiPy).
     K1_mod = np.array(
         [
-            (s1 * effarea1 * e2dn**2 * dwvl).sum()
-            / (s1 * effarea1 * e2dn * dwvl).sum()
+            (s1 * effarea1 * e2dn**2 * dwvl).sum() / (s1 * effarea1 * e2dn * dwvl).sum()
             for s1 in spect1
         ]
     )
     K2_mod = np.array(
         [
-            (s2 * effarea2 * e2dn**2 * dwvl).sum()
-            / (s2 * effarea2 * e2dn * dwvl).sum()
+            (s2 * effarea2 * e2dn**2 * dwvl).sum() / (s2 * effarea2 * e2dn * dwvl).sum()
             for s2 in spect2
         ]
     )

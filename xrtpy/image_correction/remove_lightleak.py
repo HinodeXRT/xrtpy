@@ -1,6 +1,7 @@
 """
 Functionality for removing the visible light leak from XRT composite image data.
 """
+
 import astropy.time
 import astropy.units as u
 import warnings
