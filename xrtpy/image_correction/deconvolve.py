@@ -4,15 +4,15 @@ Functionality for deconvolving XRT image data with the point spread function.
 
 __all__ = ["deconvolve"]
 
-import numpy as np
-
 from datetime import datetime
+from urllib.parse import urljoin
+
+import numpy as np
 from numpy.fft import fft2, fftshift, ifft2
 from sunpy.data import manager
 from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
-from urllib.parse import urljoin
 
 from xrtpy.image_correction import _SSW_MIRRORS
 

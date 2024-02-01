@@ -2,14 +2,14 @@
 Functionality for removing the visible light leak from XRT composite image data.
 """
 
+import warnings
+from urllib.parse import urljoin
+
 import astropy.time
 import astropy.units as u
-import warnings
-
 from sunpy.data import manager
 from sunpy.map import Map
 from sunpy.time import parse_time
-from urllib.parse import urljoin
 
 from xrtpy.image_correction import _SSW_MIRRORS
 

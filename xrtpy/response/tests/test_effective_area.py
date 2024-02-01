@@ -1,8 +1,8 @@
-import pytest
-
-from astropy import units as u
 from datetime import datetime
 from pathlib import Path
+
+import pytest
+from astropy import units as u
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental

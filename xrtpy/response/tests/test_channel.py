@@ -1,11 +1,11 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
-
 from astropy import units as u
-from pathlib import Path
 
 from xrtpy.response.channel import Channel
 

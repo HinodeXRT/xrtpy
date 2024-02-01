@@ -10,12 +10,12 @@ __all__ = [
     "resolve_filter_name",
 ]
 
+from pathlib import Path
+
 import numpy as np
 import sunpy.io.special
 import sunpy.time
-
 from astropy import units as u
-from pathlib import Path
 
 filename = Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
 

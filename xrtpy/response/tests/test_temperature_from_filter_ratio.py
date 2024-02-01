@@ -1,7 +1,7 @@
+from pathlib import Path
+
 import numpy as np
 import sunpy.map
-
-from pathlib import Path
 from scipy.io import readsav
 
 from xrtpy.response.temperature_from_filter_ratio import temperature_from_filter_ratio

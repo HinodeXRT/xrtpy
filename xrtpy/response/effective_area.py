@@ -4,19 +4,19 @@ __all__ = [
 ]
 
 
-import astropy.time
 import datetime
 import math
-import numpy as np
 import os
+from functools import cached_property
+from pathlib import Path
+
+import astropy.time
+import numpy as np
 import scipy.io
 import sunpy.io.special
 import sunpy.time
-
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
-from functools import cached_property
-from pathlib import Path
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name

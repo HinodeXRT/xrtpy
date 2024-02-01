@@ -6,13 +6,13 @@ ratio technique.
 __all__ = ["temperature_from_filter_ratio"]
 
 import logging
-import numpy as np
-
-from astropy import units as u
-from astropy.constants import c, h
 from collections import namedtuple
 from datetime import datetime
-from sunpy.coordinates.sun import angular_radius, B0
+
+import numpy as np
+from astropy import units as u
+from astropy.constants import c, h
+from sunpy.coordinates.sun import B0, angular_radius
 from sunpy.image.resample import reshape_image_to_4d_superpixel
 from sunpy.map import Map
 

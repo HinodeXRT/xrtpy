@@ -1,6 +1,6 @@
-import pytest
-
 from pathlib import Path
+
+import pytest
 from sunpy.map import Map
 
 from xrtpy.image_correction.remove_lightleak import remove_lightleak
