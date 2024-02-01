@@ -23,6 +23,46 @@ repos:
   - id: check-toml
   - id: check-yaml
 
+- repo: https://github.com/python-jsonschema/check-jsonschema
+  rev: 0.27.4
+  hooks:
+  - id: check-github-workflows
+
+- repo: https://github.com/sirosen/texthooks
+  rev: 0.6.4
+  hooks:
+  - id: fix-smartquotes
+  - id: fix-spaces
+  - id: fix-ligatures
+  - id: forbid-bidi-controls
+
+- repo: https://github.com/Lucas-C/pre-commit-hooks
+  rev: v1.5.4
+  hooks:
+  - id: remove-crlf
+    name: remove CRLF line endings
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.12.0
+  hooks:
+  - id: pretty-format-ini
+    args: [--autofix]
+  - id: pretty-format-yaml
+    args: [--autofix]
+    # For the labeler GitHub Action, labels with spaces in them must
+    # be put in quotes. However, the pretty-format-yaml hook will
+    # remove the quotes which will break that action.
+    exclude: .github/labeler.yml|.pre-commit-search-and-replace.yaml
+
+- repo: https://github.com/MarcoGorelli/absolufy-imports
+  rev: v0.3.1
+  hooks:
+  - id: absolufy-imports
+    name: Use absolute rather than relative imports
+
+
+
+
+
 - repo: https://github.com/tox-dev/pyproject-fmt
   rev: 1.7.0
   hooks:
