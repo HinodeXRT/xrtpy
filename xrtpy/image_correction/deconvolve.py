@@ -1,6 +1,7 @@
 """
 Functionality for deconvolving XRT image data with the point spread function.
 """
+
 __all__ = ["deconvolve"]
 
 import numpy as np
