@@ -5,8 +5,8 @@
 # http://www.sphinx-doc.org/en/master/config
 
 import os
-
 from datetime import datetime
+
 from sphinx.application import Sphinx
 
 # -- Project information -----------------------------------------------------
