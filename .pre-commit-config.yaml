@@ -108,35 +108,9 @@ repos:
     name: ruff for notebooks (see https://docs.astral.sh/ruff/rules)
     args: [--fix, '--select=A,ARG,B,BLE,C,C4,E,F,FLY,I,INT,ISC,PERF,PIE,PLC,PLE,PYI,Q003,RET,RSE,SIM,TID,TRY,UP,W', '--ignore=B007,B008,B015,B018,E402,E501,E741,SIM114']
 
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.15
-  hooks:
-  - id: ruff
-    name: ruff (see https://docs.astral.sh/ruff/rules)
-    args: [--fix]
-  - id: ruff-format
-    name: autoformat source code with ruff formatter
-
-
-
-
-
-
 - repo: https://github.com/nbQA-dev/nbQA
   rev: 1.7.1
   hooks:
   - id: nbqa-black
     additional_dependencies:
     - black==24.1.1
-  - id: nbqa-isort
-    additional_dependencies:
-    - isort==5.12.0
-
-
-
-- repo: https://github.com/asottile/pyupgrade
-  rev: v3.15.0
-  hooks:
-  - id: pyupgrade
-    args: [--keep-runtime-typing, --py39-plus]
-    files: ^xrtpy/
