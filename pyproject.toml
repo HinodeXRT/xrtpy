@@ -10,6 +10,7 @@ requires = [
 target-version = "py39"
 show-fixes = true
 extend-select = [
+  "I", # isort
   "UP", # pyupgrade
 ]
 ignore = [
