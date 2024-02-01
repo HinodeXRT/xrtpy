@@ -21,18 +21,18 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: 1.5.3
+  rev: 1.7.0
   hooks:
   - id: pyproject-fmt
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.6
+  rev: v0.1.15
   hooks:
   - id: ruff
     args: [--fix]
 
 - repo: https://github.com/PyCQA/isort
-  rev: 5.12.0
+  rev: 5.13.2
   hooks:
   - id: isort
     name: isort
@@ -43,7 +43,7 @@ repos:
     - python
 
 - repo: https://github.com/psf/black
-  rev: 23.11.0
+  rev: 24.1.1
   hooks:
   - id: black
 
@@ -62,7 +62,7 @@ repos:
     - --nbqa-mutate
 
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.11.0
+  rev: v2.12.0
   hooks:
   - id: pretty-format-ini
     args: [--autofix]
