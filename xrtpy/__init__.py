@@ -10,7 +10,7 @@ from xrtpy import response
 try:
     from xrtpy.version import __version__
 except ImportError:
-    warnings.warn("version not found.")
+    warnings.warn("version not found.")  # noqa: B028
 
 
 # Then you can be explicit to control what ends up in the namespace,

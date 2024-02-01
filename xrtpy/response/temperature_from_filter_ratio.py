@@ -572,7 +572,7 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
     return T_error, EMerror, K1, K2
 
 
-def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
+def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):  # noqa: ARG001
     """
     Create SunPy Map objects from the image metadata and temperature, volume
     emission measure, temperature uncertainty and emission measure uncertainty

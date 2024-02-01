@@ -70,7 +70,7 @@ def test_EffectiveArea_filter_name(name):
     instance = EffectiveAreaFundamental(
         name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0)
     )
-    actual_attr_value = getattr(instance, "name")
+    actual_attr_value = instance.name
 
     assert actual_attr_value == name
 

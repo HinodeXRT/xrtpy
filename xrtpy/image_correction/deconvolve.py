@@ -140,7 +140,7 @@ def richardson_lucy_deconvolution(image, psf, num_iter=5):
     """
     psfnorm = fft_2dim_convolution(psf, np.ones_like(psf))
     ohat = np.cdouble(image)
-    for i in range(num_iter):
+    for i in range(num_iter):  # noqa: B007
         ihat = fft_2dim_convolution(psf, ohat)
         ohat *= fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
     return np.abs(ohat)

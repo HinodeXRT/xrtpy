@@ -210,6 +210,6 @@ for epilog_file in ["_links.rst", "_substitutions.rst"]:
 
 
 def setup(app: Sphinx) -> None:
-    app.add_config_value("revision", "", True)
+    app.add_config_value("revision", "", True)  # noqa: FBT003
     app.add_css_file("css/admonition_color_contrast.css")
     app.add_css_file("css/plasmapy.css", priority=600)
