@@ -1,6 +1,6 @@
-import pytest
-
 from pathlib import Path
+
+import pytest
 from sunpy.map import Map
 
 from xrtpy.image_correction.remove_lightleak import remove_lightleak
@@ -45,7 +45,7 @@ composite_filenames = get_composite_data_files()
 data_files = list(zip(IDL_filenames, composite_filenames))
 
 
-@pytest.mark.parametrize(["idlfile", "compfile"], data_files)
+@pytest.mark.parametrize(("idlfile", "compfile"), data_files)
 def test_lightleak(idlfile, compfile, allclose):
     IDL_map = Map(idlfile)
     input_map = Map(compfile)

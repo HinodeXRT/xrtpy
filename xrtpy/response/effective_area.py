@@ -4,19 +4,19 @@ __all__ = [
 ]
 
 
-import astropy.time
 import datetime
 import math
-import numpy as np
 import os
+from functools import cached_property
+from pathlib import Path
+
+import astropy.time
+import numpy as np
 import scipy.io
 import sunpy.io.special
 import sunpy.time
-
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
-from functools import cached_property
-from pathlib import Path
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
@@ -105,7 +105,7 @@ class EffectiveAreaFundamental:
                 f"Date must be after {epoch}."
             )
 
-        modified_time_path = os.path.getmtime(_ccd_contam_filename)
+        modified_time_path = os.path.getmtime(_ccd_contam_filename)  # noqa: PTH204
         modified_time = astropy.time.Time(modified_time_path, format="unix")
         latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
             "%Y/%m/%d"
@@ -243,7 +243,7 @@ class EffectiveAreaFundamental:
             "data/n_DEHP.txt", package="xrtpy.response"
         )
 
-        with open(_n_DEHP_filename) as n_DEHP:
+        with open(_n_DEHP_filename) as n_DEHP:  # noqa: PTH123
             list_of_DEHP_attributes = []
             for line in n_DEHP:
                 stripped_line = line.strip()
