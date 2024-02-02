@@ -62,7 +62,7 @@ jobs:
 
   documentation:
     name: ${{ matrix.name }}
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
