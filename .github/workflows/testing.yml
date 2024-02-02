@@ -93,14 +93,11 @@ jobs:
 
     - name: Install pandoc
       run: |
-        # Specify the desired version of Pandoc
-        PANDOC_VERSION="3.1.11.1" # Update this to the version you need
-        # Download the pre-built binary package for Linux
-        wget https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb
-        # Install the downloaded package
+        PANDOC_VERSION="3.1.11.1"
+        wget -q https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb
         sudo dpkg -i pandoc-${PANDOC_VERSION}-1-amd64.deb
-        # Remove the downloaded package file
         rm pandoc-${PANDOC_VERSION}-1-amd64.deb
+        pandoc --version
 
     - name: Build documentation
       run: nox -e build_docs_nitpicky -- -q
