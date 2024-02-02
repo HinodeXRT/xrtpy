@@ -89,10 +89,15 @@ jobs:
       run: python -m pip install --progress-bar off --upgrade nox
 
     - name: Install graphviz
-      run: brew install graphviz
+      run: sudo apt install graphviz
 
     - name: Install pandoc
-      run: brew install pandoc
+      run: |
+        PANDOC_VERSION="3.1.11.1"
+        wget -q https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb
+        sudo dpkg -i pandoc-${PANDOC_VERSION}-1-amd64.deb
+        rm pandoc-${PANDOC_VERSION}-1-amd64.deb
+        pandoc --version
 
     - name: Build documentation
       run: nox -e build_docs_nitpicky -- -q
