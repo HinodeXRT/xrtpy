@@ -238,15 +238,11 @@ def temperature_from_filter_ratio(
             & (Kd1 <= photon_noise_threshold)
             & (Kd2 <= photon_noise_threshold)
         )
-        logging.info(
-            f"number of pixels ruled out by threshold = {np.sum(~ok_pixel)}"
-        )
+        logging.info(f"number of pixels ruled out by threshold = {np.sum(~ok_pixel)}")
         logging.info(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
         logging.info(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
         logging.info(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
-        logging.info(
-            f"number of bad pixels before threshold   = {np.sum(~ok_wothr)}"
-        )
+        logging.info(f"number of bad pixels before threshold   = {np.sum(~ok_wothr)}")
         mask = mask | ~ok_pixel
         T_e[mask] = 0.0
         EM[mask] = 0.0
