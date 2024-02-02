@@ -1,5 +1,5 @@
 Filter Al-mesh
-observation_date 7-an-224 0
+observation_date 07Jan2024
 wavelength effective area
       1.00000   2.14410e-10
       1.10000   6.12077e-10

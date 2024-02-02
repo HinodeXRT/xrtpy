@@ -1,5 +1,5 @@
 Filter Be-thin
-observation_date 7-an-224 0
+observation_date 07Jan2024
 wavelength effective area
       1.00000   2.78436e-10
       1.10000   7.94892e-10
