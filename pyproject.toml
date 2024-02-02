@@ -60,6 +60,7 @@ extend-select = [
 ]
 ignore = [
   "E501", # line-too-long
+  "ISC001", # single-line-implicit-string-concatenation (formatter conflict)
   "N802", # invalid-function-name
   "N803", # invalid-argument-name
   "N806", # non-lowercase-variable-in-function
