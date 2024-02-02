@@ -18,7 +18,7 @@ from sunpy.map import Map
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
-TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")
+TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")  # noqa: PYI024
 
 
 def temperature_from_filter_ratio(
@@ -239,13 +239,13 @@ def temperature_from_filter_ratio(
             & (Kd2 <= photon_noise_threshold)
         )
         logging.info(
-            f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}"
+            f"number of pixels ruled out by threshold = {np.sum(~ok_pixel)}"
         )
         logging.info(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
         logging.info(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
         logging.info(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
         logging.info(
-            f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}"
+            f"number of bad pixels before threshold   = {np.sum(~ok_wothr)}"
         )
         mask = mask | ~ok_pixel
         T_e[mask] = 0.0
@@ -261,7 +261,7 @@ def temperature_from_filter_ratio(
         logging.info(f"Examined T_e range: {Tmodel.min():.3E} - {Tmodel.max():.3E} K")
         logging.info(f"Applied thresholds: - T_e error < {Te_err_threshold*100.} %")
         logging.info(
-            f"                    - Photon noise < " f"{photon_noise_threshold*100.} %"
+            f"                    - Photon noise < {photon_noise_threshold*100.} %"
         )
     else:
         Tmodel = tresp1.CHIANTI_temperature.value

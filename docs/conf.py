@@ -205,7 +205,7 @@ nitpick_ignore_regex = [
 # be used globally.
 rst_epilog = ""
 for epilog_file in ["_links.rst", "_substitutions.rst"]:
-    with open(epilog_file) as file:
+    with open(epilog_file) as file:  # noqa: PTH123
         rst_epilog += file.read()
 
 

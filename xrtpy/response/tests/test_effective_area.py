@@ -92,7 +92,7 @@ def test_EffectiveArea_contamination_on_filter(name, date):
 @pytest.mark.parametrize("date", invalid_dates)
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_exception_is_raised(name, date):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         EffectiveAreaFundamental(name, date)
 
 
@@ -110,7 +110,7 @@ filenames = get_IDL_data_files()
 
 
 def _IDL_raw_data_list(filename):
-    with open(filename) as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         list_of_IDL_effective_area_data = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -143,7 +143,7 @@ def IDL_test_date(list_of_lists):
 
 
 def _IDL_effective_area_raw_data(filename):
-    with open(filename) as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         list_of_lists = []
         for line in filter_file:
             stripped_line = line.strip()

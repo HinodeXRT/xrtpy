@@ -404,7 +404,7 @@ class Channel:
 
     def __repr__(self):
         """Code representation."""
-        return f"Channel({repr(self.name)})"
+        return f"Channel({self.name!r})"
 
     @property
     def name(self) -> str:

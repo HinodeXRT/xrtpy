@@ -101,7 +101,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     ):
         extract_data = True
         if verbose:
-            print("Input data not same size as PSF. Dropping image" " in zero array.")
+            print("Input data not same size as PSF. Dropping image in zero array.")
         tmp_data = np.zeros((psf_naxis1, psf_naxis2))
         ddx = naxis1 // 2
         ddy = naxis2 // 2

@@ -18,7 +18,7 @@ def get_IDL_data_files(model):
 
 
 def _IDL_raw_data_list(filename):
-    with open(filename) as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         IDL_data_list = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -51,7 +51,7 @@ def IDL_test_date(IDL_data_list):
 
 
 def _IDL_temperature_response_raw_data(filename):
-    with open(filename) as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         IDL_data_list = []
         for line in filter_file:
             stripped_line = line.strip()
