@@ -1,5 +1,5 @@
 Filter Al-med
-observation_date 22Sept2023
+observation_date 22-Sept-2023 22:45:45
 wavelength effective area
       1.00000   2.66384e-10
       1.10000   7.49522e-10

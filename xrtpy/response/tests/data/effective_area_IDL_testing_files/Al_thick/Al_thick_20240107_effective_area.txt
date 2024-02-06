@@ -1,5 +1,5 @@
 Filter Al-thick
-observation_date 07Jan2024
+observation_date 07-Jan-2024 05:00:00
 wavelength effective area
       1.00000   2.52795e-10
       1.10000   6.99229e-10
