@@ -1,0 +1,24 @@
+name: Check Hinode X-Ray Telescope CCD Contamination Data Update
+
+on:
+  schedule:
+  - cron: 0 0 1 * *      # Runs the workflow at 00:00 on the 1st day of every month
+
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check for Contamination Data Update
+      id: check-update
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const url = 'https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/response/contam/xrt_contam_on_ccd.geny';
+          const response = await fetch(url);
+          const data = await response.text();
+          console.log(data);
+          return data;
+
+    - name: Notify if Update Detected
+      if: ${{ steps.check-update.outputs.data != 'OLD_FILE_CONTENTS' }}
+      run: echo "Contamination data file has been updated. Review and merge changes."
