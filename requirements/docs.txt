@@ -8,6 +8,7 @@ docutils >= 0.18
 ipykernel
 ipython
 jinja2 != 3.1
+nbconvert < 7.14
 nbsphinx >= 0.9
 numpydoc >= 1.2
 pillow
@@ -23,4 +24,5 @@ sphinx_codeautolink
 sphinx_copybutton
 sphinx_rtd_theme >= 1.2
 sphinxcontrib-bibtex >= 2.5
+sunpy[all]
 towncrier >= 22.12

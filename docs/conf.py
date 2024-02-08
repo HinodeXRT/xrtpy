@@ -5,8 +5,8 @@
 # http://www.sphinx-doc.org/en/master/config
 
 import os
-
 from datetime import datetime
+
 from sphinx.application import Sphinx
 
 # -- Project information -----------------------------------------------------
@@ -19,7 +19,7 @@ copyright = f"2021–{datetime.utcnow().year}, {author}"
 # from xrtpy import __version__
 # release = __version__
 
-release = "0.3.0"
+release = "0.4.0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -208,11 +208,11 @@ nitpick_ignore_regex = [
 # be used globally.
 rst_epilog = ""
 for epilog_file in ["_links.rst", "_substitutions.rst"]:
-    with open(epilog_file) as file:
+    with open(epilog_file) as file:  # noqa: PTH123
         rst_epilog += file.read()
 
 
 def setup(app: Sphinx) -> None:
-    app.add_config_value("revision", "", True)
+    app.add_config_value("revision", "", True)  # noqa: FBT003
     app.add_css_file("css/admonition_color_contrast.css")
     app.add_css_file("css/plasmapy.css", priority=600)
