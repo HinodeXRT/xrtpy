@@ -20,6 +20,8 @@ sphinx-gallery >= 0.12
 sphinx-hoverxref >= 1.1
 sphinx-issues >= 3.0
 sphinx_automodapi
+sphinx-codeautolink
+sphinx-copybutton
 sphinx_rtd_theme >= 1.2
 sphinxcontrib-bibtex >= 2.5
 sunpy[all]
