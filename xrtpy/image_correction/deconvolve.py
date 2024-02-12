@@ -4,15 +4,15 @@ Functionality for deconvolving XRT image data with the point spread function.
 
 __all__ = ["deconvolve"]
 
-import numpy as np
-
 from datetime import datetime
+from urllib.parse import urljoin
+
+import numpy as np
 from numpy.fft import fft2, fftshift, ifft2
 from sunpy.data import manager
 from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
-from urllib.parse import urljoin
 
 from xrtpy.image_correction import _SSW_MIRRORS
 
@@ -101,7 +101,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     ):
         extract_data = True
         if verbose:
-            print("Input data not same size as PSF. Dropping image" " in zero array.")
+            print("Input data not same size as PSF. Dropping image in zero array.")
         tmp_data = np.zeros((psf_naxis1, psf_naxis2))
         ddx = naxis1 // 2
         ddy = naxis2 // 2
@@ -140,7 +140,7 @@ def richardson_lucy_deconvolution(image, psf, num_iter=5):
     """
     psfnorm = fft_2dim_convolution(psf, np.ones_like(psf))
     ohat = np.cdouble(image)
-    for i in range(num_iter):
+    for i in range(num_iter):  # noqa: B007
         ihat = fft_2dim_convolution(psf, ohat)
         ohat *= fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
     return np.abs(ohat)
