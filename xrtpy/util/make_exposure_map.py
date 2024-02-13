@@ -1,9 +1,9 @@
 import logging
-import numpy as np
+from pathlib import Path
 
+import numpy as np
 from astropy.io import fits
 from astropy.utils.data import download_file
-from pathlib import Path
 
 from xrtpy.util.filename2repo_path import filename2repo_path
 
