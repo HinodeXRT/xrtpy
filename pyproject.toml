@@ -44,7 +44,6 @@ extend-select = [
   "RUF008", # mutable-dataclass-default
   "RUF009", # function-call-in-dataclass-default-argument
   "RUF010", # explicit-f-string-type-conversion
-  "RUF011", # static-key-dict-comprehension
   "RUF013", # implicit-optional
   "RUF015", # unnecessary-iterable-allocation-for-first-element
   "RUF016", # invalid-index-type
@@ -78,17 +77,17 @@ extend-exclude = [
 namespace-packages = [".github/workflows", "docs"]
 
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["E402", "F401", "F402", "F403"]  # ignore import errors
 "docs/notebooks/computing_functions/temperature_response.ipynb" = ["A001"]  # filter variable shadows Python builtin
 
-[tool.ruff.flake8-import-conventions.aliases]
+[tool.ruff.lint.flake8-import-conventions.aliases]
 "astropy.units" = "u"
 "matplotlib.pyplot" = "plt"
 numpy = "np"
 pandas = "pd"
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 12
 
 [tool.codespell]
