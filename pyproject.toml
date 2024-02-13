@@ -9,7 +9,16 @@ requires = [
 [tool.ruff]
 target-version = "py39"
 show-fixes = true
-show-source = true
+extend-exclude = [
+  ".jupyter",
+  "__pycache__",
+  "_build",
+  "_dev",
+]
+namespace-packages = [".github/workflows", "docs"]
+
+
+[tool.ruff.lint]
 # Find info about ruff rules at: https://docs.astral.sh/ruff/rules
 extend-select = [
   "ARG", # flake8-unused-arguments
@@ -44,7 +53,6 @@ extend-select = [
   "RUF008", # mutable-dataclass-default
   "RUF009", # function-call-in-dataclass-default-argument
   "RUF010", # explicit-f-string-type-conversion
-  "RUF011", # static-key-dict-comprehension
   "RUF013", # implicit-optional
   "RUF015", # unnecessary-iterable-allocation-for-first-element
   "RUF016", # invalid-index-type
@@ -69,26 +77,19 @@ ignore = [
   "SIM108", # if-else-block-instead-of-if-exp
   "TRY003", # raise-vanilla-args
 ]
-extend-exclude = [
-  ".jupyter",
-  "__pycache__",
-  "_build",
-  "_dev",
-]
-namespace-packages = [".github/workflows", "docs"]
 
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["E402", "F401", "F402", "F403"]  # ignore import errors
 "docs/notebooks/computing_functions/temperature_response.ipynb" = ["A001"]  # filter variable shadows Python builtin
 
-[tool.ruff.flake8-import-conventions.aliases]
+[tool.ruff.lint.flake8-import-conventions.aliases]
 "astropy.units" = "u"
 "matplotlib.pyplot" = "plt"
 numpy = "np"
 pandas = "pd"
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 12
 
 [tool.codespell]
