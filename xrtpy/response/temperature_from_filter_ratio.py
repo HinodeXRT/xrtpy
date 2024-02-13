@@ -21,7 +21,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")  # noqa: PYI024
 
 
-def temperature_from_filter_ratio(
+def temperature_from_filter_ratio(  # noqa: C901
     map1,
     map2,
     abundance_model="coronal",

@@ -9,7 +9,16 @@ requires = [
 [tool.ruff]
 target-version = "py39"
 show-fixes = true
-show-source = true
+extend-exclude = [
+  ".jupyter",
+  "__pycache__",
+  "_build",
+  "_dev",
+]
+namespace-packages = [".github/workflows", "docs"]
+
+
+[tool.ruff.lint]
 # Find info about ruff rules at: https://docs.astral.sh/ruff/rules
 extend-select = [
   "ARG", # flake8-unused-arguments
@@ -68,13 +77,6 @@ ignore = [
   "SIM108", # if-else-block-instead-of-if-exp
   "TRY003", # raise-vanilla-args
 ]
-extend-exclude = [
-  ".jupyter",
-  "__pycache__",
-  "_build",
-  "_dev",
-]
-namespace-packages = [".github/workflows", "docs"]
 
 
 [tool.ruff.lint.per-file-ignores]
