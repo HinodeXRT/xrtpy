@@ -2,12 +2,12 @@ __all__ = [
     "TemperatureResponseFundamental",
 ]
 
+from pathlib import Path
+
 import numpy as np
 import scipy.io
-
 from astropy import units as u
 from astropy.constants import c, h
-from pathlib import Path
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name

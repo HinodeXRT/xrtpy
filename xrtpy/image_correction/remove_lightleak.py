@@ -1,14 +1,15 @@
 """
 Functionality for removing the visible light leak from XRT composite image data.
 """
+
+import warnings
+from urllib.parse import urljoin
+
 import astropy.time
 import astropy.units as u
-import warnings
-
 from sunpy.data import manager
 from sunpy.map import Map
 from sunpy.time import parse_time
-from urllib.parse import urljoin
 
 from xrtpy.image_correction import _SSW_MIRRORS
 
@@ -85,7 +86,7 @@ def _get_stray_light_phase(date_obs):
         phase = 0
 
     if phase == 6:
-        warnings.warn(
+        warnings.warn(  # noqa: B028
             "light leak images for this period are not yet"
             " available. Defaulting to previous phase."
         )
@@ -202,7 +203,7 @@ def remove_lightleak(in_map, scale=1.0, leak_map=None):
     images at the phase 1 (as of Feb-2022).
     """
     if "Light leak subtraction: DONE" in in_map.meta["HISTORY"]:
-        warnings.warn("HISTORY indicates light leak subtraction already done on image.")
+        warnings.warn("HISTORY indicates light leak subtraction already done on image.")  # noqa: B028
 
     if leak_map is None:
         leak_filename = _select_lightleak_file(

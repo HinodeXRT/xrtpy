@@ -1,0 +1,3 @@
+Added Sphinx extensions to allow code blocks in the documentation to
+be copied and to create links to pages that show source code of
+different objects.

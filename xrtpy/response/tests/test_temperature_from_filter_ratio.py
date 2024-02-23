@@ -1,7 +1,7 @@
+from pathlib import Path
+
 import numpy as np
 import sunpy.map
-
-from pathlib import Path
 from scipy.io import readsav
 
 from xrtpy.response.temperature_from_filter_ratio import temperature_from_filter_ratio
@@ -133,9 +133,6 @@ def test_binning_case():
     idlEMerr = rebin_image(idldata.ee, 2)
     goodT = (T_e.data > 0.0) & (idlTe > 0.0)
     goodE = (EM.data > 0.0) & (idlEM > 0.0)
-
-    delta = 10.0 ** T_e.data[goodT] - 10.0 ** idlTe[goodT]  # noqa
-    x = 10.0 ** idlTe[goodT]  # noqa
 
     assert np.allclose(
         10.0 ** T_e.data[goodT], 10.0 ** idlTe[goodT], atol=2.0e5, rtol=0.02

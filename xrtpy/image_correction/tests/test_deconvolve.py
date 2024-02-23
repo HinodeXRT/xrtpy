@@ -1,7 +1,7 @@
+from pathlib import Path
+
 import numpy as np
 import pkg_resources
-
-from pathlib import Path
 from sunpy.map import Map
 
 from xrtpy.image_correction.deconvolve import deconvolve
