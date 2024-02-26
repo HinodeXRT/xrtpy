@@ -19,7 +19,11 @@ from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 from scipy import interpolate
 
-from xrtpy.response.channel import Channel, resolve_filter_name
+from xrtpy.response.channel import (
+    _channel_name_to_index_mapping,
+    Channel,
+    resolve_filter_name,
+)
 from xrtpy.util.time import epoch
 
 index_mapping_to_fw1_name = {
@@ -33,6 +37,22 @@ index_mapping_to_fw1_name = {
 
 index_mapping_to_fw2_name = {
     "Open": 0,
+    "Al-mesh": 1,
+    "Ti-poly": 2,
+    "G-band": 3,
+    "Al-thick": 4,
+    "Be-thick": 5,
+}
+
+index_mapping_to_fw1 = {
+    "Al-poly": 1,
+    "C-poly": 2,
+    "Be-thin": 3,
+    "Be-med": 4,
+    "Al-med": 5,
+}
+
+index_mapping_to_fw2 = {
     "Al-mesh": 1,
     "Ti-poly": 2,
     "G-band": 3,
@@ -64,6 +84,17 @@ _filter_contamination_file_time = astropy.time.Time(
 _filter_contamination = _filter_contam_file["p2"]
 
 
+def resolve_filter_names(name):
+    """Formats users filter name."""
+    if not isinstance(name, str):
+        raise TypeError("name must be a string")
+    name = name.replace("_", "-")
+    parts: list = name.split("/")
+    new_parts: list = [part.capitalize() for part in parts]
+    name: str = "/".join(new_parts)
+    return name
+
+
 class EffectiveAreaFundamental:
     """
     Class for calculating the effective area.
@@ -78,14 +109,55 @@ class EffectiveAreaFundamental:
         `sunpy.time.parse_time`.
     """
 
+    """
     def __init__(self, filter_name, observation_date):
         self._name = resolve_filter_name(filter_name)
         self.observation_date = observation_date
         self._channel = Channel(self.name)
 
+    """
+
+    def __init__(self, filter1_name, filter2_name, observation_date):
+        self._fw1_name = resolve_filter_names(filter1_name)
+        self._fw2_name = resolve_filter_names(filter2_name)
+        self.observation_date = observation_date
+        self._name = f"{self._fw1_name}/{self._fw2_name}"
+        self._channel = Channel(self.name)
+
+    @property
+    def filter1_name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
+        if self._fw1_name not in index_mapping_to_fw1_name:
+            raise ValueError(
+                f"\nInvalid filter: {self._fw1_name}.\n"
+                f"Available filters in XRT filter-wheel 1 {index_mapping_to_fw1_name}."
+            )
+        return self._fw1_name
+
+    @property
+    def filter2_name(self) -> str:
+        """Name of XRT X-Ray channel filter."""
+        if self._fw2_name not in index_mapping_to_fw2_name:
+            raise ValueError(
+                f"\nInvalid filter: {self._fw2_name}.\n"
+                f"Available filters in XRT filter-wheel 2 {index_mapping_to_fw2_name}."
+            )
+        return self._fw2_name
+
     @property
     def name(self) -> str:
         """Name of XRT X-Ray channel filter."""
+        filter_channe_names = _channel_name_to_index_mapping.keys()
+        if self.filter1_name or self.filter2_name != "Open":  # and
+            print(self.filter1_name)
+            print(self.filter2_name)
+            if self._name not in filter_channe_names:
+                raise ValueError(
+                    "\nChosen filter(s) must be from the filter list:\n"
+                    f"{filter_channe_names}.\n "
+                    "If the desired filter combination is not available, please raise an issue at: "
+                    "https://github.com/HinodeXRT/xrtpy/issues/new"
+                )
         return self._name
 
     @property
@@ -136,105 +208,95 @@ class EffectiveAreaFundamental:
         return interpolater(self.observation_date.utime)
 
     @property
-    def filter_index_mapping_to_name(self):
+    def filter1_wheel_number(self):
+        """Defining chosen filter to its corresponding filter wheel."""
+        filter1 = self.filter1_name
+        if filter1 != "Open":
+            return 0 if filter1 in index_mapping_to_fw1 else 1  # Update method
+        else:
+            return filter1
+
+    @property
+    def filter2_wheel_number(self):
+        """Defining chosen filter to its corresponding filter wheel."""
+        filter2 = self.filter2_name
+        if filter2 != "Open":
+            return 1 if filter2 in index_mapping_to_fw2 else 0  # Update method
+        else:
+            return filter2
+
+    @property
+    def filter_index_mapping_to_name_filter1(self):
         """Returns filter's corresponding number value."""
-        if self.name in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(self.name)
-        elif self.name in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(self.name)
-
-    @property
-    def filter_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        return 0 if self.name in index_mapping_to_fw1_name else 1
-
-    @property
-    def combo_filter_name_split(self):
-        """Defining chosen filters to its corresponding filter wheel."""
-        name = (self.name).split("/")
-        filter1, filter2 = name[0], name[1]
-        return filter1, filter2
-
-    @property
-    def combo_filter1_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        filter1, _ = self.combo_filter_name_split
-        return 0 if filter1 in index_mapping_to_fw1_name else 1
-
-    @property
-    def combo_filter2_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        _, filter2 = self.combo_filter_name_split
-        return 0 if filter2 in index_mapping_to_fw1_name else 1
-
-    @property
-    def combo_filter_index_mapping_to_name_filter1(self):
-        """Returns filter's corresponding number value."""
-        filter1, _ = self.combo_filter_name_split
-
-        if filter1 in index_mapping_to_fw1_name:
+        filter1 = self.filter1_name
+        if filter1 in index_mapping_to_fw1:
             return index_mapping_to_fw1_name.get(filter1)
-        elif filter1 in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(filter1)
+        else:
+            return filter1
 
     @property
-    def combo_filter_index_mapping_to_name_filter2(self):
+    def filter_index_mapping_to_name_filter2(self):
         """Returns filter's corresponding number value."""
-        filter1, filter2 = self.combo_filter_name_split
-
-        if filter2 in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(filter2)
-        elif filter2 in index_mapping_to_fw2_name:
+        filter2 = self.filter2_name
+        if filter2 in index_mapping_to_fw2:
             return index_mapping_to_fw2_name.get(filter2)
+        else:
+            return filter2
 
     @property
-    def combo_filter1_data(self):
+    def filter1_contam_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter1][
-            self.combo_filter1_wheel_number
-        ]
+        index_filter_value = self.filter_index_mapping_to_name_filter1
+
+        if index_filter_value != "Open":
+            return _filter_contamination[index_filter_value][self.filter1_wheel_number]
+        else:
+            return index_filter_value
 
     @property
-    def combo_filter2_data(self):
+    def filter2_contam_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter2][
-            self.combo_filter2_wheel_number
-        ]
+
+        if self.filter_index_mapping_to_name_filter2 != "Open":
+            return _filter_contamination[self.filter_index_mapping_to_name_filter2][
+                self.filter2_wheel_number
+            ]
+        else:
+            return self.filter_index_mapping_to_name_filter2
 
     @property
-    def contamination_on_filter1_combo(self) -> u.angstrom:
-        """
-        Thickness of the contamination layer on a filter."""
+    def contamination_on_filter1(self) -> u.angstrom:
+        """Thickness of the contamination layer on a filter-1."""
+        filter_data = self.filter1_contam_data
 
+        if type(filter_data) == str:
+            return filter_data
         interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
-        )
-        return interpolater(self.filter_observation_date_to_seconds)
-
-    @property
-    def contamination_on_filter2_combo(self) -> u.angstrom:
-        """
-        Thickness of the contamination layer on a filter."""
-
-        interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
-        )
-        return interpolater(self.filter_observation_date_to_seconds)
-
-    @property
-    def filter_data(self):
-        """Collecting filter contamination data."""
-        return _filter_contamination[self.filter_index_mapping_to_name][
-            self.filter_wheel_number
-        ]
-
-    @property
-    def contamination_on_filter(self) -> u.angstrom:
-        """Thickness of the contamination layer on a filter."""
-        interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self.filter_data, kind="linear"
+            _filter_contamination_file_time.utime, filter_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
+
+    @property
+    def contamination_on_filter2(self) -> u.angstrom:
+        """Thickness of the contamination layer on a filter-2."""
+        filter_data = self.filter2_contam_data
+
+        if type(filter_data) == str:
+            return filter_data
+        interpolater = scipy.interpolate.interp1d(
+            _filter_contamination_file_time.utime, filter_data, kind="linear"
+        )
+        return interpolater(self.observation_date.utime)
+
+    @property
+    def contamination_on_filters(self) -> u.angstrom:
+        """Combined filter 1 + filter 2 contamination thickness."""
+        if type(self.contamination_on_filter1) == str:
+            return self.contamination_on_filter2
+        elif type(self.contamination_on_filter2) == str:
+            return self.contamination_on_filter1
+        else:
+            return self.contamination_on_filter1 + self.contamination_on_filter2
 
     @cached_property
     def n_DEHP_attributes(self):
@@ -362,7 +424,9 @@ class EffectiveAreaFundamental:
         )
 
         # Multiply by thickness
-        angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_filter
+        angular_wavenumber_thickness = (
+            angular_wavenumber * self.contamination_on_filters
+        )
 
         real_angular_wavenumber = angular_wavenumber_thickness.real
         imaginary_angular_wavenumber = angular_wavenumber_thickness.imag
@@ -471,6 +535,14 @@ class EffectiveAreaFundamental:
 
     @property
     def interpolated_filter_contamination_transmission(self):
+        """Interpolate filter contam transmission to the wavelength."""
+        Filter_contam_transmission = interpolate.interp1d(
+            self.n_DEHP_wavelength, self.filter_contamination_transmission
+        )
+        return Filter_contam_transmission(self.channel_wavelength)
+
+    @property
+    def interpolated_filter_combo_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         Filter_contam_transmission = interpolate.interp1d(
             self.n_DEHP_wavelength, self.filter_contamination_transmission

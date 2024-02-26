@@ -1,5 +1,5 @@
 Filter Al-poly
-observation_date 22-Sept-2019 22:40:45
+observation_date 22Sept2019
 wavelength effective area
       1.00000   2.78457e-10
       1.10000   7.94913e-10
