@@ -71,6 +71,10 @@ source_suffix = ".rst"
 # The root toctree document.
 root_doc = "index"
 
+# -- nbsphinx configuration --------------------------------------------------
+
+nbsphinx_allow_errors = True  # Allow errors in Jupyter notebooks
+
 # -- Options for intersphinx extension ---------------------------------------
 
 intersphinx_mapping = {
