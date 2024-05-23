@@ -43,6 +43,9 @@ extensions = [
     "sphinx_issues",
     "sphinxcontrib.bibtex",
     "hoverxref.extension",
+    "sphinx_copybutton",
+    "sphinx_codeautolink",
+    "sphinx.ext.viewcode",
 ]
 
 bibtex_bibfiles = ["bibliography.bib"]
@@ -211,6 +214,9 @@ rst_epilog = ""
 for epilog_file in ["_links.rst", "_substitutions.rst"]:
     with open(epilog_file) as file:  # noqa: PTH123
         rst_epilog += file.read()
+
+# Add the nbsphinx_allow_errors option
+nbsphinx_allow_errors = True
 
 
 def setup(app: Sphinx) -> None:

@@ -21,7 +21,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")  # noqa: PYI024
 
 
-def temperature_from_filter_ratio(
+def temperature_from_filter_ratio(  # noqa: C901
     map1,
     map2,
     abundance_model="coronal",
@@ -31,6 +31,8 @@ def temperature_from_filter_ratio(
     Te_err_threshold=0.5,
     photon_noise_threshold=0.2,
     mask=None,
+    expmap1=None,
+    expmap2=None,
     verbose=False,
 ):
     r"""
@@ -86,6 +88,14 @@ def temperature_from_filter_ratio(
 
     no_threshold : Boolean [Optional]
         If True, no thresholds are set. (default = False)
+
+    expmap1 : numpy array [Optional]
+        if provided, gives exposure time (s) for each pixel in image 1. This
+        is useful for composite images in which different parts of the image
+        have different exposure times
+
+    expmap2 : numpy array [Optional]
+        if provided, gives exposure time (s) for each pixel in image 2.
 
     verbose : Boolean [Optional]
         If True, information is printed
@@ -157,9 +167,15 @@ def temperature_from_filter_ratio(
     n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
     # This allows use of normalized data (contrary to original IDL code):
     if n1:
-        data1 = data1 * hdr1["EXPTIME"]
+        if expmap1 is None:
+            data1 = data1 * hdr1["EXPTIME"]
+        else:
+            data1 = data1 * expmap1
     if n2:
-        data2 = data2 * hdr2["EXPTIME"]
+        if expmap2 is None:
+            data2 = data2 * hdr2["EXPTIME"]
+        else:
+            data2 = data2 * expmap2
 
     if mask is None:
         mask = np.zeros_like(data1, dtype=bool)
@@ -212,7 +228,14 @@ def temperature_from_filter_ratio(
         raise ValueError("Filters for the two images cannot be the same")
 
     T_e, EM, model_ratio, ok_pixel = _derive_temperature(
-        map1, map2, tresp1, tresp2, binfac=binfac, Trange=Trange
+        map1,
+        map2,
+        tresp1,
+        tresp2,
+        expmap1=expmap1,
+        expmap2=expmap2,
+        binfac=binfac,
+        Trange=Trange,
     )
 
     T_error, EMerror, K1, K2 = calculate_TE_errors(
@@ -313,7 +336,9 @@ def deriv(x, y):
     return np.append(np.insert(dydx1, 0, dydx0), dydxN)
 
 
-def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
+def _derive_temperature(
+    map1, map2, tresp1, tresp2, expmap1=None, expmap2=None, binfac=1, Trange=None
+):
     """
     Given two XRT Level 1 images, their associated metadata and the
     TemperatureResponseFundamental objects associated with them, derive the
@@ -333,6 +358,12 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
 
     tresp2 : ~xrtpy.response.temperature_response.TemperatureResponseFundamental
         temperature response for second image
+
+    expmap1 : numpy array, Optional
+        exposure time map for data image 1
+
+    expmap2 : numpy array, Optional
+        exposure time map for data image 2
 
     binfac : integer, Optional (default = 1)
         spatial binning factor
@@ -396,8 +427,14 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
     data2 = np.ma.masked_where(map2.mask, map2.data)
     mask = map1.mask
 
-    exptime1 = map1.meta["EXPTIME"]
-    exptime2 = map2.meta["EXPTIME"]
+    if expmap1 is None:
+        exptime1 = map1.meta["EXPTIME"]
+    else:
+        exptime1 = expmap1
+    if expmap2 is None:
+        exptime2 = map2.meta["EXPTIME"]
+    else:
+        exptime2 = expmap2
 
     if rev_ratio:
         data_ratio = (data2 / exptime2) / (data1 / exptime1)
