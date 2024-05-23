@@ -211,6 +211,9 @@ for epilog_file in ["_links.rst", "_substitutions.rst"]:
     with open(epilog_file) as file:  # noqa: PTH123
         rst_epilog += file.read()
 
+# Add the nbsphinx_allow_errors option
+nbsphinx_allow_errors = True
+
 
 def setup(app: Sphinx) -> None:
     app.add_config_value("revision", "", True)  # noqa: FBT003
