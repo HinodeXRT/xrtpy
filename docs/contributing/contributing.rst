@@ -17,3 +17,5 @@ There are several ways you can contribute to XRTpy:
    - Commit your changes with clear and descriptive commit messages.
    - Push your branch to your forked repository.
    - Create a pull request (PR) from your branch to the `main` branch of the original repository.
+
+3. **Improving Documentation**: Good documentation is crucial for the usability of the package. You can help by improving existing documentation, or writing new tutorials.
