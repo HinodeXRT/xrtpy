@@ -4,7 +4,8 @@
 Contributing to XRTpy
 *********************
 
-Thank you for your interest in contributing to XRTpy! We welcome contributions from the community to improve and expand the functionality of this package.
+Thank you for your interest in contributing to XRTpy!
+We welcome contributions from the community to improve and expand the functionality of this package.
 
 There are several ways you can contribute to XRTpy:
 
@@ -22,7 +23,43 @@ There are several ways you can contribute to XRTpy:
 
 
 Development Environment
+========================
 To set up your development environment:
 
-1. Clone the repository:
-   ```git clone https://github.com/HinodeXRT/xrtpy.git``` then run ```cd xrtpy```
+1. Clone the repository::
+   git clone https://github.com/HinodeXRT/xrtpy.git
+   cd xrtpy
+
+2. Install the required dependencies::
+
+   pip install -r requirements.txt
+
+3. Install the package in editable mode::
+
+   pip install -e .
+
+Coding Standards
+================
+- Follow the PEP 8 coding style.
+- Write clear and concise commit messages.
+- Include docstrings for all functions and classes.
+- Ensure that your code is covered by tests and that all tests pass before submitting a PR.
+
+
+Testing
+=======
+We use `pytest` for testing. To run the tests, use the following command::
+
+   pytest
+
+Ensure that all tests pass before submitting your PR.
+
+Communication
+=============
+For any questions or discussions, you can email us at `xrtpy@cfa.harvard.edu`.
+
+
+Thank you for contributing to XRTpy!
+
+
+.. _PEP-8-coding-style: https://peps.python.org/pep-0008/
