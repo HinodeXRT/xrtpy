@@ -4,8 +4,7 @@
 Contributing to XRTpy
 *********************
 
-Thank you for your interest in contributing to XRTpy!
-We welcome contributions from the community to improve and expand the functionality of this package.
+Thank you for your interest in contributing to XRTpy! We welcome contributions from the community to improve and expand the functionality of this package.
 
 There are several ways you can contribute to XRTpy:
 
@@ -21,9 +20,6 @@ There are several ways you can contribute to XRTpy:
 
 3. **Improving Documentation**: Good documentation is crucial for the usability of the package. You can help by improving existing documentation, or writing new tutorials.
 
-
-Visit the `Development Environment` to set up your development environment.
-Thank you for contributing to XRTpy!
-
+Visit the `Development Environment` section to set up your development environment. Thank you for contributing to XRTpy!
 
 .. _GitHub-issue: https://github.com/HinodeXRT/xrtpy/issues

@@ -4,23 +4,22 @@
 Installation for Development
 ****************************
 
-
 Development Environment
 ========================
 To set up your development environment:
 
 1. Clone the repository::
 
-   `git clone https://github.com/HinodeXRT/xrtpy.git`
-   `cd xrtpy`
+   git clone https://github.com/HinodeXRT/xrtpy.git
+   cd xrtpy
 
 2. Install the required dependencies::
 
-   `pip install -r requirements.txt1
+   pip install -r requirements.txt
 
 3. Install the package in editable mode::
 
-   `pip install -e .`
+   pip install -e .
 
 Coding Standards
 ================
@@ -28,7 +27,6 @@ Coding Standards
 - Write clear and concise commit messages.
 - Include docstrings for all functions and classes.
 - Ensure that your code is covered by tests and that all tests pass before submitting a PR.
-
 
 Testing
 =======
@@ -41,6 +39,5 @@ Ensure that all tests pass before submitting your PR.
 Communication
 =============
 For any questions or discussions, you can email us at `xrtpy@cfa.harvard.edu`.
-
 
 .. _PEP-8: https://peps.python.org/pep-0008/
