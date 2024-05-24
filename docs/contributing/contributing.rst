@@ -19,3 +19,11 @@ There are several ways you can contribute to XRTpy:
    - Create a pull request (PR) from your branch to the `main` branch of the original repository.
 
 3. **Improving Documentation**: Good documentation is crucial for the usability of the package. You can help by improving existing documentation, or writing new tutorials.
+
+## Development Environment
+
+To set up your development environment:
+
+1. Clone the repository:
+   ```git clone https://github.com/HinodeXRT/xrtpy.git```
+   ```cd xrtpy```
