@@ -8,6 +8,6 @@ Contributor Guide
    :maxdepth: 3
 
    install_dev
-   workflow
+   contributing
    data_from_idl
    release_guide
