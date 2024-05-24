@@ -28,20 +28,20 @@ To set up your development environment:
 
 1. Clone the repository::
 
-   git clone https://github.com/HinodeXRT/xrtpy.git
-   cd xrtpy
+   ```git clone https://github.com/HinodeXRT/xrtpy.git```
+   `cd xrtpy`
 
 2. Install the required dependencies::
 
-   pip install -r requirements.txt
+   `pip install -r requirements.txt1
 
 3. Install the package in editable mode::
 
-   pip install -e .
+   `pip install -e .`
 
 Coding Standards
 ================
-- Follow the 'PEP-8-coding-style'_.
+- Follow the `PEP-8`_ coding style.
 - Write clear and concise commit messages.
 - Include docstrings for all functions and classes.
 - Ensure that your code is covered by tests and that all tests pass before submitting a PR.
@@ -63,5 +63,5 @@ For any questions or discussions, you can email us at `xrtpy@cfa.harvard.edu`.
 Thank you for contributing to XRTpy!
 
 
-.. _PEP-8-coding-style: https://peps.python.org/pep-0008/
+.. _PEP-8: https://peps.python.org/pep-0008/
 .. _GitHub-issue: https://github.com/HinodeXRT/xrtpy/issues
