@@ -9,7 +9,7 @@ We welcome contributions from the community to improve and expand the functional
 
 There are several ways you can contribute to XRTpy:
 
-1. **Reporting Issues**: If you encounter any bugs or have suggestions for improvements, please report them using the GitHub [Issues](https://github.com/HinodeXRT/xrtpy/issues) page. Provide as much detail as possible, including steps to reproduce the issue and any relevant screenshots or code snippets.
+1. **Reporting Issues**: If you encounter any bugs or have suggestions for improvements, please report them using the `GitHub-issue`_ page. Provide as much detail as possible, including steps to reproduce the issue and any relevant screenshots or code snippets.
 
 2. **Submitting Pull Requests**: If you want to contribute code, follow these steps:
    - Fork the repository on GitHub.
@@ -27,16 +27,17 @@ Development Environment
 To set up your development environment:
 
 1. Clone the repository::
-   git clone https://github.com/HinodeXRT/xrtpy.git
-   cd xrtpy
+
+   `git clone https://github.com/HinodeXRT/xrtpy.git`
+   `cd xrtpy`
 
 2. Install the required dependencies::
 
-   pip install -r requirements.txt
+   `pip install -r requirements.txt`
 
 3. Install the package in editable mode::
 
-   pip install -e .
+   `pip install -e .`
 
 Coding Standards
 ================
@@ -50,7 +51,7 @@ Testing
 =======
 We use `pytest` for testing. To run the tests, use the following command::
 
-   pytest
+   `pytest`
 
 Ensure that all tests pass before submitting your PR.
 
@@ -63,3 +64,4 @@ Thank you for contributing to XRTpy!
 
 
 .. _PEP-8-coding-style: https://peps.python.org/pep-0008/
+.. _GitHub-issue: https://github.com/HinodeXRT/xrtpy/issues
