@@ -1,4 +1,4 @@
-.. _installation_for_development:
+.. _installation for development:
 
 ****************************
 Installation for Development
@@ -11,7 +11,7 @@ To set up your development environment:
 
 1. Clone the repository::
 
-   ```git clone https://github.com/HinodeXRT/xrtpy.git```
+   `git clone https://github.com/HinodeXRT/xrtpy.git`
    `cd xrtpy`
 
 2. Install the required dependencies::
