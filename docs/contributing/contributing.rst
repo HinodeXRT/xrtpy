@@ -25,6 +25,4 @@ Development Environment
 To set up your development environment:
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/HinodeXRT/xrtpy.git
-   cd xrtpy
+   ```git clone https://github.com/HinodeXRT/xrtpy.git``` then run ```cd xrtpy```
