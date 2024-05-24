@@ -48,8 +48,8 @@ bibliography: paper.bib
 # Summary
 
 The XRTpy Python package is a specialized tool developed for the analysis of observations made by the X-Ray Telescope (XRT) [@Golub:2007] aboard the Hinode spacecraft [@Kosugi:2007].
-Hinode, a joint mission involving space agencies from Japan, the United States, Europe, and the United Kingdom, was launched with the primary aim of providing multi-wavelength data from the photosphere to the upper corona, enabling continuous observations of the Sun.
-Within this mission, the XRT instrument stands out as a remarkable piece of technology, capable of capturing high-resolution images of the solar corona's hottest material, spanning temperatures from 10<sup>6</sup> to 10<sup>7</sup> K.
+Hinode, a joint mission involving space agencies from Japan, the United States, and Europe. Hinode was launched with the primary aim of providing multi-wavelength data from the photosphere to the upper corona, enabling continuous observations of the Sun.
+Within this mission, the XRT instrument stands out as a remarkable piece of technology, capable of capturing high-resolution images of the solar corona's hottest material, spanning temperatures from 10^6^ to 10^7^ K.
 
 # Statement of need
 
@@ -85,15 +85,15 @@ The package is structured into distinct modules, each serving a specific purpose
 
  - `xrtpy.image_correction.remove_lightleak.py`: The `remove_lightleak` function in this module eliminates light leak (visible stray light) from XRT synoptic composite images. This results in cleaner and more precise images suitable for in-depth analysis.
 
-XRTpy supports multiple elemental abundance sets, including CHIANTI coronal abundances ([@Feldman:1992] and [@Feldman:2014]) , hybrid abundances (based on [Fludra-and-Schmelz:1999] and [@Schmelz:2012]), and photospheric abundances (based on [@Grevesse:2007], [@Scott:2015], and [@Asplund:2009]).
+XRTpy supports multiple elemental abundance sets, including CHIANTI coronal abundances ([@Feldman:1992] and [@Feldman:2014]) , hybrid abundances (based on [@Fludra-and-Schmelz:1999] and [@Schmelz:2012]), and photospheric abundances (based on [@Grevesse:2007], [@Scott:2015], and [@Asplund:2009]).
 
 Researchers have the flexibility to select the abundance model that best aligns with their research requirements.
 
 XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
-![Figure 1: The Effective area for all XRT filters plotted using XRTpy. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
+![The Effective area for all XRT filters plotted using XRTpy. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
 
-![Figure 2: The temperature response is plotted for all XRT filters using XRTpy.  The plot also shows the effects of using different abundance models from CHIANTI for each filter. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
+![The temperature response is plotted for all XRT filters using XRTpy.  The plot also shows the effects of using different abundance models from CHIANTI for each filter. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
 
 ![In Figure 3, the application of the `temperature_from_filter_ratio` function is illustrated, demonstrating its role in calculating electron temperature and volume emission measure through filter ratios. The dataset, collected on January 28, 2011, between 01:31:55 and 01:32:05 UTC, comprises two images captured with specific filters. These images offer unique insights into solar conditions during the observed moments, as shown by [@Guidoni:2015]. .\label{fig:Figure 3}](xrtpy_temperature_from_filter_ratio_plot.pdf)
 
