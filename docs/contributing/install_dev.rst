@@ -1,4 +1,4 @@
-.. _installation for development:
+.. _installation_for_development:
 
 ****************************
 Installation for Development
