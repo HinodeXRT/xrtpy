@@ -7,5 +7,5 @@ Contributor Guide
 .. toctree::
    :maxdepth: 3
    contributing
-   install_dev
+   installation_for_development
    release_guide
