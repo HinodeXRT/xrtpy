@@ -17,6 +17,10 @@ Bug Encounters
 ==============
 In the event that you come across a direct XRTpy error, flaw, or unexpected operation, please report it to us directly via `email`_ or by creating a `GitHub-issue`_.
 
+Contributing
+============
+We welcome contributions from the community! For detailed guidelines on how to contribute, please see our `Contributing Guide` page section `Contributing to XRTpy` .
+
 
 .. _xrtpy@cfa.harvard.edu: xrtpy@cfa.harvard.edu
 .. _email: xrtpy@cfa.harvard.edu
