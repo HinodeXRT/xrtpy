@@ -198,14 +198,14 @@ class EffectiveAreaFundamental:
             return index_mapping_to_fw2_name.get(filter2)
 
     @property
-    def combo_filter1_data(self):
+    def _combo_filter1_data(self):
         """Collecting filter data."""
         return _filter_contamination[self._combo_filter_index_mapping_to_name_filter1][
             self._combo_filter1_wheel_number
         ]
 
     @property
-    def combo_filter2_data(self):
+    def _combo_filter2_data(self):
         """Collecting filter data."""
         return _filter_contamination[self._combo_filter_index_mapping_to_name_filter2][
             self._combo_filter2_wheel_number
@@ -229,7 +229,7 @@ class EffectiveAreaFundamental:
         -----
         The interpolation is performed using a linear interpolation method over the
         available contamination data points. The `filter_data_dates_to_seconds` and
-        `combo_filter1_data` attributes are used to provide the data for interpolation,
+        `_combo_filter1_data` attributes are used to provide the data for interpolation,
         and `filter_observation_date_to_seconds` provides the point at which to
         evaluate the interpolation.
 
@@ -240,7 +240,7 @@ class EffectiveAreaFundamental:
         """
 
         interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
+            self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
 
@@ -262,7 +262,7 @@ class EffectiveAreaFundamental:
         -----
         The interpolation is performed using a linear interpolation method over the
         available contamination data points. The `filter_data_dates_to_seconds` and
-        `combo_filter2_data` attributes are used to provide the data for interpolation,
+        `_combo_filter2_data` attributes are used to provide the data for interpolation,
         and `filter_observation_date_to_seconds` provides the point at which to
         evaluate the interpolation.
 
@@ -273,7 +273,7 @@ class EffectiveAreaFundamental:
         """
 
         interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
+            self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
 
