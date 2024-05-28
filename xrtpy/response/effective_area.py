@@ -65,15 +65,26 @@ _filter_contamination = _filter_contam_file["p2"]
 
 class EffectiveAreaFundamental:
     """
-    Class for calculating the effective area.
+    Class for calculating the effective area for an XRT filter at a specific observation date.
+
+    This class handles the calculations required to determine the effective area of a filter
+    used in the X-Ray Telescope (XRT) on the Hinode satellite. It considers various factors such as
+    contamination on the CCD and filters, as well as the geometry and transmission of the XRT channel.
 
     Parameters
-    -----------
+    ----------
     filter_name : str
         The name of the filter.
-    observation_date: str or datetime.datetime
-        The date of the observation. For valid date formats, look at the documentation for
-        `sunpy.time.parse_time`.
+    observation_date : str or datetime.datetime
+        The date of the observation. Acceptable formats include any string or datetime object
+        that can be parsed by `sunpy.time.parse_time`.
+
+    Attributes
+    ----------
+    name : str
+        Name of the XRT X-Ray channel filter.
+    observation_date : str
+        Date of the observation.
     """
 
     def __init__(self, filter_name, observation_date):
@@ -210,7 +221,7 @@ class EffectiveAreaFundamental:
 
         Returns
         -------
-        astropy.units.angstrom
+        astropy.units.Quantity
             The thickness of the contamination layer on the first filter, in Angstroms.
 
         Notes
@@ -243,14 +254,14 @@ class EffectiveAreaFundamental:
 
         Returns
         -------
-        astropy.units.angstrom
-            The thickness of the contamination layer on the first filter, in Angstroms.
+        astropy.units.Quantity
+            The thickness of the contamination layer on the second filter, in Angstroms.
 
         Notes
         -----
         The interpolation is performed using a linear interpolation method over the
         available contamination data points. The `filter_data_dates_to_seconds` and
-        `combo_filter1_data` attributes are used to provide the data for interpolation,
+        `combo_filter2_data` attributes are used to provide the data for interpolation,
         and `filter_observation_date_to_seconds` provides the point at which to
         evaluate the interpolation.
 
@@ -526,10 +537,19 @@ class EffectiveAreaFundamental:
         """
         Calculate the Effective Area.
 
+        The effective area is calculated by considering the geometry of the XRT flight model,
+        the channel transmission, and the contamination layers on both the CCD and the filter.
+
         Returns
         -------
         astropy.units.Quantity
             Effective area in cm^2.
+
+        Notes
+        -----
+        The effective area is a crucial parameter for determining the sensitivity of the XRT
+        to X-ray emissions. This method combines various factors, including the physical
+        properties of the filter and CCD, to compute the total effective area.
         """
         return (
             self.channel_geometry_aperture_area
