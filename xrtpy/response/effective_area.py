@@ -423,7 +423,7 @@ class EffectiveAreaFundamental:
         return Channel(self.name).transmission
 
     @property
-    def interpolated_CCD_contamination_transmission(self):
+    def _interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         CCD_contam_transmission = interpolate.interp1d(
             self.n_DEHP_wavelength, self.CCD_contamination_transmission
@@ -488,7 +488,7 @@ class EffectiveAreaFundamental:
         return (
             self.channel_geometry_aperture_area
             * self.channel_transmission
-            * self.interpolated_CCD_contamination_transmission
+            * self._interpolated_CCD_contamination_transmission
             * self._interpolated_filter_contamination_transmission
         )
 
