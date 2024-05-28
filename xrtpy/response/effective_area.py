@@ -139,7 +139,29 @@ class EffectiveAreaFundamental:
 
     @property
     def contamination_on_CCD(self):
-        """Calculate the contamination layer on the CCD, thickness given in Angstrom (Å)."""
+        """
+        Calculate the thickness of the contamination layer on the CCD.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the CCD at the observation date. The contamination layer
+        is measured in Angstroms (Å).
+
+        Returns
+        -------
+        astropy.units.Quantity
+            The thickness of the contamination layer on the CCD, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the
+        available contamination data points. The `observation_date` attribute is used to
+        provide the point at which to evaluate the interpolation.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
         interpolater = scipy.interpolate.interp1d(
             _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
         )
@@ -286,7 +308,30 @@ class EffectiveAreaFundamental:
 
     @property
     def contamination_on_filter(self) -> u.angstrom:
-        """Thickness of the contamination layer on a filter."""
+        """
+        Calculate the thickness of the contamination layer on a filter.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the specified filter at the observation date. The contamination layer
+        is measured in Angstroms (Å).
+
+        Returns
+        -------
+        astropy.units.Quantity
+            The thickness of the contamination layer on the filter, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the available
+        contamination data points. The `observation_date` attribute is used to provide the point
+        at which to evaluate the interpolation. The data used for interpolation is specific to
+        the filter defined by the `filter_name` attribute.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
         interpolater = scipy.interpolate.interp1d(
             _filter_contamination_file_time.utime, self._filter_data, kind="linear"
         )
