@@ -193,7 +193,14 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
-        """Interpolation between the spectra wavelength onto the channel wavelength."""
+        """
+        Interpolation between the spectra wavelength onto the channel wavelength.
+
+        Returns
+        -------
+        array
+            Interpolated spectra values.
+        """
         spectra_interpolate = []
         for i in range(61):
             interpolater = interpolate.interp1d(
@@ -208,11 +215,26 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        # return effective_area(self.filter_name, self.observation_date)
+        """
+        Calculate the effective area.
+
+        Returns
+        -------
+        quantity
+            Effective area in cm^2.
+        """
         return self._effective_area_fundamental.effective_area()
 
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
+        """
+        Perform the integration of the temperature response.
+
+        Returns
+        -------
+        quantity
+            Integrated temperature response in electron cm^5 / (s pix).
+        """
         wavelength = (self.channel_wavelength).value
         constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
@@ -237,5 +259,13 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
+        """
+        Apply gain value to the Temperature Response.
+
+        Returns
+        -------
+        quantity
+            Temperature response in DN cm^5 / (s pix).
+        """
         r"""Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
         return self.integration() / self.ccd_gain_right
