@@ -347,7 +347,7 @@ class EffectiveAreaFundamental:
         ]
 
     @cached_property
-    def filterwheel_angular_wavenumber(self):
+    def _filterwheel_angular_wavenumber(self):
         """Define angular wavenumber for a filter."""
         index, _, cos_a, _, _, _, _ = self.transmission_equation
 
@@ -442,12 +442,12 @@ class EffectiveAreaFundamental:
         M = [
             [
                 [
-                    np.cos(self.filterwheel_angular_wavenumber[i]),
-                    (-i_i * np.sin(self.filterwheel_angular_wavenumber[i])) / index[i],
+                    np.cos(self._filterwheel_angular_wavenumber[i]),
+                    (-i_i * np.sin(self._filterwheel_angular_wavenumber[i])) / index[i],
                 ],
                 [
-                    -i_i * np.sin(self.filterwheel_angular_wavenumber[i]) * index[i],
-                    np.cos(self.filterwheel_angular_wavenumber[i]),
+                    -i_i * np.sin(self._filterwheel_angular_wavenumber[i]) * index[i],
+                    np.cos(self._filterwheel_angular_wavenumber[i]),
                 ],
             ]
             for i in range(4000)
