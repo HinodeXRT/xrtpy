@@ -468,7 +468,7 @@ class EffectiveAreaFundamental:
         return [abs(transmittance[i] ** 2) for i in range(4000)]
 
     @property
-    def interpolated_filter_contamination_transmission(self):
+    def _interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         Filter_contam_transmission = interpolate.interp1d(
             self.n_DEHP_wavelength, self.filter_contamination_transmission
@@ -477,12 +477,19 @@ class EffectiveAreaFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        """Calculation of the Effective Area."""
+        """
+        Calculate the Effective Area.
+
+        Returns
+        -------
+        astropy.units.Quantity
+            Effective area in cm^2.
+        """
         return (
             self.channel_geometry_aperture_area
             * self.channel_transmission
             * self.interpolated_CCD_contamination_transmission
-            * self.interpolated_filter_contamination_transmission
+            * self._interpolated_filter_contamination_transmission
         )
 
 
@@ -500,9 +507,8 @@ def effective_area(filter_name, observation_date):
 
     Returns
     -------
-    u.Quantity
-        The effective area of the filter in cm^2.
-
+    astropy.units.Quantity
+        Effective area in cm^2.
     Notes
     -----
     The effective area calculation takes into account the geometry of the XRT flight model,
