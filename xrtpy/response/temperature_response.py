@@ -62,6 +62,18 @@ class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
 
     def __init__(self, filter_name, observation_date, abundance_model="coronal"):
+        """
+        Initialize the TemperatureResponseFundamental class.
+
+        Parameters
+        ----------
+        filter_name : str
+            The name of the filter.
+        observation_date : str or datetime
+            The date of the observation.
+        abundance_model : str, optional
+            The abundance model to use. Options are 'coronal' (default), 'hybrid', and 'photospheric'. Default abundance model is coronal.
+        """
         self._name = resolve_filter_name(filter_name)
         self._channel = Channel(self.filter_name)
         # self.observation_date = self.observation_date
