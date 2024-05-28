@@ -322,7 +322,7 @@ class EffectiveAreaFundamental:
         return (index, sin_a, cos_a, wavelength_max, n_o, n_t, incidence_angle)
 
     @cached_property
-    def angular_wavenumber_CCD(self):
+    def _angular_wavenumber_CCD(self):
         """Define angular wavenumber on CCD."""
 
         index, _, cos_a, wavelength_max, _, _, _ = self.transmission_equation
@@ -382,12 +382,12 @@ class EffectiveAreaFundamental:
         M = [
             [
                 [
-                    np.cos(self.angular_wavenumber_CCD[i]),
-                    (-i_i * np.sin(self.angular_wavenumber_CCD[i])) / index[i],
+                    np.cos(self._angular_wavenumber_CCD[i]),
+                    (-i_i * np.sin(self._angular_wavenumber_CCD[i])) / index[i],
                 ],
                 [
-                    -i_i * np.sin(self.angular_wavenumber_CCD[i]) * index[i],
-                    np.cos(self.angular_wavenumber_CCD[i]),
+                    -i_i * np.sin(self._angular_wavenumber_CCD[i]) * index[i],
+                    np.cos(self._angular_wavenumber_CCD[i]),
                 ],
             ]
             for i in range(4000)
