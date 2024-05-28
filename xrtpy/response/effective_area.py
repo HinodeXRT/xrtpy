@@ -431,7 +431,7 @@ class EffectiveAreaFundamental:
         return CCD_contam_transmission(self.channel_wavelength)
 
     @cached_property
-    def filter_contamination_transmission(self):
+    def _filter_contamination_transmission(self):
         """Calculate transmission matrix coefficient and transmittance on a filter."""
 
         index, _, _, _, n_o, n_t, _ = self.transmission_equation
@@ -471,7 +471,7 @@ class EffectiveAreaFundamental:
     def _interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         Filter_contam_transmission = interpolate.interp1d(
-            self.n_DEHP_wavelength, self.filter_contamination_transmission
+            self.n_DEHP_wavelength, self._filter_contamination_transmission
         )
         return Filter_contam_transmission(self.channel_wavelength)
 
