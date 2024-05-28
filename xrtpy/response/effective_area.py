@@ -487,5 +487,26 @@ class EffectiveAreaFundamental:
 
 
 def effective_area(filter_name, observation_date):
+    """
+    Calculate the effective area for a given XRT filter at a specific observation date.
+
+    Parameters
+    ----------
+    filter_name : str
+        The name of the filter for which the effective area is to be calculated.
+    observation_date : str or datetime.datetime
+        The date of the observation. Acceptable formats include any string or datetime object
+        that can be parsed by `sunpy.time.parse_time`.
+
+    Returns
+    -------
+    u.Quantity
+        The effective area of the filter in cm^2.
+
+    Notes
+    -----
+    The effective area calculation takes into account the geometry of the XRT flight model,
+    the channel transmission, and the contamination layers on both the CCD and the filter.
+    """
     EAP = EffectiveAreaFundamental(filter_name, observation_date)
     return EAP.effective_area()
