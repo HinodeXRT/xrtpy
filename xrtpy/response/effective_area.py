@@ -78,13 +78,6 @@ class EffectiveAreaFundamental:
     observation_date : str or datetime.datetime
         The date of the observation. Acceptable formats include any string or datetime object
         that can be parsed by `sunpy.time.parse_time`.
-
-    Attributes
-    ----------
-    name : str
-        Name of the XRT X-Ray channel filter.
-    observation_date : str
-        Date of the observation.
     """
 
     def __init__(self, filter_name, observation_date):
