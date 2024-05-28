@@ -202,7 +202,30 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_filter1_combo(self) -> u.angstrom:
         """
-        Thickness of the contamination layer on a filter."""
+        Calculate the thickness of the contamination layer on the first filter in a filter combination.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the first filter of a specified filter combination at the
+        observation date.
+
+        Returns
+        -------
+        astropy.units.angstrom
+            The thickness of the contamination layer on the first filter, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the
+        available contamination data points. The `filter_data_dates_to_seconds` and
+        `combo_filter1_data` attributes are used to provide the data for interpolation,
+        and `filter_observation_date_to_seconds` provides the point at which to
+        evaluate the interpolation.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
 
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
@@ -212,7 +235,30 @@ class EffectiveAreaFundamental:
     @property
     def contamination_on_filter2_combo(self) -> u.angstrom:
         """
-        Thickness of the contamination layer on a filter."""
+        Calculate the thickness of the contamination layer on the second filter in a filter combination.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the second filter of a specified filter combination at the
+        observation date.
+
+        Returns
+        -------
+        astropy.units.angstrom
+            The thickness of the contamination layer on the first filter, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the
+        available contamination data points. The `filter_data_dates_to_seconds` and
+        `combo_filter1_data` attributes are used to provide the data for interpolation,
+        and `filter_observation_date_to_seconds` provides the point at which to
+        evaluate the interpolation.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
 
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
@@ -220,7 +266,7 @@ class EffectiveAreaFundamental:
         return interpolater(self.filter_observation_date_to_seconds)
 
     @property
-    def filter_data(self):
+    def _filter_data(self):
         """Collecting filter contamination data."""
         return _filter_contamination[self._filter_index_mapping_to_name][
             self._filter_wheel_number
@@ -230,7 +276,7 @@ class EffectiveAreaFundamental:
     def contamination_on_filter(self) -> u.angstrom:
         """Thickness of the contamination layer on a filter."""
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self.filter_data, kind="linear"
+            _filter_contamination_file_time.utime, self._filter_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
