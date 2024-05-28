@@ -94,12 +94,20 @@ class EffectiveAreaFundamental:
 
     @property
     def name(self) -> str:
-        """Name of XRT X-Ray channel filter."""
+        """
+        Name of XRT X-Ray channel filter.
+
+        :noindex:
+        """
         return self._name
 
     @property
     def observation_date(self) -> str:
-        """Date of observation."""
+        """
+        Date of observation.
+
+        :noindex:
+        """
         return self._observation_date
 
     @observation_date.setter
