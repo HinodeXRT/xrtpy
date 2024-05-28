@@ -220,7 +220,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        u.Quantity
+        astropy.units.Quantity
             Effective area in cm^2.
         """
         return self._effective_area_fundamental.effective_area()
@@ -232,7 +232,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        u.Quantity
+        astropy.units.Quantity
             Integrated temperature response in electron cm^5 / (s pix).
         """
         wavelength = (self.channel_wavelength).value
@@ -264,7 +264,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        u.Quantity
+        astropy.units.Quantity
             Temperature response in DN cm^5 / (s pix).
         """
         r"""Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
