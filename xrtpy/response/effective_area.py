@@ -178,7 +178,7 @@ class EffectiveAreaFundamental:
         return 0 if filter2 in index_mapping_to_fw1_name else 1
 
     @property
-    def combo_filter_index_mapping_to_name_filter1(self):
+    def _combo_filter_index_mapping_to_name_filter1(self):
         """Returns filter's corresponding number value."""
         filter1, _ = self._combo_filter_name_split
 
@@ -200,7 +200,7 @@ class EffectiveAreaFundamental:
     @property
     def combo_filter1_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter1][
+        return _filter_contamination[self._combo_filter_index_mapping_to_name_filter1][
             self._combo_filter1_wheel_number
         ]
 
