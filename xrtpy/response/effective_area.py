@@ -142,12 +142,12 @@ class EffectiveAreaFundamental:
             return index_mapping_to_fw2_name.get(self.name)
 
     @property
-    def filter_wheel_number(self):
+    def _filter_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
         return 0 if self.name in index_mapping_to_fw1_name else 1
 
     @property
-    def combo_filter_name_split(self):
+    def _combo_filter_name_split(self):
         """Defining chosen filters to its corresponding filter wheel."""
         name = (self.name).split("/")
         filter1, filter2 = name[0], name[1]
@@ -156,19 +156,19 @@ class EffectiveAreaFundamental:
     @property
     def combo_filter1_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        filter1, _ = self.combo_filter_name_split
+        filter1, _ = self._combo_filter_name_split
         return 0 if filter1 in index_mapping_to_fw1_name else 1
 
     @property
     def combo_filter2_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        _, filter2 = self.combo_filter_name_split
+        _, filter2 = self._combo_filter_name_split
         return 0 if filter2 in index_mapping_to_fw1_name else 1
 
     @property
     def combo_filter_index_mapping_to_name_filter1(self):
         """Returns filter's corresponding number value."""
-        filter1, _ = self.combo_filter_name_split
+        filter1, _ = self._combo_filter_name_split
 
         if filter1 in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(filter1)
@@ -178,7 +178,7 @@ class EffectiveAreaFundamental:
     @property
     def combo_filter_index_mapping_to_name_filter2(self):
         """Returns filter's corresponding number value."""
-        filter1, filter2 = self.combo_filter_name_split
+        filter1, filter2 = self._combo_filter_name_split
 
         if filter2 in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(filter2)
@@ -223,7 +223,7 @@ class EffectiveAreaFundamental:
     def filter_data(self):
         """Collecting filter contamination data."""
         return _filter_contamination[self._filter_index_mapping_to_name][
-            self.filter_wheel_number
+            self._filter_wheel_number
         ]
 
     @property
