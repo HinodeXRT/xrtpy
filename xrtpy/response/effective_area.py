@@ -509,6 +509,7 @@ def effective_area(filter_name, observation_date):
     -------
     astropy.units.Quantity
         Effective area in cm^2.
+
     Notes
     -----
     The effective area calculation takes into account the geometry of the XRT flight model,
