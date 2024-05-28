@@ -402,9 +402,21 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def _transmission_equation(self):
-        """Defining equations that will be used to calculate the effective area.
-        REFERENCES: G.R Fowles, Intro to Modern Optics 2nd Edition, pp 96-101."""
+        """
+        Define equations used to calculate the effective area.
 
+        This method sets up the necessary equations to calculate the effective area of a filter
+        in the X-Ray Telescope (XRT) on the Hinode satellite. The calculations are based on the
+        principles of modern optics as described in G.R Fowles, "Introduction to Modern Optics,"
+        2nd Edition, pp 96-101.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the index of refraction, sine of the angle of incidence, cosine of the angle of incidence,
+            maximum wavelength, index of refraction of the medium at the entrance, index of refraction of the medium at the exit,
+            and the angle of incidence.
+        """
         n_o = 1.0  # index of medium at entrance of filter (assumed vacuum)
         n_t = 1.0  # index of medium at exit of filter (assumed vacuum)
 
