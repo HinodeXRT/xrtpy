@@ -69,7 +69,7 @@ class TemperatureResponseFundamental:
         ----------
         filter_name : str
             The name of the filter.
-        observation_date : str or datetime
+        observation_date : str or date-time object
             The date of the observation.
         abundance_model : str, optional
             The abundance model to use. Options are 'coronal' (default), 'hybrid', and 'photospheric'. Default abundance model is coronal.
@@ -99,7 +99,14 @@ class TemperatureResponseFundamental:
 
     @property
     def get_abundance_data(self):
-        """Returning the requested abundance data that is used to calculate the temperature response."""
+        """
+        Return the requested abundance data used to calculate the temperature response.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the abundance model data.
+        """
         abundance_type_name = self.abundances
         data = _abundance_model_data[abundance_type_name]
         if abundance_type_name not in list_of_abundance_name:
