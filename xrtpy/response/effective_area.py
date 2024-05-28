@@ -401,7 +401,7 @@ class EffectiveAreaFundamental:
         )
 
     @cached_property
-    def transmission_equation(self):
+    def _transmission_equation(self):
         """Defining equations that will be used to calculate the effective area.
         REFERENCES: G.R Fowles, Intro to Modern Optics 2nd Edition, pp 96-101."""
 
@@ -428,7 +428,7 @@ class EffectiveAreaFundamental:
     def _angular_wavenumber_CCD(self):
         """Define angular wavenumber on CCD."""
 
-        index, _, cos_a, wavelength_max, _, _, _ = self.transmission_equation
+        index, _, cos_a, wavelength_max, _, _, _ = self._transmission_equation
 
         # Define wavevector
         angular_wavenumber = np.array(
@@ -452,7 +452,7 @@ class EffectiveAreaFundamental:
     @cached_property
     def _filterwheel_angular_wavenumber(self):
         """Define angular wavenumber for a filter."""
-        index, _, cos_a, _, _, _, _ = self.transmission_equation
+        index, _, cos_a, _, _, _, _ = self._transmission_equation
 
         # Define wavevector
         angular_wavenumber = np.array(
@@ -477,7 +477,7 @@ class EffectiveAreaFundamental:
     def _CCD_contamination_transmission(self):
         """Calculate transmission matrix coefficient and transmittance on the CCD."""
 
-        index, _, _, _, n_o, n_t, _ = self.transmission_equation
+        index, _, _, _, n_o, n_t, _ = self._transmission_equation
 
         i_i = complex(0, 1)  # Define complex number
 
@@ -537,7 +537,7 @@ class EffectiveAreaFundamental:
     def _filter_contamination_transmission(self):
         """Calculate transmission matrix coefficient and transmittance on a filter."""
 
-        index, _, _, _, n_o, n_t, _ = self.transmission_equation
+        index, _, _, _, n_o, n_t, _ = self._transmission_equation
 
         i_i = complex(0, 1)  # Define complex number
 
