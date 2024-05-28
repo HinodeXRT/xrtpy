@@ -126,7 +126,7 @@ class EffectiveAreaFundamental:
         self._observation_date = observation_date
 
     @property
-    def _contamination_on_CCD(self):
+    def contamination_on_CCD(self):
         """Calculate the contamination layer on the CCD, thickness given in Angstrom (Å)."""
         interpolater = scipy.interpolate.interp1d(
             _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
@@ -336,7 +336,7 @@ class EffectiveAreaFundamental:
         )
 
         # Multiply by thickness
-        angular_wavenumber_thickness = angular_wavenumber * self._contamination_on_CCD
+        angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_CCD
 
         real_angular_wavenumber = angular_wavenumber_thickness.real
         imaginary_angular_wavenumber = angular_wavenumber_thickness.imag
