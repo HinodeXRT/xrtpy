@@ -3,7 +3,6 @@ __all__ = [
     "effective_area",
 ]
 
-
 import datetime
 import math
 import os
@@ -72,9 +71,8 @@ class EffectiveAreaFundamental:
     -----------
     filter_name : str
         The name of the filter.
-
-    observation_date: str
-        The date of the observation.  For valid date formats, look at the documentation for
+    observation_date: str or datetime.datetime
+        The date of the observation. For valid date formats, look at the documentation for
         `sunpy.time.parse_time`.
     """
 
@@ -128,15 +126,15 @@ class EffectiveAreaFundamental:
         self._observation_date = observation_date
 
     @property
-    def contamination_on_CCD(self):
-        """Calculation of contamination layer on the CCD, thickness given in Angstrom (Å)."""
+    def _contamination_on_CCD(self):
+        """Calculate the contamination layer on the CCD, thickness given in Angstrom (Å)."""
         interpolater = scipy.interpolate.interp1d(
             _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
     @property
-    def filter_index_mapping_to_name(self):
+    def _filter_index_mapping_to_name(self):
         """Returns filter's corresponding number value."""
         if self.name in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(self.name)
@@ -224,7 +222,7 @@ class EffectiveAreaFundamental:
     @property
     def filter_data(self):
         """Collecting filter contamination data."""
-        return _filter_contamination[self.filter_index_mapping_to_name][
+        return _filter_contamination[self._filter_index_mapping_to_name][
             self.filter_wheel_number
         ]
 
@@ -338,7 +336,7 @@ class EffectiveAreaFundamental:
         )
 
         # Multiply by thickness
-        angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_CCD
+        angular_wavenumber_thickness = angular_wavenumber * self._contamination_on_CCD
 
         real_angular_wavenumber = angular_wavenumber_thickness.real
         imaginary_angular_wavenumber = angular_wavenumber_thickness.imag
