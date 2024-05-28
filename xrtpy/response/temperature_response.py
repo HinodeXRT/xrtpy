@@ -198,7 +198,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        array
+        np.ndarray
             Interpolated spectra values.
         """
         spectra_interpolate = []
@@ -264,7 +264,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        quantity
+        u.Quantity
             Temperature response in DN cm^5 / (s pix).
         """
         r"""Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
