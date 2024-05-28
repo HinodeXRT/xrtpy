@@ -188,7 +188,7 @@ class TemperatureResponseFundamental:
     @property
     @u.quantity_input
     def solid_angle_per_pixel(self) -> u.sr / u.pix:
-        """This quantity represents the solid angle, which is given in units of steradians over pixel."""
+        """This amount represents the solid angle, which is given in units of steradians over pixel."""
         return (self.pixel_size / self.focal_len) ** 2 * (u.sr / u.pix)
 
     @u.quantity_input
@@ -198,7 +198,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        np.ndarray
+        np.array
             Interpolated spectra values.
         """
         spectra_interpolate = []
@@ -220,7 +220,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        quantity
+        u.Quantity
             Effective area in cm^2.
         """
         return self._effective_area_fundamental.effective_area()
@@ -232,7 +232,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        quantity
+        u.Quantity
             Integrated temperature response in electron cm^5 / (s pix).
         """
         wavelength = (self.channel_wavelength).value
