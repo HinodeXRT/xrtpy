@@ -198,7 +198,7 @@ class TemperatureResponseFundamental:
 
         Returns
         -------
-        np.array
+        numpy.ndarray
             Interpolated spectra values.
         """
         spectra_interpolate = []
