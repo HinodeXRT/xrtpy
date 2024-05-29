@@ -401,49 +401,85 @@ class Filter:
     @property
     @u.quantity_input
     def filter_density(self) -> u.g * u.cm**-3:
-        """XRT filter density."""
+        """
+        XRT filter density.
+
+        :noindex:
+        """
         return u.Quantity(self._fp_filter_data["DENS"], u.g * u.cm**-3)
 
     @property
     def filter_material(self) -> str:
-        """XRT filter material."""
+        """
+        XRT filter material.
+
+        :noindex:
+        """
         return self._fp_filter_data["MATERIAL"]
 
     @property
     def filter_mesh_transmission(self):
-        """Mesh transmission for the focal plane filter."""
+        """
+        Mesh transmission for the focal plane filter.
+
+        :noindex:
+        """
         return self._fp_filter_data["MESH_TRANS"]
 
     @property
     def filter_name(self) -> str:
-        """XRT filter name."""
+        """
+        XRT filter name.
+
+        :noindex:
+        """
         return self._fp_filter_data["LONG_NAME"]
 
     @property
     def number_of_wavelengths(self):
-        """Data number length."""
+        """
+        Data number length.
+
+        :noindex:
+        """
         return self._fp_filter_data["LENGTH"]
 
     @property
     def filter_substrate(self) -> str:
-        """XRT filter substrate."""
+        """
+        XRT filter substrate.
+
+        :noindex:
+        """
         return self._fp_filter_data["SUBSTRATE"]
 
     @property
     @u.quantity_input
     def filter_thickness(self) -> u.angstrom:
-        """Filter thickness."""
+        """
+        Filter thickness.
+
+        :noindex:
+        """
         return u.Quantity(self._fp_filter_data["THICK"], u.angstrom)
 
     @property
     def filter_transmission(self):
-        """Filter transmission."""
+        """
+        Filter transmission.
+
+        :noindex:
+        """
         return self._fp_filter_data["TRANS"][: self.number_of_wavelengths]
 
     @property
     @u.quantity_input
     def filter_wavelength(self) -> u.angstrom:
-        """XRT filter wavelength in angstroms."""
+        """
+        XRT filter wavelength in angstroms.
+
+        :noindex:
+        """
         return u.Quantity(self._fp_filter_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
