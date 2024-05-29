@@ -289,29 +289,49 @@ class Mirror:
     @property
     @u.quantity_input
     def mirror_density(self) -> u.g * u.cm**-3:
-        """Mirror mass density."""
+        """
+        Mirror mass density.
+
+        :noindex:
+        """
         return u.Quantity(self._mirror_data["DENS"], u.g * u.cm**-3)
 
     @property
     @u.quantity_input
     def mirror_graze_angle(self) -> u.deg:
-        """Mirror graze angle in units of degrees."""
+        """
+        Mirror graze angle in units of degrees.
+
+        :noindex:
+        """
         return u.Quantity(self._mirror_data["GRAZE_ANGLE"], u.deg)
 
     @property
     def mirror_name(self) -> str:
-        """Hinode/XRT flight model mirror."""
+        """
+        Hinode/XRT flight model mirror.
+
+        :noindex:
+        """
         return self._mirror_data["LONG_NAME"]
 
     @property
     def mirror_material(self) -> str:
-        """XRT flight model mirror material."""
+        """
+        XRT flight model mirror material.
+
+        :noindex:
+        """
         return self._mirror_data["MATERIAL"]
 
     @property
     @u.quantity_input
     def mirror_reflection(self) -> u.angstrom:
-        """Reflection of a mirror."""
+        """
+        Reflection of a mirror.
+
+        :noindex:
+        """
         return u.Quantity(self._mirror_data["REFL"], u.angstrom)[
             : self.number_of_wavelengths
         ]
@@ -319,14 +339,22 @@ class Mirror:
     @property
     @u.quantity_input
     def mirror_wavelength(self) -> u.angstrom:
-        """Array of wavelengths for mirror reflectance."""
+        """
+        Array of wavelengths for mirror reflectance.
+
+        :noindex:
+        """
         return u.Quantity(self._mirror_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
 
     @property
     def number_of_wavelengths(self):
-        """Data number length."""
+        """
+        Data number length.
+
+        :noindex:
+        """
         return self._mirror_data["LENGTH"]
 
 
