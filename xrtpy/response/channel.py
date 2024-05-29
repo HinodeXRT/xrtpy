@@ -115,12 +115,35 @@ class Geometry:
 
 class EntranceFilter:
     """
-    Entrance filter properties.
+    Represents the entrance filter of the X-Ray Telescope (XRT) on the Hinode spacecraft.
 
-    Thin prefilters cover the narrow annular entrance aperture of the XRT serving two main purposes:
+    The entrance filter covers the annular entrance aperture of the XRT, serving to reduce
+    both visible light and heat load entering the instrument. These filters are critical
+    for maintaining the necessary optical conditions inside the telescope.
 
-    1. Reduce the visible light entering the instrument.
-    2. Reduce the heat load in the instrument.
+    Parameters
+    ----------
+    index : int
+        The index of the channel within the GENX file that contains data specific to this filter.
+
+    Attributes
+    ----------
+    entrancefilter_density : astropy.units.Quantity
+        The density of the entrance filter material in g/cm³.
+    entrancefilter_material : str
+        The material composition of the entrance filter.
+    entrancefilter_mesh_transmission : float
+        The percentage transmission of the mesh part of the filter.
+    entrancefilter_name : str
+        The descriptive name of the entrance filter.
+    entrancefilter_substrate : str
+        The substrate material of the entrance filter.
+    entrancefilter_thickness : astropy.units.Quantity
+        The thickness of the entrance filter material measured in Angstroms.
+    entrancefilter_transmission : numpy.ndarray
+        The transmission efficiency of the entrance filter across different wavelengths.
+    entrancefilter_wavelength : astropy.units.Quantity
+        The wavelengths at which the transmission data of the filter are measured, in Angstroms.
     """
 
     _genx_file = _genx_file
