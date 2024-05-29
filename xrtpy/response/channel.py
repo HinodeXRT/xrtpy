@@ -164,38 +164,66 @@ class EntranceFilter:
 
     @property
     def entrancefilter_density(self) -> u.g * u.cm**-3:
-        r"""XRT entrance filter material density in g/cm\ :sup:`3`\ ."""
+        """
+        XRT entrance filter material density in g/cm³.
+
+        :noindex:
+        """
         return u.Quantity(self._en_filter_data["DENS"], u.g * u.cm**-3)
 
     @property
     def entrancefilter_material(self) -> str:
-        """XRT entrance filter material."""
+        """
+        XRT entrance filter material.
+
+        :noindex:
+        """
         return self._en_filter_data["MATERIAL"]
 
     @property
     def entrancefilter_mesh_transmission(self):
-        """Transmission of mesh filter substrate."""
+        """
+        Transmission of mesh filter substrate.
+
+        :noindex:
+        """
         return self._en_filter_data["MESH_TRANS"]
 
     @property
     def entrancefilter_name(self) -> str:
-        """Entrance filter name."""
+        """
+        Entrance filter name.
+
+        :noindex:
+        """
         return self._en_filter_data["LONG_NAME"]
 
     @property
     def number_of_wavelengths(self):
-        """Data number length."""
+        """
+        Data number length.
+
+        :noindex:
+        """
         return self._en_filter_data["LENGTH"]
 
     @property
     def entrancefilter_substrate(self) -> str:
-        """XRT entrance filter substrate."""
+        """
+        XRT entrance filter substrate.
+
+        :noindex:
+        """
         return self._en_filter_data["SUBSTRATE"]
 
     @property
     @u.quantity_input
     def entrancefilter_wavelength(self) -> u.angstrom:
-        """Array of wavelengths for entrance filter transmission in angstroms."""
+        """
+        Array of wavelengths for entrance filter transmission in angstroms.
+
+        :noindex:
+        """
         return u.Quantity(self._en_filter_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
@@ -203,12 +231,20 @@ class EntranceFilter:
     @property
     @u.quantity_input
     def entrancefilter_thickness(self) -> u.angstrom:
-        """XRT entrance filter material thickness in angstroms."""
+        """
+        XRT entrance filter material thickness in angstroms.
+
+        :noindex:
+        """
         return u.Quantity(self._en_filter_data["THICK"], u.angstrom)
 
     @property
     def entrancefilter_transmission(self):
-        """Entrance filter transmission."""
+        """
+        Entrance filter transmission.
+
+        :noindex:
+        """
         return self._en_filter_data["TRANS"][: self.number_of_wavelengths]
 
 
