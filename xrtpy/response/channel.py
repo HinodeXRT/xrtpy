@@ -370,7 +370,7 @@ class Channel:
     Attributes
     ----------
     geometry : Geometry
-        The geometric parameters of the XRT channel.
+        The geometric parameters of the XRT channel. :noindex:
     """
 
     _genx_file = _genx_file
