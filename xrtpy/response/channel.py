@@ -204,10 +204,32 @@ class EntranceFilter:
 
 class Mirror:
     """
-    Grazing incidence mirror properties.
+    Defines a grazing incidence mirror used in the X-Ray Telescope (XRT) for imaging in soft X-rays.
 
-    Grazing-incidence optics used for soft X-ray imaging generally require a minimum of two surfaces.
-    Since XRT is a two-bounce telescope, there are two mirror reflectivities.
+    XRT utilizes a two-bounce telescope design requiring at least two mirrors. This class provides
+    properties of one of these mirrors.
+
+    Parameters
+    ----------
+    index : int
+        Index of the channel within the GENX data file.
+    mirror_number : int
+        Specifies whether this is the first or second mirror (1 or 2).
+
+    Attributes
+    ----------
+    mirror_density : astropy.units.Quantity
+        The mass density of the mirror in g/cm³.
+    mirror_graze_angle : astropy.units.Quantity
+        The graze angle of the mirror during operation, measured in degrees.
+    mirror_material : str
+        The material composition of the mirror.
+    mirror_name : str
+        The name or identifier of the mirror.
+    mirror_reflection : numpy.ndarray
+        The reflectance values of the mirror at different wavelengths.
+    mirror_wavelength : astropy.units.Quantity
+        The wavelengths at which the mirror's reflectance is measured, in Angstroms.
     """
 
     _genx_file = _genx_file
