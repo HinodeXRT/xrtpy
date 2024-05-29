@@ -404,8 +404,6 @@ class Channel:
     def geometry(self) -> Geometry:
         """
         Geometric parameters of the XRT channel.
-
-        :noindex:
         """
         return self._geometry
 
