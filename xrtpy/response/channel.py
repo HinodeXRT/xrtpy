@@ -115,35 +115,12 @@ class Geometry:
 
 class EntranceFilter:
     """
-    Represents the entrance filter of the X-Ray Telescope (XRT) on the Hinode spacecraft.
+    Entrance filter properties.
 
-    The entrance filter covers the annular entrance aperture of the XRT, serving to reduce
-    both visible light and heat load entering the instrument. These filters are critical
-    for maintaining the necessary optical conditions inside the telescope.
+    Thin prefilters cover the narrow annular entrance aperture of the XRT serving two main purposes:
 
-    Parameters
-    ----------
-    index : int
-        The index of the channel within the GENX file that contains data specific to this filter.
-
-    Attributes
-    ----------
-    entrancefilter_density : astropy.units.Quantity
-        The density of the entrance filter material in g/cm³.
-    entrancefilter_material : str
-        The material composition of the entrance filter.
-    entrancefilter_mesh_transmission : float
-        The percentage transmission of the mesh part of the filter.
-    entrancefilter_name : str
-        The descriptive name of the entrance filter.
-    entrancefilter_substrate : str
-        The substrate material of the entrance filter.
-    entrancefilter_thickness : astropy.units.Quantity
-        The thickness of the entrance filter material measured in Angstroms.
-    entrancefilter_transmission : numpy.ndarray
-        The transmission efficiency of the entrance filter across different wavelengths.
-    entrancefilter_wavelength : astropy.units.Quantity
-        The wavelengths at which the transmission data of the filter are measured, in Angstroms.
+    1. Reduce the visible light entering the instrument.
+    2. Reduce the heat load in the instrument.
     """
 
     _genx_file = _genx_file
@@ -204,32 +181,10 @@ class EntranceFilter:
 
 class Mirror:
     """
-    Defines a grazing incidence mirror used in the X-Ray Telescope (XRT) for imaging in soft X-rays.
+    Grazing incidence mirror properties.
 
-    XRT utilizes a two-bounce telescope design requiring at least two mirrors. This class provides
-    properties of one of these mirrors.
-
-    Parameters
-    ----------
-    index : int
-        Index of the channel within the GENX data file.
-    mirror_number : int
-        Specifies whether this is the first or second mirror (1 or 2).
-
-    Attributes
-    ----------
-    mirror_density : astropy.units.Quantity
-        The mass density of the mirror in g/cm³.
-    mirror_graze_angle : astropy.units.Quantity
-        The graze angle of the mirror during operation, measured in degrees.
-    mirror_material : str
-        The material composition of the mirror.
-    mirror_name : str
-        The name or identifier of the mirror.
-    mirror_reflection : numpy.ndarray
-        The reflectance values of the mirror at different wavelengths.
-    mirror_wavelength : astropy.units.Quantity
-        The wavelengths at which the mirror's reflectance is measured, in Angstroms.
+    Grazing-incidence optics used for soft X-ray imaging generally require a minimum of two surfaces.
+    Since XRT is a two-bounce telescope, there are two mirror reflectivities.
     """
 
     _genx_file = _genx_file
@@ -286,34 +241,9 @@ class Mirror:
 
 class Filter:
     """
-    Represents one of the focal plane filters of the X-Ray Telescope (XRT) on the Hinode spacecraft,
-    which are mounted on two filter wheels.
+    X-ray filters using two filter wheels.
 
-    Parameters
-    ----------
-    index : int
-        Index of the channel within the GENX data file.
-    filter_number : int
-        Specifies the filter wheel position (1 or 2).
-
-    Attributes
-    ----------
-    filter_density : astropy.units.Quantity
-        The density of the filter material in g/cm³.
-    filter_material : str
-        The material composition of the filter.
-    filter_mesh_transmission : float
-        The transmission efficiency of the filter's mesh.
-    filter_name : str
-        The descriptive name of the filter.
-    filter_substrate : str
-        The substrate material of the filter.
-    filter_thickness : astropy.units.Quantity
-        The thickness of the filter material, measured in Angstroms.
-    filter_transmission : numpy.ndarray
-        The transmission efficiency of the filter across different wavelengths.
-    filter_wavelength : astropy.units.Quantity
-        The wavelengths at which the filter's transmission data are measured, in Angstroms.
+    The corresponding categories are used for both filter 1 and filter 2.
     """
 
     _genx_file = _genx_file
@@ -376,37 +306,7 @@ class Filter:
 
 
 class CCD:
-    """
-    Describes the Charge-Coupled Device (CCD) used in the X-Ray Telescope (XRT) on the Hinode spacecraft.
-
-    The CCD is a crucial component of the XRT, responsible for capturing X-ray images. This class provides
-    various properties and characteristics of the CCD, including its gain, quantum efficiency, and physical
-    dimensions.
-
-    Parameters
-    ----------
-    index : int
-        Index of the channel within the GENX data file containing CCD-specific properties.
-
-    Attributes
-    ----------
-    ccd_energy_per_electron : astropy.units.Quantity
-        The energy required to dislodge a single electron, measured in electron-volts per electron.
-    ccd_full_well : astropy.units.Quantity
-        The full well capacity of the CCD in terms of the maximum number of electrons it can hold.
-    ccd_gain_left : astropy.units.Quantity
-        The gain of the CCD when reading from the left port, measured in electrons per digital number.
-    ccd_gain_right : astropy.units.Quantity
-        The gain of the CCD when reading from the right port, measured in electrons per digital number.
-    ccd_name : str
-        The name or identifier of the CCD.
-    ccd_pixel_size : astropy.units.Quantity
-        The size of individual pixels on the CCD, measured in micrometers.
-    ccd_quantum_efficiency : numpy.ndarray
-        The quantum efficiency of the CCD, representing the efficiency of photon-to-electron conversion.
-    ccd_wavelength : astropy.units.Quantity
-        The wavelengths at which the CCD's quantum efficiency is measured, in Angstroms.
-    """
+    """Charge-coupled device (CCD) on board X-Ray Telescope (XRT) on the Hinode spacecraft."""
 
     _genx_file = _genx_file
 
