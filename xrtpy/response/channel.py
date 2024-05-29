@@ -366,6 +366,11 @@ class Channel:
     ----------
     name : str
         The name of the filter for the XRT channel.
+
+    Attributes
+    ----------
+    geometry : Geometry
+        The geometric parameters of the XRT channel.
     """
 
     _genx_file = _genx_file
