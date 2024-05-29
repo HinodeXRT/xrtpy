@@ -426,30 +426,65 @@ class Channel:
 
     @property
     def geometry(self) -> Geometry:
+        """
+        Geometric parameters of the XRT channel.
+
+        :noindex:
+        """
         return self._geometry
 
     @property
     def entrancefilter(self) -> EntranceFilter:
+        """
+        Entrance filter properties.
+
+        :noindex:
+        """
         return self._entrancefilter
 
     @property
     def mirror_1(self) -> Mirror:
+        """
+        Properties of the first mirror.
+
+        :noindex:
+        """
         return self._mirror_1
 
     @property
     def mirror_2(self) -> Mirror:
+        """
+        Properties of the second mirror.
+
+        :noindex:
+        """
         return self._mirror_2
 
     @property
     def filter_1(self) -> Filter:
+        """
+        Properties of the first filter.
+
+        :noindex:
+        """
         return self._filter_1
 
     @property
     def filter_2(self) -> Filter:
+        """
+        Properties of the second filter.
+
+        :noindex:
+        """
         return self._filter_2
 
     @property
     def ccd(self) -> CCD:
+        """
+        Properties of the CCD.
+
+        :noindex:
+        """
         return self._ccd
 
     def __str__(self):
@@ -462,33 +497,57 @@ class Channel:
 
     @property
     def name(self) -> str:
-        """Name of XRT X-Ray channel."""
+        """
+        Name of XRT X-Ray channel.
+
+        :noindex:
+        """
         return self._channel_data["NAME"]
 
     @property
     @u.quantity_input
     def wavelength(self) -> u.angstrom:
-        """Array of wavelengths for every X-ray channel in angstroms."""
+        """
+        Array of wavelengths for every X-ray channel in angstroms.
+
+        :noindex:
+        """
         return u.Quantity(self._channel_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
 
     @property
     def transmission(self):
-        """Get channel transmission."""
+        """
+        Get channel transmission.
+
+        :noindex:
+        """
         return self._channel_data["TRANS"][: self.number_of_wavelengths]
 
     @property
     def number_of_wavelengths(self):
-        """Data number length."""
+        """
+        Data number length.
+
+        :noindex:
+        """
         return self._channel_data["LENGTH"]
 
     @property
     def observatory(self) -> str:
-        """The spacecraft name."""
+        """
+        The spacecraft name.
+
+        :noindex:
+        """
         return self._channel_data["OBSERVATORY"]
 
     @property
     def instrument(self) -> str:
-        """X-Ray Telescope -XRT."""
+        """
+        X-Ray Telescope -XRT.
+
+        :noindex:
+        """
         return self._channel_data["INSTRUMENT"]
