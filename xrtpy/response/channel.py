@@ -527,52 +527,88 @@ class CCD:
     @property
     @u.quantity_input
     def ccd_energy_per_electron(self) -> u.eV / u.electron:
-        """The energy necessary to dislodge one electron."""
+        """
+        The energy necessary to dislodge one electron.
+
+        :noindex:
+        """
         return u.Quantity(self._ccd_data["EV_PER_EL"], u.eV / u.electron)
 
     @property
     @u.quantity_input
     def ccd_full_well(self) -> u.electron:
-        """Number of electrons for a CCD full well."""
+        """
+        Number of electrons for a CCD full well.
+
+        :noindex:
+        """
         return u.Quantity(self._ccd_data["FULL_WELL"], u.electron)
 
     @property
     @u.quantity_input
     def ccd_gain_left(self) -> u.electron / u.DN:
-        """Gain when reading the left port of the CCD."""
+        """
+        Gain when reading the left port of the CCD.
+
+        :noindex:
+        """
         return u.Quantity(self._ccd_data["GAIN_L"], u.electron / u.DN)
 
     @property
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
-        """Gain when reading the right port of the CCD."""
+        """
+        Gain when reading the right port of the CCD.
+
+        :noindex:
+        """
         return u.Quantity(57.5, u.electron / u.DN)
 
     @property
     def ccd_name(self) -> str:
-        """Hinode/XRT flight model CCD."""
+        """
+        Hinode/XRT flight model CCD.
+
+        :noindex:
+        """
         return self._ccd_data["LONG_NAME"]
 
     @property
     def number_of_wavelengths(self):
-        """Data number length."""
+        """
+        Data number length.
+
+        :noindex:
+        """
         return self._ccd_data["LENGTH"]
 
     @property
     @u.quantity_input
     def ccd_pixel_size(self) -> u.micron:
-        """CCD pixel size in micrometers."""
+        """
+        CCD pixel size in micrometers.
+
+        :noindex:
+        """
         return u.Quantity(self._ccd_data["PIXEL_SIZE"], u.micron)
 
     @property
     def ccd_quantum_efficiency(self):
-        """Quantum efficiency of the CCD."""
+        """
+        Quantum efficiency of the CCD.
+
+        :noindex:
+        """
         return self._ccd_data["QE"][: self.number_of_wavelengths]
 
     @property
     @u.quantity_input
     def ccd_wavelength(self) -> u.angstrom:
-        """Array of wavelengths for the CCD quantum efficiency in angstroms."""
+        """
+        Array of wavelengths for the CCD quantum efficiency in angstroms.
+
+        :noindex:
+        """
         return u.Quantity(self._ccd_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
