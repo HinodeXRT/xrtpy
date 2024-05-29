@@ -41,7 +41,24 @@ _genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
 
 
 def resolve_filter_name(name):
-    """Formats users filter name."""
+    """
+    Formats the user's filter name to match the expected format.
+
+    Parameters
+    ----------
+    name : str
+        The filter name provided by the user.
+
+    Returns
+    -------
+    str
+        The formatted filter name.
+
+    Raises
+    ------
+    TypeError
+        If the provided name is not a string.
+    """
     if not isinstance(name, str):
         raise TypeError("name must be a string")
     name = name.replace("_", "-")
