@@ -286,9 +286,34 @@ class Mirror:
 
 class Filter:
     """
-    X-ray filters using two filter wheels.
+    Represents one of the focal plane filters of the X-Ray Telescope (XRT) on the Hinode spacecraft,
+    which are mounted on two filter wheels.
 
-    The corresponding categories are used for both filter 1 and filter 2.
+    Parameters
+    ----------
+    index : int
+        Index of the channel within the GENX data file.
+    filter_number : int
+        Specifies the filter wheel position (1 or 2).
+
+    Attributes
+    ----------
+    filter_density : astropy.units.Quantity
+        The density of the filter material in g/cm³.
+    filter_material : str
+        The material composition of the filter.
+    filter_mesh_transmission : float
+        The transmission efficiency of the filter's mesh.
+    filter_name : str
+        The descriptive name of the filter.
+    filter_substrate : str
+        The substrate material of the filter.
+    filter_thickness : astropy.units.Quantity
+        The thickness of the filter material, measured in Angstroms.
+    filter_transmission : numpy.ndarray
+        The transmission efficiency of the filter across different wavelengths.
+    filter_wavelength : astropy.units.Quantity
+        The wavelengths at which the filter's transmission data are measured, in Angstroms.
     """
 
     _genx_file = _genx_file
