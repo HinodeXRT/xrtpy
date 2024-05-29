@@ -94,32 +94,22 @@ class Geometry:
         self._geom_data = self._genx_file[self._channel_index]["GEOM"]
 
     @property
-    def geometry_name(self) -> str:
-        """
-        Hinode/XRT flight model geometry.
-
-        :noindex:
-        """
+    def geometry_name(
+        self,
+    ) -> str:
+        """Hinode/XRT flight model geometry."""
         return self._geom_data["LONG_NAME"]
 
     @property
     @u.quantity_input
     def geometry_focal_len(self) -> u.cm:
-        """
-        XRT flight model geometry focal length.
-
-        :noindex:
-        """
+        """XRT flight model geometry focal length."""
         return u.Quantity(self._geom_data["FOC_LEN"], u.cm)
 
     @property
     @u.quantity_input
     def geometry_aperture_area(self) -> u.cm**2:
-        """
-        XRT flight model geometry aperture area.
-
-        :noindex:
-        """
+        """XRT flight model geometry aperture area."""
         return u.Quantity(self._geom_data["APERTURE_AREA"], u.cm**2)
 
 
@@ -164,66 +154,38 @@ class EntranceFilter:
 
     @property
     def entrancefilter_density(self) -> u.g * u.cm**-3:
-        """
-        XRT entrance filter material density in g/cm³.
-
-        :noindex:
-        """
+        r"""XRT entrance filter material density in g/cm\ :sup:`3`\ ."""
         return u.Quantity(self._en_filter_data["DENS"], u.g * u.cm**-3)
 
     @property
     def entrancefilter_material(self) -> str:
-        """
-        XRT entrance filter material.
-
-        :noindex:
-        """
+        """XRT entrance filter material."""
         return self._en_filter_data["MATERIAL"]
 
     @property
     def entrancefilter_mesh_transmission(self):
-        """
-        Transmission of mesh filter substrate.
-
-        :noindex:
-        """
+        """Transmission of mesh filter substrate."""
         return self._en_filter_data["MESH_TRANS"]
 
     @property
     def entrancefilter_name(self) -> str:
-        """
-        Entrance filter name.
-
-        :noindex:
-        """
+        """Entrance filter name."""
         return self._en_filter_data["LONG_NAME"]
 
     @property
     def number_of_wavelengths(self):
-        """
-        Data number length.
-
-        :noindex:
-        """
+        """Data number length."""
         return self._en_filter_data["LENGTH"]
 
     @property
     def entrancefilter_substrate(self) -> str:
-        """
-        XRT entrance filter substrate.
-
-        :noindex:
-        """
+        """XRT entrance filter substrate."""
         return self._en_filter_data["SUBSTRATE"]
 
     @property
     @u.quantity_input
     def entrancefilter_wavelength(self) -> u.angstrom:
-        """
-        Array of wavelengths for entrance filter transmission in angstroms.
-
-        :noindex:
-        """
+        """Array of wavelengths for entrance filter transmission in angstroms."""
         return u.Quantity(self._en_filter_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
@@ -231,20 +193,12 @@ class EntranceFilter:
     @property
     @u.quantity_input
     def entrancefilter_thickness(self) -> u.angstrom:
-        """
-        XRT entrance filter material thickness in angstroms.
-
-        :noindex:
-        """
+        """XRT entrance filter material thickness in angstroms."""
         return u.Quantity(self._en_filter_data["THICK"], u.angstrom)
 
     @property
     def entrancefilter_transmission(self):
-        """
-        Entrance filter transmission.
-
-        :noindex:
-        """
+        """Entrance filter transmission."""
         return self._en_filter_data["TRANS"][: self.number_of_wavelengths]
 
 
@@ -289,49 +243,29 @@ class Mirror:
     @property
     @u.quantity_input
     def mirror_density(self) -> u.g * u.cm**-3:
-        """
-        Mirror mass density.
-
-        :noindex:
-        """
+        """Mirror mass density."""
         return u.Quantity(self._mirror_data["DENS"], u.g * u.cm**-3)
 
     @property
     @u.quantity_input
     def mirror_graze_angle(self) -> u.deg:
-        """
-        Mirror graze angle in units of degrees.
-
-        :noindex:
-        """
+        """Mirror graze angle in units of degrees."""
         return u.Quantity(self._mirror_data["GRAZE_ANGLE"], u.deg)
 
     @property
     def mirror_name(self) -> str:
-        """
-        Hinode/XRT flight model mirror.
-
-        :noindex:
-        """
+        """Hinode/XRT flight model mirror."""
         return self._mirror_data["LONG_NAME"]
 
     @property
     def mirror_material(self) -> str:
-        """
-        XRT flight model mirror material.
-
-        :noindex:
-        """
+        """XRT flight model mirror material."""
         return self._mirror_data["MATERIAL"]
 
     @property
     @u.quantity_input
     def mirror_reflection(self) -> u.angstrom:
-        """
-        Reflection of a mirror.
-
-        :noindex:
-        """
+        """Reflection of a mirror."""
         return u.Quantity(self._mirror_data["REFL"], u.angstrom)[
             : self.number_of_wavelengths
         ]
@@ -339,22 +273,14 @@ class Mirror:
     @property
     @u.quantity_input
     def mirror_wavelength(self) -> u.angstrom:
-        """
-        Array of wavelengths for mirror reflectance.
-
-        :noindex:
-        """
+        """Array of wavelengths for mirror reflectance."""
         return u.Quantity(self._mirror_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
 
     @property
     def number_of_wavelengths(self):
-        """
-        Data number length.
-
-        :noindex:
-        """
+        """Data number length."""
         return self._mirror_data["LENGTH"]
 
 
@@ -401,85 +327,49 @@ class Filter:
     @property
     @u.quantity_input
     def filter_density(self) -> u.g * u.cm**-3:
-        """
-        XRT filter density.
-
-        :noindex:
-        """
+        """XRT filter density."""
         return u.Quantity(self._fp_filter_data["DENS"], u.g * u.cm**-3)
 
     @property
     def filter_material(self) -> str:
-        """
-        XRT filter material.
-
-        :noindex:
-        """
+        """XRT filter material."""
         return self._fp_filter_data["MATERIAL"]
 
     @property
     def filter_mesh_transmission(self):
-        """
-        Mesh transmission for the focal plane filter.
-
-        :noindex:
-        """
+        """Mesh transmission for the focal plane filter."""
         return self._fp_filter_data["MESH_TRANS"]
 
     @property
     def filter_name(self) -> str:
-        """
-        XRT filter name.
-
-        :noindex:
-        """
+        """XRT filter name."""
         return self._fp_filter_data["LONG_NAME"]
 
     @property
     def number_of_wavelengths(self):
-        """
-        Data number length.
-
-        :noindex:
-        """
+        """Data number length."""
         return self._fp_filter_data["LENGTH"]
 
     @property
     def filter_substrate(self) -> str:
-        """
-        XRT filter substrate.
-
-        :noindex:
-        """
+        """XRT filter substrate."""
         return self._fp_filter_data["SUBSTRATE"]
 
     @property
     @u.quantity_input
     def filter_thickness(self) -> u.angstrom:
-        """
-        Filter thickness.
-
-        :noindex:
-        """
+        """Filter thickness."""
         return u.Quantity(self._fp_filter_data["THICK"], u.angstrom)
 
     @property
     def filter_transmission(self):
-        """
-        Filter transmission.
-
-        :noindex:
-        """
+        """Filter transmission."""
         return self._fp_filter_data["TRANS"][: self.number_of_wavelengths]
 
     @property
     @u.quantity_input
     def filter_wavelength(self) -> u.angstrom:
-        """
-        XRT filter wavelength in angstroms.
-
-        :noindex:
-        """
+        """XRT filter wavelength in angstroms."""
         return u.Quantity(self._fp_filter_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
@@ -527,88 +417,52 @@ class CCD:
     @property
     @u.quantity_input
     def ccd_energy_per_electron(self) -> u.eV / u.electron:
-        """
-        The energy necessary to dislodge one electron.
-
-        :noindex:
-        """
+        """The energy necessary to dislodge one electron."""
         return u.Quantity(self._ccd_data["EV_PER_EL"], u.eV / u.electron)
 
     @property
     @u.quantity_input
     def ccd_full_well(self) -> u.electron:
-        """
-        Number of electrons for a CCD full well.
-
-        :noindex:
-        """
+        """Number of electrons for a CCD full well."""
         return u.Quantity(self._ccd_data["FULL_WELL"], u.electron)
 
     @property
     @u.quantity_input
     def ccd_gain_left(self) -> u.electron / u.DN:
-        """
-        Gain when reading the left port of the CCD.
-
-        :noindex:
-        """
+        """Gain when reading the left port of the CCD."""
         return u.Quantity(self._ccd_data["GAIN_L"], u.electron / u.DN)
 
     @property
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
-        """
-        Gain when reading the right port of the CCD.
-
-        :noindex:
-        """
+        """Gain when reading the right port of the CCD."""
         return u.Quantity(57.5, u.electron / u.DN)
 
     @property
     def ccd_name(self) -> str:
-        """
-        Hinode/XRT flight model CCD.
-
-        :noindex:
-        """
+        """Hinode/XRT flight model CCD."""
         return self._ccd_data["LONG_NAME"]
 
     @property
     def number_of_wavelengths(self):
-        """
-        Data number length.
-
-        :noindex:
-        """
+        """Data number length."""
         return self._ccd_data["LENGTH"]
 
     @property
     @u.quantity_input
     def ccd_pixel_size(self) -> u.micron:
-        """
-        CCD pixel size in micrometers.
-
-        :noindex:
-        """
+        """CCD pixel size in micrometers."""
         return u.Quantity(self._ccd_data["PIXEL_SIZE"], u.micron)
 
     @property
     def ccd_quantum_efficiency(self):
-        """
-        Quantum efficiency of the CCD.
-
-        :noindex:
-        """
+        """Quantum efficiency of the CCD."""
         return self._ccd_data["QE"][: self.number_of_wavelengths]
 
     @property
     @u.quantity_input
     def ccd_wavelength(self) -> u.angstrom:
-        """
-        Array of wavelengths for the CCD quantum efficiency in angstroms.
-
-        :noindex:
-        """
+        """Array of wavelengths for the CCD quantum efficiency in angstroms."""
         return u.Quantity(self._ccd_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
