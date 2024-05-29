@@ -94,22 +94,32 @@ class Geometry:
         self._geom_data = self._genx_file[self._channel_index]["GEOM"]
 
     @property
-    def geometry_name(
-        self,
-    ) -> str:
-        """Hinode/XRT flight model geometry."""
+    def geometry_name(self) -> str:
+        """
+        Hinode/XRT flight model geometry.
+
+        :noindex:
+        """
         return self._geom_data["LONG_NAME"]
 
     @property
     @u.quantity_input
     def geometry_focal_len(self) -> u.cm:
-        """XRT flight model geometry focal length."""
+        """
+        XRT flight model geometry focal length.
+
+        :noindex:
+        """
         return u.Quantity(self._geom_data["FOC_LEN"], u.cm)
 
     @property
     @u.quantity_input
     def geometry_aperture_area(self) -> u.cm**2:
-        """XRT flight model geometry aperture area."""
+        """
+        XRT flight model geometry aperture area.
+
+        :noindex:
+        """
         return u.Quantity(self._geom_data["APERTURE_AREA"], u.cm**2)
 
 
