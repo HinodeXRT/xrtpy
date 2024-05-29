@@ -48,6 +48,11 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 
+# Add this configuration to handle duplicate warnings
+autodoc_default_options = {
+    "noindex": True,
+}
+
 bibtex_bibfiles = ["bibliography.bib"]
 bibtex_default_style = "plain"
 bibtex_reference_style = "author_year"
