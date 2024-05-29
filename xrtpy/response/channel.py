@@ -376,7 +376,37 @@ class Filter:
 
 
 class CCD:
-    """Charge-coupled device (CCD) on board X-Ray Telescope (XRT) on the Hinode spacecraft."""
+    """
+    Describes the Charge-Coupled Device (CCD) used in the X-Ray Telescope (XRT) on the Hinode spacecraft.
+
+    The CCD is a crucial component of the XRT, responsible for capturing X-ray images. This class provides
+    various properties and characteristics of the CCD, including its gain, quantum efficiency, and physical
+    dimensions.
+
+    Parameters
+    ----------
+    index : int
+        Index of the channel within the GENX data file containing CCD-specific properties.
+
+    Attributes
+    ----------
+    ccd_energy_per_electron : astropy.units.Quantity
+        The energy required to dislodge a single electron, measured in electron-volts per electron.
+    ccd_full_well : astropy.units.Quantity
+        The full well capacity of the CCD in terms of the maximum number of electrons it can hold.
+    ccd_gain_left : astropy.units.Quantity
+        The gain of the CCD when reading from the left port, measured in electrons per digital number.
+    ccd_gain_right : astropy.units.Quantity
+        The gain of the CCD when reading from the right port, measured in electrons per digital number.
+    ccd_name : str
+        The name or identifier of the CCD.
+    ccd_pixel_size : astropy.units.Quantity
+        The size of individual pixels on the CCD, measured in micrometers.
+    ccd_quantum_efficiency : numpy.ndarray
+        The quantum efficiency of the CCD, representing the efficiency of photon-to-electron conversion.
+    ccd_wavelength : astropy.units.Quantity
+        The wavelengths at which the CCD's quantum efficiency is measured, in Angstroms.
+    """
 
     _genx_file = _genx_file
 
