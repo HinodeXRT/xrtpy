@@ -370,10 +370,45 @@ class CCD:
 
 class Channel:
     """
-    XRTpy
+    Represents an XRT channel on the Hinode spacecraft.
 
-    Available channels: ``"Al-mesh"``, ``"Al-poly"``,  ``"C-poly"``, ``"Ti-poly"``, ``"Be-thin"``, ``"Be-med"``, ``"Al-med"``, ``"Al-thick"``,  ``"Be-thick"`` ,
-    ``"Al-poly/Al-mesh"``, ``"Al-poly/Ti-poly"``, ``"Al-poly/Al-thick"``, ``"Al-poly/Be-thick"`` , ``"C-poly/Ti-poly"``
+    Available channels: "Al-mesh", "Al-poly", "C-poly", "Ti-poly", "Be-thin", "Be-med",
+    "Al-med", "Al-thick", "Be-thick", "Al-poly/Al-mesh", "Al-poly/Ti-poly", "Al-poly/Al-thick",
+    "Al-poly/Be-thick", "C-poly/Ti-poly".
+
+    Parameters
+    ----------
+    name : str
+        The name of the filter for the XRT channel.
+
+    Attributes
+    ----------
+    geometry : Geometry
+        The geometric parameters of the XRT channel.
+    entrancefilter : EntranceFilter
+        The entrance filter properties.
+    mirror_1 : Mirror
+        Properties of the first mirror.
+    mirror_2 : Mirror
+        Properties of the second mirror.
+    filter_1 : Filter
+        Properties of the first filter.
+    filter_2 : Filter
+        Properties of the second filter.
+    ccd : CCD
+        Properties of the CCD.
+    name : str
+        Name of XRT X-Ray channel.
+    wavelength : astropy.units.Quantity
+        Array of wavelengths for every X-ray channel in angstroms.
+    transmission : numpy.ndarray
+        Transmission of the channel.
+    number_of_wavelengths : int
+        Length of the data.
+    observatory : str
+        Name of the spacecraft.
+    instrument : str
+        Name of the instrument (X-Ray Telescope -XRT).
     """
 
     _genx_file = _genx_file
