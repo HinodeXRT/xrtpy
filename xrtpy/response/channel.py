@@ -369,7 +369,7 @@ class Channel:
 
     Attributes
     ----------
-    Channel.Geometry
+    Geometry
         The geometric parameters of the XRT channel.
     """
 
