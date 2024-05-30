@@ -383,7 +383,7 @@ class Channel:
         Properties of the second filter.
     CCD
         Properties of the CCD.
-    name
+    Name
         Name of XRT X-Ray channel.
     """
 
