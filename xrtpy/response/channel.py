@@ -383,6 +383,8 @@ class Channel:
         Properties of the second filter.
     CCD
         Properties of the CCD.
+    name : str
+        Name of XRT X-Ray channel.
     """
 
     _genx_file = _genx_file
@@ -473,8 +475,6 @@ class Channel:
     def name(self) -> str:
         """
         Name of XRT X-Ray channel.
-
-        :noindex:
         """
         return self._channel_data["NAME"]
 
