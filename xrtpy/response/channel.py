@@ -41,7 +41,24 @@ _genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
 
 
 def resolve_filter_name(name):
-    """Formats users filter name."""
+    """
+    Formats the user's filter name to match the expected format.
+
+    Parameters
+    ----------
+    name : str
+        The filter name provided by the user.
+
+    Returns
+    -------
+    str
+        The formatted filter name.
+
+    Raises
+    ------
+    TypeError
+        If the provided name is not a string.
+    """
     if not isinstance(name, str):
         raise TypeError("name must be a string")
     name = name.replace("_", "-")
@@ -52,7 +69,23 @@ def resolve_filter_name(name):
 
 
 class Geometry:
-    """The physical geometric parameters of the X-Ray Telescope (XRT) on board the Hinode spacecraft."""
+    """
+    The physical geometric parameters of the X-Ray Telescope (XRT) on board the Hinode spacecraft.
+
+    Parameters
+    ----------
+    index : int
+        The index of the channel in the GENX file.
+
+    Attributes
+    ----------
+        Channel.Geometry.geometry_name : str
+            Hinode/XRT flight model geometry.
+        Channel.Geometry.geometry_focal_len : astropy.units.Quantity
+            XRT flight model geometry focal length in cm.
+        Channel.Geometry.geometry_aperture_area : astropy.units.Quantity
+            XRT flight model geometry aperture area in cm^2.
+    """
 
     _genx_file = _genx_file
 
@@ -82,12 +115,34 @@ class Geometry:
 
 class EntranceFilter:
     """
-    Entrance filter properties.
+    Represents the entrance filter of the X-Ray Telescope (XRT) on the Hinode spacecraft.
 
-    Thin prefilters cover the narrow annular entrance aperture of the XRT serving two main purposes:
+    The entrance filter covers the annular entrance aperture of the XRT, serving to reduce
+    both visible light and heat load entering the instrument.
 
-    1. Reduce the visible light entering the instrument.
-    2. Reduce the heat load in the instrument.
+    Parameters
+    ----------
+    index : int
+        The index of the channel within the GENX file that contains data specific to this filter.
+
+    Attributes
+    ----------
+        Channel.EntranceFilter.entrancefilter_density : astropy.units.Quantity
+            The density of the entrance filter material in g/cm³.
+        Channel.EntranceFilter.entrancefilter_material : str
+            The material composition of the entrance filter.
+        Channel.EntranceFilter.entrancefilter_mesh_transmission : float
+            The percentage transmission of the mesh part of the filter.
+        Channel.EntranceFilter.entrancefilter_name : str
+            The descriptive name of the entrance filter.
+        Channel.EntranceFilter.entrancefilter_substrate : str
+            The substrate material of the entrance filter.
+        Channel.EntranceFilter.entrancefilter_thickness : astropy.units.Quantity
+            The thickness of the entrance filter material measured in Angstroms.
+        Channel.EntranceFilter.entrancefilter_transmission : numpy.ndarray
+            The transmission efficiency of the entrance filter across different wavelengths.
+        Channel.EntranceFilter.entrancefilter_wavelength : astropy.units.Quantity
+            The wavelengths at which the transmission data of the filter are measured, in Angstroms.
     """
 
     _genx_file = _genx_file
@@ -148,10 +203,29 @@ class EntranceFilter:
 
 class Mirror:
     """
-    Grazing incidence mirror properties.
+    Defines a grazing incidence mirror used in the X-Ray Telescope (XRT) for imaging in soft X-rays.
 
-    Grazing-incidence optics used for soft X-ray imaging generally require a minimum of two surfaces.
-    Since XRT is a two-bounce telescope, there are two mirror reflectivities.
+    Parameters
+    ----------
+    index : int
+        Index of the channel within the GENX data file.
+    mirror_number : int
+        Specifies whether this is the first or second mirror (1 or 2).
+
+    Attributes
+    ----------
+        Channel.Mirror.mirror_density : astropy.units.Quantity
+            The mass density of the mirror in g/cm³.
+        Channel.Mirror.mirror_graze_angle : astropy.units.Quantity
+            The graze angle of the mirror during operation, measured in degrees.
+        Channel.Mirror.mirror_material : str
+            The material composition of the mirror.
+        Channel.Mirror.mirror_name : str
+            The name or identifier of the mirror.
+        Channel.Mirror.mirror_reflection : numpy.ndarray
+            The reflectance values of the mirror at different wavelengths.
+        Channel.Mirror.mirror_wavelength : astropy.units.Quantity
+            The wavelengths at which the mirror's reflectance is measured, in Angstroms.
     """
 
     _genx_file = _genx_file
@@ -208,9 +282,34 @@ class Mirror:
 
 class Filter:
     """
-    X-ray filters using two filter wheels.
+    Represents one of the focal plane filters of the X-Ray Telescope (XRT) on the Hinode spacecraft,
+    which are mounted on two filter wheels.
 
-    The corresponding categories are used for both filter 1 and filter 2.
+    Parameters
+    ----------
+    index : int
+        Index of the channel within the GENX data file.
+    filter_number : int
+        Specifies the filter wheel position (1 or 2).
+
+    Attributes
+    ----------
+        Channel.Filter.filter_density : astropy.units.Quantity
+            The density of the filter material in g/cm³.
+        Channel.Filter.filter_material : str
+            The material composition of the filter.
+        Channel.Filter.filter_mesh_transmission : float
+            The transmission efficiency of the filter's mesh.
+        Channel.Filter.filter_name : str
+            The descriptive name of the filter.
+        Channel.Filter.filter_substrate : str
+            The substrate material of the filter.
+        Channel.Filter.filter_thickness : astropy.units.Quantity
+            The thickness of the filter material, measured in Angstroms.
+        Channel.Filter.filter_transmission : numpy.ndarray
+            The transmission efficiency of the filter across different wavelengths.
+        Channel.Filter.filter_wavelength : astropy.units.Quantity
+            The wavelengths at which the filter's transmission data are measured, in Angstroms.
     """
 
     _genx_file = _genx_file
@@ -273,7 +372,37 @@ class Filter:
 
 
 class CCD:
-    """Charge-coupled device (CCD) on board X-Ray Telescope (XRT) on the Hinode spacecraft."""
+    """
+    Describes the Charge-Coupled Device (CCD) used in the X-Ray Telescope (XRT) on the Hinode spacecraft.
+
+    The CCD is a crucial component of the XRT, responsible for capturing X-ray images. This class provides
+    various properties and characteristics of the CCD, including its gain, quantum efficiency, and physical
+    dimensions.
+
+    Parameters
+    ----------
+    index : int
+        Index of the channel within the GENX data file containing CCD-specific properties.
+
+    Attributes
+    ----------
+        Channel.CCD.ccd_energy_per_electron : astropy.units.Quantity
+            The energy required to dislodge a single electron, measured in electron-volts per electron.
+        Channel.CCD.ccd_full_well : astropy.units.Quantity
+            The full well capacity of the CCD in terms of the maximum number of electrons it can hold.
+        Channel.CCD.ccd_gain_left : astropy.units.Quantity
+            The gain of the CCD when reading from the left port, measured in electrons per digital number.
+        Channel.CCD.ccd_gain_right : astropy.units.Quantity
+            The gain of the CCD when reading from the right port, measured in electrons per digital number.
+        Channel.CCD.ccd_name : str
+            The name or identifier of the CCD.
+        Channel.CCD.ccd_pixel_size : astropy.units.Quantity
+            The size of individual pixels on the CCD, measured in micrometers.
+        Channel.CCD.ccd_quantum_efficiency : numpy.ndarray
+            The quantum efficiency of the CCD, representing the efficiency of photon-to-electron conversion.
+        Channel.CCD.ccd_wavelength : astropy.units.Quantity
+            The wavelengths at which the CCD's quantum efficiency is measured, in Angstroms.
+    """
 
     _genx_file = _genx_file
 
@@ -337,10 +466,45 @@ class CCD:
 
 class Channel:
     """
-    XRTpy
+    Represents an XRT channel on the Hinode spacecraft.
 
-    Available channels: ``"Al-mesh"``, ``"Al-poly"``,  ``"C-poly"``, ``"Ti-poly"``, ``"Be-thin"``, ``"Be-med"``, ``"Al-med"``, ``"Al-thick"``,  ``"Be-thick"`` ,
-    ``"Al-poly/Al-mesh"``, ``"Al-poly/Ti-poly"``, ``"Al-poly/Al-thick"``, ``"Al-poly/Be-thick"`` , ``"C-poly/Ti-poly"``
+    Available channels: "Al-mesh", "Al-poly", "C-poly", "Ti-poly", "Be-thin", "Be-med",
+    "Al-med", "Al-thick", "Be-thick", "Al-poly/Al-mesh", "Al-poly/Ti-poly", "Al-poly/Al-thick",
+    "Al-poly/Be-thick", "C-poly/Ti-poly".
+
+    Parameters
+    ----------
+    name : str
+        The name of the filter for the XRT channel.
+
+    Attributes
+    ----------
+    Channel.Geometry
+        The geometric parameters of the XRT channel.
+    Channel.EntranceFilter
+        The entrance filter properties.
+    Channel.Mirror.mirror_1
+        Properties of the first mirror.
+    Channel.Mirror.mirror_2
+        Properties of the second mirror.
+    Channel.Filter.filter_1
+        Properties of the first filter.
+    Channel.Filter.filter_2
+        Properties of the second filter.
+    Channel.CCD
+        Properties of the CCD.
+    Name : str
+        Name of XRT X-Ray channel.
+    Wavelength : astropy.units.Quantity
+        Array of wavelengths for every X-ray channel in angstroms.
+    Transmission : numpy.ndarray
+        Transmission of the channel.
+    Number_of_wavelengths : int
+        Length of the data.
+    Observatory : str
+        Name of the spacecraft.
+    Instrument : str
+        Name of the instrument (X-Ray Telescope -XRT).
     """
 
     _genx_file = _genx_file
@@ -372,30 +536,51 @@ class Channel:
 
     @property
     def geometry(self) -> Geometry:
+        """
+        Geometric parameters of the XRT channel.
+        """
         return self._geometry
 
     @property
     def entrancefilter(self) -> EntranceFilter:
+        """
+        Entrance filter properties.
+        """
         return self._entrancefilter
 
     @property
     def mirror_1(self) -> Mirror:
+        """
+        Properties of the first mirror.
+        """
         return self._mirror_1
 
     @property
     def mirror_2(self) -> Mirror:
+        """
+        Properties of the second mirror.
+        """
         return self._mirror_2
 
     @property
     def filter_1(self) -> Filter:
+        """
+        Properties of the first filter.
+        """
         return self._filter_1
 
     @property
     def filter_2(self) -> Filter:
+        """
+        Properties of the second filter.
+        """
         return self._filter_2
 
     @property
     def ccd(self) -> CCD:
+        """
+        Properties of the CCD.
+        """
         return self._ccd
 
     def __str__(self):
@@ -408,33 +593,45 @@ class Channel:
 
     @property
     def name(self) -> str:
-        """Name of XRT X-Ray channel."""
+        """
+        Name of XRT X-Ray channel.
+        """
         return self._channel_data["NAME"]
 
     @property
     @u.quantity_input
     def wavelength(self) -> u.angstrom:
-        """Array of wavelengths for every X-ray channel in angstroms."""
+        """
+        Array of wavelengths for every X-ray channel in angstroms.
+        """
         return u.Quantity(self._channel_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
 
     @property
     def transmission(self):
-        """Get channel transmission."""
+        """
+        Channel transmission.
+        """
         return self._channel_data["TRANS"][: self.number_of_wavelengths]
 
     @property
     def number_of_wavelengths(self):
-        """Data number length."""
+        """
+        Data number length.
+        """
         return self._channel_data["LENGTH"]
 
     @property
     def observatory(self) -> str:
-        """The spacecraft name."""
+        """
+        The spacecraft name - Hinode.
+        """
         return self._channel_data["OBSERVATORY"]
 
     @property
     def instrument(self) -> str:
-        """X-Ray Telescope -XRT."""
+        """
+        X-Ray Telescope -XRT.
+        """
         return self._channel_data["INSTRUMENT"]
