@@ -389,7 +389,7 @@ class Channel:
         Array of wavelengths for every X-ray channel in angstroms. Type: astropy.units.Quantity
     Transmission
         Transmission of the channel.  Type: numpy.ndarray
-    number_of_wavelengths
+    Number_of_wavelengths
         Length of the data.  Type: int
     Observatory
         Name of the spacecraft.  Type: str
