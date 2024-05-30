@@ -128,22 +128,22 @@ class EntranceFilter:
 
     Attributes
     ----------
-    Channel.EntranceFilter.entrancefilter_density : astropy.units.Quantity
-        The density of the entrance filter material in g/cm³.
-    >entrancefilter_material
-        The material composition of the entrance filter.  Type: str
-    >entrancefilter_mesh_transmission
-        The percentage transmission of the mesh part of the filter. Type: float
-    >entrancefilter_name
-        The descriptive name of the entrance filter. Type: str
-    >entrancefilter_substrate
-        The substrate material of the entrance filter. Type: str
-    >entrancefilter_thickness
-        The thickness of the entrance filter material measured in Angstroms. Type: astropy.units.Quantity
-    >entrancefilter_transmission
-        The transmission efficiency of the entrance filter across different wavelengths. Type: numpy.ndarray
-    >entrancefilter_wavelength
-        The wavelengths at which the transmission data of the filter are measured, in Angstroms. Type: astropy.units.Quantity
+        Channel.EntranceFilter.entrancefilter_density : astropy.units.Quantity
+            The density of the entrance filter material in g/cm³.
+        Channel.EntranceFilter.entrancefilter_material : str
+            The material composition of the entrance filter.
+        Channel.EntranceFilter.entrancefilter_mesh_transmission : float
+            The percentage transmission of the mesh part of the filter.
+        Channel.EntranceFilter.entrancefilter_name : str
+            The descriptive name of the entrance filter.
+        Channel.EntranceFilter.entrancefilter_substrate : str
+            The substrate material of the entrance filter.
+        Channel.EntranceFilter.entrancefilter_thickness : astropy.units.Quantity
+            The thickness of the entrance filter material measured in Angstroms.
+        Channel.EntranceFilter.entrancefilter_transmission : numpy.ndarray
+            The transmission efficiency of the entrance filter across different wavelengths.
+        Channel.EntranceFilter.entrancefilter_wavelength : astropy.units.Quantity
+            The wavelengths at which the transmission data of the filter are measured, in Angstroms.
     """
 
     _genx_file = _genx_file
