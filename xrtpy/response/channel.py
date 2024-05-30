@@ -128,8 +128,8 @@ class EntranceFilter:
 
     Attributes
     ----------
-    Channel.EntranceFilter.entrancefilter_density
-        The density of the entrance filter material in g/cm³. Type: astropy.units.Quantity
+    Channel.EntranceFilter.entrancefilter_density : astropy.units.Quantity
+        The density of the entrance filter material in g/cm³.
     >entrancefilter_material
         The material composition of the entrance filter.  Type: str
     >entrancefilter_mesh_transmission
