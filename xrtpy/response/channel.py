@@ -483,8 +483,6 @@ class Channel:
     def wavelength(self) -> u.angstrom:
         """
         Array of wavelengths for every X-ray channel in angstroms.
-
-        :noindex:
         """
         return u.Quantity(self._channel_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
@@ -493,9 +491,7 @@ class Channel:
     @property
     def transmission(self):
         """
-        Get channel transmission.
-
-        :noindex:
+        Channel transmission.
         """
         return self._channel_data["TRANS"][: self.number_of_wavelengths]
 
@@ -503,25 +499,19 @@ class Channel:
     def number_of_wavelengths(self):
         """
         Data number length.
-
-        :noindex:
         """
         return self._channel_data["LENGTH"]
 
     @property
     def observatory(self) -> str:
         """
-        The spacecraft name.
-
-        :noindex:
+        The spacecraft name - Hinode.
         """
         return self._channel_data["OBSERVATORY"]
 
     @property
     def instrument(self) -> str:
         """
-        X-Ray Telescope -XRT.
-
-        :noindex:
+        Instrument - X-Ray Telescope -XRT.
         """
         return self._channel_data["INSTRUMENT"]
