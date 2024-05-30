@@ -118,8 +118,7 @@ class EntranceFilter:
     Represents the entrance filter of the X-Ray Telescope (XRT) on the Hinode spacecraft.
 
     The entrance filter covers the annular entrance aperture of the XRT, serving to reduce
-    both visible light and heat load entering the instrument. These filters are critical
-    for maintaining the necessary optical conditions inside the telescope.
+    both visible light and heat load entering the instrument.
 
     Parameters
     ----------
@@ -205,9 +204,6 @@ class EntranceFilter:
 class Mirror:
     """
     Defines a grazing incidence mirror used in the X-Ray Telescope (XRT) for imaging in soft X-rays.
-
-    XRT utilizes a two-bounce telescope design requiring at least two mirrors. This class provides
-    properties of one of these mirrors.
 
     Parameters
     ----------
