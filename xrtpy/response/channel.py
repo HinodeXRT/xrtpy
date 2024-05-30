@@ -483,33 +483,32 @@ class Channel:
 
     Attributes
     ----------
-    Geometry
+    Channel.Geometry
         The geometric parameters of the XRT channel.
-    EntranceFilter
+    Channel.EntranceFilter
         The entrance filter properties.
-    Mirror 1
+    Channel.Mirror.mirror_1
         Properties of the first mirror.
-    Mirror 2
+    Channel.Mirror.mirror_2
         Properties of the second mirror.
-    Filter 1
+    Channel.Filter.filter_1
         Properties of the first filter.
-    Filter 2
+    Channel.Filter.filter_2
         Properties of the second filter.
-    CCD
+    Channel.CCD
         Properties of the CCD.
-    Name
-        Name of XRT X-Ray channel. Type: str
-    Wavelength
-        Array of wavelengths for every X-ray channel in angstroms. Type: astropy.units.Quantity
-    Transmission
-        Transmission of the channel.  Type: numpy.ndarray
-    Number_of_wavelengths
-        Length of the data.  Type: int
-    Observatory
-        Name of the spacecraft.  Type: str
-    Instrument
-        Name of the instrument (X-Ray Telescope -XRT).  Type: str
-
+    Channel.name : str
+        Name of XRT X-Ray channel.
+    Channel.wavelength : astropy.units.Quantity
+        Array of wavelengths for every X-ray channel in angstroms.
+    Channel.transmission : numpy.ndarray
+        Transmission of the channel.
+    Channel.number_of_wavelengths : int
+        Length of the data.
+    Channel.observatory : str
+        Name of the spacecraft.
+    Channel.instrument : str
+        Name of the instrument (X-Ray Telescope -XRT).
     """
 
     _genx_file = _genx_file
