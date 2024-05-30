@@ -371,6 +371,8 @@ class Channel:
     ----------
     Geometry
         The geometric parameters of the XRT channel.
+    EntranceFilter
+        The entrance filter properties.
     """
 
     _genx_file = _genx_file
@@ -411,8 +413,6 @@ class Channel:
     def entrancefilter(self) -> EntranceFilter:
         """
         Entrance filter properties.
-
-        :noindex:
         """
         return self._entrancefilter
 
