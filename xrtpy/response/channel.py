@@ -475,6 +475,8 @@ class Channel:
     def name(self) -> str:
         """
         Name of XRT X-Ray channel.
+
+        :noindex:
         """
         return self._channel_data["NAME"]
 
