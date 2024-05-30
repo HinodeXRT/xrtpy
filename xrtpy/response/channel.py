@@ -384,7 +384,7 @@ class Channel:
     CCD
         Properties of the CCD.
     Name
-        Name of XRT X-Ray channel.
+        Name of XRT X-Ray channel. Type: str
     """
 
     _genx_file = _genx_file
