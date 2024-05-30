@@ -373,6 +373,16 @@ class Channel:
         The geometric parameters of the XRT channel.
     EntranceFilter
         The entrance filter properties.
+    Mirror 1
+        Properties of the first mirror.
+    Mirror 2
+        Properties of the second mirror.
+    Filter 1
+        Properties of the first filter.
+    Filter 2
+        Properties of the second filter.
+    CCD
+        Properties of the CCD.
     """
 
     _genx_file = _genx_file
@@ -420,8 +430,6 @@ class Channel:
     def mirror_1(self) -> Mirror:
         """
         Properties of the first mirror.
-
-        :noindex:
         """
         return self._mirror_1
 
@@ -429,8 +437,6 @@ class Channel:
     def mirror_2(self) -> Mirror:
         """
         Properties of the second mirror.
-
-        :noindex:
         """
         return self._mirror_2
 
@@ -438,8 +444,6 @@ class Channel:
     def filter_1(self) -> Filter:
         """
         Properties of the first filter.
-
-        :noindex:
         """
         return self._filter_1
 
@@ -447,8 +451,6 @@ class Channel:
     def filter_2(self) -> Filter:
         """
         Properties of the second filter.
-
-        :noindex:
         """
         return self._filter_2
 
@@ -456,8 +458,6 @@ class Channel:
     def ccd(self) -> CCD:
         """
         Properties of the CCD.
-
-        :noindex:
         """
         return self._ccd
 
