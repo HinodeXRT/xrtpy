@@ -497,17 +497,17 @@ class Channel:
         Properties of the second filter.
     Channel.CCD
         Properties of the CCD.
-    name : str
+    Name : str
         Name of XRT X-Ray channel.
-    wavelength : astropy.units.Quantity
+    Wavelength : astropy.units.Quantity
         Array of wavelengths for every X-ray channel in angstroms.
-    transmission : numpy.ndarray
+    Transmission : numpy.ndarray
         Transmission of the channel.
-    number_of_wavelengths : int
+    Number_of_wavelengths : int
         Length of the data.
-    observatory : str
+    Observatory : str
         Name of the spacecraft.
-    instrument : str
+    Instrument : str
         Name of the instrument (X-Ray Telescope -XRT).
     """
 
@@ -597,27 +597,45 @@ class Channel:
 
     @property
     def name(self) -> str:
+        """
+        Name of XRT X-Ray channel.
+        """
         return self._channel_data["NAME"]
 
     @property
     @u.quantity_input
     def wavelength(self) -> u.angstrom:
+        """
+        Array of wavelengths for every X-ray channel in angstroms.
+        """
         return u.Quantity(self._channel_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
         ]
 
     @property
     def transmission(self):
+        """
+        Channel transmission.
+        """
         return self._channel_data["TRANS"][: self.number_of_wavelengths]
 
     @property
     def number_of_wavelengths(self):
+        """
+        Data number length.
+        """
         return self._channel_data["LENGTH"]
 
     @property
     def observatory(self) -> str:
+        """
+        The spacecraft name - Hinode.
+        """
         return self._channel_data["OBSERVATORY"]
 
     @property
     def instrument(self) -> str:
+        """
+        X-Ray Telescope -XRT.
+        """
         return self._channel_data["INSTRUMENT"]
