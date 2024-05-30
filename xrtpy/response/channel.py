@@ -71,6 +71,20 @@ def resolve_filter_name(name):
 class Geometry:
     """
     The physical geometric parameters of the X-Ray Telescope (XRT) on board the Hinode spacecraft.
+
+    Parameters
+    ----------
+    index : int
+        The index of the channel in the GENX file.
+
+    Attributes
+    ----------
+    Geometry_name
+        Hinode/XRT flight model geometry. Type: str
+    Geometry_focal_len
+        XRT flight model geometry focal length in cm. Type: astropy.units.Quantity
+    Geometry_aperture_area
+        XRT flight model geometry aperture area in cm^2. Type astropy.units.Quantity
     """
 
     _genx_file = _genx_file
