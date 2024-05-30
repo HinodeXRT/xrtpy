@@ -79,12 +79,12 @@ class Geometry:
 
     Attributes
     ----------
-    Geometry_name
-        Hinode/XRT flight model geometry. Type: str
-    Geometry_focal_len
-        XRT flight model geometry focal length in cm. Type: astropy.units.Quantity
-    Geometry_aperture_area
-        XRT flight model geometry aperture area in cm^2. Type astropy.units.Quantity
+        Channel.Geometry.geometry_name : str
+            Hinode/XRT flight model geometry.
+        Channel.Geometry.geometry_focal_len : astropy.units.Quantity
+            XRT flight model geometry focal length in cm.
+        Channel.Geometry.geometry_aperture_area : astropy.units.Quantity
+            XRT flight model geometry aperture area in cm^2.
     """
 
     _genx_file = _genx_file
