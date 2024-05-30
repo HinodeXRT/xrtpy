@@ -497,17 +497,17 @@ class Channel:
         Properties of the second filter.
     Channel.CCD
         Properties of the CCD.
-    Channel.name : str
+    name : str
         Name of XRT X-Ray channel.
-    Channel.wavelength : astropy.units.Quantity
+    wavelength : astropy.units.Quantity
         Array of wavelengths for every X-ray channel in angstroms.
-    Channel.transmission : numpy.ndarray
+    transmission : numpy.ndarray
         Transmission of the channel.
-    Channel.number_of_wavelengths : int
+    number_of_wavelengths : int
         Length of the data.
-    Channel.observatory : str
+    observatory : str
         Name of the spacecraft.
-    Channel.instrument : str
+    instrument : str
         Name of the instrument (X-Ray Telescope -XRT).
     """
 
