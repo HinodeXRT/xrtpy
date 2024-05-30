@@ -599,6 +599,7 @@ class Channel:
     def name(self) -> str:
         """
         Name of XRT X-Ray channel.
+        :no-index:
         """
         return self._channel_data["NAME"]
 
@@ -607,6 +608,7 @@ class Channel:
     def wavelength(self) -> u.angstrom:
         """
         Array of wavelengths for every X-ray channel in angstroms.
+        :no-index:
         """
         return u.Quantity(self._channel_data["WAVE"], u.angstrom)[
             : self.number_of_wavelengths
@@ -616,6 +618,7 @@ class Channel:
     def transmission(self):
         """
         Channel transmission.
+        :no-index:
         """
         return self._channel_data["TRANS"][: self.number_of_wavelengths]
 
@@ -623,6 +626,7 @@ class Channel:
     def number_of_wavelengths(self):
         """
         Data number length.
+        :no-index:
         """
         return self._channel_data["LENGTH"]
 
@@ -630,6 +634,7 @@ class Channel:
     def observatory(self) -> str:
         """
         The spacecraft name - Hinode.
+        :no-index:
         """
         return self._channel_data["OBSERVATORY"]
 
@@ -637,5 +642,6 @@ class Channel:
     def instrument(self) -> str:
         """
         Instrument - X-Ray Telescope -XRT.
+        :no-index:
         """
         return self._channel_data["INSTRUMENT"]
