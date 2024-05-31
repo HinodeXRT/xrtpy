@@ -1,4 +1,4 @@
-from xrtpy.util import time, filename2repo_path, make_exposure_map
+from xrtpy.util import filename2repo_path, make_exposure_map, time
 from xrtpy.util.time import epoch
 
 __all__ = [
