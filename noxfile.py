@@ -26,6 +26,7 @@ def tests(session):
     session.run("pytest", *pytest_options)
 
 
+@nox.session
 def linters(session):
     session.install("pre-commit")
     session.run("pre-commit", "run", "--all-files", *session.posargs)
