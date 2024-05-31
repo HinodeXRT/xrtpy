@@ -14,7 +14,7 @@ from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
 
-from xrtpy.image_correction._ssw_mirrors import _SSW_MIRRORS
+from xrtpy.util import SSW_MIRRORS
 
 
 @manager.require(

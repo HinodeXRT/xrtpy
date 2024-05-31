@@ -11,7 +11,7 @@ from sunpy.data import manager
 from sunpy.map import Map
 from sunpy.time import parse_time
 
-from xrtpy.image_correction._ssw_mirrors import _SSW_MIRRORS
+from xrtpy.util import SSW_MIRRORS
 
 __all__ = ["remove_lightleak"]
 
