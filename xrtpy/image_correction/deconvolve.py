@@ -14,7 +14,7 @@ from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
 
-from xrtpy.image_correction import _SSW_MIRRORS
+from xrtpy.image_correction._ssw_mirrors import _SSW_MIRRORS
 
 
 @manager.require(
@@ -80,7 +80,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
                 "DECONVOLVE: Input data and PSF have different"
                 " chip sums. Binning PSF..."
             )
-        psf_map = rebin_psf(psf_map, image_map.meta)
+        psf_map = _rebin_psf(psf_map, image_map.meta)
 
     data = np.clip(image_map.data, 0.0, None)
 
@@ -110,7 +110,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
         tmp_data[xcen - ddx : xcen + ddx, ycen - ddy : ycen + ddy] = data
     else:
         tmp_data = data
-    tmp_deconv = richardson_lucy_deconvolution(tmp_data, psf_map.data, num_iter=5)
+    tmp_deconv = _richardson_lucy_deconvolution(tmp_data, psf_map.data, num_iter=5)
 
     if extract_data:
         tmp_deconv = tmp_deconv[xcen - ddx : xcen + ddx, ycen - ddy : ycen + ddy]
@@ -123,7 +123,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     return Map(deconv_data, deconv_meta)
 
 
-def fft_2dim_convolution(image1, image2, correlation=False):
+def _fft_2dim_convolution(image1, image2, correlation=False):
     """
     Convolve (or optionally correlate) two images
     """
@@ -134,19 +134,19 @@ def fft_2dim_convolution(image1, image2, correlation=False):
     return fftshift(fftres)
 
 
-def richardson_lucy_deconvolution(image, psf, num_iter=5):
+def _richardson_lucy_deconvolution(image, psf, num_iter=5):
     """
     Use the Richardson-Lucy algorithm to deconvolve an image.
     """
-    psfnorm = fft_2dim_convolution(psf, np.ones_like(psf))
+    psfnorm = _fft_2dim_convolution(psf, np.ones_like(psf))
     ohat = np.cdouble(image)
-    for i in range(num_iter):  # noqa: B007
-        ihat = fft_2dim_convolution(psf, ohat)
-        ohat *= fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
+    for _ in range(num_iter):
+        ihat = _fft_2dim_convolution(psf, ohat)
+        ohat *= _fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
     return np.abs(ohat)
 
 
-def rebin_psf(psf_map, image_meta):
+def _rebin_psf(psf_map, image_meta):
     """
     Rebin the point spread function (psf) to match the dimensions of an image.
     It's assumed that the image is smaller than the psf array
