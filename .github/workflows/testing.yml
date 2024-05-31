@@ -32,11 +32,6 @@ jobs:
           python: '3.12'
           noxposargs: --durations=10
 
-        - name: Linters
-          os: ubuntu-latest
-          python: '3.11'
-          noxenv: linters
-
         - name: Import package
           os: windows-latest
           python: '3.11'

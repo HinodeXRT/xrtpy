@@ -4,11 +4,6 @@
 # pip install xrtpy[tests]
 -r extras.txt
 -r install.txt
-dlint
-flake8
-flake8-absolute-import
-flake8-rst-docstrings
-flake8-use-fstring
 pydocstyle
 pytest >= 5.4.0
 pytest-allclose
