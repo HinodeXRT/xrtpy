@@ -2,6 +2,8 @@
 Functionality for removing the visible light leak from XRT composite image data.
 """
 
+__all__ = ["remove_lightleak"]
+
 import warnings
 from urllib.parse import urljoin
 
@@ -12,8 +14,6 @@ from sunpy.map import Map
 from sunpy.time import parse_time
 
 from xrtpy.util import SSW_MIRRORS
-
-__all__ = ["remove_lightleak"]
 
 LL_FILE_HASHES = {
     "term_p1cp_20140527_204601.fits": "bdb924a6ae62292980b266cec0fb96c3626d921efe8148a13b26f964513ea533",
