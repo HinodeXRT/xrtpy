@@ -216,7 +216,7 @@ def remove_lightleak(in_map, scale=1.0, leak_map=None):
             "ll_file",
             [
                 urljoin(mirror, f"hinode/xrt/idl/util/leak_fits/{leak_filename}")
-                for mirror in _SSW_MIRRORS
+                for mirror in SSW_MIRRORS
             ],
             LL_FILE_HASHES[leak_filename],
         )

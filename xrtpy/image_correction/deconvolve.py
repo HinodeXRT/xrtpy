@@ -21,7 +21,7 @@ from xrtpy.util import SSW_MIRRORS
     "PSF560.fits",
     [
         urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits")
-        for mirror in _SSW_MIRRORS
+        for mirror in SSW_MIRRORS
     ],
     "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d",
 )
@@ -29,7 +29,7 @@ from xrtpy.util import SSW_MIRRORS
     "PSF1000.fits",
     [
         urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits")
-        for mirror in _SSW_MIRRORS
+        for mirror in SSW_MIRRORS
     ],
     "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1",
 )
