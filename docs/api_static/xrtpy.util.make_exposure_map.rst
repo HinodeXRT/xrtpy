@@ -5,4 +5,4 @@
 
 .. currentmodule:: xrtpy.util.make_exposure_map
 
-.. automodapi:: xrtpy.response.make_exposure_map
+.. automodapi:: xrtpy.util.make_exposure_map
