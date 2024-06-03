@@ -139,6 +139,9 @@ nbsphinx_thumbnails = {
     "notebooks/getting_started/units": (
         "_static/notebook_images/astropy_logo_notext.png"
     ),  # CC BY-SA
+    "notebooks/getting_started/A_Practical_Guide_to_Data_Extraction_and_Visualization": (
+        "_static/notebook_images/hinode_satellite.png"
+    ),
 }
 
 # adapted from sphinx-hoverxref conf.py
