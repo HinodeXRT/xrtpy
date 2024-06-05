@@ -601,7 +601,7 @@ class EffectiveAreaFundamental:
         Returns
         -------
         astropy.units.Quantity
-            Effective area in cm^2.
+            Effective area in cm\ :math:`^2`.
 
         Notes
         -----
