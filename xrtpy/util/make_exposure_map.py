@@ -7,6 +7,8 @@ from astropy.utils.data import download_file
 
 from xrtpy.util.filename2repo_path import filename2repo_path
 
+__all__ = ["make_exposure_map"]
+
 
 def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=False):
     """
