@@ -592,7 +592,7 @@ class EffectiveAreaFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        """
+        r"""
         Calculate the Effective Area.
 
         The effective area is calculated by considering the geometry of the XRT flight model,
