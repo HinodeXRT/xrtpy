@@ -632,7 +632,7 @@ def effective_area(filter_name, observation_date):
     Returns
     -------
     astropy.units.Quantity
-        Effective area in cm^2.
+        Effective area in cm\ :math:`^2`.
 
     Notes
     -----
