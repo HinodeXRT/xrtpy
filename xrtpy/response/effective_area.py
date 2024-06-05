@@ -618,7 +618,7 @@ class EffectiveAreaFundamental:
 
 
 def effective_area(filter_name, observation_date):
-    """
+    r"""
     Calculate the effective area for a given XRT filter at a specific observation date.
 
     Parameters
