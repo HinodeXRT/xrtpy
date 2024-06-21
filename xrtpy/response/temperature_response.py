@@ -236,8 +236,14 @@ class TemperatureResponseFundamental:
         """
         # Add epsilon to ensure values are within bounds
         epsilon = 1e-8
-        self._effective_area_fundamental.channel_wavelength = np.maximum(
-            self._effective_area_fundamental.channel_wavelength, 1.00000001 + epsilon
+        self._effective_area_fundamental.channel_wavelength = (
+            np.maximum(
+                self._effective_area_fundamental.channel_wavelength.to_value(
+                    "Angstrom"
+                ),
+                1.00000001 + epsilon,
+            )
+            * u.Angstrom
         )
         return self._effective_area_fundamental.effective_area()
 
