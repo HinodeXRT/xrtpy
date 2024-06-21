@@ -13,3 +13,4 @@ Documentation
 
 Internal modifications and improvements
 ---------------------------------------
+- Updated the `xrt_contam_on_ccd.geny` file with new CCD contamination values. (:pr:`245`)
