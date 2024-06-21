@@ -8,8 +8,9 @@ New Features
 Deprecations and Removals
 -------------------------
 
-Documentation
--------------
+Documentation Updates
+---------------------
+- Contributing Information: Updated informational methods for contributing to xrtpy through different avenues such as reporting issues, submitting pull requests, or improving documentation. (:pr:248)
 
 Internal modifications and improvements
 ---------------------------------------
