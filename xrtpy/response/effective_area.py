@@ -553,8 +553,11 @@ class EffectiveAreaFundamental:
         )
         # Add epsilon to ensure values are within the valid range
         epsilon = 1e-8
-        channel_wavelength_adjusted = np.maximum(
-            self.channel_wavelength, 1.00000001 + epsilon
+        channel_wavelength_adjusted = (
+            np.maximum(
+                self.channel_wavelength.to_value("Angstrom"), 1.00000001 + epsilon
+            )
+            * u.Angstrom
         )
         return CCD_contam_transmission(channel_wavelength_adjusted)
 
