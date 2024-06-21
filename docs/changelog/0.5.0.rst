@@ -15,7 +15,7 @@ Internal modifications and improvements
 - Effective Area Testing Files Update: Updated IDL result - Effective Area testing files for the following years: 2020, 2021, 2022, 2023, 2024. (:pr:`218`)
 - Temperature Response Testing Files Update: Updated IDL result - Temperature Response testing files for the following years: 2020, 2021, 2022, 2023, 2024. (:pr:`220`)
 - SunPy Maps Import Method: Modified import methods for SunPy `~sunpy.map.Map` objects in the XRTpy notebook for consistency with the way it is imported in other notebooks. (:pr:`237`)
-- Complete Review of Function Documentation: Expanded documentation for every method in the following XRTpy objects: `~xrtpy.response.channel.Channel`, Effective Area, and Temperature Response. (:pr:`253,250,249`)
+- Complete Review of Class Documentation: Expanded documentation for every method in the following XRTpy objects: `~xrtpy.response.channel.Channel`, Effective Area, and Temperature Response. (:pr:`253,250,249`)
 
 Miscellaneous
 -------------
