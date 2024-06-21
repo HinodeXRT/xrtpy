@@ -13,6 +13,7 @@ Documentation
 
 Internal modifications and improvements
 ---------------------------------------
-- Updated the `xrt_contam_on_ccd.geny` file with new CCD contamination values. (:pr:`245`)
-- Updated IDL result - Effective Area testing files for the following years: 2020,2021,2022,2023,2024. (:pr:`218`)
-- Updated IDL result - Temperature Response testing files for the following years: 2020,2021,2022,2023,2024. (:pr:`220`)
+- CCD Contamination Update: Updated the xrt_contam_on_ccd.geny file with new CCD contamination values. (:pr:245)
+- Effective Area Testing Files Update: Updated IDL result - Effective Area testing files for the following years: 2020, 2021, 2022, 2023, 2024. (:pr:218)
+- Temperature Response Testing Files Update: Updated IDL result - Temperature Response testing files for the following years: 2020, 2021, 2022, 2023, 2024. (:pr:220)
+- SunPy Maps Import Method: Modified import methods for SunPy maps in the XRTpy notebook to align with the way it's imported in other notebooks for consistency. (:pr:237)
