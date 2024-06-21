@@ -537,13 +537,26 @@ class EffectiveAreaFundamental:
         """XRT channel transmission."""
         return Channel(self.name).transmission
 
+    # @property
+    # def _interpolated_CCD_contamination_transmission(self):
+    #     """Interpolate filter contam transmission to the wavelength."""
+    #     CCD_contam_transmission = interpolate.interp1d(
+    #         self.n_DEHP_wavelength, self._CCD_contamination_transmission
+    #     )
+    #     return CCD_contam_transmission(self.channel_wavelength)
+
     @property
     def _interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
         CCD_contam_transmission = interpolate.interp1d(
             self.n_DEHP_wavelength, self._CCD_contamination_transmission
         )
-        return CCD_contam_transmission(self.channel_wavelength)
+        # Add epsilon to ensure values are within the valid range
+        epsilon = 1e-8
+        channel_wavelength_adjusted = np.maximum(
+            self.channel_wavelength, 1.00000001 + epsilon
+        )
+        return CCD_contam_transmission(channel_wavelength_adjusted)
 
     @cached_property
     def _filter_contamination_transmission(self):
