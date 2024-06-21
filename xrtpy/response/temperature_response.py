@@ -213,17 +213,6 @@ class TemperatureResponseFundamental:
             u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
         )
 
-    # @u.quantity_input
-    # def effective_area(self) -> u.cm**2:
-    #     """
-    #     Calculate the effective area.
-
-    #     Returns
-    #     -------
-    #     astropy.units.Quantity
-    #         Effective area in cm^2.
-    #     """
-    #     return self._effective_area_fundamental.effective_area()
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
         """
@@ -234,17 +223,6 @@ class TemperatureResponseFundamental:
         astropy.units.Quantity
             Effective area in cm^2.
         """
-        # Add epsilon to ensure values are within bounds
-        epsilon = 1e-8
-        self._effective_area_fundamental.channel_wavelength = (
-            np.maximum(
-                self._effective_area_fundamental.channel_wavelength.to_value(
-                    "Angstrom"
-                ),
-                1.00000001 + epsilon,
-            )
-            * u.Angstrom
-        )
         return self._effective_area_fundamental.effective_area()
 
     @u.quantity_input
