@@ -5,9 +5,6 @@ New Features
 ------------
 - New Example Notebook: Introduced a new example notebook titled "Hinode-XRT: A Practical Guide to Data Extraction and Visualization." This notebook provides a step-by-step guide on how to download, process, and visualize solar observation data from the Hinode X-Ray Telescope, making it accessible for research and analysis.(:pr:`210`)
 
-Deprecations and Removals
--------------------------
-
 Documentation Updates
 ---------------------
 - Contributing Information: Updated informational methods for contributing to xrtpy through different avenues such as reporting issues, submitting pull requests, or improving documentation. (:pr:`248`)
@@ -19,3 +16,8 @@ Internal modifications and improvements
 - Temperature Response Testing Files Update: Updated IDL result - Temperature Response testing files for the following years: 2020, 2021, 2022, 2023, 2024. (:pr:`220`)
 - SunPy Maps Import Method: Modified import methods for SunPy maps in the XRTpy notebook to align with the way it's imported in other notebooks for consistency. (:pr:`237`)
 - Complete Review of Function Documentation: Conducted a complete review of documentation for every function in the following XRTpy objects: Channel, Effective Area, and Temperature Response. (:pr:`253,250,249`)
+
+Miscellaneous
+-------------
+- SunPy Installation Requirement: Added SunPy as an installation requirement for XRTpy. (:pr:`247`)
+- Installation Instructions Update: Updated installation instructions to differentiate between the use of Bash or Zsh for XRTpy installation. (:pr:`251`)
