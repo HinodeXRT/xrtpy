@@ -102,7 +102,7 @@ repos:
     name: validate Python notebooks
   - id: nbqa-ruff
     name: ruff for notebooks (see https://docs.astral.sh/ruff/rules)
-    args: [--fix, '--select=A,ARG,B,BLE,C,C4,E,F,FLY,I,INT,ISC,PERF,PIE,PLC,PLE,PYI,Q003,RET,RSE,SIM,TID,TRY,UP,W', '--ignore=B018,E402,E501']
+    args: [--fix, '--select=A,ARG,B,BLE,C,C4,E,F,FLY,I,INT,ISC,PERF,PIE,PLC,PLE,PYI,Q003,RET,RSE,SIM,TID,TRY,UP,W', '--ignore=B018,E402,E501,TRY003']
   - id: nbqa-black
     additional_dependencies:
     - black==24.1.1
