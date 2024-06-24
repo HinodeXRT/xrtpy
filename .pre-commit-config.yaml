@@ -23,7 +23,7 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.28.3
+  rev: 0.28.6
   hooks:
   - id: check-github-workflows
 
@@ -69,7 +69,7 @@ repos:
   - id: text-unicode-replacement-char
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.6
+  rev: v2.3.0
   hooks:
   - id: codespell
     name: codespell (add false positives to pyproject.toml)
@@ -79,7 +79,7 @@ repos:
     exclude: .*\.fits
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.4.4
+  rev: v0.4.10
   hooks:
   - id: ruff
     name: ruff (see https://docs.astral.sh/ruff/rules)
