@@ -149,7 +149,6 @@ extend-exclude = [
 ]
 namespace-packages = [".github/workflows", "docs"]
 
-
 [tool.ruff.lint]
 # Find info about ruff rules at: https://docs.astral.sh/ruff/rules
 extend-select = [
