@@ -17,7 +17,7 @@ def filename2repo_path(  # noqa: C901
     Parameters:
     -----------
     filename    string, required
-                filename comforming to standard naming conventions
+                filename conforming to standard naming conventions
 
     urlroot     string
                 root of the directory tree on the repository; by default the
