@@ -268,7 +268,7 @@ packages = ["xrtpy"]
 "xrtpy.response.tests" = ["data/*/*/*.txt"]
 
 [tool.setuptools_scm]
-write_to = "xrtpy/_version.py"
+write_to = "xrtpy/version.py"
 
 [tool.towncrier]
 package = "xrtpy"
