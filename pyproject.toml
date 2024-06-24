@@ -6,6 +6,138 @@ requires = [
   "wheel>=0.34",
 ]  # ought to mirror 'requirements/build.txt'
 
+[project]
+name = "xrtpy"
+readme = "README.md"
+keywords = ["solar physics"]
+description = "For analyzing data from the X-Ray Telescope (XRT) on the Hinode spacecraft."
+license = {file = "LICENSE"}
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Topic :: Scientific/Engineering :: Astronomy",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+# SPEC 0 recommends that packages in the scientific pythoniverse support
+# versions of Python that have been released in the last ≤36 months
+requires-python = ">=3.9"
+dynamic = ["version"]
+authors = [
+  {name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu"},
+  {name = "Jonathan Slavin", email = "jslavin@cfa.harvard.edu"},
+  {name = "Nick Murpy", email="namurphy@cfa.harvard.edu"},
+  {name = "Will Barnes"},
+  {name = "Stuart Mumford"},
+]
+
+dependencies = [
+  "astropy >= 5.0.1",
+  "cached-property >= 1.5.2",
+  "matplotlib >= 3.4.0",
+  "numpy >= 1.22",
+  "packaging",
+  "scipy >= 1.7.0",
+  "sunpy >= 3.0.0",
+  "scikit-image >= 0.16.2",
+  "sunpy[map] >= 3.0.0",
+  "requests",
+]
+
+[project.optional-dependencies]
+extras = [
+  # ought to mirror requirements/extras.txt
+  "codespell",
+  "pre-commit",
+  "nox",
+]
+tests = [
+  # ought to mirror requirements/tests.txt
+  "codespell",
+  "pre-commit",
+  "nox",
+  "pydocstyle",
+  "pytest >= 5.4.0",
+  "pytest-allclose",
+  "pytest-xdist",
+]
+docs = [
+  # ought to mirror requirements/docs.txt
+  "codespell",
+  "pre-commit",
+  "nox",
+  "docutils >= 0.18",
+  "ipykernel",
+  "ipython",
+  "jinja2 != 3.1",
+  "nbconvert < 7.14",
+  "nbsphinx >= 0.9",
+  "numpydoc >= 1.2",
+  "pillow",
+  "pygments >= 2.11",
+  "sphinx >= 6.0",
+  "sphinx-changelog >= 1.3",
+  "sphinx-codeautolink >= 0.15.0",
+  "sphinx-copybutton >= 0.5",
+  "sphinx-gallery >= 0.12",
+  "sphinx-hoverxref >= 1.1",
+  "sphinx-issues >= 3.0",
+  "sphinx_automodapi",
+  "sphinx_rtd_theme >= 1.2",
+  "sphinxcontrib-bibtex >= 2.5",
+  "sunpy[net] >= 3.0.0",
+  "towncrier >= 22.12",
+  "imageio",
+  "ipywidgets",
+]
+developer = [
+  # install everything for developers
+  # ought to functionally mirror requirements.txt
+  "codespell",
+  "pre-commit",
+  "nox",
+  "docutils >= 0.18",
+  "ipykernel",
+  "ipython",
+  "jinja2 != 3.1",
+  "nbconvert < 7.14",
+  "nbsphinx >= 0.9",
+  "numpydoc >= 1.2",
+  "pillow",
+  "pygments >= 2.11",
+  "sphinx >= 6.0",
+  "sphinx-changelog >= 1.3",
+  "sphinx-codeautolink >= 0.15.0",
+  "sphinx-copybutton >= 0.5",
+  "sphinx-gallery >= 0.12",
+  "sphinx-hoverxref >= 1.1",
+  "sphinx-issues >= 3.0",
+  "sphinx_automodapi",
+  "sphinx_rtd_theme >= 1.2",
+  "sphinxcontrib-bibtex >= 2.5",
+  "sunpy[net] >= 3.0.0",
+  "towncrier >= 22.12",
+  "imageio",
+  "ipywidgets",
+  "pydocstyle",
+  "pytest >= 5.4.0",
+  "pytest-allclose",
+  "pytest-xdist",
+]
+
+[project.urls]
+Documentation = "https://xrtpy.readthedocs.io"
+Repository = "https://github.com/HinodeXRT/xrtpy"
+Issues = "https://github.com/HinodeXRT/xrtpy/issues"
+Changelog = "https://xrtpy.readthedocs.io/en/stable/changelog/index.html"
+
 [tool.ruff]
 target-version = "py39"
 show-fixes = true
@@ -78,7 +210,6 @@ ignore = [
   "TRY003", # raise-vanilla-args
 ]
 
-
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["E402", "F401", "F402", "F403"]  # ignore import errors
 "docs/notebooks/computing_functions/temperature_response.ipynb" = ["A001"]  # filter variable shadows Python builtin
@@ -107,6 +238,37 @@ te,
 tne,
 ue
 """
+
+[tool.pytest.ini_options]
+testpaths = ['xrtpy', 'docs']
+xfail_strict = true
+doctest_optionflags = """
+NORMALIZE_WHITESPACE
+ELLIPSIS
+NUMBER
+IGNORE_EXCEPTION_DETAIL"""
+norecursedirs = [
+  'build',
+  'docs/_build',
+  'examples',
+  'auto_examples',
+]
+addopts = [
+  '--doctest-modules',
+  '--doctest-continue-on-failure',
+  '--ignore=docs/conf.py',
+]
+
+[tool.setuptools]
+packages = ["xrtpy"]
+
+[tool.setuptools.package-data]
+"xrtpy" = ["data/*"]
+"xrtpy.response" = ["data/*.txt", "data/*.geny"]
+"xrtpy.response.tests" = ["data/*/*/*.txt"]
+
+[tool.setuptools_scm]
+write_to = "xrtpy/_version.py"
 
 [tool.towncrier]
 package = "xrtpy"
