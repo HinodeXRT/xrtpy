@@ -39,16 +39,15 @@ authors = [
 ]
 
 dependencies = [
-  "astropy >= 5.0.1",
+  "astropy >= 5.1",
   "cached-property >= 1.5.2",
-  "matplotlib >= 3.4.0",
-  "numpy >= 1.22",
+  "matplotlib >= 3.5.0",
+  "numpy >= 1.24.0",
   "packaging",
-  "scipy >= 1.7.0",
-  "sunpy >= 3.0.0",
-  "scikit-image >= 0.16.2",
-  "sunpy[map] >= 3.0.0",
-  "requests",
+  "scipy >= 1.8.0",
+  "sunpy[map] >= 4.0.0",
+  "scikit-image >= 0.19.0",
+  "requests >= 2.28.0",
 ]
 
 [project.optional-dependencies]
