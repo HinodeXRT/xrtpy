@@ -5,44 +5,48 @@ on:
     branches:
     - main
     - stable
-    - v*.*.x
+    - v*.*.*
+    tags:
+    - v*
   pull_request:
   workflow_dispatch:
 
 jobs:
 
-  initial-tests:
+  tests:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
     strategy:
       fail-fast: false
 
       matrix:
         include:
 
-        - name: Python 3.12 (Windows)
+        - name: Tests, Python 3.12, Windows
           os: windows-latest
           noxenv: tests-3.12
           python: '3.12'
           noxposargs: --durations=10
 
-        - name: Python 3.11 (Windows)
+        - name: Tests, Python 3.11, Windows
           os: windows-latest
           noxenv: tests-3.11
           python: '3.11'
           noxposargs: --durations=10
 
-        - name: Python 3.10 (Mac OS)
+        - name: Tests, Python 3.10, macOS
           os: macos-latest
           noxenv: tests-3.10
           python: '3.10'
 
-        - name: Python 3.9 (Windows)
+        - name: Tests, Python 3.9, Windows
           os: windows-latest
           python: 3.9
           noxenv: tests-3.9
 
-        - name: Import package
+        - name: Import XRTpy, Python 3.9, Windows
           os: windows-latest
           python: 3.9
           noxenv: import_package
@@ -105,4 +109,4 @@ jobs:
         pandoc --version
 
     - name: Build documentation
-      run: nox -e build_docs_nitpicky -- -q
+      run: nox -s build_docs_nitpicky -- -q
