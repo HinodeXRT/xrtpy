@@ -60,7 +60,7 @@ tests = [
   "pytest-xdist >= 3.6.1",
 ]
 docs = [
-  "docutils >= 0.21.2",
+  "docutils >= 0.19",
   "imageio >= 2.20.0",
   "ipykernel >= 6.20.0",
   "ipython >= 8.4.0",
