@@ -1,6 +1,6 @@
 import nox
 
-nox.options.sessions = ["tests"]
+nox.options.sessions = ["tests", "linters"]
 
 python_versions = ("3.9", "3.10", "3.11", "3.12")
 
@@ -19,10 +19,9 @@ pytest_options = [
 ]
 
 
-@nox.session
+@nox.session(python=python_versions)
 def tests(session):
-    session.install("-r", "requirements/tests.txt")
-    session.install(".")
+    session.install(".[dev,tests]")
     session.run("pytest", *pytest_options, *session.posargs)
 
 
@@ -50,9 +49,8 @@ def build_docs(session):
 
 
 @nox.session
-def build_docs_nitpicky(session):
-    session.install("-r", "requirements/docs.txt")
-    session.install(".")
+def docs(session):
+    session.install(".[dev,docs]")
     session.run(
         "sphinx-build",
         *sphinx_opts,
