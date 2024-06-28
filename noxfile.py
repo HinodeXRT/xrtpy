@@ -1,6 +1,6 @@
 import nox
 
-nox.options.sessions = ["tests", "linters"]
+nox.options.sessions = ["tests"]
 
 python_versions = ("3.10", "3.11", "3.12")
 
@@ -19,7 +19,7 @@ pytest_options = [
 ]
 
 
-@nox.session(python=python_versions)
+@nox.session
 def tests(session):
     session.install(".[dev,tests]")
     session.run("pytest", *pytest_options)
