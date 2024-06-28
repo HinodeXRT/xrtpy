@@ -26,19 +26,19 @@ jobs:
 
         - name: Tests, Python 3.12, Windows
           os: windows-latest
-          noxenv: tests-3.12
+          noxenv: tests
           python: '3.12'
           noxposargs: --durations=10
 
         - name: Tests, Python 3.11, Windows
           os: windows-latest
-          noxenv: tests-3.11
+          noxenv: tests
           python: '3.11'
           noxposargs: --durations=10
 
         - name: Tests, Python 3.10, macOS
           os: macos-latest
-          noxenv: tests-3.10
+          noxenv: tests
           python: '3.10'
 
         - name: Tests, Python 3.10, Linux
