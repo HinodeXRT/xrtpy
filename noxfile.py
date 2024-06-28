@@ -38,32 +38,11 @@ def import_package(session):
 
 
 @nox.session
-def build_docs(session):
-    session.install(".[dev,docs]")
-    session.run(
-        "sphinx-build",
-        *sphinx_opts,
-        *session.posargs,
-    )
-
-
-@nox.session
-def build_docs_nitpicky(session):
+def docs(session):
     session.install(".[dev,docs]")
     session.run(
         "sphinx-build",
         *sphinx_opts,
         *sphinx_nitpicky,
-        *session.posargs,
-    )
-
-
-@nox.session
-def build_docs_no_examples(session):
-    session.install(".[dev,docs]")
-    session.run(
-        "sphinx-build",
-        *sphinx_opts,
-        *sphinx_no_notebooks,
         *session.posargs,
     )
