@@ -109,4 +109,4 @@ jobs:
         pandoc --version
 
     - name: Build documentation
-      run: nox -s build_docs_nitpicky -- -q
+      run: nox -s docs -- -q
