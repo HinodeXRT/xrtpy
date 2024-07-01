@@ -79,7 +79,7 @@ repos:
     exclude: .*\.fits
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.4.10
+  rev: v0.5.0
   hooks:
   - id: ruff
     name: ruff (see https://docs.astral.sh/ruff/rules)
@@ -88,7 +88,7 @@ repos:
     name: autoformat source code with ruff formatter
 
 - repo: https://github.com/asottile/blacken-docs
-  rev: 1.16.0
+  rev: 1.18.0
   hooks:
   - id: blacken-docs
     name: autoformat code blocks in docs
