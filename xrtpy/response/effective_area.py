@@ -540,10 +540,12 @@ class EffectiveAreaFundamental:
     @property
     def _interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        CCD_contam_transmission = interpolate.interp1d(
-            self.n_DEHP_wavelength, self._CCD_contamination_transmission
+        CCD_contam_transmission = np.interp(
+            self.channel_wavelength.to_value("AA"),
+            self.n_DEHP_wavelength,
+            self._CCD_contamination_transmission,
         )
-        return CCD_contam_transmission(self.channel_wavelength)
+        return CCD_contam_transmission
 
     @cached_property
     def _filter_contamination_transmission(self):
@@ -585,10 +587,12 @@ class EffectiveAreaFundamental:
     @property
     def _interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        Filter_contam_transmission = interpolate.interp1d(
-            self.n_DEHP_wavelength, self._filter_contamination_transmission
+        Filter_contam_transmission = np.interp(
+            self.channel_wavelength.to_value("AA"),
+            self.n_DEHP_wavelength,
+            self._filter_contamination_transmission,
         )
-        return Filter_contam_transmission(self.channel_wavelength)
+        return Filter_contam_transmission
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
