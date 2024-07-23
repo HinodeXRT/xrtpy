@@ -159,6 +159,7 @@ ignore = [
   "N803", # invalid-argument-name
   "N806", # non-lowercase-variable-in-function
   "N816", # mixed-case-variable-in-global-scope
+  "PLC2401", # non-ascii-name
   "S101", # asserts
   "SIM108", # if-else-block-instead-of-if-exp
   "TRY003", # raise-vanilla-args

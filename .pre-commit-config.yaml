@@ -23,7 +23,7 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.28.6
+  rev: 0.29.0
   hooks:
   - id: check-github-workflows
 
@@ -41,7 +41,7 @@ repos:
   - id: remove-crlf
     name: remove CRLF line endings
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.13.0
+  rev: v2.14.0
   hooks:
   - id: pretty-format-ini
     args: [--autofix]
@@ -79,7 +79,7 @@ repos:
     exclude: .*\.fits
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.4.10
+  rev: v0.5.4
   hooks:
   - id: ruff
     name: ruff (see https://docs.astral.sh/ruff/rules)
@@ -88,7 +88,7 @@ repos:
     name: autoformat source code with ruff formatter
 
 - repo: https://github.com/asottile/blacken-docs
-  rev: 1.16.0
+  rev: 1.18.0
   hooks:
   - id: blacken-docs
     name: autoformat code blocks in docs
@@ -102,7 +102,7 @@ repos:
     name: validate Python notebooks
   - id: nbqa-ruff
     name: ruff for notebooks (see https://docs.astral.sh/ruff/rules)
-    args: [--fix, '--select=A,ARG,B,BLE,C,C4,E,F,FLY,I,INT,ISC,PERF,PIE,PLC,PLE,PYI,Q003,RET,RSE,SIM,TID,TRY,UP,W', '--ignore=B018,E402,E501,TRY003']
+    args: [--fix, '--select=A,ARG,B,BLE,C,C4,E,F,FLY,I,INT,ISC,PERF,PIE,PLC,PLE,PYI,Q003,RET,RSE,SIM,TID,TRY,UP,W', '--ignore=B018,E402,E501,PLC2401,TRY003']
   - id: nbqa-black
     additional_dependencies:
     - black==24.1.1
