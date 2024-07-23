@@ -42,7 +42,9 @@ def docs(session):
     sphinx_fail_on_warnings = ["-W", "--keep-going"]
     sphinx_builder = ["-b", "html"]
     sphinx_nitpicky = ["-n"]
-    sphinx_opts = sphinx_paths + sphinx_fail_on_warnings + sphinx_builder + sphinx_nitpicky
+    sphinx_opts = (
+        sphinx_paths + sphinx_fail_on_warnings + sphinx_builder + sphinx_nitpicky
+    )
 
     session.install(".[dev,docs]")
     session.run(
