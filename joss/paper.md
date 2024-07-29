@@ -91,7 +91,7 @@ Researchers have the flexibility to select the abundance model that best aligns 
 
 XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
-![This graph displays the effective area (in cm²) for all X-ray focal-plane filters used in the XRT, plotted across a wavelength range of 0 to 70 Å. Each filter, represented by a unique color, shows distinct peaks that are important for choosing the best filter based on the wavelength being observed, and the curves demonstrate the instrument’s ability to distinguish between different X-ray wavelengths. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
+![This graph displays the effective area for all X-ray focal-plane filters used in the XRT, plotted across a wavelength range of 0 to 70 angstroms. Each filter, represented by a unique color, shows distinct peaks that are important for choosing the best filter based on the wavelength being observed, and the curves demonstrate the instrument’s ability to distinguish between different X-ray wavelengths. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
 
 ![The temperature response is plotted for all XRT X-ray focal-plane filters using XRTpy. Each curve represents the total instrument response as a function of temperature, integrated with different CHIANTI abundance models: Coronal (solid lines), Hybrid (dashed lines), and Photospheric (dotted lines). Highlights the sensitivity variations under different coronal conditions. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
 
