@@ -1,5 +1,5 @@
 ---
-title: 'XRTpy : A Hinode-X-Ray Telescope Python Package'
+title: 'XRTpy: A Hinode-X-Ray Telescope Python Package'
 
 tags:
   - Python
@@ -91,9 +91,9 @@ Researchers have the flexibility to select the abundance model that best aligns 
 
 XRTpy's capabilities are designed to empower researchers and scientists to fully exploit the potential of XRT data, offering the scientific community a unique opportunity to study the Sun's dynamic and complex behavior in a user-friendly and efficient manner.
 
-![The Effective area for all XRT filters plotted using XRTpy. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
+![The effective area for all XRT filters plotted using XRTpy. .\label{fig:Figure 1}](xrtpy_effective_area_plot.pdf)
 
-![The temperature response is plotted for all XRT filters using XRTpy.  The plot also shows the effects of using different abundance models from CHIANTI for each filter. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
+![The temperature response is plotted for all XRT X-ray focal-plane filters using XRTpy. Each curve represents the total instrument response as a function of temperature, integrated with different CHIANTI abundance models: Coronal (solid lines), Hybrid (dashed lines), and Photospheric (dotted lines). Highlights the sensitivity variations under different coronal conditions. .\label{fig:Figure 2}](xrtpy_temperature_response_plot.pdf)
 
 ![In Figure 3, the application of the `temperature_from_filter_ratio` function is illustrated, demonstrating its role in calculating electron temperature and volume emission measure through filter ratios. The dataset, collected on January 28, 2011, between 01:31:55 and 01:32:05 UTC, comprises two images captured with specific filters. These images offer unique insights into solar conditions during the observed moments, as shown by [@Guidoni:2015]. .\label{fig:Figure 3}](xrtpy_temperature_from_filter_ratio_plot.pdf)
 
