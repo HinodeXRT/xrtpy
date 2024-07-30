@@ -21,8 +21,7 @@ pytest_options = [
 
 @nox.session(python=python_versions)
 def tests(session):
-    session.install("-r", "requirements/tests.txt")
-    session.install(".")
+    session.install(".[dev,tests]")
     session.run("pytest", *pytest_options)
 
 
@@ -40,8 +39,7 @@ def import_package(session):
 
 @nox.session
 def build_docs(session):
-    session.install("-r", "requirements/docs.txt")
-    session.install(".")
+    session.install(".[dev,docs]")
     session.run(
         "sphinx-build",
         *sphinx_opts,
@@ -51,8 +49,7 @@ def build_docs(session):
 
 @nox.session
 def build_docs_nitpicky(session):
-    session.install("-r", "requirements/docs.txt")
-    session.install(".")
+    session.install(".[dev,docs]")
     session.run(
         "sphinx-build",
         *sphinx_opts,
@@ -63,8 +60,7 @@ def build_docs_nitpicky(session):
 
 @nox.session
 def build_docs_no_examples(session):
-    session.install("-r", "requirements/docs.txt")
-    session.install(".")
+    session.install(".[dev,docs]")
     session.run(
         "sphinx-build",
         *sphinx_opts,
