@@ -32,12 +32,6 @@ The X-Ray Telescope (XRT), depicted as a long linear black tube on the Hinode sp
  thermal conditions within the corona. For a comprehensive overview of XRT's mission and capabilities, please visit the
   official `xrt-cfa-harvard`_ website for mission overview information about the XRT.
 
-.. image:: images/XRT_composite_image_full_disk_14February2015.png
-   :alt: XRT Composite Image
-   :align: center
-   :scale: 64%
-
-
 .. tip::
    Visit the `XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for captivating visual content showcasing the XRT's solar observations.
 
