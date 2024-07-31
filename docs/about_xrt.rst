@@ -30,6 +30,11 @@ The image below is a synoptic composite from February 14, 2015, created using th
 This method combines images taken with different filters, each set to a distinct color in the RGB color model to highlight various thermal conditions within the corona. 
 For a comprehensive overview of XRT's mission and capabilities, please visit the  official xrt-cfa-harvard_ website.
 
+.. image:: images/XRT_composite_image_full_disk_14February2015.png
+   :alt: XRT Composite Image
+   :align: center
+   :scale: 64%
+   
 .. tip::
    Visit the `XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for captivating visual content showcasing the XRT's solar observations.
 
