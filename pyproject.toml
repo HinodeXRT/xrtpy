@@ -191,7 +191,8 @@ ons,
 sav,
 te,
 tne,
-ue
+ue,
+aas
 """
 
 [tool.pytest.ini_options]
