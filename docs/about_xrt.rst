@@ -25,12 +25,10 @@ September 23, 2006 (Japan Standard Time) and placed into a polar,  sun-synchrono
 
 The X-Ray Telescope
 ====================
-The X-Ray Telescope (XRT), depicted as a long linear black tube on the Hinode spacecraft (illustration at the top of the page ),
- is a crucial instrument for observing the solar corona's most intense regions, with temperatures ranging from 1,000,000 to 10,000,000
- Kelvin. The image on the bellow is a synoptic composite from February 14, 2015, created using the Al-Mesh/Be-Thin/Al-Med filters.
- This method combines images taken with different filters, each set to a distinct color in the RGB color model to highlight various
- thermal conditions within the corona. For a comprehensive overview of XRT's mission and capabilities, please visit the
-  official `xrt-cfa-harvard`_ website for mission overview information about the XRT.
+The X-Ray Telescope (XRT), depicted as a long linear black tube on the Hinode spacecraft (illustration at the top of the page), is a crucial instrument for observing the solar corona's most intense regions, with temperatures ranging from 1,000,000 to 10,000,000 Kelvin. 
+The image below is a synoptic composite from February 14, 2015, created using the Al-Mesh/Be-Thin/Al-Med filters. 
+This method combines images taken with different filters, each set to a distinct color in the RGB color model to highlight various thermal conditions within the corona. 
+For a comprehensive overview of XRT's mission and capabilities, please visit the  official xrt-cfa-harvard_ website.
 
 .. tip::
    Visit the `XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for captivating visual content showcasing the XRT's solar observations.
