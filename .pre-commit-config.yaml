@@ -23,7 +23,7 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.29.0
+  rev: 0.29.1
   hooks:
   - id: check-github-workflows
 
@@ -79,7 +79,7 @@ repos:
     exclude: .*\.fits
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.5.4
+  rev: v0.5.6
   hooks:
   - id: ruff
     name: ruff (see https://docs.astral.sh/ruff/rules)
@@ -96,7 +96,7 @@ repos:
     - black==24.1.1
 
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.8.5
+  rev: 1.8.7
   hooks:
   - id: nbqa-check-ast
     name: validate Python notebooks
