@@ -9,6 +9,13 @@ Glossary
 .. glossary::
    :sorted:
 
+   Light Leak
+      In the context of the X-Ray Telescope (XRT), a light leak refers to periodic increases in visible stray light contamination, which is often categorized as stray light.
+      This phenomenon is primarily attributed to a potential pinhole in the telescope's entrance filter, allowing some visible light transmission even when the visible light shutter is closed.
+      This defect has resulted in significant visible light contributions to X-ray images, especially noticeable in some of the thinner XRT X-ray filters.
+      Users of XRT data, particularly those working with affected filters, are encouraged to consult the `SolarSoft XRT Analysis Guide`_ for detailed analysis and
+      potential corrections of the stray light in their datasets (see Table 2.2 in the guide for more details).
+
    DN
       Data number (DN) per unit.
 
