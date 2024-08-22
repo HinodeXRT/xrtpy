@@ -128,7 +128,7 @@ are essential for tailoring the telescope's imaging capabilities. By rotating th
 .. image:: images/XRT_filter_wheels_Sun_View_Diagram.png
    :alt: Diagram of the XRT Filter Wheels
    :align: center
-   :scale: 40%
+   :scale: 25%
 
 
 .. _CHIANTI: https://www.chiantidatabase.org/chianti_database_history.html
