@@ -33,11 +33,7 @@ For a comprehensive overview of XRT's mission and capabilities, please visit the
 .. image:: images/XRT_composite_image_full_disk_14February2015.png
    :alt: XRT Composite Image
    :align: center
-   :scale: 50%
-
-.. tip::
-   Visit the `XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for captivating visual content showcasing the XRT's solar observations.
-
+   :scale: 40%
 
 SolarSoft XRT Analysis Guide
 ============================
@@ -51,6 +47,8 @@ IDL is a software programming language used to analyze and create meaningful inf
    Please note that the `SolarSoft XRT Analysis Guide`_ does not serve as a guide for using XRTpy.
    It focuses solely on the analysis of XRT data using the IDL software.
 
+.. tip::
+   Visit the `XRT Picture of the Week`_ and the `Hinode-XRT YouTube`_ page for captivating visual content showcasing the XRT's solar observations.
 
 .. _NASA's Hinode space mission to the Sun: https://www.nasa.gov/mission_pages/hinode/mission.html
 .. _Interactive Data Language: https://www.l3harrisgeospatial.com/Software-Technology/IDL
