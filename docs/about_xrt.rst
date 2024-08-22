@@ -13,15 +13,12 @@ About the X-Ray Telescope (XRT)
 .. contents:: Contents
    :local:
 
-
 Hinode
 ======
 Hinode is a joint mission involving the space agencies of Japan, the United States, Europe,  and the United Kingdom. It is depicted in the *illustration shown above*.
 The spacecraft is equipped with three instruments: the Solar Optical Telescope (SOT), the Extreme Ultraviolet Imaging Spectrometer (EIS), and the X-Ray Telescope (XRT).
 These instruments are designed to provide multi-wavelength data from the  photosphere to the upper corona. The solar spacecraft spacecraft was launched at 6:36 a.m on
 September 23, 2006 (Japan Standard Time) and placed into a polar,  sun-synchronous orbit, enabling continuous observations of the Sun. For further information, visit `NASA's Hinode space mission to the Sun`_.
-
-
 
 The X-Ray Telescope
 ====================
@@ -41,7 +38,6 @@ The `SolarSoft XRT Analysis Guide`_ is a comprehensive resource for analysis of 
 It includes both an Instrument Guide and an overview of the X-Ray telescope's hardware components.
 The XRT software was originally created in Interactive Data Language (IDL).
 IDL is a software programming language used to analyze and create meaningful information from numerical data.
-
 
 .. note::
    Please note that the `SolarSoft XRT Analysis Guide`_ does not serve as a guide for using XRTpy.
