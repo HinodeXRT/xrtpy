@@ -91,7 +91,11 @@ For more detailed information about our XRT data products, please visit the `XRT
 X-Ray Filter Channel
 *********************
 
+<<<<<<< HEAD
 The XRT controls filter imaging using two sequentially positioned filter wheels, as shown in the diagram below.  Each wheel houses a variety of filters for tailoring the telescope’s imaging capabilities.
+=======
+The XRT controls filter imaging using two sequentially positioned filter wheels, as shown in the diagram below.  Each wheel houses a variety of filters crucial for tailoring the telescope's imaging capabilities.
+>>>>>>> 1467d7e6999637065bcae552fcab09e9932597fd
 By rotating these wheels, scientists can select different filters to study the sun in multiple wavelengths, thereby enhancing the resolution and quality of solar images.
 Refer to Section 3 in the `X-Ray Telescope Instrument Guide` in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filters.
 The existing filters are structured as follows:
