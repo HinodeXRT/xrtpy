@@ -30,7 +30,7 @@ For a comprehensive overview of XRT's mission and capabilities, please visit the
 .. image:: images/XRT_composite_image_full_disk_14February2015.png
    :alt: XRT Composite Image
    :align: center
-   :scale: 35%
+   :scale: 40%
 
 SolarSoft XRT Analysis Guide
 ============================
