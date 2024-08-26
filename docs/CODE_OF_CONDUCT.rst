@@ -39,6 +39,10 @@ If unresolved, project maintainers will mediate to ensure a fair resolution. Vio
 in appropriate consequences, including warnings, temporary bans, or permanent removal. Community leaders are responsible for
 enforcing these rules and taking corrective action as needed.
 
+**Enforcement and Reporting**
+- Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at xrtpy@cfa.harvard.edu. All complaints will be reviewed and investigated promptly and fairly.
+- Community leaders are obligated to respect the privacy and security of the reporter of any incident.
+
 This Code of Conduct is adapted from the `Contributor Covenant`_, version 2.1.
 
 .. _Contributor Covenant : https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
