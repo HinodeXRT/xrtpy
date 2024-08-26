@@ -8,6 +8,7 @@ New Features
 Documentation Updates
 ---------------------
 - Contributing Information: Updated information for contributing to XRTpy through different avenues such as reporting issues, submitting pull requests, or improving documentation. (:pr:`248`)
+- Code of Conduct: Introduced a Code of Conduct for the XRTpy community, outlining expectations for respectful communication, diversity, inclusion, and enforcement guidelines. (:pr:`278`)
 
 Internal modifications and improvements
 ---------------------------------------
