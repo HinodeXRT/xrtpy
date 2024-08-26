@@ -24,13 +24,19 @@ while avoiding any form of harassment, discrimination, or offensive behavior.
 
 Diversity and Inclusion
 =========================
-XRTpy values diversity and is dedicated to creating an inclusive environment. We welcome contributions from people of all backgrounds, 
+XRTpy values diversity and is dedicated to creating an inclusive environment. We welcome contributions from people of all backgrounds,
 regardless of gender, disability, ethnicity, religion, nationality, sexual orientation, or any other characteristic.
 
 Constructive Criticism
 =========================
 Feedback is essential for the growth and improvement of XRTpy. We encourage everyone to provide and receive feedback in a constructive manner.
 Constructive criticism should be aimed at improving the project and fostering learning. We focus on what is best for the overall community, not just for us as individuals.
+
+Conflict Resolution and Enforcement
+=====================================
+Conflicts are inevitable in any collaborative environment. When they arise, participants are expected to engage in discussions with respect and an open mind. If a conflict cannot be resolved amicably, project maintainers will mediate to ensure a fair and respectful resolution. We are committed to resolving conflicts quickly and fairly, maintaining harmony within the community.
+Violations of this Code of Conduct will not be tolerated. The consequences for such behavior may include warnings, temporary bans, or permanent removal from the project. Community leaders are responsible for enforcing these rules and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+
 
 This Code of Conduct is adapted from the `Contributor Covenant`_, version 2.1.
 
