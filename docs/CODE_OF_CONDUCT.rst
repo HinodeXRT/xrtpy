@@ -32,4 +32,6 @@ Constructive Criticism
 Feedback is essential for the growth and improvement of XRTpy. We encourage everyone to provide and receive feedback in a constructive manner.
 Constructive criticism should be aimed at improving the project and fostering learning. We focus on what is best for the overall community, not just for us as individuals.
 
-This Code of Conduct is adapted from the Contributor Covenant, version 2.1, available at https://www.contributor-covenant.org/version/2/1/code_of_conduct.html.
+This Code of Conduct is adapted from the `Contributor Covenant`_, version 2.1.
+
+.. _Contributor Covenant : https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
