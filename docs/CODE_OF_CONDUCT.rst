@@ -14,7 +14,7 @@ Our Pledge
 ==========
 We, as contributors and maintainers of XRTpy, pledge to make participation in our project and community a harassment-free
 experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of
-experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and
+experience, education, socioeconomic status, nationality, personal appearance, race, religion, or sexual identity and
 orientation.
 
 Respectful Communication
