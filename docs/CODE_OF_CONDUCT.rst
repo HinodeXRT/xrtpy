@@ -30,7 +30,7 @@ regardless of gender, disability, ethnicity, religion, nationality, sexual orien
 Constructive Criticism
 =========================
 Feedback is essential for the growth and improvement of XRTpy. We encourage everyone to provide and receive feedback in a constructive manner.
-Constructive criticism should be aimed at improving the project and fostering learning. We focus on what is best for the overall community, not just for us as individuals.
+Criticism should focus on improving the project and fostering learning, with an emphasis on what is best for the overall community.
 
 Conflict Resolution and Enforcement
 =====================================
@@ -43,6 +43,7 @@ enforcing these rules and taking corrective action as needed.
 
 - Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at xrtpy@cfa.harvard.edu. All complaints will be reviewed and investigated promptly and fairly.
 - Community leaders are obligated to respect the privacy and security of the reporter of any incident.
+
 
 This Code of Conduct is adapted from the `Contributor Covenant`_, version 2.1.
 
