@@ -6,8 +6,6 @@
 XRTpy Code of Conduct
 ********************
 
-XRTpy CODE_OF_CONDUC
-
 Our Pledge
 ==========
 Our Pledge
