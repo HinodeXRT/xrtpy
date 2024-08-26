@@ -34,9 +34,10 @@ Constructive criticism should be aimed at improving the project and fostering le
 
 Conflict Resolution and Enforcement
 =====================================
-Conflicts are inevitable in any collaborative environment. When they arise, participants are expected to engage in discussions with respect and an open mind. If a conflict cannot be resolved amicably, project maintainers will mediate to ensure a fair and respectful resolution. We are committed to resolving conflicts quickly and fairly, maintaining harmony within the community.
-Violations of this Code of Conduct will not be tolerated. The consequences for such behavior may include warnings, temporary bans, or permanent removal from the project. Community leaders are responsible for enforcing these rules and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
-
+Conflicts may arise in any collaborative environment. Participants should engage respectfully and with an open mind.
+If unresolved, project maintainers will mediate to ensure a fair resolution. Violations of this Code of Conduct will result
+in appropriate consequences, including warnings, temporary bans, or permanent removal. Community leaders are responsible for
+enforcing these rules and taking corrective action as needed.
 
 This Code of Conduct is adapted from the `Contributor Covenant`_, version 2.1.
 
