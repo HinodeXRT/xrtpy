@@ -13,11 +13,7 @@ To set up your development environment:
       git clone https://github.com/HinodeXRT/xrtpy.git`
       cd xrtpy
 
-2. Install the required dependencies::
-
-      pip install -r requirements.txt
-
-3. Install the package in editable mode::
+2. Install the package in editable mode::
 
       pip install -e .
 
