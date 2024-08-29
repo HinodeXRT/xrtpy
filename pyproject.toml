@@ -168,6 +168,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["E402", "F401", "F402", "F403"]  # ignore import errors
 "docs/notebooks/computing_functions/temperature_response.ipynb" = ["A001"]  # filter variable shadows Python builtin
+"docs/notebooks/getting_started/A_Practical_Guide_to_Data_Extraction_and_Visualization.ipynb" = ["PTH106", "PTH107", "PTH118"]  # should switch to using pathlib here later
 
 [tool.ruff.lint.flake8-import-conventions.aliases]
 "astropy.units" = "u"
