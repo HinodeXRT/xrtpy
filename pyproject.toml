@@ -93,7 +93,7 @@ Issues = "https://github.com/HinodeXRT/xrtpy/issues"
 Changelog = "https://xrtpy.readthedocs.io/en/stable/changelog/index.html"
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 show-fixes = true
 extend-exclude = [
   ".jupyter",
