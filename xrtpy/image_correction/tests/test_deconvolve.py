@@ -32,7 +32,7 @@ def data_dir():
         ),
     ],
 )
-def test_unbinned(data_dir, observed_file, idl_file, rtol, atol):
+def test_deconvolve(data_dir, observed_file, idl_file, rtol, atol):
     """
     Test deconvolution against IDL results for binned and unbinned cases
     """
