@@ -207,6 +207,13 @@ will be installed.
    be improved or have become out of date, please create an issue on
    `XRTpy's GitHub repository`_. It would really help!
 
+
+.. installation:: sphinx-toolbox
+    :pypi:
+    :anaconda:
+    :conda-channels: conda-forge
+    :github:
+
 .. _Anaconda Navigator: https://www.anaconda.com/products/individual
 .. _clone a repository using SSH: https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-ssh-urls
 .. _conda-forge: https://conda-forge.org

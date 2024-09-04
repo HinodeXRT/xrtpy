@@ -46,6 +46,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_codeautolink",
     "sphinx.ext.viewcode",
+    "sphinx_toolbox.github",
     "sphinx_toolbox.installation",
 ]
 
@@ -222,6 +223,8 @@ for epilog_file in ["_links.rst", "_substitutions.rst"]:
 # Add the nbsphinx_allow_errors option
 nbsphinx_allow_errors = True
 
+github_username = 'HinodeXRT'
+github_repository = 'xrtpy'
 
 def setup(app: Sphinx) -> None:
     app.add_config_value("revision", "", True)  # noqa: FBT003
