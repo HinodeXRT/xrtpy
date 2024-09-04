@@ -23,7 +23,7 @@ def data_dir():
             1e-7,
         ),
         # Case where image is binned, i.e. has chip_sum = 2
-        # Needs higher tolerances because the binned PSF for the IDL and python codes don't match
+        # Needs higher tolerances because the binned PSF for the IDL and Python codes don't match
         (
             "L1_XRT20210730_175810.1.fits",
             "L1_XRT20210730_175810.1_deconv.fits",
