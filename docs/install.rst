@@ -176,19 +176,30 @@ Building and installing
 To install the downloaded version of `xrtpy`, enter the :file:`xrtpy`
 directory and run:
 
-.. code:: bash
+.. code-block:: bash
 
    pip install .
 
 If you expect to occasionally edit the source code, instead run:
 
-.. code:: bash
+.. code-block:: bash
 
+   # For Bash
    pip install -e .[developer]
+
+   # For Zsh
+   pip install -e ".[developer]"
 
 The ``-e`` flag makes the installation editable and ``[developer]``
 indicates that all of the dependencies needed for developing XRTpy
 will be installed.
+
+.. note::
+
+   If you noticed any places where the installation instructions could
+   be improved or have become out of date, please create an issue on
+   `XRTpy's GitHub repository`_. It would really help!
+
 
 .. note::
 

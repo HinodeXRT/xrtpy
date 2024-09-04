@@ -83,17 +83,17 @@ The `Level 1 Data`_ section contains an extensive archive of all Level 1 XRT dat
 Additionally, for users interested in synoptic images, `Level 2 Synoptics`_ data is available, which consists of composite images from the twice-daily synoptic program. These images have been processed and are available in the archive.
 For more detailed information about our XRT data products, please visit the `XRT data products`_ site, where you can find comprehensive data resources and references.
 
-
 .. _Level 1 Data: https://xrt.cfa.harvard.edu/level1/
 .. _Level 2 Synoptics: https://xrt.cfa.harvard.edu/data_products/Level2_Synoptics/
 .. _XRT data products: https://xrt.cfa.harvard.edu/data_products/index.php
 .. _xrt_prep: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
 
-
 X-Ray Filter Channel
 *********************
-The XRT controls filter imaging using two sequentially positioned filter wheels. Refer to Section 3 in the `X-Ray Telescope Instrument Guide`
-in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filters. The existing filters are structured as so:
+
+The XRT controls filter imaging using two sequentially positioned filter wheels, as shown in the diagram below.  Each wheel houses a variety of filters. By rotating these wheels, scientists can select different filters to study the sun in multiple wavelengths, thereby enhancing the resolution and quality of solar images.
+Refer to Section 3 in the `X-Ray Telescope Instrument Guide` in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filters.
+The existing filters are structured as follows:
 
 #. Filter Configuration
     #. Filter position
@@ -122,6 +122,10 @@ in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT filter
     that selects the titanium-on-polyimide filter, then the string would be ``'Ti-poly'``. The process is the same for all XRT
     filter channels.
 
+.. image:: images/XRT_filter_wheels_Sun_View_Diagram.png
+   :alt: Diagram of the XRT Filter Wheels
+   :align: center
+   :scale: 25%
 
 .. _CHIANTI: https://www.chiantidatabase.org/chianti_database_history.html
 .. _SolarSoft XRT Analysis Guide: https://xrt.cfa.harvard.edu/resources/documents/XAG/XAG.pdf
