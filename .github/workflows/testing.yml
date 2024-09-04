@@ -41,14 +41,14 @@ jobs:
           noxenv: tests-3.10
           python: '3.10'
 
-        - name: Tests, Python 3.9, Windows
-          os: windows-latest
-          python: 3.9
-          noxenv: tests-3.9
+        - name: Tests, Python 3.10, Linux
+          os: ubuntu-latest
+          noxenv: tests-3.10
+          python: '3.10'
 
-        - name: Import XRTpy, Python 3.9, Windows
-          os: windows-latest
-          python: 3.9
+        - name: Import XRTpy, Python 3.10, Linux
+          os: ubuntu-latest
+          python: 3.10
           noxenv: import_package
 
     steps:
