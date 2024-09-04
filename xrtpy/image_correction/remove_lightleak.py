@@ -206,11 +206,9 @@ def remove_lightleak(in_map, scale=1.0, leak_map=None):
         warnings.warn("HISTORY indicates light leak subtraction already done on image.")  # noqa: B028
 
     if leak_map is None:
-        fw1 = in_map.meta['EC_FW1_']
-        fw2 = in_map.meta['EC_FW2_']
-        leak_filename = _select_lightleak_file(
-            fw1, fw2, in_map.date
-        )
+        fw1 = in_map.meta["EC_FW1_"]
+        fw2 = in_map.meta["EC_FW2_"]
+        leak_filename = _select_lightleak_file(fw1, fw2, in_map.date)
 
         # NOTE: This function is being defined inline because the filename is only known once
         # the date and filter wheel combination are known.
