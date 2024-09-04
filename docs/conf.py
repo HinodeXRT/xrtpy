@@ -46,6 +46,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_codeautolink",
     "sphinx.ext.viewcode",
+    "sphinx_toolbox.installation",
 ]
 
 bibtex_bibfiles = ["bibliography.bib"]

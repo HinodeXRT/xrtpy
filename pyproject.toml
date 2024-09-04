@@ -79,6 +79,7 @@ docs = [
   "sphinx-gallery >= 0.16.0",
   "sphinx-hoverxref >= 1.4.0",
   "sphinx-issues >= 4.1.0",
+  "sphinx-toolbox >= 3.8.0",
   "sphinx_automodapi >= 0.17.0",
   "sphinx_rtd_theme >= 2.0.0",
   "sphinxcontrib-bibtex >= 2.6.2",
