@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
@@ -63,7 +64,9 @@ def _IDL_temperature_response_raw_data(filename):
 
 
 @pytest.mark.parametrize("abundance_model", ["coronal", "hybrid", "photospheric"])
-def test_temperature_response(abundance_model, allclose):
+def test_temperature_response(
+    abundance_model,
+):
     filenames = get_IDL_data_files(abundance_model)
     for filename in filenames:
         IDL_data = _IDL_raw_data_list(filename)
@@ -78,7 +81,7 @@ def test_temperature_response(abundance_model, allclose):
         actual_temperature_response = instance.temperature_response()
         atol = actual_temperature_response.value.max() * 0.013
 
-        assert allclose(
+        assert np.allclose(
             actual_temperature_response.value,
             IDL_temperature_response,
             rtol=0.028,
