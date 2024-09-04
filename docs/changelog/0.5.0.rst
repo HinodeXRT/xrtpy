@@ -20,5 +20,5 @@ Internal modifications and improvements
 
 Miscellaneous
 -------------
-- SunPy Installation Requirement: Added SunPy as an installation requirement for XRTpy. (:pr:`247`)
+- sunpy Installation Requirement: Added sunpy as an installation requirement for XRTpy. (:pr:`247`)
 - Installation Instructions Update: Updated installation instructions to differentiate between the use of Bash or Zsh for XRTpy installation. (:pr:`251`)
