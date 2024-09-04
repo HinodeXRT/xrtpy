@@ -115,9 +115,8 @@ def test_effective_area_compare_idl(filename):
     IDL_effective_area = np.loadtxt(filename, skiprows=3)[:, 1] * u.cm**2
     instance = EffectiveAreaFundamental(filter_name, filter_obs_date)
     actual_effective_area = instance.effective_area()
-    i_valid = np.where(IDL_effective_area >= IDL_effective_area.max() * 1e-2)
     assert u.allclose(
-        actual_effective_area[i_valid],
-        IDL_effective_area[i_valid],
+        actual_effective_area,
+        IDL_effective_area,
         atol=1e-2 * u.cm**2,
     )
