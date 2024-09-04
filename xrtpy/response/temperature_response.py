@@ -41,7 +41,7 @@ _abundance_model_data = {
     )["p0"],
 }
 
-list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
+_list_of_abundance_name = ["coronal", "hybrid", "photospheric"]
 
 
 def _resolve_abundance_model_type(abundance_model):
@@ -49,7 +49,7 @@ def _resolve_abundance_model_type(abundance_model):
     if not isinstance(abundance_model, str):
         raise TypeError("Abundance model name must be a string")
     abundance_name = abundance_model.lower()
-    if abundance_name not in list_of_abundance_name:
+    if abundance_name not in _list_of_abundance_name:
         raise ValueError(
             f"\n{abundance_name} is not a current abundance model for XRTpy.\n"
             "Available abundance models:\n"
@@ -62,9 +62,20 @@ class TemperatureResponseFundamental:
     """Produce the temperature response for each XRT x-ray channel, assuming a spectral emission model."""
 
     def __init__(self, filter_name, observation_date, abundance_model="coronal"):
+        """
+        Initialize the TemperatureResponseFundamental class.
+
+        Parameters
+        ----------
+        filter_name : str
+            The name of the filter.
+        observation_date : str or date-time object
+            The date of the observation.
+        abundance_model : str, optional
+            The abundance model to use. Options are 'coronal' (default), 'hybrid', and 'photospheric'. Default abundance model is coronal.
+        """
         self._name = resolve_filter_name(filter_name)
         self._channel = Channel(self.filter_name)
-        # self.observation_date = self.observation_date
         self._abundance_model = _resolve_abundance_model_type(abundance_model)
         self._effective_area_fundamental = EffectiveAreaFundamental(
             self._name, observation_date
@@ -86,13 +97,19 @@ class TemperatureResponseFundamental:
         return self._effective_area_fundamental.observation_date
 
     @property
-    def get_abundance_data(self):
-        """Returning the requested abundance data that is used to calculate the temperature response."""
+    def _get_abundance_data(self):
+        """
+        Return the requested abundance data used to calculate the temperature response.
+
+        Returns
+        -------
+        dict
+            A dictionary containing the abundance model data.
+        """
         abundance_type_name = self.abundances
         data = _abundance_model_data[abundance_type_name]
-        if abundance_type_name not in list_of_abundance_name:
-            ValueError("Unable to process data. ")
-
+        if abundance_type_name not in _list_of_abundance_name:
+            raise ValueError("Unable to process data.")
         return {
             "abundance_model_info": data["ABUND_MODEL"][0],
             "dens_model": data["DENS_MODEL"][0],
@@ -111,39 +128,39 @@ class TemperatureResponseFundamental:
     @property
     def chianti_abundance_version(self):
         """Version of the chianti abundance model."""
-        return self.get_abundance_data["name"]
+        return self._get_abundance_data["name"]
 
     @property
     def abundance_model_information(self):
-        """A brief description of what abundance model was used in the creation of the emission spectra."""
-        return self.get_abundance_data["abundance_model_info"]
+        """A brief description of the abundance model used in the creation of the emission spectra."""
+        return self._get_abundance_data["abundance_model_info"]
 
     @property
     def density_model(self):
-        """A brief description of the plasma density, emission measure,or differential emission measure that was used in the creation of the emission spectra."""
-        return self.get_abundance_data["dens_model"]
+        """A brief description of the plasma density, emission measure, or differential emission measure used in the creation of the emission spectra."""
+        return self._get_abundance_data["dens_model"]
 
     @property
     def ionization_model(self):
-        """A brief description of that ionization equilibrium model was used in the creation of the emission spectra."""
-        return self.get_abundance_data["ioneq_model"]
+        """A brief description of the ionization equilibrium model used in the creation of the emission spectra."""
+        return self._get_abundance_data["ioneq_model"]
 
     @property
     @u.quantity_input
     def CHIANTI_temperature(self):
         """Emission model temperatures in kelvin."""
-        return u.Quantity(self.get_abundance_data["temperature"] * u.K)
+        return u.Quantity(self._get_abundance_data["temperature"] * u.K)
 
     @property
     def file_spectra(self):
         """Emission model file spectra."""
-        return self.get_abundance_data["spectra"][0]
+        return self._get_abundance_data["spectra"][0]
 
     @property
     @u.quantity_input
     def wavelength(self):
         """Emission model file wavelength values in Å."""
-        return u.Quantity(self.get_abundance_data["wavelength"] * u.Angstrom)
+        return u.Quantity(self._get_abundance_data["wavelength"] * u.Angstrom)
 
     @property
     @u.quantity_input
@@ -171,12 +188,19 @@ class TemperatureResponseFundamental:
     @property
     @u.quantity_input
     def solid_angle_per_pixel(self) -> u.sr / u.pix:
-        """This quantity represents the solid angle, which is given in units of steradians over pixel."""
+        """This amount represents the solid angle, which is given in units of steradians over pixel."""
         return (self.pixel_size / self.focal_len) ** 2 * (u.sr / u.pix)
 
     @u.quantity_input
     def spectra(self) -> u.photon * u.cm**3 / (u.sr * u.s * u.Angstrom):
-        """Interpolation between the spectra wavelength onto the channel wavelength."""
+        """
+        Interpolation between the spectra wavelength onto the channel wavelength.
+
+        Returns
+        -------
+        numpy.ndarray
+            Interpolated spectra values.
+        """
         spectra_interpolate = []
         for i in range(61):
             interpolater = interpolate.interp1d(
@@ -191,11 +215,26 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        # return effective_area(self.filter_name, self.observation_date)
+        """
+        Calculate the effective area.
+
+        Returns
+        -------
+        astropy.units.Quantity
+            Effective area in cm^2.
+        """
         return self._effective_area_fundamental.effective_area()
 
     @u.quantity_input
     def integration(self) -> u.electron * u.cm**5 / (u.s * u.pix):
+        """
+        Perform the integration of the temperature response.
+
+        Returns
+        -------
+        astropy.units.Quantity
+            Integrated temperature response in electron cm^5 / (s pix).
+        """
         wavelength = (self.channel_wavelength).value
         constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
         factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
@@ -220,5 +259,13 @@ class TemperatureResponseFundamental:
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):
+        """
+        Apply gain value to the Temperature Response.
+
+        Returns
+        -------
+        astropy.units.Quantity
+            Temperature response in DN cm^5 / (s pix).
+        """
         r"""Apply gain value to the Temperature Response in units of DN cm\ :sup:`5` s\ :sup:`-1` pix\ :sup:`-1`."""
         return self.integration() / self.ccd_gain_right

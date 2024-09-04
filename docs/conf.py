@@ -74,6 +74,10 @@ source_suffix = ".rst"
 # The root toctree document.
 root_doc = "index"
 
+# -- nbsphinx configuration --------------------------------------------------
+
+nbsphinx_allow_errors = True  # Allow errors in Jupyter notebooks
+
 # -- Options for intersphinx extension ---------------------------------------
 
 intersphinx_mapping = {
@@ -135,6 +139,9 @@ nbsphinx_thumbnails = {
     "notebooks/getting_started/units": (
         "_static/notebook_images/astropy_logo_notext.png"
     ),  # CC BY-SA
+    "notebooks/getting_started/A_Practical_Guide_to_Data_Extraction_and_Visualization": (
+        "_static/notebook_images/hinode_satellite.png"
+    ),
 }
 
 # adapted from sphinx-hoverxref conf.py
@@ -210,6 +217,9 @@ rst_epilog = ""
 for epilog_file in ["_links.rst", "_substitutions.rst"]:
     with open(epilog_file) as file:  # noqa: PTH123
         rst_epilog += file.read()
+
+# Add the nbsphinx_allow_errors option
+nbsphinx_allow_errors = True
 
 
 def setup(app: Sphinx) -> None:

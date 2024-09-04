@@ -7,7 +7,6 @@ Contributor Guide
 .. toctree::
    :maxdepth: 3
 
-   install_dev
-   workflow
-   data_from_idl
+   contributing
+   installation_for_development
    release_guide

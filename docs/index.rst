@@ -27,6 +27,7 @@ for the analysis of observations made by the `X-Ray Telescope`_ (XRT)
    glossary
    changelog/index
    feedback_communication
+   CODE_OF_CONDUCT
    contributing/index
 
 Indices and tables
