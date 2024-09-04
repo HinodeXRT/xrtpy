@@ -8,7 +8,7 @@ from sunpy.map import Map
 from xrtpy.image_correction.deconvolve import deconvolve
 
 
-@pytest.fixture()
+@pytest.fixture
 def data_dir():
     return Path(get_pkg_data_path("data", package="xrtpy.image_correction.tests"))
 
