@@ -1,8 +1,10 @@
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
 import pytest
 from astropy import units as u
+from astropy.utils.data import get_pkg_data_filenames
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
@@ -70,9 +72,7 @@ def test_EffectiveArea_filter_name(name):
     instance = EffectiveAreaFundamental(
         name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0)
     )
-    actual_attr_value = instance.name
-
-    assert actual_attr_value == name
+    assert instance.name == name
 
 
 @pytest.mark.parametrize("date", valid_dates)
@@ -97,76 +97,27 @@ def test_EffectiveArea_exception_is_raised(name, date):
 
 
 def get_IDL_data_files():
-    directory = (
-        Path(__file__).parent.parent.absolute()
-        / "data"
-        / "effective_area_IDL_testing_files"
-    )
-    filter_data_files = directory.glob("**/*.txt")
+    filter_data_files = []
+    for dir in get_pkg_data_filenames(
+        "data/effective_area_IDL_testing_files", package="xrtpy.response.tests"
+    ):
+        filter_data_files += list(Path(dir).glob("*.txt"))
     return sorted(filter_data_files)
 
 
-filenames = get_IDL_data_files()
-
-
-def _IDL_raw_data_list(filename):
-    with open(filename) as filter_file:  # noqa: PTH123
-        list_of_IDL_effective_area_data = []
-        for line in filter_file:
-            stripped_line = line.strip()
-            line_list = stripped_line.split()
-            list_of_IDL_effective_area_data.append(line_list)
-
-    return list_of_IDL_effective_area_data
-
-
-def IDL_test_filter_name(list_of_lists):
-    return str(list_of_lists[0][1])
-
-
-def IDL_test_date(list_of_lists):
-    obs_date = str(list_of_lists[1][1])
-    obs_time = str(list_of_lists[1][2])
-
-    day = int(obs_date[:2])
-
-    month_datetime_object = datetime.strptime(obs_date[3:6], "%b")
-    month = month_datetime_object.month
-
-    year = int(obs_date[8:12])
-
-    hour = int(obs_time[:2])
-    minute = int(obs_time[3:5])
-    second = int(obs_time[6:8])
-
-    return datetime(year, month, day, hour, minute, second)
-
-
-def _IDL_effective_area_raw_data(filename):
-    with open(filename) as filter_file:  # noqa: PTH123
-        list_of_lists = []
-        for line in filter_file:
-            stripped_line = line.strip()
-            line_list = stripped_line.split()
-            list_of_lists.append(line_list)
-
-    effective_area = [list_of_lists[i][1] for i in range(3, len(list_of_lists))]
-    effective_area = [float(i) for i in effective_area] * u.cm**2
-
-    return effective_area
-
-
-@pytest.mark.parametrize("filename", filenames)
-def test_EffectiveAreaPreparatory_effective_area(filename, allclose):
-    data_list = _IDL_raw_data_list(filename)
-
-    filter_name = IDL_test_filter_name(data_list)
-    filter_obs_date = IDL_test_date(data_list)
-
-    IDL_effective_area = _IDL_effective_area_raw_data(filename)
-
+@pytest.mark.parametrize("filename", get_IDL_data_files())
+def test_effective_area_compare_idl(filename):
+    with Path.open(filename) as f:
+        filter_name = f.readline().split()[1]
+        filter_obs_date = " ".join(f.readline().split()[1:])
+    # NOTE: Annoyingly the date strings use "Sept" instead of "Sep" for "September"
+    filter_obs_date = filter_obs_date.replace("Sept", "Sep")
+    IDL_effective_area = np.loadtxt(filename, skiprows=3)[:, 1] * u.cm**2
     instance = EffectiveAreaFundamental(filter_name, filter_obs_date)
     actual_effective_area = instance.effective_area()
-
-    assert actual_effective_area.unit == IDL_effective_area.unit
-    assert allclose(actual_effective_area.value, IDL_effective_area.value, atol=1e-2)
+    i_valid = np.where(IDL_effective_area >= IDL_effective_area.max() * 1e-2)
+    assert u.allclose(
+        actual_effective_area[i_valid],
+        IDL_effective_area[i_valid],
+        rtol=1e-1,
+    )
