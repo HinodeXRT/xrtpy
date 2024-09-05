@@ -1,6 +1,10 @@
 XRTpy v0.5.0 (2024-06-21)
 =========================
 
+Deprecations and Removals
+-------------------------
+- Dropped support for Python 3.9. (:pr:`281`)
+
 New Features
 ------------
 - New Example Notebook: Introduced a new example notebook titled "Hinode-XRT: A Practical Guide to Data Extraction and Visualization." This notebook provides a step-by-step guide on how to download, process, and visualize solar observation data from the Hinode X-Ray Telescope, making it accessible for research and analysis. (:pr:`210`)
