@@ -42,7 +42,7 @@ def get_composite_data_files():
 composite_filenames = get_composite_data_files()
 
 # Using zip as an iterator to pair the data files together. Trouble-free method to use in pytest-parametrize
-data_files = list(zip(IDL_filenames, composite_filenames))
+data_files = list(zip(IDL_filenames, composite_filenames, strict=False))
 
 
 @pytest.mark.parametrize(("idlfile", "compfile"), data_files)
