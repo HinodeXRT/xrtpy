@@ -73,7 +73,9 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
             )
             medium_exp_urlpath = filename2repo_path(medium_exp_qualpath, join=True)
             logging.info(f"medium exp. url: {medium_exp_urlpath}")
-            medium_exp_qualpath = download_file(medium_exp_urlpath)
+            medium_exp_qualpath = download_file(
+                medium_exp_urlpath, allow_insecure=True
+            )
         else:
             medium_exp_qualpath = Path(qualfiles[0])
     else:
@@ -87,7 +89,9 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
             long_exp_filename.stem + ".qual" + long_exp_filename.suffix
         )
         long_exp_urlpath = filename2repo_path(long_exp_qualpath, join=True)
-        long_exp_qualpath = download_file(long_exp_urlpath)
+        long_exp_qualpath = download_file(
+            long_exp_urlpath, allow_insecure=True
+        )
     else:
         if triple:
             long_exp_qualpath = Path(qualfiles[1])
