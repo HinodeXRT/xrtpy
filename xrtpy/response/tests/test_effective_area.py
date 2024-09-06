@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
 import pytest
 from astropy import units as u
 
@@ -92,7 +93,7 @@ def test_EffectiveArea_contamination_on_filter(name, date):
 @pytest.mark.parametrize("date", invalid_dates)
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_exception_is_raised(name, date):
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match="Invalid date"):
         EffectiveAreaFundamental(name, date)
 
 
@@ -110,7 +111,7 @@ filenames = get_IDL_data_files()
 
 
 def _IDL_raw_data_list(filename):
-    with open(filename) as filter_file:  # noqa: PTH123
+    with Path(filename).open() as filter_file:
         list_of_IDL_effective_area_data = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -143,7 +144,7 @@ def IDL_test_date(list_of_lists):
 
 
 def _IDL_effective_area_raw_data(filename):
-    with open(filename) as filter_file:  # noqa: PTH123
+    with Path(filename).open() as filter_file:
         list_of_lists = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -157,7 +158,7 @@ def _IDL_effective_area_raw_data(filename):
 
 
 @pytest.mark.parametrize("filename", filenames)
-def test_EffectiveAreaPreparatory_effective_area(filename, allclose):
+def test_EffectiveAreaPreparatory_effective_area(filename):
     data_list = _IDL_raw_data_list(filename)
 
     filter_name = IDL_test_filter_name(data_list)
@@ -169,4 +170,6 @@ def test_EffectiveAreaPreparatory_effective_area(filename, allclose):
     actual_effective_area = instance.effective_area()
 
     assert actual_effective_area.unit == IDL_effective_area.unit
-    assert allclose(actual_effective_area.value, IDL_effective_area.value, atol=1e-2)
+    np.testing.assert_allclose(
+        actual_effective_area.value, IDL_effective_area.value, atol=1e-2
+    )

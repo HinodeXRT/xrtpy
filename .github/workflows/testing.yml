@@ -43,7 +43,7 @@ jobs:
 
         - name: Tests, Python 3.10, Linux
           os: ubuntu-latest
-          noxenv: tests-3.10
+          noxenv: tests
           python: '3.10'
 
         - name: Import XRTpy, Python 3.10, Linux
@@ -109,4 +109,4 @@ jobs:
         pandoc --version
 
     - name: Build documentation
-      run: nox -s docs -- -q
+      run: nox -s docs
