@@ -21,7 +21,7 @@ IDL_filenames = sorted(
 
 
 @pytest.mark.parametrize(
-    ("idlfile", "compfile"), list(zip(IDL_filenames, composite_filenames))
+    ("idlfile", "compfile"), list(zip(IDL_filenames, composite_filenames, strict=True))
 )
 def test_lightleak(idlfile, compfile):
     IDL_map = Map(idlfile)
