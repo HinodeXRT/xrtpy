@@ -11,6 +11,7 @@ from pathlib import Path
 
 import astropy.time
 import numpy as np
+import scipy.interpolate
 import scipy.io
 import sunpy.io.special
 import sunpy.time
@@ -523,29 +524,34 @@ class EffectiveAreaFundamental:
         return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
 
     @property
-    def channel_wavelength(self):
+    def wavelength(self):
         """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
-        return Channel(self.name).wavelength
+        _wave = self._channel.wavelength.to_value("AA")
+        delta_wave = 0.01
+        return np.arange(_wave[0], _wave[-1], delta_wave) * u.Angstrom
 
     @property
     def channel_geometry_aperture_area(self):
         """XRT flight model geometry aperture area."""
-        return Channel(self.name).geometry.geometry_aperture_area
+        return self._channel.geometry.geometry_aperture_area
 
     @property
     def channel_transmission(self):
         """XRT channel transmission."""
-        return Channel(self.name).transmission
+        return np.interp(
+            self.wavelength, self._channel.wavelength, self._channel.transmission
+        )
+
+    def _contamination_interpolator(self, x, y):
+        return np.interp(self.wavelength.to_value("Angstrom"), x, y)
 
     @property
     def _interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        CCD_contam_transmission = np.interp(
-            self.channel_wavelength.to_value("AA"),
+        return self._contamination_interpolator(
             self.n_DEHP_wavelength,
             self._CCD_contamination_transmission,
         )
-        return CCD_contam_transmission
 
     @cached_property
     def _filter_contamination_transmission(self):
@@ -587,12 +593,10 @@ class EffectiveAreaFundamental:
     @property
     def _interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        Filter_contam_transmission = np.interp(
-            self.channel_wavelength.to_value("AA"),
+        return self._contamination_interpolator(
             self.n_DEHP_wavelength,
             self._filter_contamination_transmission,
         )
-        return Filter_contam_transmission
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:

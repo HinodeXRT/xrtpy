@@ -105,6 +105,11 @@ def get_IDL_data_files():
     return sorted(filter_data_files)
 
 
+# NOTE: This is marked as xfail because the IDL results that this test compares against
+# are incorrect due to the use of quadratic interpolation in the contamination curves
+# which leads to ringing near the edges in the contamination curve.
+# See https://github.com/HinodeXRT/xrtpy/pull/284#issuecomment-2334503108
+@pytest.mark.xfail
 @pytest.mark.parametrize("filename", get_IDL_data_files())
 def test_effective_area_compare_idl(filename):
     with Path.open(filename) as f:
@@ -112,11 +117,16 @@ def test_effective_area_compare_idl(filename):
         filter_obs_date = " ".join(f.readline().split()[1:])
     # NOTE: Annoyingly the date strings use "Sept" instead of "Sep" for "September"
     filter_obs_date = filter_obs_date.replace("Sept", "Sep")
-    IDL_effective_area = np.loadtxt(filename, skiprows=3)[:, 1] * u.cm**2
+    IDL_data = np.loadtxt(filename, skiprows=3)
+    IDL_wavelength = IDL_data[:, 0] * u.AA
+    IDL_effective_area = IDL_data[:, 1] * u.cm**2
     instance = EffectiveAreaFundamental(filter_name, filter_obs_date)
     actual_effective_area = instance.effective_area()
+    IDL_effective_area = np.interp(
+        instance.wavelength, IDL_wavelength, IDL_effective_area
+    )
     assert u.allclose(
         actual_effective_area,
         IDL_effective_area,
-        atol=1e-2 * u.cm**2,
+        rtol=1e-6,
     )
