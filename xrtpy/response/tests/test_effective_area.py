@@ -1,7 +1,6 @@
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
 import pytest
 from astropy import units as u
 
@@ -111,7 +110,7 @@ filenames = get_IDL_data_files()
 
 
 def _IDL_raw_data_list(filename):
-    with Path(filename).open() as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         list_of_IDL_effective_area_data = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -144,7 +143,7 @@ def IDL_test_date(list_of_lists):
 
 
 def _IDL_effective_area_raw_data(filename):
-    with Path(filename).open() as filter_file:
+    with open(filename) as filter_file:  # noqa: PTH123
         list_of_lists = []
         for line in filter_file:
             stripped_line = line.strip()
@@ -158,7 +157,7 @@ def _IDL_effective_area_raw_data(filename):
 
 
 @pytest.mark.parametrize("filename", filenames)
-def test_EffectiveAreaPreparatory_effective_area(filename):
+def test_EffectiveAreaPreparatory_effective_area(filename, allclose):
     data_list = _IDL_raw_data_list(filename)
 
     filter_name = IDL_test_filter_name(data_list)
@@ -170,6 +169,4 @@ def test_EffectiveAreaPreparatory_effective_area(filename):
     actual_effective_area = instance.effective_area()
 
     assert actual_effective_area.unit == IDL_effective_area.unit
-    np.testing.assert_allclose(
-        actual_effective_area.value, IDL_effective_area.value, atol=1e-2
-    )
+    assert allclose(actual_effective_area.value, IDL_effective_area.value, atol=1e-2)

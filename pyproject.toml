@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
-  "setuptools>=62.1,!=71.0.1",
-  "setuptools_scm[toml]>=6.2",
-  "wheel>=0.34",
+  "setuptools >=62.1 , != 71.0.1",
+  "setuptools_scm[toml] >=6.2",
+  "wheel >=0.34",
 ]
 
 [project]
@@ -33,17 +33,17 @@ authors = [
   {name = "Jonathan Slavin", email = "jslavin@cfa.harvard.edu"},
   {name = "Nick Murpy", email="namurphy@cfa.harvard.edu"},
   {name = "Will Barnes"},
-  {name = "Nabil Freij"},
+  {name = "Nabil Freij", email="nabil.freij@gmail.com"},
   {name = "Stuart Mumford"},
 ]
 
 dependencies = [
   "astropy >= 5.3.0",
   "matplotlib >= 3.5.0",
-  "numpy>=1.23.5",
+  "numpy >=1.23.5",
   "scikit-image >= 0.19.0",
   # !=1.10.0 due to https://github.com/scipy/scipy/issues/17718
-  "scipy>=1.9.0,!=1.10.0",
+  "scipy >= 1.9.0 , != 1.10.0",
   "sunpy[map] >= 5.0.0",
 ]
 
@@ -53,7 +53,7 @@ dev = [
   "nox >= 2022.8.7",
 ]
 tests = [
-  "pytest >= 8.0.0",
+  "pytest-allclose >= 1.0.0",
   "pytest-astropy",
 ]
 docs = [

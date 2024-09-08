@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import numpy as np
 import pytest
 from sunpy.map import Map
 
@@ -47,7 +46,7 @@ data_files = list(zip(IDL_filenames, composite_filenames, strict=False))
 
 
 @pytest.mark.parametrize(("idlfile", "compfile"), data_files)
-def test_lightleak(idlfile, compfile):
+def test_lightleak(idlfile, compfile, allclose):
     IDL_map = Map(idlfile)
     input_map = Map(compfile)
 
@@ -57,6 +56,6 @@ def test_lightleak(idlfile, compfile):
         # Because of rebinning for full resolution images, the match is worse
         # between IDL created images and XRTpy ones. IDL's method of rebinning
         # is different from that used by sunpy.
-        np.testing.assert_allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=0.75)
+        assert allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=0.75)
     else:
-        np.testing.assert_allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=1e-5)
+        assert allclose(ll_removed_map_xrtpy.data, IDL_map.data, atol=1e-5)
