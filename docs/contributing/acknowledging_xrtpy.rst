@@ -1,8 +1,8 @@
 .. _citation_guide:
 
-=======================================
+==========================================
 Citing XRTpy in Publications and Presentations
-=======================================
+==========================================
 
 If XRTpy has been useful in your research, we encourage you to consider including a citation or acknowledgment in your work. Below are suggested formats to credit XRTpy in your scientific papers, posters, or presentations. While this is not required, it is greatly appreciated.
 
