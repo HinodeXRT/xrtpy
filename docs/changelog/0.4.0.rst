@@ -3,17 +3,22 @@ XRTpy v0.4.0 (2023-10-10)
 
 Deprecations and Removals
 -------------------------
+
 - Remove the light-leak files from the repository in favor of pulling them from one of two possible SolarSoft mirrors with the goal of reducing the total repository size. (:pr:`178,180`)
 
 Documentation
 -------------
+
 - Updated Python example notebooks to ensure a user-friendly and accessible experience. (:pr:`164`)
 - Revised and improved all text/documentation sections of XRTpy to ensure accuracy, clarity, and completeness. (:pr:`165`)
 
 Internal modifications and improvements
 ---------------------------------------
-- Modified `~xrtpy.response.xrt_deconvolve` to use the Sunpy data manager to download the data files. (:pr:`172`)
+
+- Modified ``xrtpy.response.xrt_deconvolve`` to use the Sunpy data manager to download the data files. (:pr:`172`)
 - Updated the Read the Docs configuration file. (:pr:`173`)
 - Removed psf files after a new improvement in downloading them as part of the XRTpy package. (:pr:`177`)
-- Updated the `xrt_contam_on_ccd.geny` file with new CCD contamination values. (:pr:`191`)
-- Moved `xrt_deconvolve` and `xrt_remove_lightleak` from the `util` directory to a new directory named `image_correction`, and removed the `xrt_` prefix from their names. Renamed `xrt_teem` to `temperature_from_filter_ratio`.  Updated all tests and notebooks to reflect the name and directory changes. (:pr:`196`)
+- Updated the ``xrt_contam_on_ccd.geny`` file with new CCD contamination values. (:pr:`191`)
+- Moved ``xrt_deconvolve`` and ``xrt_remove_lightleak`` from the ``util`` directory to a new directory named ``image_correction``, and removed the ``xrt_`` prefix from their names.
+  Renamed ``xrt_teem`` to ``temperature_from_filter_ratio``.
+  Updated all tests and notebooks to reflect the name and directory changes. (:pr:`196`)

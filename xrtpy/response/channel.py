@@ -1,5 +1,12 @@
 """Classes for describing channels on Hinode/XRT."""
 
+from pathlib import Path
+
+import numpy as np
+import sunpy.io.special
+import sunpy.time
+from astropy import units as u
+
 __all__ = [
     "Geometry",
     "EntranceFilter",
@@ -9,15 +16,6 @@ __all__ = [
     "Channel",
     "resolve_filter_name",
 ]
-
-from pathlib import Path
-
-import numpy as np
-import sunpy.io.special
-import sunpy.time
-from astropy import units as u
-
-filename = Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
 
 _channel_name_to_index_mapping = {
     "Al-mesh": 0,
@@ -35,9 +33,9 @@ _channel_name_to_index_mapping = {
     "Al-poly/Be-thick": 12,
     "C-poly/Ti-poly": 13,
 }
-
-
-_genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
+_genx_file = sunpy.io.special.genx.read_genx(
+    Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
+)["SAVEGEN0"]
 
 
 def resolve_filter_name(name):

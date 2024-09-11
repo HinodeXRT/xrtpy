@@ -1,117 +1,57 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
+"""
+Configuration file for the Sphinx documentation builder.
+"""
 
+# -- stdlib imports ------------------------------------------------------------
 import os
-from datetime import datetime
+import warnings
+from datetime import UTC, datetime
+from pathlib import Path
 
-from sphinx.application import Sphinx
+from packaging.version import Version
 
-# -- Project information -----------------------------------------------------
+# -- Read the Docs Specific Configuration --------------------------------------
+# This needs to be done before xrtpy is imported
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+if on_rtd:
+    os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
+    os.environ["HOME"] = "/home/docs/"
+    os.environ["LANG"] = "C"
+    os.environ["LC_ALL"] = "C"
+    os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
 
+# -- Imports -------------------------------------------------------------------
+from astropy.utils.exceptions import AstropyDeprecationWarning  # NOQA: E402
+from matplotlib import MatplotlibDeprecationWarning  # NOQA: E402
+from sunpy.util.exceptions import (  # NOQA: E402
+    SunpyDeprecationWarning,
+    SunpyPendingDeprecationWarning,
+)
+
+# -- Project information -------------------------------------------------------
 project = "xrtpy"
 author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
-copyright = f"2021–{datetime.utcnow().year}, {author}"
+copyright = f"2021-{datetime.now(tz=UTC).year}, {author}"
 
 # The full version, including alpha/beta/rc tags
-# from xrtpy import __version__
-# release = __version__
+from xrtpy import __version__  # NOQA: E402
 
-release = "0.4.0"
-
+_version_ = Version(__version__)
+# NOTE: Avoid "post" appearing in version string in rendered docs
+if _version_.is_postrelease:
+    version = release = f"{_version_.major}.{_version_.minor}.{_version_.micro}"
+else:
+    version = release = str(_version_)
+is_development = _version_.is_devrelease
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
-extensions = [
-    "sphinx_automodapi.automodapi",
-    "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.graphviz",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.todo",
-    "nbsphinx",
-    "sphinx_changelog",
-    "sphinx_copybutton",
-    "sphinx_gallery.load_style",
-    "IPython.sphinxext.ipython_console_highlighting",
-    "sphinx_changelog",
-    "sphinx_issues",
-    "sphinxcontrib.bibtex",
-    "hoverxref.extension",
-    "sphinx_copybutton",
-    "sphinx_codeautolink",
-    "sphinx.ext.viewcode",
-]
+# We want to make sure all the following warnings fail the build
+warnings.filterwarnings("error", category=SunpyDeprecationWarning)
+warnings.filterwarnings("error", category=SunpyPendingDeprecationWarning)
+warnings.filterwarnings("error", category=MatplotlibDeprecationWarning)
+warnings.filterwarnings("error", category=AstropyDeprecationWarning)
 
-bibtex_bibfiles = ["bibliography.bib"]
-bibtex_default_style = "plain"
-bibtex_reference_style = "author_year"
-bibtex_cite_id = "{key}"
-
-# Add any paths that contain templates here, relative to this directory.
-# templates_path = ['_templates']
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [
-    ".DS_Store",
-    "_build",
-    "_links.rst",
-    "_substitutions.rst",
-    "Thumbs.db",
-]
-
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-source_suffix = ".rst"
-
-# The root toctree document.
-root_doc = "index"
-
-# -- nbsphinx configuration --------------------------------------------------
-
-nbsphinx_allow_errors = True  # Allow errors in Jupyter notebooks
-
-# -- Options for intersphinx extension ---------------------------------------
-
-intersphinx_mapping = {
-    "astropy": ("https://docs.astropy.org/en/stable/", None),
-    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "python": ("https://docs.python.org/3", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
-    "sunpy": ("https://docs.sunpy.org/en/stable/", None),
-}
-
-hoverxref_intersphinx = [
-    "astropy",
-    "ndcube",
-    "numpy",
-    "python",
-    "scipy",
-    "sunpy",
-]
-
-autoclass_content = "both"
-autodoc_typehints_format = "short"
-
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-html_theme = "sphinx_rtd_theme"
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
-
+# For the linkcheck
 linkcheck_allowed_redirects = {
     r"https://doi\.org/.+": r"https://.+",  # DOI links are more persistent
     r"https://docs.+\.org": r"https://docs.+\.org/en/.+",
@@ -123,53 +63,158 @@ linkcheck_allowed_redirects = {
     r"https://pip\.pypa\.io": r"https://pip\.pypa\.io/en/.+",
     r"https://www.python.org/dev/peps/pep.+": "https://peps.python.org/pep.+",
 }
-
 linkcheck_anchors = True
-linkcheck_anchors_ignore = [
-    "/room",
-    r".+openastronomy.+",
-    "L[0-9].+",
-    "!forum/plasmapy",
+linkcheck_anchors_ignore = []
+
+# sphinxext-opengraph
+ogp_image = "https://raw.githubusercontent.com/HinodeXRT/xrtpy/main/docs/_static/images/XRTpy_logo.png"
+ogp_use_first_image = True
+ogp_description_length = 160
+ogp_custom_meta_tags = [
+    '<meta property="og:ignore_canonical" content="true" />',
 ]
 
-# Use a code highlighting style that meets the WCAG AA contrast standard
-pygments_style = "default"
+# Suppress warnings about overriding directives as we overload some of the
+# doctest extensions.
+suppress_warnings = [
+    "app.add_directive",
+]
 
-nbsphinx_thumbnails = {
-    "notebooks/getting_started/units": (
-        "_static/notebook_images/astropy_logo_notext.png"
-    ),  # CC BY-SA
-    "notebooks/getting_started/A_Practical_Guide_to_Data_Extraction_and_Visualization": (
-        "_static/notebook_images/hinode_satellite.png"
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
+# ones.
+extensions = [
+    "hoverxref.extension",
+    "matplotlib.sphinxext.plot_directive",
+    "sphinx_automodapi.automodapi",
+    "sphinx_automodapi.smart_resolver",
+    "sphinx_copybutton",
+    "sphinx_design",
+    "sphinx_gallery.gen_gallery",
+    "sphinx_issues",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    "sphinx.ext.inheritance_diagram",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
+    "sphinxcontrib.bibtex",
+    "sphinxext.opengraph",
+]
+
+# Set automodapi to generate files inside the generated directory
+automodapi_toctreedirnm = "generated/api"
+
+# Add any paths that contain templates here, relative to this directory.
+# templates_path = ["_templates"]
+
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+# This pattern also affects html_static_path and html_extra_path.
+
+# Add any extra paths that contain custom files (such as robots.txt or
+# .htaccess) here, relative to this directory. These files are copied
+# directly to the root of the documentation.
+# html_extra_path = ['robots.txt']
+
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "_links.rst",
+    "_substitutions.rst",
+]
+
+# The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
+source_suffix = ".rst"
+
+# The master toctree document.
+master_doc = "index"
+
+# The reST default role (used for this markup: `text`) to use for all
+# documents. Set to the "smart" one.
+default_role = "obj"
+
+# Disable having a separate return type row
+napoleon_use_rtype = False
+
+# Disable google style docstrings
+napoleon_google_docstring = False
+
+# Disable the use of param, which prevents a distinct "Other Parameters" section
+napoleon_use_param = False
+
+# Enable nitpicky mode, which forces links to be non-broken
+nitpicky = True
+# This is not used. See docs/nitpick-exceptions file for the actual listing.
+nitpick_ignore = []
+with Path("nitpick-exceptions").open() as f:
+    for line in f:
+        if line.strip() == "" or line.startswith("#"):
+            continue
+        dtype, target = line.split(None, 1)
+        target = target.strip()
+        nitpick_ignore.append((dtype, target))
+
+bibtex_bibfiles = ["bibliography.bib"]
+bibtex_default_style = "plain"
+bibtex_reference_style = "author_year"
+bibtex_cite_id = "{key}"
+
+# This is added to the end of RST files — a good place to put substitutions to be used globally.
+rst_epilog = ""
+for epilog_file in ["_links.rst", "_substitutions.rst"]:
+    with Path(epilog_file).open() as file:
+        rst_epilog += file.read()
+
+# Configure sphinx-issues
+issues_github_path = "HinodeXRT/xrtpy"
+
+# -- Options for intersphinx extension ---------------------------------------
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {
+    "python": (
+        "https://docs.python.org/3/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/python3.inv"),
     ),
+    "numpy": (
+        "https://numpy.org/doc/stable/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
+    ),
+    "scipy": (
+        "https://docs.scipy.org/doc/scipy/reference/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
+    ),
+    "astropy": ("https://docs.astropy.org/en/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable", None),
+    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
+    "sunpy": ("https://docs.sunpy.org/en/stable/", None),
 }
 
-# adapted from sphinx-hoverxref conf.py
+# -- Options for hoverxref -----------------------------------------------------
+
 if os.environ.get("READTHEDOCS"):
-    # Building on Read the Docs
     hoverxref_api_host = "https://readthedocs.org"
 
     if os.environ.get("PROXIED_API_ENDPOINT"):
         # Use the proxied API endpoint
-        # - A RTD thing to avoid a CSRF block when docs are using a
-        #   custom domain
+        # A RTD thing to avoid a CSRF block when docs are using a custom domain
         hoverxref_api_host = "/_"
 
-hoverxref_tooltip_maxwidth = 600  # RTD main window is 696px
 hoverxref_auto_ref = True
-hoverxref_mathjax = True
-hoverxref_sphinxtabs = True
-
-# hoverxref has to be applied to these
 hoverxref_domains = ["py", "cite"]
 hoverxref_roles = ["confval", "term"]
-
+hoverxref_mathjax = True
+hoverxref_modal_hover_delay = 500
+hoverxref_tooltip_maxwidth = 600  # RTD main window is 696px
+hoverxref_intersphinx = list(intersphinx_mapping.keys())
 hoverxref_role_types = {
-    # roles with cite domain
-    "p": "tooltip",
-    "t": "tooltip",
-    #
-    # roles with py domain
+    # Roles within the py domain
     "attr": "tooltip",
     "class": "tooltip",
     "const": "tooltip",
@@ -179,50 +224,90 @@ hoverxref_role_types = {
     "meth": "tooltip",
     "mod": "tooltip",
     "obj": "tooltip",
-    #
-    # roles with std domain
+    # Roles within the std domain
     "confval": "tooltip",
     "hoverxref": "tooltip",
-    "ref": "tooltip",
+    "ref": "tooltip",  # Would be used by hoverxref_auto_ref if we set it to True
     "term": "tooltip",
 }
-# Configure sphinx-issues
 
-issues_github_path = "HinodeXRT/xrtpy"
+# -- Options for HTML output ---------------------------------------------------
 
-# Specify patterns to ignore when doing a nitpicky documentation build.
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+html_theme = "pydata_sphinx_theme"
+html_theme_options = {
+    "logo": {
+        "text": "XrtPy",
+    },
+    "use_edit_page_button": True,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/HinodeXRT/xrtpy/",
+            "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/xrtpy/",
+            "icon": "fa-brands fa-python",
+        },
+    ],
+}
+html_context = {
+    "github_user": "HinodeXRT",
+    "github_repo": "xrtpy",
+    "github_version": "main",
+    "doc_path": "docs",
+}
+html_logo = "_static/images/XRTpy_logo.png"
+html_sidebars = {
+    # Sidebar removal
+    "about_xrt*": [],
+    "install*": [],
+    "getting_started*": [],
+    "bibliography*": [],
+    "glossary*": [],
+    "feedback_communication*": [],
+    "contributing*": [],
+    "code_of_conduct*": [],
+}
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+# html_static_path = ["_static"]
 
-python_role = "py:.*"
+# Render inheritance diagrams in SVG
+graphviz_output_format = "svg"
 
-nitpick_ignore_regex = [
-    (python_role, "and"),
-    (python_role, "array .*"),
-    (python_role, "array_like"),
-    (python_role, "callable"),
-    (python_role, "function"),
-    (python_role, ".*integer.*"),
-    (python_role, "iterable"),
-    (python_role, "key"),
-    (python_role, "keyword-only"),
-    (python_role, ".* object"),
-    (python_role, "optional"),
-    (python_role, "or"),
-    (python_role, ".*real number.*"),
-    (python_role, ".*Unit.*"),
+graphviz_dot_args = [
+    "-Nfontsize=10",
+    "-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Efontsize=10",
+    "-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Gfontsize=10",
+    "-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
 ]
 
-# This is added to the end of RST files — a good place to put substitutions to
-# be used globally.
-rst_epilog = ""
-for epilog_file in ["_links.rst", "_substitutions.rst"]:
-    with open(epilog_file) as file:  # noqa: PTH123
-        rst_epilog += file.read()
+# -- Sphinx Gallery ------------------------------------------------------------
 
-# Add the nbsphinx_allow_errors option
-nbsphinx_allow_errors = True
+sphinx_gallery_conf = {
+    "backreferences_dir": Path("generated") / "modules",
+    "filename_pattern": "^((?!skip_).)*$",
+    "examples_dirs": Path("..") / "examples",
+    "within_subsection_order": "ExampleTitleSortKey",
+    "gallery_dirs": Path("generated") / "gallery",
+    "matplotlib_animations": True,
+    "default_thumb_file": "https://raw.githubusercontent.com/HinodeXRT/xrtpy/main/docs/_static/images/XRTpy_logo.png",
+    "abort_on_example_error": False,
+    "plot_gallery": "True",
+    "remove_config_comments": True,
+    "doc_module": ("xrtpy"),
+    "only_warn_on_example_error": True,
+}
 
+# -- Options for sphinx-copybutton ---------------------------------------------
 
-def setup(app: Sphinx) -> None:
-    app.add_config_value("revision", "", True)  # noqa: FBT003
-    app.add_css_file("css/admonition_color_contrast.css")
-    app.add_css_file("css/plasmapy.css", priority=600)
+# Python Repl + continuation, Bash, ipython and qtconsole + continuation, jupyter-console + continuation
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
