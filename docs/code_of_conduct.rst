@@ -1,4 +1,4 @@
-.. _xrtpy-coc:
+.. _XRTpy-coc:
 
 ***************
 Code of Conduct
@@ -42,7 +42,7 @@ Community leaders are responsible for enforcing these rules and taking correctiv
 
 **Enforcement and Reporting**
 
-- Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at ``xrtpy@cfa.harvard.edu``.
+- Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at ``XRTpy@cfa.harvard.edu``.
   All complaints will be reviewed and investigated promptly and fairly.
 - Community leaders are obligated to respect the privacy and security of the reporter of any incident.
 

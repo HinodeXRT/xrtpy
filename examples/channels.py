@@ -15,7 +15,7 @@ import xrtpy
 ##############################################################################
 # We begin by defining a filter channel by its common abbreviation.
 # In this example we will be exploring the titanium-on-polyimide filter.
-# For detailed information about various filter channels and their characteristics, you can refer to :ref:`xrtpy-getting-started-filters`.
+# For detailed information about various filter channels and their characteristics, you can refer to :ref:`xrtpy-about-xrt-filters`.
 #
 # To  explore the properties and characteristics of a defined filter channel, we will create a
 # `xrtpy.response.Channel`. By passing in the filter name as an input, we can work
@@ -62,7 +62,7 @@ print("Density: ", channel.entrancefilter.entrancefilter_density)
 # we can explore detailed information about the selected XRT channel filter.
 #
 # It's worth noting that sometimes the other filter will yield the result "Open," as it's not use.
-# For more comprehensive information about the XRT filters, you can refer to :ref:`xrtpy-getting-started-filters`.
+# For more comprehensive information about the XRT filters, you can refer to :ref:`xrtpy-about-xrt-filters`.
 
 print("Filter Wheel:", channel.filter_2.filter_name)
 print("\nFilter material:", channel.filter_2.filter_material)

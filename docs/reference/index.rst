@@ -1,6 +1,8 @@
-*******************
-xrtpy API Reference
-*******************
+.. _xrtpy-api-index:
+
+*************
+API Reference
+*************
 
 .. toctree::
     :maxdepth: 1

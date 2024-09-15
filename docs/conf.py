@@ -29,7 +29,7 @@ from sunpy.util.exceptions import (  # NOQA: E402
 )
 
 # -- Project information -------------------------------------------------------
-project = "xrtpy"
+project = "XRTpy"
 author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
 copyright = f"2021-{datetime.now(tz=UTC).year}, {author}"
 
@@ -67,7 +67,7 @@ linkcheck_anchors = True
 linkcheck_anchors_ignore = []
 
 # sphinxext-opengraph
-ogp_image = "https://raw.githubusercontent.com/HinodeXRT/xrtpy/main/docs/_static/images/XRTpy_logo.png"
+ogp_image = "https://raw.githubusercontent.com/HinodeXRT/xrtpy/main/docs/_static/images/xrtpy_logo.png"
 ogp_use_first_image = True
 ogp_description_length = 160
 ogp_custom_meta_tags = [
@@ -238,7 +238,7 @@ hoverxref_role_types = {
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "logo": {
-        "text": "XrtPy",
+        "text": "XRTpy",
     },
     "use_edit_page_button": True,
     "icon_links": [

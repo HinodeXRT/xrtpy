@@ -4,7 +4,7 @@
 Providing Feedback
 ******************
 
-XRTpy has several methods that one can use to get contact with XRTpy developers, giving feedback or giving feedback.
+XRTpy has several methods that one can use to get contact with the XRTpy developers.
 
 Feedback
 ========

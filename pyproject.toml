@@ -7,7 +7,7 @@ requires = [
 ]
 
 [project]
-name = "xrtpy"
+name = "XRTpy"
 readme = "README.md"
 keywords = ["solar physics"]
 description = "For analyzing data from the X-Ray Telescope (XRT) on the Hinode spacecraft."
@@ -215,7 +215,7 @@ write_to = "xrtpy/version.py"
 
 [tool.towncrier]
 package = "xrtpy"
-name = "XRTpy"
+name = "xrtpy"
 filename = "CHANGELOG.rst"
 directory = "changelog/"
 title_format = "{name} v{version} ({project_date})"
