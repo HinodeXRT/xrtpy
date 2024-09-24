@@ -9,10 +9,10 @@ from XRT synoptic composite images.
 
 from pathlib import Path
 
-import astropy.units as u
 import matplotlib.pyplot as plt
 import sunpy.map
 from astropy.utils.data import get_pkg_data_path
+from astropy.visualization import ImageNormalize, SqrtStretch
 
 from xrtpy.image_correction import remove_lightleak
 
@@ -35,14 +35,34 @@ lightleak_map = remove_lightleak(xrt_map)
 fig = plt.figure(figsize=(12, 6))
 
 ax = fig.add_subplot(121, projection=xrt_map)
-xrt_map.plot(axes=ax, title="Original", clip_interval=(1, 99.9) * u.percent)
+xrt_map.plot(
+    axes=ax,
+    title="Original",
+    norm=ImageNormalize(vmin=0, vmax=7e3, stretch=SqrtStretch()),
+)
 ax1 = fig.add_subplot(122, projection=lightleak_map)
 lightleak_map.plot(
-    axes=ax1, title="Light Leak Subtracted", clip_interval=(1, 99.9) * u.percent
+    axes=ax1,
+    title="Light Leak Subtracted",
+    norm=ImageNormalize(vmin=0, vmax=7e3, stretch=SqrtStretch()),
 )
 
 ax1.coords[1].set_ticks_visible(False)
 ax1.coords[1].set_ticklabel_visible(False)
 fig.tight_layout()
+
+##############################################################################
+# They look almost identical, but the light leak has been removed from the second image.
+# To confirm this we can plot the difference between the two images.
+
+diff_data = xrt_map.data - lightleak_map.data
+# For this image, the difference is very small.
+print(diff_data.min(), diff_data.max())
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set_title("Lightleak Difference")
+im = ax.imshow(diff_data, origin="lower")
+fig.colorbar(im)
 
 plt.show()

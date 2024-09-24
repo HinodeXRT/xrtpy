@@ -9,6 +9,7 @@ This example provides a simple overview of filtering and visualizing XRT data.
 import astropy.units as u
 import matplotlib.pyplot as plt
 import sunpy.map
+from astropy.visualization import ImageNormalize, SqrtStretch
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 
@@ -49,7 +50,9 @@ xrt_seq = sunpy.map.Map(xrt_files, sequence=True)
 
 fig = plt.figure()
 ax = fig.add_subplot(projection=xrt_seq.maps[0])
-ani = xrt_seq.plot(axes=ax)
+ani = xrt_seq.plot(
+    axes=ax, norm=ImageNormalize(vmin=0, vmax=5e3, stretch=SqrtStretch())
+)
 
 ##############################################################################
 # You might notice that there is a jump in the sequence.
@@ -62,7 +65,9 @@ xrt_seq_filtered_shape = sunpy.map.Map(
 
 fig = plt.figure()
 ax = fig.add_subplot(projection=xrt_seq.maps[0])
-ani = xrt_seq_filtered_shape.plot(axes=ax)
+ani = xrt_seq_filtered_shape.plot(
+    axes=ax, norm=ImageNormalize(vmin=0, vmax=5e3, stretch=SqrtStretch())
+)
 
 ##############################################################################
 # In fact, `sunpy.map.Map` provides many attributes that can be used to filter the data.
@@ -76,7 +81,9 @@ xrt_seq_filtered_exp_time = sunpy.map.Map(
 
 fig = plt.figure()
 ax = fig.add_subplot(projection=xrt_seq.maps[0])
-ani = xrt_seq_filtered_exp_time.plot(axes=ax)
+ani = xrt_seq_filtered_exp_time.plot(
+    axes=ax, norm=ImageNormalize(vmin=0, vmax=5e3, stretch=SqrtStretch())
+)
 
 ##############################################################################
 # If you want to save this animation to a file, you can use the ``save`` method.
