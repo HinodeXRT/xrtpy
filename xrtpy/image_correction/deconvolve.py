@@ -2,8 +2,6 @@
 Functionality for deconvolving XRT image data with the point spread function.
 """
 
-__all__ = ["deconvolve"]
-
 from datetime import datetime
 from urllib.parse import urljoin
 
@@ -15,6 +13,8 @@ from sunpy.image.transform import affine_transform
 from sunpy.map import Map
 
 from xrtpy.util import SSW_MIRRORS
+
+__all__ = ["deconvolve"]
 
 
 @manager.require(

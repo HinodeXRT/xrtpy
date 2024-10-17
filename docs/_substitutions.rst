@@ -1,4 +1,4 @@
-.. |bibliography| replace:: :ref:`bibliography`\
+.. |bibliography| replace:: :ref:`xrtpy-bibliography`\
 .. |Channel| replace:: :class:`~xrtpy.response.channel.Channel`
 .. |EffectiveAreaFundamental| replace:: :class:`~xrtpy.response.effective_area.EffectiveAreaFundamental`
 .. |glossary| replace:: :ref:`glossary`\
