@@ -535,7 +535,7 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
         Narukage's K factor for image 2
     """
 
-    wvl = tresp1.channel_wavelength
+    wvl = tresp1.wavelength
     eVe = tresp1.ev_per_electron
     gain = tresp1.ccd_gain_right
     # (h*c/lambda) * 1/(eV per electron) * 1/gain

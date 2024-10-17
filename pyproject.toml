@@ -53,8 +53,9 @@ dev = [
   "nox >= 2022.8.7",
 ]
 tests = [
-  "pytest-allclose >= 1.0.0",
+  "pytest >= 8.0.0",
   "pytest-astropy",
+  "pytest-xdist >= 3.6.1",
 ]
 docs = [
   "imageio >= 2.20.0",
