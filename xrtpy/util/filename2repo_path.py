@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 
-def filename2repo_path(  # noqa: C901
+def filename2repo_path(
     filename, urlroot="https://xrt.cfa.harvard.edu/", join=False, verbose=False
 ):
     """
