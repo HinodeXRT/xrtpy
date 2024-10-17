@@ -54,6 +54,7 @@ dev = [
 ]
 tests = [
   "pytest >= 8.0.0",
+  "pytest-astropy",
   "pytest-xdist >= 3.6.1",
 ]
 docs = [
