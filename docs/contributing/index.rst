@@ -10,3 +10,4 @@ Contributor Guide
    contributing
    installation_for_development
    release_guide
+   acknowledging_xrtpy
