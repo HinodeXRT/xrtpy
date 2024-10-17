@@ -8,7 +8,7 @@ Installing Python
 =================
 
 To use ``xrtpy``, you will need to have Python installed on your system.
-We recommend following :ref:`sunpy-tutorial-installing` which walks you through installing Python.
+We recommend following this :ref:`sunpy-tutorial-installing` guide, which walks you through installing Python.
 
 Installing XRTpy
 ----------------
@@ -19,11 +19,6 @@ Now we will create and activate a new virtual environment to install ``xrtpy`` i
 .. code-block:: bash
 
     $ conda create --name xrtpy
-    # Only run the following two lines
-    # if you have NOT installed miniforge or added conda-forge to your channels
-    # Do not run these lines if you are using Anaconda
-    $ conda config --add channels conda-forge
-    $ conda config --set channel_priority strict
     $ conda activate xrtpy
 
 In this case the environment is named 'xrtpy'.

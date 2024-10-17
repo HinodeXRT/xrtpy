@@ -5,8 +5,8 @@
 [![Read the Docs Status](https://readthedocs.org/projects/xrtpy/badge/?version=latest&logo=twitter)](http://xrtpy.readthedocs.io/en/latest/?badge=latest)
 [![astropy](http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat&logo=astropy)](http://www.astropy.org/)
 
-XRTpy is a Python package being developed for the analysis of observations made by the X-Ray Telescope (XRT) on the *Hinode* spacecraft.
+XRTpy is a Python package being developed for the analysis of observations made by the X-Ray Telescope (XRT) on the **Hinode** spacecraft.
 
 ## Acknowledgements
 
-The development of XRTpy is supported by NASA contract NNM07AB07C to the Smithsonian Astrophysical Observatory.
+The development of XRTpy is supported by NASA contract **NNM07AB07C** to the Smithsonian Astrophysical Observatory.

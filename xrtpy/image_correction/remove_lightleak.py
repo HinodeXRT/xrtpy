@@ -86,9 +86,10 @@ def _get_stray_light_phase(date_obs):
         phase = 0
 
     if phase == 6:
-        warnings.warn(  # noqa: B028
+        warnings.warn(
             "light leak images for this period are not yet"
-            " available. Defaulting to previous phase."
+            " available. Defaulting to previous phase.",
+            stacklevel=3,
         )
         phase = 5
 
@@ -203,7 +204,10 @@ def remove_lightleak(in_map, scale=1.0, leak_map=None):
     images at the phase 1 (as of Feb-2022).
     """
     if "Light leak subtraction: DONE" in in_map.meta["HISTORY"]:
-        warnings.warn("HISTORY indicates light leak subtraction already done on image.")  # noqa: B028
+        warnings.warn(
+            "HISTORY indicates light leak subtraction already done on image.",
+            stacklevel=3,
+        )
 
     if leak_map is None:
         fw1 = in_map.meta["EC_FW1_"]

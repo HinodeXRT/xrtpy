@@ -53,12 +53,12 @@ launch_effective_area = eaf_launch.effective_area()
 plt.figure()
 
 plt.plot(
-    eaf.channel_wavelength,
+    eaf.wavelength,
     effective_area,
     label=f"{date_time}",
 )
 plt.plot(
-    eaf.channel_wavelength,
+    eaf.wavelength,
     launch_effective_area,
     label=f"{relative_launch_date_time}",
 )

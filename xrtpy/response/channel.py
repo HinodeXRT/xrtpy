@@ -430,6 +430,8 @@ class CCD:
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
         """Gain when reading the right port of the CCD."""
+        # NOTE: Value for the right gain in the instrument data files is incorrect.
+        # See https://github.com/HinodeXRT/xrtpy/pull/76
         return u.Quantity(57.5, u.electron / u.DN)
 
     @property

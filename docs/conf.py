@@ -21,9 +21,9 @@ if on_rtd:
     os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
 
 # -- Imports -------------------------------------------------------------------
-from astropy.utils.exceptions import AstropyDeprecationWarning  # NOQA: E402
-from matplotlib import MatplotlibDeprecationWarning  # NOQA: E402
-from sunpy.util.exceptions import (  # NOQA: E402
+from astropy.utils.exceptions import AstropyDeprecationWarning
+from matplotlib import MatplotlibDeprecationWarning
+from sunpy.util.exceptions import (
     SunpyDeprecationWarning,
     SunpyPendingDeprecationWarning,
 )
@@ -34,7 +34,7 @@ author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
 copyright = f"2021-{datetime.now(tz=UTC).year}, {author}"
 
 # The full version, including alpha/beta/rc tags
-from xrtpy import __version__  # NOQA: E402
+from xrtpy import __version__
 
 _version_ = Version(__version__)
 # NOTE: Avoid "post" appearing in version string in rendered docs
@@ -85,11 +85,9 @@ suppress_warnings = [
 # ones.
 extensions = [
     "hoverxref.extension",
-    "matplotlib.sphinxext.plot_directive",
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
     "sphinx_copybutton",
-    "sphinx_design",
     "sphinx_gallery.gen_gallery",
     "sphinx_issues",
     "sphinx.ext.autodoc",
@@ -176,7 +174,6 @@ issues_github_path = "HinodeXRT/xrtpy"
 
 # -- Options for intersphinx extension ---------------------------------------
 
-# Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     "python": (
         "https://docs.python.org/3/",

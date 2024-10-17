@@ -4,8 +4,8 @@ ratio technique.
 """
 
 import logging
-from collections import namedtuple
 from datetime import datetime
+from typing import Any, NamedTuple
 
 import numpy as np
 from astropy import units as u
@@ -18,10 +18,15 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 __all__ = ["temperature_from_filter_ratio"]
 
-TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")  # noqa: PYI024
+
+class TempEMdata(NamedTuple):
+    Tmap: Any
+    EMmap: Any
+    Terrmap: Any
+    EMerrmap: Any
 
 
-def temperature_from_filter_ratio(  # noqa: C901
+def temperature_from_filter_ratio(
     map1,
     map2,
     abundance_model="coronal",
@@ -287,7 +292,7 @@ def temperature_from_filter_ratio(  # noqa: C901
         logging.info(f"Examined T_e range: {Tmodel.min():.3E} - {Tmodel.max():.3E} K")
         logging.info("No thresholds applied")
     Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
-        hdr1, hdr2, T_e, EM, T_error, EMerror, mask
+        hdr1, hdr2, T_e, EM, T_error, EMerror
     )
     return TempEMdata(Tmap, EMmap, Terrmap, EMerrmap)
 
@@ -530,7 +535,7 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
         Narukage's K factor for image 2
     """
 
-    wvl = tresp1.channel_wavelength
+    wvl = tresp1.wavelength
     eVe = tresp1.ev_per_electron
     gain = tresp1.ccd_gain_right
     # (h*c/lambda) * 1/(eV per electron) * 1/gain
@@ -605,7 +610,7 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
     return T_error, EMerror, K1, K2
 
 
-def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):  # noqa: ARG001
+def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror):
     """
     Create SunPy Map objects from the image metadata and temperature, volume
     emission measure, temperature uncertainty and emission measure uncertainty
@@ -631,10 +636,6 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):  # noqa: ARG
 
     EMerror : 2D float array
         image containing the uncertainties in EM derived for the images
-
-    mask : 2D boolean array
-        image containing the mask for T_e and EM, either provided or derived
-        from the data
 
     Returns:
     --------
