@@ -92,7 +92,7 @@ def test_EffectiveArea_contamination_on_filter(name, date):
 @pytest.mark.parametrize("date", invalid_dates)
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_exception_is_raised(name, date):
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match="Invalid date"):
         EffectiveAreaFundamental(name, date)
 
 

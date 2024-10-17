@@ -7,9 +7,9 @@ formats:
 - htmlzip
 
 build:
-  os: ubuntu-22.04
+  os: ubuntu-lts-latest
   tools:
-    python: '3.11'
+    python: latest
   apt_packages:
   - graphviz
   jobs:
