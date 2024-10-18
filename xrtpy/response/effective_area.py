@@ -5,12 +5,12 @@ __all__ = [
 
 import datetime
 import math
-import os
 from functools import cached_property
 from pathlib import Path
 
 import astropy.time
 import numpy as np
+import scipy.interpolate
 import scipy.io
 import sunpy.io.special
 import sunpy.time
@@ -115,7 +115,7 @@ class EffectiveAreaFundamental:
                 f"Date must be after {epoch}."
             )
 
-        modified_time_path = os.path.getmtime(_ccd_contam_filename)  # noqa: PTH204
+        modified_time_path = Path(_ccd_contam_filename).stat().st_mtime
         modified_time = astropy.time.Time(modified_time_path, format="unix")
         latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
             "%Y/%m/%d"
@@ -344,7 +344,7 @@ class EffectiveAreaFundamental:
             "data/n_DEHP.txt", package="xrtpy.response"
         )
 
-        with open(_n_DEHP_filename) as n_DEHP:  # noqa: PTH123
+        with Path(_n_DEHP_filename).open() as n_DEHP:
             list_of_DEHP_attributes = []
             for line in n_DEHP:
                 stripped_line = line.strip()
@@ -523,29 +523,34 @@ class EffectiveAreaFundamental:
         return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
 
     @property
-    def channel_wavelength(self):
+    def wavelength(self):
         """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
-        return Channel(self.name).wavelength
+        _wave = self._channel.wavelength.to_value("AA")
+        delta_wave = 0.01
+        return np.arange(_wave[0], _wave[-1], delta_wave) * u.Angstrom
 
     @property
     def channel_geometry_aperture_area(self):
         """XRT flight model geometry aperture area."""
-        return Channel(self.name).geometry.geometry_aperture_area
+        return self._channel.geometry.geometry_aperture_area
 
     @property
     def channel_transmission(self):
         """XRT channel transmission."""
-        return Channel(self.name).transmission
+        return np.interp(
+            self.wavelength, self._channel.wavelength, self._channel.transmission
+        )
+
+    def _contamination_interpolator(self, x, y):
+        return np.interp(self.wavelength.to_value("Angstrom"), x, y)
 
     @property
     def _interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        CCD_contam_transmission = np.interp(
-            self.channel_wavelength.to_value("AA"),
+        return self._contamination_interpolator(
             self.n_DEHP_wavelength,
             self._CCD_contamination_transmission,
         )
-        return CCD_contam_transmission
 
     @cached_property
     def _filter_contamination_transmission(self):
@@ -587,12 +592,10 @@ class EffectiveAreaFundamental:
     @property
     def _interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        Filter_contam_transmission = np.interp(
-            self.channel_wavelength.to_value("AA"),
+        return self._contamination_interpolator(
             self.n_DEHP_wavelength,
             self._filter_contamination_transmission,
         )
-        return Filter_contam_transmission
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:

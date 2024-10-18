@@ -1,0 +1,76 @@
+target-version = "py310"
+show-fixes = true
+extend-exclude = [
+  ".jupyter",
+  "__pycache__",
+  "_build",
+  "_dev",
+]
+
+[lint]
+# Find info about ruff rules at: https://docs.astral.sh/ruff/rules
+extend-select = [
+  "ARG", # flake8-unused-arguments
+  "B", # flake8-bugbear
+  "BLE", # flake8-blind-except
+  "C4", # flake8-comprehensions
+  "C90", # mccabe
+  "COM818", # trailing-comma-on-bare-tuple
+  "FBT003", # flake8-boolean-trap
+  "FLY", # flynt
+  "I", # isort
+  "ICN", # flake8-import-conventions
+  "INP", # flake8-no-pep420
+  "INT", # flake8-gettext
+  "ISC", # flake8-implicit-str-concat
+  "N", # pep8-naming
+  "NPY", # numpy-deprecated-type-alias
+  "PD", # pandas-vet
+  "PERF", # perflint
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PLC", # pylint convention
+  "PLE", # pylint errors
+  "PLW", # pylint warnings
+  "PT", # flake8-pytest-style
+  "PTH", # flake8-use-pathlib
+  "PYI", # flake8-pyi
+  "RSE", # flake8-raise
+  "RUF005",# collection-literal-concatenation
+  "RUF006", # asyncio-dangling-task
+  "RUF007", # pairwise-over-zipped
+  "RUF008", # mutable-dataclass-default
+  "RUF009", # function-call-in-dataclass-default-argument
+  "RUF010", # explicit-f-string-type-conversion
+  "RUF013", # implicit-optional
+  "RUF015", # unnecessary-iterable-allocation-for-first-element
+  "RUF016", # invalid-index-type
+  "RUF100", # unused-noqa
+  "RUF200", # invalid-pyproject-toml
+  "S", # flake8-bandit
+  "SIM", # flake8-simplify
+  "TCH", # flake8-type-checking
+  "TID", # flake8-tidy-imports
+  "TRY", # tryceratops
+  "UP", # pyupgrade
+  "W", # pycodestyle warnings
+]
+ignore = [
+  "C901", # is too complex
+  "E501", # line-too-long
+  "ISC001", # single-line-implicit-string-concatenation (formatter conflict)
+  "N802", # invalid-function-name
+  "N803", # invalid-argument-name
+  "N806", # non-lowercase-variable-in-function
+  "N816", # mixed-case-variable-in-global-scope
+  "PLC2401", # non-ascii-name
+  "S101", # asserts
+  "SIM108", # if-else-block-instead-of-if-exp
+  "TRY003", # raise-vanilla-args
+]
+
+[lint.per-file-ignores]
+"docs/conf.py" = [
+  "E402",  # Module imports not at top of file
+  "INP001",  # Implicit-namespace-package. The examples are not a package.
+]

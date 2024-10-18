@@ -3,7 +3,7 @@
 .. _xrtpy-documentation:
 
 .. image:: images/XRTpy_logo.png
-   :alt: PlasmaPy logo
+   :alt: XRTpy logo
    :align: right
    :scale: 40%
 
