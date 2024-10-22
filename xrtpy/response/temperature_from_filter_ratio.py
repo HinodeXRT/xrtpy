@@ -460,14 +460,11 @@ def _derive_temperature(
 
     # Performs linear interpolation between two adjacent temperatures in Tmodel,
     # based on the observed filter ratio (`data_ratio`) and the model ratios (`model_ratio`).
-    #
     # `a` and `b` represent differences between the observed and model ratios.
     # The equation weighs the temperatures proportionally, with more weight given
     # to the temperature whose model ratio is closer to the observed filter ratio.
-    #
     # This ensures a smooth transition between temperature values, providing a more
     # accurate estimate when the observed filter ratio lies between two model ratios.
-            
     ok_num[ok_cnt != 1] = 0
     a = np.abs(model_ratio[ok_num] - data_ratio)
     b = np.abs(model_ratio[np.maximum((ok_num - 1), 0)] - data_ratio)
