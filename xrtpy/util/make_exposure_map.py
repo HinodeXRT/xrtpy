@@ -12,6 +12,7 @@ __all__ = ["make_exposure_map"]
 
 def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=False):
     """
+    TESTING ON WINDOWS
     Make an exposure map for a composite image. That is, using data from the
     header of a composite image, create an image where the pixel values are
     the exposure times used in the composite image
