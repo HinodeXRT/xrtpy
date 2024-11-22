@@ -87,7 +87,7 @@ class Geometry:
             XRT flight model geometry aperture area in cm^2.
     """
 
-    _genx_file = _genx_file
+    #_genx_file = _genx_file
 
     def __init__(self, index):
         self._channel_index = index
@@ -145,7 +145,7 @@ class EntranceFilter:
             The wavelengths at which the transmission data of the filter are measured, in Angstroms.
     """
 
-    _genx_file = _genx_file
+    #_genx_file = _genx_file
 
     def __init__(self, index):
         self._channel_index = index
@@ -228,7 +228,7 @@ class Mirror:
             The wavelengths at which the mirror's reflectance is measured, in Angstroms.
     """
 
-    _genx_file = _genx_file
+    #_genx_file = _genx_file
 
     def __init__(self, index, mirror_number):
         self._channel_index = index
@@ -312,7 +312,7 @@ class Filter:
             The wavelengths at which the filter's transmission data are measured, in Angstroms.
     """
 
-    _genx_file = _genx_file
+    #_genx_file = _genx_file
 
     def __init__(self, index, filter_number):
         self._channel_index = index
@@ -404,7 +404,7 @@ class CCD:
             The wavelengths at which the CCD's quantum efficiency is measured, in Angstroms.
     """
 
-    _genx_file = _genx_file
+    #_genx_file = _genx_file
 
     def __init__(self, index):
         self._channel_index = index
@@ -507,7 +507,7 @@ class Channel:
         Name of the instrument (X-Ray Telescope -XRT).
     """
 
-    _genx_file = _genx_file
+    #_genx_file = _genx_file
 
     def __init__(self, name):
         name = resolve_filter_name(name)
