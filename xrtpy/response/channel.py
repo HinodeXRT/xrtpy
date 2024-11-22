@@ -36,7 +36,9 @@ _channel_name_to_index_mapping = {
     "C-poly/Ti-poly": 13,
 }
 
+
 _genx_file = sunpy.io.special.genx.read_genx(filename)["SAVEGEN0"]
+
 
 def resolve_filter_name(name):
     """
