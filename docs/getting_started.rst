@@ -35,7 +35,7 @@ Deriving Temperature and Emission Measure for a Pair of Images
 --------------------------------------------------------------
 XRTpy provides a routine, *temperature_from_filter_ratio*, that employs the objects listed above to derive the temperature and emission
 measure in for a given pair of images using the filter ratio method. This uses the same methods as in the SolarSoft IDL
-routine of the same name. Familiarize yourself with the utilization of this function through the notebook example provided on our Example page.
+routine, *xrt_teem.pro*. Familiarize yourself with the utilization of this function through the notebook example provided on our Example page.
 
 
 Enhancing Images Sharpness with Point Spread Function - Deconvolution
