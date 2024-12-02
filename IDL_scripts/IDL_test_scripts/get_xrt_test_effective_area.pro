@@ -58,8 +58,8 @@ pro write_xrt_eff_area
   ;                        spectral responses for a set of XRT x-ray channel
   ;                        accounting for some thickness of the CCD
   ;                        contamination layer. The spectral response is
-  ;                        directly calculated from the effective area, and both are
-  ;                        functions of wavelength.
+  ;                        directly calculated from the effective area, and 
+  ;                        both are functions of wavelength.
   ;
   ; CONTACT:
   ;
@@ -79,17 +79,27 @@ pro write_xrt_eff_area
   ;
   ; === Insert an observation date to test ======================
 
-  observation_date = '24-Oct-2023 10:04:23'
+  observation_date = '24-Oct-2023 10:04:23' ;'24-Oct-2023 10:04:23'
+  ; alternative: use 2023-10-24T10:04:23
+  ; then below wouldn't have to use the conversion from month string to no.
+  ; Note: this would be standard CCSDS ASCII time code format
+  ; however the parsing would need to be fixed:
+  ; observation_date_str = strmid(strjoin(strsplit(observation_date, '-', $
+  ;    /extract)),0,8)
 
   channel = make_xrt_wave_resp(contam_time=observation_date)
 
   ; ==== Individual string of the observation date created for text file
   ; title ===
 
-  year = strmid(observation_date, 0, 2)
-  month = strmid(observation_date, 3, 4)
-  day = strmid(observation_date, 8, 4)
-  observation_date_str = year + month + day
+  year = strmid(observation_date, 7, 4)
+  month = strmid(observation_date, 3, 3)
+  month_str = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', $
+      'Sep', 'Oct', 'Nov', 'Dec']
+  month_indx = where(month eq month_str)
+  month_no = month_indx[0] + 1
+  day = strmid(observation_date, 0, 2)
+  observation_date_str = year + strtrim(string(month_no),2) + day
 
   ; === Index is a list of numbers corresponding to each filter ===
   index = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -98,7 +108,8 @@ pro write_xrt_eff_area
   ; OUTPUTS ===
 
   for i = 0, n_elements(index) - 1 do begin
-    openw, unit, channel[index[i]].name + '_' + observation_date_str + '_effective_area.txt', /get_lun
+    openw, unit, channel[index[i]].name + '_' + observation_date_str + $
+        '_effective_area.txt', /get_lun
 
     printf, unit, 'Filter ', channel[index[i]].name
     printf, unit, 'observation_date ', observation_date_str
@@ -106,7 +117,8 @@ pro write_xrt_eff_area
     match = where(channel[index[i]].effar.wave ne 0)
 
     for j = 0, n_elements(match) - 1 do begin
-      printf, unit, channel[index[i]].effar.wave[j], ' ', channel[index[i]].effar.eff_area[j]
+      printf, unit, channel[index[i]].effar.wave[j], ' ', $
+          channel[index[i]].effar.eff_area[j]
     endfor
 
     close, unit, /force
