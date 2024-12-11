@@ -48,6 +48,8 @@ valid_dates = [
     datetime(year=2020, month=9, day=23, hour=22, minute=1, second=1),
     datetime(year=2021, month=9, day=23, hour=22, minute=1, second=1),
     datetime(year=2022, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2023, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2024, month=9, day=23, hour=22, minute=1, second=1),
 ]
 
 invalid_dates = [
