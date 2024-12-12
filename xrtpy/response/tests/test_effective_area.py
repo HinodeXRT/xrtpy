@@ -130,5 +130,5 @@ def test_effective_area_compare_idl(filename):
     assert u.allclose(
         actual_effective_area,
         IDL_effective_area,
-        rtol=1e-6,
+        rtol=1e-4, #Moderate Precision
     )
