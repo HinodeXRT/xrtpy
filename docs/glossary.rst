@@ -1,6 +1,4 @@
-.. currentmodule:: xrtpy
-
-.. _glossary:
+.. _xrtpy-glossary:
 
 ********
 Glossary
@@ -21,7 +19,7 @@ Glossary
 
    Contamination (related to the XRT)
       Contamination refers to the accumulation of contaminating material on the XRT CCD and focal plane filters (FPFs), which results in a decrease in sensitivity.
-      Refer to Section 2.5.3 `Contamination` in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT contamination.
+      Refer to Section 2.5.3 "Contamination" in the `SolarSoft XRT Analysis Guide`_ for more information about the XRT contamination.
 
    Temperature response
       Temperature response refers to the instrument's temperature response function for a specific filter channel. Units measured in
