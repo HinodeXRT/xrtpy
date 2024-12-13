@@ -4,20 +4,17 @@ XRTpy v0.2.0 (2023-03-16)
 Deprecations and Removals
 -------------------------
 
-- Fixed time handling in contamination calculations using ``astropy.time``.
-  (:pr:`104`)
+- Fixed time handling in contamination calculations using ``astropy.time``. (:pr:`104`)
 
 Features
 --------
 
-- Added routine ``xrt_teem`` to derive temperatures and emission
-  measures from pairs of images using the filter ratio method. (:pr:`89`)
+- Added routine ``xrt_teem`` to derive temperatures and emission  measures from pairs of images using the filter ratio method. (:pr:`89`)
 
 Bug Fixes
 ---------
 
-- Addressed and fixed the temperature response ``nan`` calculations output.
-  (:pr:`111`)
+- Addressed and fixed the temperature response ``nan`` calculations output. (:pr:`111`)
 
 Improved Documentation
 ----------------------

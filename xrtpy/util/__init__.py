@@ -1,9 +1,9 @@
-from xrtpy.util import filename2repo_path, make_exposure_map, time
+from xrtpy.util.filename2repo_path import filename2repo_path
+from xrtpy.util.make_exposure_map import make_exposure_map
 from xrtpy.util.time import epoch
 
 __all__ = [
     "epoch",
-    "time",
     "filename2repo_path",
     "make_exposure_map",
     "SSW_MIRRORS",
