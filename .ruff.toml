@@ -74,3 +74,6 @@ ignore = [
   "E402",  # Module imports not at top of file
   "INP001",  # Implicit-namespace-package. The examples are not a package.
 ]
+"examples/*" = [
+  "INP001",  # Implicit-namespace-package. The examples are not a package.
+]

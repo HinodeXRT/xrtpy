@@ -7,7 +7,7 @@ requires = [
 ]
 
 [project]
-name = "xrtpy"
+name = "XRTpy"
 readme = "README.md"
 keywords = ["Solar Physics", "x-ray", "Hinode", "XRT"]
 description = "For analyzing data from the X-Ray Telescope (XRT) on the Hinode spacecraft."
@@ -58,24 +58,21 @@ tests = [
   "pytest-xdist >= 3.6.1",
 ]
 docs = [
-  "imageio >= 2.20.0",
-  "ipykernel >= 6.20.0",
-  "ipython >= 8.4.0",
-  "ipywidgets >= 8.1.0",
-  "nbconvert >= 7.7.0, < 7.14",
-  "nbsphinx >= 0.9",
+  "pydata_sphinx_theme >= 0.15.0",
+  # Need pkg_resources for sphinxcontrib-bibtex
+  # and this comes from setuptools
+  # This is a bug upstream in the extension which
+  # has yet to be fixed.
+  "setuptools",
   "sphinx >= 7.3.0",
   "sphinx_automodapi >= 0.17.0",
-  "sphinx-codeautolink >= 0.15.2",
   "sphinx-copybutton >= 0.5.2",
   "sphinx-gallery >= 0.16.0",
   "sphinx-hoverxref >= 1.4.0",
   "sphinx-issues >= 4.1.0",
-  "sphinx-rtd-theme >= 2.0.0",
-  # Need pkg_resources for sphinxcontrib-bibtex
-  # and this comes from setuptools
-  "setuptools",
   "sphinxcontrib-bibtex >= 2.6.2",
+  "sphinxext-opengraph>=0.6.0",
+  "sunpy[net] >= 5.0.0",
 ]
 
 [project.urls]

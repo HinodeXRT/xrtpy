@@ -3,8 +3,6 @@ Functionality for diagnosing plasma temperature through the filter
 ratio technique.
 """
 
-__all__ = ["temperature_from_filter_ratio"]
-
 from datetime import datetime
 from typing import Any, NamedTuple
 
@@ -16,6 +14,8 @@ from sunpy.image.resample import reshape_image_to_4d_superpixel
 from sunpy.map import Map
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
+
+__all__ = ["temperature_from_filter_ratio"]
 
 
 class TempEMdata(NamedTuple):
