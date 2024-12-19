@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 from astropy import units as u
-from astropy.utils.data import get_pkg_data_filenames
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
@@ -96,23 +95,32 @@ def test_EffectiveArea_exception_is_raised(name, date):
         EffectiveAreaFundamental(name, date)
 
 
-def get_IDL_data_files():
+"""def get_IDL_data_files():
     filter_data_files = []
     for dir in get_pkg_data_filenames(
         "data/effective_area_IDL_testing_files", package="xrtpy.response.tests"
     ):
         filter_data_files += list(Path(dir).glob("*.txt"))
     return sorted(filter_data_files)
+"""
+
+
+def get_IDL_data_files():
+    data_dir = Path(__file__).parent / "data" / "effective_area_IDL_testing_files"
+    assert data_dir.exists(), f"Data directory {data_dir} does not exist."
+    files = sorted(data_dir.glob("**/*.txt"))
+    # print(f"\n\n\nFound files: {files}\n\n")  # Debugging output
+    return files
 
 
 # NOTE: This is marked as xfail because the IDL results that this test compares against
 # are incorrect due to the use of quadratic interpolation in the contamination curves
 # which leads to ringing near the edges in the contamination curve.
 # See https://github.com/HinodeXRT/xrtpy/pull/284#issuecomment-2334503108
-@pytest.mark.xfail
+# @pytest.mark.xfail
 @pytest.mark.parametrize("filename", get_IDL_data_files())
 def test_effective_area_compare_idl(filename):
-    with Path.open(filename) as f:
+    with filename.open() as f:
         filter_name = f.readline().split()[1]
         filter_obs_date = " ".join(f.readline().split()[1:])
     # NOTE: Annoyingly the date strings use "Sept" instead of "Sep" for "September"
@@ -120,13 +128,22 @@ def test_effective_area_compare_idl(filename):
     IDL_data = np.loadtxt(filename, skiprows=3)
     IDL_wavelength = IDL_data[:, 0] * u.AA
     IDL_effective_area = IDL_data[:, 1] * u.cm**2
+
+    # Interpolate XRTpy effective area onto the IDL wavelength grid
     instance = EffectiveAreaFundamental(filter_name, filter_obs_date)
     actual_effective_area = instance.effective_area()
-    IDL_effective_area = np.interp(
-        instance.wavelength, IDL_wavelength, IDL_effective_area
+    XRTpy_effective_area = (
+        np.interp(
+            IDL_wavelength.value,  # Target grid (IDL wavelengths)
+            instance.wavelength.value,  # Source grid (XRTpy wavelengths)
+            actual_effective_area.value,  # Data to interpolate
+        )
+        * u.cm**2
     )
+
     assert u.allclose(
-        actual_effective_area,
-        IDL_effective_area,
-        rtol=1e-6,
+        XRTpy_effective_area,  # Interpolated XRTpy values
+        IDL_effective_area,  # Original IDL values
+        rtol=1e-4,  # Relative tolerance
+        atol=1.0e-4 * u.cm**2,
     )

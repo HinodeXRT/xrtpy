@@ -525,8 +525,7 @@ class EffectiveAreaFundamental:
     def wavelength(self):
         """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
         _wave = self._channel.wavelength.to_value("AA")
-        delta_wave = 0.01
-        return np.arange(_wave[0], _wave[-1], delta_wave) * u.Angstrom
+        return _wave * u.Angstrom
 
     @property
     def channel_geometry_aperture_area(self):
