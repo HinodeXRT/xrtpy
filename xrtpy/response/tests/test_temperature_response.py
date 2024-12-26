@@ -1,86 +1,67 @@
-import pytest
-
-from datetime import datetime
 from pathlib import Path
+
+import astropy.units as u
+import numpy as np
+import pytest
+from astropy.utils.data import get_pkg_data_filenames
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
-def get_IDL_data_files(model):
-    path = (
-        Path(__file__).parent.parent.absolute()
-        / "tests"
-        / "data"
-        / f"temperature_response_{model}_IDL_testing_files"
-    )
-    filter_data_files = list(path.glob("**/*.txt"))
+def get_IDL_data_files(abundance):
+    filter_data_files = []
+    for dir in get_pkg_data_filenames(
+        f"data/temperature_response_{abundance}_IDL_testing_files",
+        package="xrtpy.response.tests",
+    ):
+        filter_data_files += list(Path(dir).glob("*.txt"))
     return sorted(filter_data_files)
 
 
-def _IDL_raw_data_list(filename):
-    with open(filename) as filter_file:
-        IDL_data_list = []
-        for line in filter_file:
-            stripped_line = line.strip()
-            line_list = stripped_line.split()
-            IDL_data_list.append(line_list)
-    return IDL_data_list
+filenames = (
+    get_IDL_data_files("coronal")
+    + get_IDL_data_files("hybrid")
+    + get_IDL_data_files("photospheric")
+)
 
 
-def IDL_test_abundance_name(IDL_data_list):
-    return str(IDL_data_list[1][1])
+@pytest.mark.parametrize("filename", filenames)
+def test_temperature_response(filename):
+    with Path.open(filename) as f:
+        _ = f.readline()
+        abundance = f.readline().split()[1]
+        filter_name = f.readline().split()[1]
+        filter_obs_date = " ".join(f.readline().split()[1:])
+    # NOTE: Annoyingly the date strings use "Sept" instead of "Sep" for "September"
+    filter_obs_date = filter_obs_date.replace("Sept", "Sep")
+    IDL_data = np.loadtxt(filename, skiprows=5)
+    IDL_temperature = IDL_data[:, 0] * u.K
+    IDL_temperature_response = IDL_data[:, 1] * u.Unit("DN cm5 pix-1 s-1")
 
+    instance = TemperatureResponseFundamental(
+        filter_name, filter_obs_date, abundance_model=abundance
+    )
 
-def IDL_test_filter_name(IDL_data_list):
-    return str(IDL_data_list[2][1])
+    IDL_temperature_response = np.interp(
+        instance.CHIANTI_temperature, IDL_temperature, IDL_temperature_response
+    )
 
+    actual_temperature_response = instance.temperature_response()
 
-def IDL_test_date(IDL_data_list):
-    obs_date = str(IDL_data_list[3][1])
-    obs_time = str(IDL_data_list[3][2])
+    # NOTE: there may be small deviations where the response function is very small, likely
+    # due to differences in the interpolation schemes. These are not critical as the response
+    # is effectively zero in these regions anyway.
+    i_valid = np.where(
+        actual_temperature_response > 1e-8 * actual_temperature_response.max()
+    )
 
-    day = int(obs_date[:2])
-    month_datetime_object = datetime.strptime(obs_date[3:6], "%b")
-    month = month_datetime_object.month
-    year = int(obs_date[8:12])
-
-    hour = int(obs_time[:2])
-    minute = int(obs_time[3:5])
-    second = int(obs_time[6:8])
-    return datetime(year, month, day, hour, minute, second)
-
-
-def _IDL_temperature_response_raw_data(filename):
-    with open(filename) as filter_file:
-        IDL_data_list = []
-        for line in filter_file:
-            stripped_line = line.strip()
-            line_list = stripped_line.split()
-            IDL_data_list.append(line_list)
-
-    new_IDL_data_list = [IDL_data_list[i][1] for i in range(5, len(IDL_data_list))]
-    return [float(i) for i in new_IDL_data_list]
-
-
-@pytest.mark.parametrize("abundance_model", ["coronal", "hybrid", "photospheric"])
-def test_temperature_response(abundance_model, allclose):
-    filenames = get_IDL_data_files(abundance_model)
-    for filename in filenames:
-        IDL_data = _IDL_raw_data_list(filename)
-        filter_name = IDL_test_filter_name(IDL_data)
-        filter_obs_date = IDL_test_date(IDL_data)
-        IDL_temperature_response = _IDL_temperature_response_raw_data(filename)
-
-        instance = TemperatureResponseFundamental(
-            filter_name, filter_obs_date, abundance_model=abundance_model
-        )
-
-        actual_temperature_response = instance.temperature_response()
-        atol = actual_temperature_response.value.max() * 0.013
-
-        assert allclose(
-            actual_temperature_response.value,
-            IDL_temperature_response,
-            rtol=0.028,
-            atol=atol,
-        )
+    # NOTE: The relative tolerance is set comparatively high here because the CCD right gain
+    # values in the IDL and xrtpy codes are explicitly different. See https://github.com/HinodeXRT/xrtpy/pull/76.
+    # If the IDL results files are corrected to account for this updated gain, then this
+    # relative tolerance can be set significantly lower. Setting the gains to be the same,
+    # nearly all cases match within less than 1%.
+    assert u.allclose(
+        actual_temperature_response[i_valid],
+        IDL_temperature_response[i_valid],
+        rtol=5e-2,
+    )

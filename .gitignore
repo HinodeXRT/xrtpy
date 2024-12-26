@@ -69,7 +69,9 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/generated
+docs/sg_execution_times.rst
+docs/_build
 docs/api
 
 # PyBuilder
@@ -81,6 +83,7 @@ target/
 # IPython
 profile_default/
 ipython_config.py
+Untitled*.ipynb
 
 # pyenv
 .python-version
@@ -137,6 +140,8 @@ dmypy.json
 version.py
 .idea
 .vscode
+.history
+.\#*
 
 #ignore mac files
 .DS_store

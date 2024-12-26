@@ -2,22 +2,27 @@
 Functionality for diagnosing plasma temperature through the filter
 ratio technique.
 """
-__all__ = ["temperature_from_filter_ratio"]
 
-import logging
+from datetime import datetime
+from typing import Any, NamedTuple
+
 import numpy as np
-
 from astropy import units as u
 from astropy.constants import c, h
-from collections import namedtuple
-from datetime import datetime
-from sunpy.coordinates.sun import angular_radius, B0
+from sunpy.coordinates.sun import B0, angular_radius
 from sunpy.image.resample import reshape_image_to_4d_superpixel
 from sunpy.map import Map
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
-TempEMdata = namedtuple("TempEMdata", "Tmap, EMmap, Terrmap, EMerrmap")
+__all__ = ["temperature_from_filter_ratio"]
+
+
+class TempEMdata(NamedTuple):
+    Tmap: Any
+    EMmap: Any
+    Terrmap: Any
+    EMerrmap: Any
 
 
 def temperature_from_filter_ratio(
@@ -30,7 +35,8 @@ def temperature_from_filter_ratio(
     Te_err_threshold=0.5,
     photon_noise_threshold=0.2,
     mask=None,
-    verbose=False,
+    expmap1=None,
+    expmap2=None,
 ):
     r"""
     Get coronal temperatures and emission measures from a pair of images using
@@ -86,9 +92,13 @@ def temperature_from_filter_ratio(
     no_threshold : Boolean [Optional]
         If True, no thresholds are set. (default = False)
 
-    verbose : Boolean [Optional]
-        If True, information is printed
+    expmap1 : numpy array [Optional]
+        if provided, gives exposure time (s) for each pixel in image 1. This
+        is useful for composite images in which different parts of the image
+        have different exposure times
 
+    expmap2 : numpy array [Optional]
+        if provided, gives exposure time (s) for each pixel in image 2.
 
     Returns:
     --------
@@ -149,16 +159,19 @@ def temperature_from_filter_ratio(
     data1 = data1.astype(float)
     data2 = data2.astype(float)
 
-    if verbose:
-        logging.basicConfig(format="%(funcName)s: %(message)s", level=logging.INFO)
-
     n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
     n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
     # This allows use of normalized data (contrary to original IDL code):
     if n1:
-        data1 = data1 * hdr1["EXPTIME"]
+        if expmap1 is None:
+            data1 = data1 * hdr1["EXPTIME"]
+        else:
+            data1 = data1 * expmap1
     if n2:
-        data2 = data2 * hdr2["EXPTIME"]
+        if expmap2 is None:
+            data2 = data2 * hdr2["EXPTIME"]
+        else:
+            data2 = data2 * expmap2
 
     if mask is None:
         mask = np.zeros_like(data1, dtype=bool)
@@ -211,7 +224,14 @@ def temperature_from_filter_ratio(
         raise ValueError("Filters for the two images cannot be the same")
 
     T_e, EM, model_ratio, ok_pixel = _derive_temperature(
-        map1, map2, tresp1, tresp2, binfac=binfac, Trange=Trange
+        map1,
+        map2,
+        tresp1,
+        tresp2,
+        expmap1=expmap1,
+        expmap2=expmap2,
+        binfac=binfac,
+        Trange=Trange,
     )
 
     T_error, EMerror, K1, K2 = calculate_TE_errors(
@@ -237,15 +257,18 @@ def temperature_from_filter_ratio(
             & (Kd1 <= photon_noise_threshold)
             & (Kd2 <= photon_noise_threshold)
         )
-        logging.info(
-            f"number of pixels ruled out by threshold = " f"{np.sum(~ok_pixel)}"
-        )
-        logging.info(f"number of pixels ruled out by T_e errors = {np.sum(~tthr)}")
-        logging.info(f"number of pixels ruled out by d1 noise  = {np.sum(~k1thr)}")
-        logging.info(f"number of pixels ruled out by d2 noise  = {np.sum(~k2thr)}")
-        logging.info(
-            f"number of bad pixels before threshold   = " f"{np.sum(~ok_wothr)}"
-        )
+        npix_thresh = np.sum(~ok_pixel)
+        npix_Terr = np.sum(~tthr)
+        npix_d1_noise = np.sum(~k1thr)
+        npix_d2_noise = np.sum(~k2thr)
+        npix_badpix = np.sum(~ok_wothr)
+        extra_metadata = {
+            "NPTHRESH": (npix_thresh, "number of pixels ruled out by threshold"),
+            "NPTERR": (npix_Terr, "number of pixels ruled out by T_e errors"),
+            "NPD1NOIS": (npix_d1_noise, "number of pixels ruled out by d1 noise"),
+            "NPD2NOIS": (npix_d2_noise, "number of pixels ruled out by d2 noise"),
+            "NPBPIX": (npix_badpix, "number of bad pixels before threshold"),
+        }
         mask = mask | ~ok_pixel
         T_e[mask] = 0.0
         EM[mask] = 0.0
@@ -257,17 +280,18 @@ def temperature_from_filter_ratio(
             Tmodel = Tmodel[
                 (np.log10(Tmodel) >= Trange[0]) & (np.log10(Tmodel) <= Trange[1])
             ]
-        logging.info(f"Examined T_e range: {Tmodel.min():.3E} - {Tmodel.max():.3E} K")
-        logging.info(f"Applied thresholds: - T_e error < {Te_err_threshold*100.} %")
-        logging.info(
-            f"                    - Photon noise < " f"{photon_noise_threshold*100.} %"
-        )
+        extra_metadata["TEMIN"] = (Tmodel.min(), "lowest T_e examined")
+        extra_metadata["TEMAX"] = (Tmodel.max(), "highest T_e examined")
+        extra_metadata["TETHRESH"] = (Te_err_threshold, "T_e error threshold")
+        extra_metadata["PHNOISE"] = (photon_noise_threshold, "Photon noise threshold")
     else:
         Tmodel = tresp1.CHIANTI_temperature.value
-        logging.info(f"Examined T_e range: {Tmodel.min():.3E} - {Tmodel.max():.3E} K")
-        logging.info("No thresholds applied")
+        extra_metadata = {
+            "TEMIN": (Tmodel.min(), "lowest T_e examined"),
+            "TEMAX": (Tmodel.max(), "highest T_e examined"),
+        }
     Tmap, EMmap, Terrmap, EMerrmap = make_results_maps(
-        hdr1, hdr2, T_e, EM, T_error, EMerror, mask
+        hdr1, hdr2, T_e, EM, T_error, EMerror, extra_metadata
     )
     return TempEMdata(Tmap, EMmap, Terrmap, EMerrmap)
 
@@ -316,7 +340,9 @@ def deriv(x, y):
     return np.append(np.insert(dydx1, 0, dydx0), dydxN)
 
 
-def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
+def _derive_temperature(
+    map1, map2, tresp1, tresp2, expmap1=None, expmap2=None, binfac=1, Trange=None
+):
     """
     Given two XRT Level 1 images, their associated metadata and the
     TemperatureResponseFundamental objects associated with them, derive the
@@ -336,6 +362,12 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
 
     tresp2 : ~xrtpy.response.temperature_response.TemperatureResponseFundamental
         temperature response for second image
+
+    expmap1 : numpy array, Optional
+        exposure time map for data image 1
+
+    expmap2 : numpy array, Optional
+        exposure time map for data image 2
 
     binfac : integer, Optional (default = 1)
         spatial binning factor
@@ -399,8 +431,14 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
     data2 = np.ma.masked_where(map2.mask, map2.data)
     mask = map1.mask
 
-    exptime1 = map1.meta["EXPTIME"]
-    exptime2 = map2.meta["EXPTIME"]
+    if expmap1 is None:
+        exptime1 = map1.meta["EXPTIME"]
+    else:
+        exptime1 = expmap1
+    if expmap2 is None:
+        exptime2 = map2.meta["EXPTIME"]
+    else:
+        exptime2 = expmap2
 
     if rev_ratio:
         data_ratio = (data2 / exptime2) / (data1 / exptime1)
@@ -424,6 +462,13 @@ def _derive_temperature(map1, map2, tresp1, tresp2, binfac=1, Trange=None):
             # pixels are assigned a temperature of 0
             ok_cnt[n] += 1
 
+    # Performs linear interpolation between two adjacent temperatures in Tmodel,
+    # based on the observed filter ratio (`data_ratio`) and the model ratios (`model_ratio`).
+    # `a` and `b` represent differences between the observed and model ratios.
+    # The equation weighs the temperatures proportionally, with more weight given
+    # to the temperature whose model ratio is closer to the observed filter ratio.
+    # This ensures a smooth transition between temperature values, providing a more
+    # accurate estimate when the observed filter ratio lies between two model ratios.
     ok_num[ok_cnt != 1] = 0
     a = np.abs(model_ratio[ok_num] - data_ratio)
     b = np.abs(model_ratio[np.maximum((ok_num - 1), 0)] - data_ratio)
@@ -496,7 +541,7 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
         Narukage's K factor for image 2
     """
 
-    wvl = tresp1.channel_wavelength
+    wvl = tresp1.wavelength
     eVe = tresp1.ev_per_electron
     gain = tresp1.ccd_gain_right
     # (h*c/lambda) * 1/(eV per electron) * 1/gain
@@ -534,15 +579,13 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
     # line broadening (as is the default in ChiantiPy).
     K1_mod = np.array(
         [
-            (s1 * effarea1 * e2dn**2 * dwvl).sum()
-            / (s1 * effarea1 * e2dn * dwvl).sum()
+            (s1 * effarea1 * e2dn**2 * dwvl).sum() / (s1 * effarea1 * e2dn * dwvl).sum()
             for s1 in spect1
         ]
     )
     K2_mod = np.array(
         [
-            (s2 * effarea2 * e2dn**2 * dwvl).sum()
-            / (s2 * effarea2 * e2dn * dwvl).sum()
+            (s2 * effarea2 * e2dn**2 * dwvl).sum() / (s2 * effarea2 * e2dn * dwvl).sum()
             for s2 in spect2
         ]
     )
@@ -573,7 +616,7 @@ def calculate_TE_errors(map1, map2, T_e, EM, model_ratio, tresp1, tresp2, Trange
     return T_error, EMerror, K1, K2
 
 
-def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
+def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, extra_metadata):
     """
     Create SunPy Map objects from the image metadata and temperature, volume
     emission measure, temperature uncertainty and emission measure uncertainty
@@ -599,10 +642,6 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
 
     EMerror : 2D float array
         image containing the uncertainties in EM derived for the images
-
-    mask : 2D boolean array
-        image containing the mask for T_e and EM, either provided or derived
-        from the data
 
     Returns:
     --------
@@ -667,11 +706,14 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
         "crota1",
         "crota2",
         "platescl",
+        "keycomments",
     ]
     for kw in kw_to_copy:
         new_hdr[kw] = hdr1[kw]
-    new_hdr["L1_data_file1"] = filename1
-    new_hdr["L1_data_file2"] = filename2
+    new_hdr["L1_file1"] = filename1
+    new_hdr["L1_file2"] = filename2
+    extra_values, extra_comments = split_values_comments(extra_metadata)
+    new_hdr.update(extra_values)
     create_date = datetime.now().ctime()
     new_hdr["history"] = f"Created by temperature_from_filter_ratio {create_date}\n"
     Thdr = new_hdr.copy()
@@ -680,6 +722,7 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
         new_hdr["history"] + "Temperature derived using filter ratio method"
     )
     Tmap = Map(T_e, Thdr)
+    Tmap.meta["keycomments"] = extra_comments
     Tmap.nickname = "Log Derived Temperature (K)"
     EMhdr = new_hdr.copy()
     EMhdr["BUNIT"] = r"log10(cm$^{{-3}}$)"
@@ -687,6 +730,7 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
         new_hdr["history"] + "Volume emission measure derived using filter ratio method"
     )
     EMmap = Map(EM, EMhdr)
+    EMmap.meta["keycomments"] = extra_comments
     EMmap.nickname = r"Log Derived Volume E.M. (cm$^{{-3}}$)"
     Terrhdr = new_hdr.copy()
     Terrhdr["BUNIT"] = "log10(K)"
@@ -694,6 +738,7 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
         new_hdr["history"] + "Temperature uncertainty derived using filter ratio method"
     )
     Terrmap = Map(T_error, Terrhdr)
+    Terrmap.meta["keycomments"] = extra_comments
     Terrmap.nickname = "Log Derived Temperature Errors (K)"
     EMerrhdr = new_hdr.copy()
     EMerrhdr["BUNIT"] = r"log10(cm$^{{-3}}$)"
@@ -702,6 +747,7 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, mask):
         + "Volume emission measure uncertainty derived using filter ratio method"
     )
     EMerrmap = Map(EMerror, EMerrhdr)
+    EMerrmap.meta["keycomments"] = extra_comments
     EMerrmap.nickname = r"Log Derived V.E.M. Errors (cm$^{{-3}}$)"
     return Tmap, EMmap, Terrmap, EMerrmap
 
@@ -722,3 +768,20 @@ def measurement_to_filtername(measurement):
     else:
         raise ValueError("Invalid filter values, both fw1 and fw2 are Open")
     return filtername
+
+
+def split_values_comments(metadict):
+    """
+    Given a dictionary of keys and values where some of the values are tuples
+    of the actual value and a string comment, return a dictionary with only
+    the actual values and another one with the comments.
+    """
+    comment_dict = {}
+    value_dict = {}
+    for k, v in metadict.items():
+        if isinstance(v, tuple):
+            value_dict[k] = v[0]
+            comment_dict[k] = v[1]
+        else:
+            value_dict[k] = v
+    return value_dict, comment_dict

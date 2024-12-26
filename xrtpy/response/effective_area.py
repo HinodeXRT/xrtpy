@@ -1,22 +1,20 @@
 __all__ = [
     "EffectiveAreaFundamental",
-    "effective_area",
 ]
 
-
-import astropy.time
 import datetime
 import math
+from functools import cached_property
+from pathlib import Path
+
+import astropy.time
 import numpy as np
-import os
+import scipy.interpolate
 import scipy.io
 import sunpy.io.special
 import sunpy.time
-
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
-from functools import cached_property
-from pathlib import Path
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
@@ -66,16 +64,19 @@ _filter_contamination = _filter_contam_file["p2"]
 
 class EffectiveAreaFundamental:
     """
-    Class for calculating the effective area.
+    Class for calculating the effective area for an XRT filter at a specific observation date.
+
+    This class handles the calculations required to determine the effective area of a filter
+    used in the X-Ray Telescope (XRT) on the Hinode satellite. It considers various factors such as
+    contamination on the CCD and filters, as well as the geometry and transmission of the XRT channel.
 
     Parameters
-    -----------
+    ----------
     filter_name : str
         The name of the filter.
-
-    observation_date: str
-        The date of the observation.  For valid date formats, look at the documentation for
-        `sunpy.time.parse_time`.
+    observation_date : str or datetime.datetime
+        The date of the observation. Acceptable formats include any string or datetime object
+        that can be parsed by `sunpy.time.parse_time`.
     """
 
     def __init__(self, filter_name, observation_date):
@@ -85,12 +86,20 @@ class EffectiveAreaFundamental:
 
     @property
     def name(self) -> str:
-        """Name of XRT X-Ray channel filter."""
+        """
+        Name of XRT X-Ray channel filter.
+
+        :noindex:
+        """
         return self._name
 
     @property
     def observation_date(self) -> str:
-        """Date of observation."""
+        """
+        Date of observation.
+
+        :noindex:
+        """
         return self._observation_date
 
     @observation_date.setter
@@ -105,7 +114,7 @@ class EffectiveAreaFundamental:
                 f"Date must be after {epoch}."
             )
 
-        modified_time_path = os.path.getmtime(_ccd_contam_filename)
+        modified_time_path = Path(_ccd_contam_filename).stat().st_mtime
         modified_time = astropy.time.Time(modified_time_path, format="unix")
         latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
             "%Y/%m/%d"
@@ -129,14 +138,36 @@ class EffectiveAreaFundamental:
 
     @property
     def contamination_on_CCD(self):
-        """Calculation of contamination layer on the CCD, thickness given in Angstrom (Å)."""
+        """
+        Calculate the thickness of the contamination layer on the CCD.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the CCD at the observation date. The contamination layer
+        is measured in Angstroms (Å).
+
+        Returns
+        -------
+        astropy.units.Quantity
+            The thickness of the contamination layer on the CCD, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the
+        available contamination data points. The `observation_date` attribute is used to
+        provide the point at which to evaluate the interpolation.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
         interpolater = scipy.interpolate.interp1d(
             _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
     @property
-    def filter_index_mapping_to_name(self):
+    def _filter_index_mapping_to_name(self):
         """Returns filter's corresponding number value."""
         if self.name in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(self.name)
@@ -144,33 +175,33 @@ class EffectiveAreaFundamental:
             return index_mapping_to_fw2_name.get(self.name)
 
     @property
-    def filter_wheel_number(self):
+    def _filter_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
         return 0 if self.name in index_mapping_to_fw1_name else 1
 
     @property
-    def combo_filter_name_split(self):
+    def _combo_filter_name_split(self):
         """Defining chosen filters to its corresponding filter wheel."""
         name = (self.name).split("/")
         filter1, filter2 = name[0], name[1]
         return filter1, filter2
 
     @property
-    def combo_filter1_wheel_number(self):
+    def _combo_filter1_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        filter1, _ = self.combo_filter_name_split
+        filter1, _ = self._combo_filter_name_split
         return 0 if filter1 in index_mapping_to_fw1_name else 1
 
     @property
-    def combo_filter2_wheel_number(self):
+    def _combo_filter2_wheel_number(self):
         """Defining chosen filter to its corresponding filter wheel."""
-        _, filter2 = self.combo_filter_name_split
+        _, filter2 = self._combo_filter_name_split
         return 0 if filter2 in index_mapping_to_fw1_name else 1
 
     @property
-    def combo_filter_index_mapping_to_name_filter1(self):
+    def _combo_filter_index_mapping_to_name_filter1(self):
         """Returns filter's corresponding number value."""
-        filter1, _ = self.combo_filter_name_split
+        filter1, _ = self._combo_filter_name_split
 
         if filter1 in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(filter1)
@@ -178,9 +209,9 @@ class EffectiveAreaFundamental:
             return index_mapping_to_fw2_name.get(filter1)
 
     @property
-    def combo_filter_index_mapping_to_name_filter2(self):
+    def _combo_filter_index_mapping_to_name_filter2(self):
         """Returns filter's corresponding number value."""
-        filter1, filter2 = self.combo_filter_name_split
+        filter1, filter2 = self._combo_filter_name_split
 
         if filter2 in index_mapping_to_fw1_name:
             return index_mapping_to_fw1_name.get(filter2)
@@ -188,51 +219,120 @@ class EffectiveAreaFundamental:
             return index_mapping_to_fw2_name.get(filter2)
 
     @property
-    def combo_filter1_data(self):
+    def _combo_filter1_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter1][
-            self.combo_filter1_wheel_number
+        return _filter_contamination[self._combo_filter_index_mapping_to_name_filter1][
+            self._combo_filter1_wheel_number
         ]
 
     @property
-    def combo_filter2_data(self):
+    def _combo_filter2_data(self):
         """Collecting filter data."""
-        return _filter_contamination[self.combo_filter_index_mapping_to_name_filter2][
-            self.combo_filter2_wheel_number
+        return _filter_contamination[self._combo_filter_index_mapping_to_name_filter2][
+            self._combo_filter2_wheel_number
         ]
 
     @property
     def contamination_on_filter1_combo(self) -> u.angstrom:
         """
-        Thickness of the contamination layer on a filter."""
+        Calculate the thickness of the contamination layer on the first filter in a filter combination.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the first filter of a specified filter combination at the
+        observation date.
+
+        Returns
+        -------
+        astropy.units.Quantity
+            The thickness of the contamination layer on the first filter, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the
+        available contamination data points. The ``filter_data_dates_to_seconds`` and
+        ``_combo_filter1_data`` attributes are used to provide the data for interpolation,
+        and ``filter_observation_date_to_seconds`` provides the point at which to
+        evaluate the interpolation.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
 
         interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter1_data, kind="linear"
+            self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
 
     @property
     def contamination_on_filter2_combo(self) -> u.angstrom:
         """
-        Thickness of the contamination layer on a filter."""
+        Calculate the thickness of the contamination layer on the second filter in a filter combination.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the second filter of a specified filter combination at the
+        observation date.
+
+        Returns
+        -------
+        astropy.units.Quantity
+            The thickness of the contamination layer on the second filter, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the
+        available contamination data points. The ``filter_data_dates_to_seconds`` and
+        ``_combo_filter2_data`` attributes are used to provide the data for interpolation,
+        and ``filter_observation_date_to_seconds`` provides the point at which to
+        evaluate the interpolation.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
 
         interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self.combo_filter2_data, kind="linear"
+            self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
 
     @property
-    def filter_data(self):
+    def _filter_data(self):
         """Collecting filter contamination data."""
-        return _filter_contamination[self.filter_index_mapping_to_name][
-            self.filter_wheel_number
+        return _filter_contamination[self._filter_index_mapping_to_name][
+            self._filter_wheel_number
         ]
 
     @property
     def contamination_on_filter(self) -> u.angstrom:
-        """Thickness of the contamination layer on a filter."""
+        """
+        Calculate the thickness of the contamination layer on a filter.
+
+        This property interpolates the contamination data over time to determine the thickness
+        of the contamination layer on the specified filter at the observation date. The contamination layer
+        is measured in Angstroms (Å).
+
+        Returns
+        -------
+        astropy.units.Quantity
+            The thickness of the contamination layer on the filter, in Angstroms.
+
+        Notes
+        -----
+        The interpolation is performed using a linear interpolation method over the available
+        contamination data points. The `observation_date` attribute is used to provide the point
+        at which to evaluate the interpolation. The data used for interpolation is specific to
+        the filter defined by the ``filter_name`` attribute.
+
+        Raises
+        ------
+        ValueError
+            If the observation date is outside the range of the available contamination data.
+        """
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self.filter_data, kind="linear"
+            _filter_contamination_file_time.utime, self._filter_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
@@ -243,7 +343,7 @@ class EffectiveAreaFundamental:
             "data/n_DEHP.txt", package="xrtpy.response"
         )
 
-        with open(_n_DEHP_filename) as n_DEHP:
+        with Path(_n_DEHP_filename).open() as n_DEHP:
             list_of_DEHP_attributes = []
             for line in n_DEHP:
                 stripped_line = line.strip()
@@ -300,10 +400,22 @@ class EffectiveAreaFundamental:
         )
 
     @cached_property
-    def transmission_equation(self):
-        """Defining equations that will be used to calculate the effective area.
-        REFERENCES: G.R Fowles, Intro to Modern Optics 2nd Edition, pp 96-101."""
+    def _transmission_equation(self):
+        """
+        Define equations used to calculate the effective area.
 
+        This method sets up the necessary equations to calculate the effective area of a filter
+        in the X-Ray Telescope (XRT) on the Hinode satellite. The calculations are based on the
+        principles of modern optics as described in G.R Fowles, "Introduction to Modern Optics,"
+        2nd Edition, pp 96-101.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the index of refraction, sine of the angle of incidence, cosine of the angle of incidence,
+            maximum wavelength, index of refraction of the medium at the entrance, index of refraction of the medium at the exit,
+            and the angle of incidence.
+        """
         n_o = 1.0  # index of medium at entrance of filter (assumed vacuum)
         n_t = 1.0  # index of medium at exit of filter (assumed vacuum)
 
@@ -324,10 +436,10 @@ class EffectiveAreaFundamental:
         return (index, sin_a, cos_a, wavelength_max, n_o, n_t, incidence_angle)
 
     @cached_property
-    def angular_wavenumber_CCD(self):
+    def _angular_wavenumber_CCD(self):
         """Define angular wavenumber on CCD."""
 
-        index, _, cos_a, wavelength_max, _, _, _ = self.transmission_equation
+        index, _, cos_a, wavelength_max, _, _, _ = self._transmission_equation
 
         # Define wavevector
         angular_wavenumber = np.array(
@@ -349,9 +461,9 @@ class EffectiveAreaFundamental:
         ]
 
     @cached_property
-    def filterwheel_angular_wavenumber(self):
+    def _filterwheel_angular_wavenumber(self):
         """Define angular wavenumber for a filter."""
-        index, _, cos_a, _, _, _, _ = self.transmission_equation
+        index, _, cos_a, _, _, _, _ = self._transmission_equation
 
         # Define wavevector
         angular_wavenumber = np.array(
@@ -373,10 +485,10 @@ class EffectiveAreaFundamental:
         ]
 
     @cached_property
-    def CCD_contamination_transmission(self):
+    def _CCD_contamination_transmission(self):
         """Calculate transmission matrix coefficient and transmittance on the CCD."""
 
-        index, _, _, _, n_o, n_t, _ = self.transmission_equation
+        index, _, _, _, n_o, n_t, _ = self._transmission_equation
 
         i_i = complex(0, 1)  # Define complex number
 
@@ -384,12 +496,12 @@ class EffectiveAreaFundamental:
         M = [
             [
                 [
-                    np.cos(self.angular_wavenumber_CCD[i]),
-                    (-i_i * np.sin(self.angular_wavenumber_CCD[i])) / index[i],
+                    np.cos(self._angular_wavenumber_CCD[i]),
+                    (-i_i * np.sin(self._angular_wavenumber_CCD[i])) / index[i],
                 ],
                 [
-                    -i_i * np.sin(self.angular_wavenumber_CCD[i]) * index[i],
-                    np.cos(self.angular_wavenumber_CCD[i]),
+                    -i_i * np.sin(self._angular_wavenumber_CCD[i]) * index[i],
+                    np.cos(self._angular_wavenumber_CCD[i]),
                 ],
             ]
             for i in range(4000)
@@ -410,33 +522,39 @@ class EffectiveAreaFundamental:
         return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
 
     @property
-    def channel_wavelength(self):
+    def wavelength(self):
         """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
-        return Channel(self.name).wavelength
+        _wave = self._channel.wavelength.to_value("AA")
+        return _wave * u.Angstrom
 
     @property
     def channel_geometry_aperture_area(self):
         """XRT flight model geometry aperture area."""
-        return Channel(self.name).geometry.geometry_aperture_area
+        return self._channel.geometry.geometry_aperture_area
 
     @property
     def channel_transmission(self):
         """XRT channel transmission."""
-        return Channel(self.name).transmission
+        return np.interp(
+            self.wavelength, self._channel.wavelength, self._channel.transmission
+        )
+
+    def _contamination_interpolator(self, x, y):
+        return np.interp(self.wavelength.to_value("Angstrom"), x, y)
 
     @property
-    def interpolated_CCD_contamination_transmission(self):
+    def _interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        CCD_contam_transmission = interpolate.interp1d(
-            self.n_DEHP_wavelength, self.CCD_contamination_transmission
+        return self._contamination_interpolator(
+            self.n_DEHP_wavelength,
+            self._CCD_contamination_transmission,
         )
-        return CCD_contam_transmission(self.channel_wavelength)
 
     @cached_property
-    def filter_contamination_transmission(self):
+    def _filter_contamination_transmission(self):
         """Calculate transmission matrix coefficient and transmittance on a filter."""
 
-        index, _, _, _, n_o, n_t, _ = self.transmission_equation
+        index, _, _, _, n_o, n_t, _ = self._transmission_equation
 
         i_i = complex(0, 1)  # Define complex number
 
@@ -444,12 +562,12 @@ class EffectiveAreaFundamental:
         M = [
             [
                 [
-                    np.cos(self.filterwheel_angular_wavenumber[i]),
-                    (-i_i * np.sin(self.filterwheel_angular_wavenumber[i])) / index[i],
+                    np.cos(self._filterwheel_angular_wavenumber[i]),
+                    (-i_i * np.sin(self._filterwheel_angular_wavenumber[i])) / index[i],
                 ],
                 [
-                    -i_i * np.sin(self.filterwheel_angular_wavenumber[i]) * index[i],
-                    np.cos(self.filterwheel_angular_wavenumber[i]),
+                    -i_i * np.sin(self._filterwheel_angular_wavenumber[i]) * index[i],
+                    np.cos(self._filterwheel_angular_wavenumber[i]),
                 ],
             ]
             for i in range(4000)
@@ -470,24 +588,35 @@ class EffectiveAreaFundamental:
         return [abs(transmittance[i] ** 2) for i in range(4000)]
 
     @property
-    def interpolated_filter_contamination_transmission(self):
+    def _interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        Filter_contam_transmission = interpolate.interp1d(
-            self.n_DEHP_wavelength, self.filter_contamination_transmission
+        return self._contamination_interpolator(
+            self.n_DEHP_wavelength,
+            self._filter_contamination_transmission,
         )
-        return Filter_contam_transmission(self.channel_wavelength)
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
-        """Calculation of the Effective Area."""
+        r"""
+        Calculate the Effective Area.
+
+        The effective area is calculated by considering the geometry of the XRT flight model,
+        the channel transmission, and the contamination layers on both the CCD and the filter.
+
+        Returns
+        -------
+        astropy.units.Quantity
+            Effective area in cm\ :math:`^2`.
+
+        Notes
+        -----
+        The effective area is a crucial parameter for determining the sensitivity of the XRT
+        to X-ray emissions. This method combines various factors, including the physical
+        properties of the filter and CCD, to compute the total effective area.
+        """
         return (
             self.channel_geometry_aperture_area
             * self.channel_transmission
-            * self.interpolated_CCD_contamination_transmission
-            * self.interpolated_filter_contamination_transmission
+            * self._interpolated_CCD_contamination_transmission
+            * self._interpolated_filter_contamination_transmission
         )
-
-
-def effective_area(filter_name, observation_date):
-    EAP = EffectiveAreaFundamental(filter_name, observation_date)
-    return EAP.effective_area()

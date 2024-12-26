@@ -1,16 +1,17 @@
 """
 Functionality for removing the visible light leak from XRT composite image data.
 """
+
+import warnings
+from urllib.parse import urljoin
+
 import astropy.time
 import astropy.units as u
-import warnings
-
 from sunpy.data import manager
 from sunpy.map import Map
 from sunpy.time import parse_time
-from urllib.parse import urljoin
 
-from xrtpy.image_correction import _SSW_MIRRORS
+from xrtpy.util import SSW_MIRRORS
 
 __all__ = ["remove_lightleak"]
 
@@ -87,7 +88,8 @@ def _get_stray_light_phase(date_obs):
     if phase == 6:
         warnings.warn(
             "light leak images for this period are not yet"
-            " available. Defaulting to previous phase."
+            " available. Defaulting to previous phase.",
+            stacklevel=3,
         )
         phase = 5
 
@@ -97,22 +99,22 @@ def _get_stray_light_phase(date_obs):
 def _select_lightleak_file(filter_wheel_1, filter_wheel_2, date):
     phase = _get_stray_light_phase(date)
     file_dict = {
-        ("open", "al mesh"): {
+        ("open", "al_mesh"): {
             2: "term_p2am_20150718_160913.fits",
             3: "term_p3am_20170808_180126.fits",
             4: "term_p4am_20180712_171919.fits",
             5: "term_p5am_20220709_180901.fits",
         },
-        ("al poly", "open"): {
+        ("al_poly", "open"): {
             2: "term_p2ap_20150620_172818.fits",
             3: "term_p3ap_20170809_183821.fits",
             4: "term_p4ap_20180712_171928.fits",
             5: "term_p5ap_20220709_180910.fits",
         },
-        ("c poly", "open"): {
+        ("c_poly", "open"): {
             2: "term_p2cp_20150620_190645.fits",
         },
-        ("open", "ti poly"): {
+        ("open", "ti_poly"): {
             1: "term_p1tp_20140515_182503.fits",
             2: "term_p2tp_20150718_160921.fits",
         },
@@ -202,12 +204,15 @@ def remove_lightleak(in_map, scale=1.0, leak_map=None):
     images at the phase 1 (as of Feb-2022).
     """
     if "Light leak subtraction: DONE" in in_map.meta["HISTORY"]:
-        warnings.warn("HISTORY indicates light leak subtraction already done on image.")
+        warnings.warn(
+            "HISTORY indicates light leak subtraction already done on image.",
+            stacklevel=3,
+        )
 
     if leak_map is None:
-        leak_filename = _select_lightleak_file(
-            *in_map.measurement.split("-"), in_map.date
-        )
+        fw1 = in_map.meta["EC_FW1_"]
+        fw2 = in_map.meta["EC_FW2_"]
+        leak_filename = _select_lightleak_file(fw1, fw2, in_map.date)
 
         # NOTE: This function is being defined inline because the filename is only known once
         # the date and filter wheel combination are known.
@@ -215,7 +220,7 @@ def remove_lightleak(in_map, scale=1.0, leak_map=None):
             "ll_file",
             [
                 urljoin(mirror, f"hinode/xrt/idl/util/leak_fits/{leak_filename}")
-                for mirror in _SSW_MIRRORS
+                for mirror in SSW_MIRRORS
             ],
             LL_FILE_HASHES[leak_filename],
         )

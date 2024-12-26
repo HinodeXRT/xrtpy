@@ -1,66 +1,42 @@
-import numpy as np
-import pkg_resources
-
 from pathlib import Path
+
+import numpy as np
+import pytest
+from astropy.utils.data import get_pkg_data_path
 from sunpy.map import Map
 
 from xrtpy.image_correction.deconvolve import deconvolve
 
-test_file = "L1_XRT20120605_215839.9.fits"
-idl_result_file = "L1_XRT20120605_215839.9.deconv.fits"
-test_file_binned = "L1_XRT20210730_175810.1.fits"
-idl_result_file_binned = "L1_XRT20210730_175810.1_deconv.fits"
+
+@pytest.fixture
+def data_dir():
+    return Path(get_pkg_data_path("data", package="xrtpy.image_correction.tests"))
 
 
-def get_observed_data():
-    directory = pkg_resources.resource_filename("xrtpy", "image_correction/tests/data")
-    data_file = Path(directory) / test_file
-
-    return data_file
-
-
-def get_IDL_results_data():
-    directory = pkg_resources.resource_filename("xrtpy", "image_correction/tests/data")
-    results_file = Path(directory) / idl_result_file
-
-    return results_file
-
-
-def get_observed_binned_data():
-    directory = pkg_resources.resource_filename("xrtpy", "image_correction/tests/data")
-    data_file = Path(directory) / test_file_binned
-
-    return data_file
-
-
-def get_IDL_results_binned_data():
-    directory = pkg_resources.resource_filename("xrtpy", "image_correction/tests/data")
-    results_file = Path(directory) / idl_result_file_binned
-
-    return results_file
-
-
-def test_unbinned():
+@pytest.mark.parametrize(
+    ("observed_file", "idl_file", "atol", "rtol"),
+    [
+        (
+            "L1_XRT20120605_215839.9.fits",
+            "L1_XRT20120605_215839.9.deconv.fits",
+            0,
+            1e-7,
+        ),
+        # Case where image is binned, i.e. has chip_sum = 2
+        # Needs higher tolerances because the binned PSF for the IDL and Python codes don't match
+        (
+            "L1_XRT20210730_175810.1.fits",
+            "L1_XRT20210730_175810.1_deconv.fits",
+            4.1,
+            0.008,
+        ),
+    ],
+)
+def test_deconvolve(data_dir, observed_file, idl_file, rtol, atol):
     """
-    Test case where the image is at full resolution, i.e. chip_sum = 1
+    Test deconvolution against IDL results for binned and unbinned cases
     """
-    test_data = get_observed_data()
-    in_map = Map(test_data)
-    IDL_result_image = get_IDL_results_data()
-    IDL_result = Map(IDL_result_image)
+    in_map = Map(data_dir / observed_file)
+    IDL_result = Map(data_dir / idl_file)
     out_map = deconvolve(in_map)
-    assert np.allclose(out_map.data, IDL_result.data, atol=1.0e-7)
-
-
-def test_binned():
-    """
-    Test case where the image is binned, i.e. has chip_sum = 2
-    This case needs higher tolerances (atol, rtol) because the binned PSF for
-    the IDL and python codes don't match
-    """
-    test_data = get_observed_binned_data()
-    in_map = Map(test_data)
-    IDL_result_image = get_IDL_results_binned_data()
-    IDL_result = Map(IDL_result_image)
-    out_map = deconvolve(in_map)
-    assert np.allclose(out_map.data, IDL_result.data, atol=4.1, rtol=0.008)
+    assert np.allclose(out_map.data, IDL_result.data, rtol=rtol, atol=atol)

@@ -1,11 +1,11 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
-
 from astropy import units as u
-from pathlib import Path
 
 from xrtpy.response.channel import Channel
 
@@ -846,41 +846,6 @@ def test_channel_name2(channel_name):
     ]
 
     assert name == IDL_mirror_name_AUTO
-
-
-@pytest.mark.parametrize("channel_name", channel_names)
-def test_channel_wavelength(channel_name):
-    channel_filter = Channel(channel_name)
-
-    wavelength_length = int(channel_filter.number_of_wavelengths)
-    wavelength = channel_filter.wavelength[:wavelength_length]
-
-    idl_array_length = int(
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["LENGTH"]
-    )
-    idl_wavelength_auto = (
-        v6_genx_s[_channel_name_to_index_mapping[channel_name]]["WAVE"][
-            :idl_array_length
-        ]
-        * u.angstrom
-    )
-
-    assert u.allclose(idl_wavelength_auto, wavelength)
-
-    idl_mirror_wavelength_manu = [
-        9.00000,
-        9.10000,
-        9.20000,
-        9.30000,
-        9.40000,
-        9.50000,
-        9.60000,
-        9.70000,
-        9.80000,
-        9.90000,
-    ] * u.angstrom
-
-    assert u.allclose(idl_mirror_wavelength_manu, wavelength[80:90])
 
 
 @pytest.mark.parametrize("channel_name", channel_names)

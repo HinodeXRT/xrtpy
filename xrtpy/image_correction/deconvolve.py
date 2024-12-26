@@ -1,26 +1,27 @@
 """
 Functionality for deconvolving XRT image data with the point spread function.
 """
-__all__ = ["deconvolve"]
-
-import numpy as np
 
 from datetime import datetime
+from urllib.parse import urljoin
+
+import numpy as np
 from numpy.fft import fft2, fftshift, ifft2
 from sunpy.data import manager
 from sunpy.image.resample import resample
 from sunpy.image.transform import affine_transform
 from sunpy.map import Map
-from urllib.parse import urljoin
 
-from xrtpy.image_correction import _SSW_MIRRORS
+from xrtpy.util import SSW_MIRRORS
+
+__all__ = ["deconvolve"]
 
 
 @manager.require(
     "PSF560.fits",
     [
         urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_151721.0.PSF560.fits")
-        for mirror in _SSW_MIRRORS
+        for mirror in SSW_MIRRORS
     ],
     "0eaa5da6fb69661e7f46d1f0c463e4b3b1745426a399a4fbc53fc0c0ae87dd0d",
 )
@@ -28,7 +29,7 @@ from xrtpy.image_correction import _SSW_MIRRORS
     "PSF1000.fits",
     [
         urljoin(mirror, "hinode/xrt/idl/util/XRT20170324_161721.0.PSF1000.fits")
-        for mirror in _SSW_MIRRORS
+        for mirror in SSW_MIRRORS
     ],
     "95590a7174692977a2f111b932811c9c7ae105a59b93bfe6c96fba862cefacf1",
 )
@@ -79,7 +80,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
                 "DECONVOLVE: Input data and PSF have different"
                 " chip sums. Binning PSF..."
             )
-        psf_map = rebin_psf(psf_map, image_map.meta)
+        psf_map = _rebin_psf(psf_map, image_map.meta)
 
     data = np.clip(image_map.data, 0.0, None)
 
@@ -100,7 +101,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     ):
         extract_data = True
         if verbose:
-            print("Input data not same size as PSF. Dropping image" " in zero array.")
+            print("Input data not same size as PSF. Dropping image in zero array.")
         tmp_data = np.zeros((psf_naxis1, psf_naxis2))
         ddx = naxis1 // 2
         ddy = naxis2 // 2
@@ -109,7 +110,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
         tmp_data[xcen - ddx : xcen + ddx, ycen - ddy : ycen + ddy] = data
     else:
         tmp_data = data
-    tmp_deconv = richardson_lucy_deconvolution(tmp_data, psf_map.data, num_iter=5)
+    tmp_deconv = _richardson_lucy_deconvolution(tmp_data, psf_map.data, num_iter=5)
 
     if extract_data:
         tmp_deconv = tmp_deconv[xcen - ddx : xcen + ddx, ycen - ddy : ycen + ddy]
@@ -122,7 +123,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     return Map(deconv_data, deconv_meta)
 
 
-def fft_2dim_convolution(image1, image2, correlation=False):
+def _fft_2dim_convolution(image1, image2, correlation=False):
     """
     Convolve (or optionally correlate) two images
     """
@@ -133,19 +134,19 @@ def fft_2dim_convolution(image1, image2, correlation=False):
     return fftshift(fftres)
 
 
-def richardson_lucy_deconvolution(image, psf, num_iter=5):
+def _richardson_lucy_deconvolution(image, psf, num_iter=5):
     """
     Use the Richardson-Lucy algorithm to deconvolve an image.
     """
-    psfnorm = fft_2dim_convolution(psf, np.ones_like(psf))
+    psfnorm = _fft_2dim_convolution(psf, np.ones_like(psf))
     ohat = np.cdouble(image)
-    for i in range(num_iter):
-        ihat = fft_2dim_convolution(psf, ohat)
-        ohat *= fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
+    for _ in range(num_iter):
+        ihat = _fft_2dim_convolution(psf, ohat)
+        ohat *= _fft_2dim_convolution(image / ihat, psf, correlation=True) / psfnorm
     return np.abs(ohat)
 
 
-def rebin_psf(psf_map, image_meta):
+def _rebin_psf(psf_map, image_meta):
     """
     Rebin the point spread function (psf) to match the dimensions of an image.
     It's assumed that the image is smaller than the psf array
