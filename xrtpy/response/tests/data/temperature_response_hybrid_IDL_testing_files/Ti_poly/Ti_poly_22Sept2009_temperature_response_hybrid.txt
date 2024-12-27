@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: hybrid
 Filter Ti-poly
 observation_date 22-Sept-2009 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.14039e-31
       112202.   1.54512e-31
       125893.   2.29714e-31

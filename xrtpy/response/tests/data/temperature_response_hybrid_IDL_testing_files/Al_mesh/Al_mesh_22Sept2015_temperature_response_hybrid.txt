@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: hybrid
 Filter Al-mesh
 observation_date 22-Sept-2015 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   5.67394e-29
       112202.   6.87563e-29
       125893.   9.33142e-29

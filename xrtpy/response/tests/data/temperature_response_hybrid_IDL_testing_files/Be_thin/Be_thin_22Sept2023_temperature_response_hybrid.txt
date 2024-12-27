@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: hybrid
 Filter Be-thin
 observation_date 22-Sept-2023 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   5.23545e-37
       112202.   8.12154e-37
       125893.   1.32909e-36

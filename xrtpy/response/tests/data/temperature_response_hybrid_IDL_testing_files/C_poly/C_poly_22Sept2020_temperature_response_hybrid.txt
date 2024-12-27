@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: hybrid
 Filter C-poly
 observation_date 22-Sept-2020 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.17240e-32
       112202.   1.93575e-32
       125893.   3.44614e-32
