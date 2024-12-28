@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: photospheric
 Filter Ti-poly
 observation_date 22-Sept-2022 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.04448e-31
       112202.   1.33615e-31
       125893.   1.79029e-31

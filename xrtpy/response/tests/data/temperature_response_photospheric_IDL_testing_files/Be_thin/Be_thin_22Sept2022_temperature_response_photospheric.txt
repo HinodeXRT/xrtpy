@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: photospheric
 Filter Be-thin
 observation_date 22-Sept-2022 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   6.67073e-37
       112202.   9.65884e-37
       125893.   1.41079e-36

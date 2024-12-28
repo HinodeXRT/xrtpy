@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: photospheric
 Filter Al-mesh
 observation_date 22-Sept-2023 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   5.96669e-29
       112202.   6.97606e-29
       125893.   8.93913e-29

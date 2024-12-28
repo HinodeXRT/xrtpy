@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: photospheric
 Filter Al-poly
 observation_date 22-Sept-2022 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   9.92159e-31
       112202.   1.21472e-30
       125893.   1.60296e-30

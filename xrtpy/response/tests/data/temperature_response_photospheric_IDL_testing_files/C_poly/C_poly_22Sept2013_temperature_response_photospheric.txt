@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: photospheric
 Filter C-poly
 observation_date 22-Sept-2013 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.63447e-32
       112202.   2.53298e-32
       125893.   4.12118e-32
