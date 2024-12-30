@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: coronal
 Filter Ti-poly
 observation_date 22-Sept-2022 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.10028e-31
       112202.   1.50300e-31
       125893.   2.25446e-31

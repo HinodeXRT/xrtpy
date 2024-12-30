@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: coronal
 Filter Al-med
 observation_date 22-Sept-2015 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   2.85393e-36
       112202.   3.66176e-36
       125893.   5.28712e-36

@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: coronal
 Filter Al-poly
 observation_date 22-Sept-2015 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.22511e-30
       112202.   1.58268e-30
       125893.   2.29021e-30

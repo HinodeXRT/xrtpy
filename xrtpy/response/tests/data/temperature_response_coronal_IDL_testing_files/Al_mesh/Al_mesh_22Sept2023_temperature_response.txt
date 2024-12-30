@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: coronal
 Filter Al-mesh
 observation_date 22-Sept-2023 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   6.15994e-29
       112202.   7.44799e-29
       125893.   1.00657e-28

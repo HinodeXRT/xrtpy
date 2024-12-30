@@ -2,7 +2,7 @@ Temperature Response: IDL Results
 Abundance_model: coronal
 Filter Be-thin
 observation_date 22-Sept-2006 22:45:45
-Temperature Temperature Response 
+Temperature Temperature Response
       100000.   1.36267e-36
       112202.   2.04700e-36
       125893.   3.28487e-36
