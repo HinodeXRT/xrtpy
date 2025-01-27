@@ -33,7 +33,7 @@ def test_channel_name(channel_name):
     assert channel.name == channel_name
 
 
-filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0016.genx"
+filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0017.genx"
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)
 v6_genx_s = v6_genx["SAVEGEN0"]
