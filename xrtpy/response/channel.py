@@ -34,7 +34,7 @@ _channel_name_to_index_mapping = {
     "C-poly/Ti-poly": 13,
 }
 _genx_file = sunpy.io.special.genx.read_genx(
-    Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
+    Path(__file__).parent.absolute() / "data" / "xrt_channels_v0017.genx"
 )["SAVEGEN0"]
 
 
