@@ -735,8 +735,7 @@ def test_ccd_gain_right(channel_name):
     ccd_gain_right = channel_filter.ccd.ccd_gain_right
 
     idl_ccd_gain_right_auto = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["CCD"]["GAIN_R"] * (u.electron / u.DN)
-    #idl_ccd_gain_right_correction = 57.5 * (u.electron / u.DN)
-
+  
     assert u.isclose(ccd_gain_right, idl_ccd_gain_right_auto)
 
 
