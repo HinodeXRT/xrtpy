@@ -85,8 +85,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
     data = np.clip(image_map.data, 0.0, None)
 
     deconvolve_hist = (
-        f"(DECONVOLVE) Deconvolved with {used_psf}, "
-        f"bin={data_chip_sum}, niter={niter}."
+        f"(DECONVOLVE) Deconvolved with {used_psf}, bin={data_chip_sum}, niter={niter}."
     )
 
     # if input image size is smaller than the psf (2048x2048), put the
