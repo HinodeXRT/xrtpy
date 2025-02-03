@@ -117,9 +117,7 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
         med_hdu.close()
         med_sat = (med_gmap & 1).astype(bool)
         exp_map[~med_sat & lng_sat] = med_exp
-        logging.info(
-            "No. of saturated pixels in medium exposure = " f"{np.sum(med_sat)}"
-        )
+        logging.info(f"No. of saturated pixels in medium exposure = {np.sum(med_sat)}")
         logging.info(f"Medium image exposure time = {med_exp}")
     logging.info(f"Long image exposure time = {lng_exp}")
 
