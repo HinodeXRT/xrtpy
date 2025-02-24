@@ -14,10 +14,7 @@ build:
   - graphviz
   jobs:
     post_build:
-    - echo $'\n'For help deciphering documentation build error messages, see:$'\n\n'\ \ https://xrtpy.readthedocs.io/en/latest/contributing.html#troubleshooting
-
-sphinx:
-  configuration: docs/conf.py #Feb2025
+    - echo $'\n'For help deciphering documentation build error messages, see:$'\n\n'\ \ https://docs.plasmapy.org/en/latest/contributing/doc_guide.html#troubleshooting
 
 python:
   install:
