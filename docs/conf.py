@@ -5,8 +5,10 @@ Configuration file for the Sphinx documentation builder.
 # -- stdlib imports ------------------------------------------------------------
 import os
 import warnings
-#from datetime import UTC, datetime #Feb2025 - comment out
-from datetime import datetime, timezone #Feb2025
+
+# from datetime import UTC, datetime #Feb2025 - comment out
+from datetime import datetime, timezone  # Feb2025
+
 UTC = timezone.utc  # Define UTC manually for Python 3.10 compatibility Feb2025
 from pathlib import Path
 
@@ -48,13 +50,15 @@ is_development = _version_.is_devrelease
 # -- General configuration ---------------------------------------------------
 
 # We want to make sure all the following warnings fail the build
-#warnings.filterwarnings("error", category=SunpyDeprecationWarning)#Feb272025 - Create new PR to fix
+# warnings.filterwarnings("error", category=SunpyDeprecationWarning)#Feb272025 - Create new PR to fix
 warnings.filterwarnings("error", category=SunpyPendingDeprecationWarning)
 warnings.filterwarnings("error", category=MatplotlibDeprecationWarning)
 warnings.filterwarnings("error", category=AstropyDeprecationWarning)
 
 # TEMPORARY FIX: Suppress SunPy Deprecation Warnings for CTYPE1 ('solar-x')
-warnings.filterwarnings("ignore", category=SunpyDeprecationWarning) #Feb272025 - Create new PR to fix
+warnings.filterwarnings(
+    "ignore", category=SunpyDeprecationWarning
+)  # Feb272025 - Create new PR to fix
 
 # For the linkcheck
 linkcheck_allowed_redirects = {
