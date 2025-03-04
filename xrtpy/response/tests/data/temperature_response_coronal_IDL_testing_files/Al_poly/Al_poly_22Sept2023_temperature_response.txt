@@ -1,5 +1,5 @@
 Temperature Response: IDL Results
-Abundance_model: chianti
+Abundance_model: coronal
 Filter Al-poly
 observation_date 22-Sept-2023 21:25:45
 Temperature Temperature Response 
