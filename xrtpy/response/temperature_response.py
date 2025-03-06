@@ -4,18 +4,14 @@ __all__ = [
 
 from pathlib import Path
 
+import astropy.constants as const
 import numpy as np
 import scipy.io
 from astropy import units as u
-from astropy.constants import c, h
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.response.effective_area import EffectiveAreaFundamental
-
-_c_Å_per_s = c.to(u.angstrom / u.second).value
-_h_eV_s = h.to(u.eV * u.s).value
-
 
 _abundance_model_file_path = {
     "coronal_abundance_path": Path(__file__).parent.absolute()
@@ -158,31 +154,31 @@ class TemperatureResponseFundamental:
 
     @property
     @u.quantity_input
-    def wavelength(self):
+    def _wavelength_spectra(self):
         """Emission model file wavelength values in Å."""
         return u.Quantity(self._get_abundance_data["wavelength"] * u.Angstrom)
 
     @property
     @u.quantity_input
-    def channel_wavelength(self):
+    def wavelength(self):
         """Array of wavelengths for every X-ray channel in Å."""
-        return u.Quantity((Channel(self.filter_name).wavelength[:3993]) * u.photon)
+        return self._effective_area_fundamental.wavelength
 
     @property
     def focal_len(self):
         """Focal length of the telescope in units of cm."""
-        return Channel(self.filter_name).geometry.geometry_focal_len
+        return self._channel.geometry.geometry_focal_len
 
     @property
     def ev_per_electron(self):
         """Amount of energy it takes to dislodge 1 electron in the CCD."""
-        return Channel(self.filter_name).ccd.ccd_energy_per_electron
+        return self._channel.ccd.ccd_energy_per_electron
 
     @property
     @u.quantity_input
     def pixel_size(self) -> u.cm:
         """CCD pixel size. Units converted from μm to cm."""
-        ccd_pixel_size = Channel(self.filter_name).ccd.ccd_pixel_size
+        ccd_pixel_size = self._channel.ccd.ccd_pixel_size
         return ccd_pixel_size.to(u.cm)
 
     @property
@@ -204,14 +200,12 @@ class TemperatureResponseFundamental:
         spectra_interpolate = []
         for i in range(61):
             interpolater = interpolate.interp1d(
-                self.wavelength,
+                self._wavelength_spectra.to_value("AA"),
                 self.file_spectra[i],
                 kind="linear",
             )
-            spectra_interpolate.append(interpolater(self.channel_wavelength))
-        return spectra_interpolate * (
-            u.photon * u.cm**3 * (1 / u.sr) * (1 / u.s) * (1 / u.Angstrom)
-        )
+            spectra_interpolate.append(interpolater(self.wavelength.to_value("AA")))
+        return spectra_interpolate * u.Unit("photon cm3 sr-1 s-1 Angstrom-1")
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
@@ -235,27 +229,24 @@ class TemperatureResponseFundamental:
         astropy.units.Quantity
             Integrated temperature response in electron cm^5 / (s pix).
         """
-        wavelength = (self.channel_wavelength).value
-        constants = (_c_Å_per_s * _h_eV_s / self.channel_wavelength).value
-        factors = (self.solid_angle_per_pixel / self.ev_per_electron).value
-        effective_area = (self.effective_area()).value
-        dwvl = wavelength[1:] - wavelength[:-1]
-        dwvl = np.append(dwvl, dwvl[-1])
+        constants = const.h * const.c / self.wavelength / u.photon
+        constants *= self.solid_angle_per_pixel / self.ev_per_electron
         # Simple summing like this is appropriate for binned data like in the current
         # spectrum file. More recent versions of Chianti include the line width,
         # which then makes the previous version that uses Simpson's method
         # to integrate more appropriate (10/05/2022)
-        temp_resp_w_u_c = (
-            self.spectra().value * effective_area * constants * factors * dwvl
+        return (
+            self.spectra()
+            * self.effective_area()
+            * constants
+            * np.gradient(self.wavelength)
         ).sum(axis=1)
-
-        return temp_resp_w_u_c * (u.electron * u.cm**5 * (1 / u.s) * (1 / u.pix))
 
     @property
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
         """Provide the camera gain in electrons per data number."""
-        return Channel(self.filter_name).ccd.ccd_gain_right
+        return self._channel.ccd.ccd_gain_right
 
     @u.quantity_input
     def temperature_response(self) -> u.DN * u.cm**5 / (u.s * u.pix):

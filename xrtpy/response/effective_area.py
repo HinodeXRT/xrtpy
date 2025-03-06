@@ -1,16 +1,15 @@
 __all__ = [
     "EffectiveAreaFundamental",
-    "effective_area",
 ]
 
 import datetime
 import math
-import os
 from functools import cached_property
 from pathlib import Path
 
 import astropy.time
 import numpy as np
+import scipy.interpolate
 import scipy.io
 import sunpy.io.special
 import sunpy.time
@@ -115,7 +114,7 @@ class EffectiveAreaFundamental:
                 f"Date must be after {epoch}."
             )
 
-        modified_time_path = os.path.getmtime(_ccd_contam_filename)  # noqa: PTH204
+        modified_time_path = Path(_ccd_contam_filename).stat().st_mtime
         modified_time = astropy.time.Time(modified_time_path, format="unix")
         latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
             "%Y/%m/%d"
@@ -250,9 +249,9 @@ class EffectiveAreaFundamental:
         Notes
         -----
         The interpolation is performed using a linear interpolation method over the
-        available contamination data points. The `filter_data_dates_to_seconds` and
-        `_combo_filter1_data` attributes are used to provide the data for interpolation,
-        and `filter_observation_date_to_seconds` provides the point at which to
+        available contamination data points. The ``filter_data_dates_to_seconds`` and
+        ``_combo_filter1_data`` attributes are used to provide the data for interpolation,
+        and ``filter_observation_date_to_seconds`` provides the point at which to
         evaluate the interpolation.
 
         Raises
@@ -283,9 +282,9 @@ class EffectiveAreaFundamental:
         Notes
         -----
         The interpolation is performed using a linear interpolation method over the
-        available contamination data points. The `filter_data_dates_to_seconds` and
-        `_combo_filter2_data` attributes are used to provide the data for interpolation,
-        and `filter_observation_date_to_seconds` provides the point at which to
+        available contamination data points. The ``filter_data_dates_to_seconds`` and
+        ``_combo_filter2_data`` attributes are used to provide the data for interpolation,
+        and ``filter_observation_date_to_seconds`` provides the point at which to
         evaluate the interpolation.
 
         Raises
@@ -325,7 +324,7 @@ class EffectiveAreaFundamental:
         The interpolation is performed using a linear interpolation method over the available
         contamination data points. The `observation_date` attribute is used to provide the point
         at which to evaluate the interpolation. The data used for interpolation is specific to
-        the filter defined by the `filter_name` attribute.
+        the filter defined by the ``filter_name`` attribute.
 
         Raises
         ------
@@ -344,7 +343,7 @@ class EffectiveAreaFundamental:
             "data/n_DEHP.txt", package="xrtpy.response"
         )
 
-        with open(_n_DEHP_filename) as n_DEHP:  # noqa: PTH123
+        with Path(_n_DEHP_filename).open() as n_DEHP:
             list_of_DEHP_attributes = []
             for line in n_DEHP:
                 stripped_line = line.strip()
@@ -523,29 +522,33 @@ class EffectiveAreaFundamental:
         return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
 
     @property
-    def channel_wavelength(self):
+    def wavelength(self):
         """Array of wavelengths for every X-ray channel in Angstroms (Å)."""
-        return Channel(self.name).wavelength
+        _wave = self._channel.wavelength.to_value("AA")
+        return _wave * u.Angstrom
 
     @property
     def channel_geometry_aperture_area(self):
         """XRT flight model geometry aperture area."""
-        return Channel(self.name).geometry.geometry_aperture_area
+        return self._channel.geometry.geometry_aperture_area
 
     @property
     def channel_transmission(self):
         """XRT channel transmission."""
-        return Channel(self.name).transmission
+        return np.interp(
+            self.wavelength, self._channel.wavelength, self._channel.transmission
+        )
+
+    def _contamination_interpolator(self, x, y):
+        return np.interp(self.wavelength.to_value("Angstrom"), x, y)
 
     @property
     def _interpolated_CCD_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        CCD_contam_transmission = np.interp(
-            self.channel_wavelength.to_value("AA"),
+        return self._contamination_interpolator(
             self.n_DEHP_wavelength,
             self._CCD_contamination_transmission,
         )
-        return CCD_contam_transmission
 
     @cached_property
     def _filter_contamination_transmission(self):
@@ -587,12 +590,10 @@ class EffectiveAreaFundamental:
     @property
     def _interpolated_filter_contamination_transmission(self):
         """Interpolate filter contam transmission to the wavelength."""
-        Filter_contam_transmission = np.interp(
-            self.channel_wavelength.to_value("AA"),
+        return self._contamination_interpolator(
             self.n_DEHP_wavelength,
             self._filter_contamination_transmission,
         )
-        return Filter_contam_transmission
 
     @u.quantity_input
     def effective_area(self) -> u.cm**2:
@@ -619,29 +620,3 @@ class EffectiveAreaFundamental:
             * self._interpolated_CCD_contamination_transmission
             * self._interpolated_filter_contamination_transmission
         )
-
-
-def effective_area(filter_name, observation_date):
-    r"""
-    Calculate the effective area for a given XRT filter at a specific observation date.
-
-    Parameters
-    ----------
-    filter_name : str
-        The name of the filter for which the effective area is to be calculated.
-    observation_date : str or datetime.datetime
-        The date of the observation. Acceptable formats include any string or datetime object
-        that can be parsed by `sunpy.time.parse_time`.
-
-    Returns
-    -------
-    astropy.units.Quantity
-        Effective area in cm\ :math:`^2`.
-
-    Notes
-    -----
-    The effective area calculation takes into account the geometry of the XRT flight model,
-    the channel transmission, and the contamination layers on both the CCD and the filter.
-    """
-    EAP = EffectiveAreaFundamental(filter_name, observation_date)
-    return EAP.effective_area()
