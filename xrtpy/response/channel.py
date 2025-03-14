@@ -45,7 +45,7 @@ import numpy as np
 
 _genx_file = sunpy.io.special.genx.read_genx(
     Path(__file__).parent.absolute() / "data" / "xrt_channels_v0017.genx"
-)["SAVEGEN0"][0]
+)["SAVEGEN0"]
 
 
 def resolve_filter_name(name):
@@ -99,8 +99,7 @@ class Geometry:
 
     def __init__(self, index):
         self._channel_index = index
-        self._geom_data = self._genx_file["GEOM"]
-        #self._geom_data = self._genx_file[self._channel_index]["GEOM"]
+        self._geom_data = self._genx_file[self._channel_index]["GEOM"]
 
     @property
     def geometry_name(
@@ -158,8 +157,7 @@ class EntranceFilter:
 
     def __init__(self, index):
         self._channel_index = index
-        #self._en_filter_data = self._genx_file[self._channel_index]["EN_FILTER"]
-        self._en_filter_data = self._genx_file["EN_FILTER"]
+        self._en_filter_data = self._genx_file[self._channel_index]["EN_FILTER"]
 
     @property
     def entrancefilter_density(self) -> u.g * u.cm**-3:
@@ -242,8 +240,7 @@ class Mirror:
 
     def __init__(self, index, mirror_number):
         self._channel_index = index
-        #self._mirror_data = self._genx_file[self._channel_index][f"MIRROR{mirror_number}"]
-        self._mirror_data = self._genx_file[f"MIRROR{mirror_number}"]
+        self._mirror_data = self._genx_file[self._channel_index][f"MIRROR{mirror_number}"]
 
     @property
     @u.quantity_input
@@ -325,8 +322,7 @@ class Filter:
 
     def __init__(self, index, filter_number):
         self._channel_index = index
-        #self._fp_filter_data = self._genx_file[self._channel_index][f"FP_FILTER{filter_number}"]
-        self._fp_filter_data = self._genx_file[f"FP_FILTER{filter_number}"]
+        self._fp_filter_data = self._genx_file[self._channel_index][f"FP_FILTER{filter_number}"]
 
     @property
     @u.quantity_input
@@ -416,8 +412,7 @@ class CCD:
 
     def __init__(self, index):
         self._channel_index = index
-        #self._ccd_data = self._genx_file[self._channel_index]["CCD"]
-        self._ccd_data = self._genx_file["CCD"]
+        self._ccd_data = self._genx_file[self._channel_index]["CCD"]
 
 
     @property
@@ -525,8 +520,7 @@ class Channel:
         name = resolve_filter_name(name)
         if name in _channel_name_to_index_mapping:
             self._channel_index = _channel_name_to_index_mapping[name]
-            #self._channel_data = _genx_file[self._channel_index]
-            self._channel_data = _genx_file  # Now `_genx_file` is a dictionary
+            self._channel_data = _genx_file[self._channel_index]
             self._geometry = Geometry(self._channel_index)
             self._entrancefilter = EntranceFilter(self._channel_index)
             self._mirror_1 = Mirror(self._channel_index, 1)
@@ -535,7 +529,7 @@ class Channel:
             self._filter_2 = Filter(self._channel_index, 2)
             self._ccd = CCD(self._channel_index)
         elif name.lower() == "open":  # Complete by adding remaining indices
-            self._sample_channel_data = _genx_file#[1]
+            self._sample_channel_data = _genx_file[1]
             self._geometry = Geometry(1)
             self._channel_data = {
                 "WAVE": self._sample_channel_data["WAVE"],
@@ -651,11 +645,3 @@ class Channel:
         X-Ray Telescope -XRT.
         """
         return self._channel_data["INSTRUMENT"]
-
-
-if __name__ == "__main__":
-    # Initialize a test channel (e.g., "C-poly")
-    test_channel = Channel("C-poly")
-
-    # Access and print CCD gain right
-    print(f"[DEBUG] CCD Gain Right: {test_channel.ccd.ccd_gain_right}")
