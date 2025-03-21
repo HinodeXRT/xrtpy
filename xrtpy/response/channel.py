@@ -34,14 +34,7 @@ _channel_name_to_index_mapping = {
     "C-poly/Ti-poly": 13,
 }
 
-from pathlib import Path
 import sunpy.io.special
-import numpy as np
-
-from pathlib import Path
-import sunpy.io.special
-import numpy as np
-
 
 _genx_file = sunpy.io.special.genx.read_genx(
     Path(__file__).parent.absolute() / "data" / "xrt_channels_v0017.genx"
@@ -240,7 +233,9 @@ class Mirror:
 
     def __init__(self, index, mirror_number):
         self._channel_index = index
-        self._mirror_data = self._genx_file[self._channel_index][f"MIRROR{mirror_number}"]
+        self._mirror_data = self._genx_file[self._channel_index][
+            f"MIRROR{mirror_number}"
+        ]
 
     @property
     @u.quantity_input
@@ -322,7 +317,9 @@ class Filter:
 
     def __init__(self, index, filter_number):
         self._channel_index = index
-        self._fp_filter_data = self._genx_file[self._channel_index][f"FP_FILTER{filter_number}"]
+        self._fp_filter_data = self._genx_file[self._channel_index][
+            f"FP_FILTER{filter_number}"
+        ]
 
     @property
     @u.quantity_input
@@ -414,7 +411,6 @@ class CCD:
         self._channel_index = index
         self._ccd_data = self._genx_file[self._channel_index]["CCD"]
 
-
     @property
     @u.quantity_input
     def ccd_energy_per_electron(self) -> u.eV / u.electron:
@@ -437,9 +433,8 @@ class CCD:
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
         """Gain when reading the right port of the CCD."""
-        #return u.Quantity(self._ccd_data["GAIN_R"], u.electron / u.DN)
+        # return u.Quantity(self._ccd_data["GAIN_R"], u.electron / u.DN)
         return u.Quantity(57.5, u.electron / u.DN)
-        
 
     @property
     def ccd_name(self) -> str:
@@ -540,9 +535,6 @@ class Channel:
             raise ValueError(
                 f"{name} is not a valid channel. The available channels are: {list(_channel_name_to_index_mapping.keys())}"
             )
-
-
-
 
     @property
     def geometry(self) -> Geometry:

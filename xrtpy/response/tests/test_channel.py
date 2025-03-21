@@ -843,7 +843,9 @@ def test_channel_name2(channel_name):
     channel_filter = Channel(channel_name)
     name = channel_filter.name
 
-    IDL_mirror_name_AUTO = v6_genx_s[_channel_name_to_index_mapping[channel_name]]["NAME"]
+    IDL_mirror_name_AUTO = v6_genx_s[_channel_name_to_index_mapping[channel_name]][
+        "NAME"
+    ]
 
     assert name == IDL_mirror_name_AUTO
 
