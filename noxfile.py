@@ -52,12 +52,16 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
 
 
 @nox.session
-def linters(session):
-    """
-    Run all pre-commit hooks on all files.
-    """
+def lint(session: nox.Session) -> None:
+    """Run all pre-commit hooks on all files."""
     session.install("pre-commit")
-    session.run("pre-commit", "run", "--all-files", *session.posargs)
+    session.run(
+        "pre-commit",
+        "run",
+        "--all-files",
+        "--show-diff-on-failure",
+        *session.posargs,
+    )
 
 
 @nox.session
