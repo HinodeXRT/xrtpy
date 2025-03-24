@@ -54,7 +54,7 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
     )
 
     if session.python == maxpython and test_specifier != "lowest-direct":
-        options += with_doctests
+        pytest_options += with_doctests
 
     session.install("uv")
     session.install(".[tests]", *install_options)
