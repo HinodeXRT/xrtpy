@@ -12,11 +12,7 @@ nox.options.sessions = [f"tests-{current_python}(all)"]
 nox.options.default_venv_backend = "uv|virtualenv"
 
 
-test_specifiers: list = [
-    nox.param("run all tests", id="all"),
-    nox.param("lowest-direct", id="lowest-direct"),
-    nox.param("with code coverage", id="cov"),
-]
+
 
 pytest_command: tuple[str, ...] = (
     "pytest",
@@ -36,6 +32,11 @@ with_coverage: tuple[str, ...] = (
     "xml:coverage.xml",
 )
 
+test_specifiers: list = [
+    nox.param("run all tests", id="all"),
+    nox.param("with code coverage", id="cov"),
+    nox.param("lowest-direct", id="lowest-direct"),
+]
 
 @nox.session(python=supported_python_versions)
 @nox.parametrize("test_specifier", test_specifiers)
