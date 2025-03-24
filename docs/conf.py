@@ -175,9 +175,18 @@ issues_github_path = "HinodeXRT/xrtpy"
 # -- Options for intersphinx extension ---------------------------------------
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "python": (
+        "https://docs.python.org/3/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/python3.inv"),
+    ),
+    "numpy": (
+        "https://numpy.org/doc/stable/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
+    ),
+    "scipy": (
+        "https://docs.scipy.org/doc/scipy/reference/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
+    ),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
     "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
