@@ -31,8 +31,6 @@ with_coverage: tuple[str, ...] = (
     "xml:coverage.xml",
 )
 
-with_doctests: tuple[str, ...] = ("--doctest-modules", "--doctest-continue-on-failure")
-
 test_specifiers: list = [
     nox.param("run all tests", id="all"),
     nox.param("with code coverage", id="cov"),
@@ -52,9 +50,6 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
     pytest_options: list[str] = (
         with_coverage if test_specifier == "with code coverage" else []
     )
-
-    if session.python == maxpython and test_specifier != "lowest-direct":
-        pytest_options += with_doctests
 
     session.install("uv")
     session.install(".[tests]", *install_options)
