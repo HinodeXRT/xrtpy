@@ -63,14 +63,14 @@ def lint(session: nox.Session) -> None:
         *session.posargs,
     )
 
-
 @nox.session
-def import_package(session):
-    """
-    Import xrtpy.
-    """
-    session.install(".")
-    session.run("python", "-c", "import xrtpy")
+def build(session: nox.Session) -> None:
+    """Build & verify the source distribution and wheel."""
+    session.install("twine", "build")
+    build_command = ("python", "-m", "build")
+    session.run(*build_command, "--sdist")
+    session.run(*build_command, "--wheel")
+    session.run("twine", "check", "dist/*", *session.posargs)
 
 
 @nox.session
