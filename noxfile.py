@@ -1,10 +1,12 @@
 import nox
 
 nox.options.sessions = ["tests"]
-python_versions = ("3.10", "3.11", "3.12")
+nox.options.default_venv_backend = "uv|virtualenv"
+
+supported_python_versions = ("3.11", "3.12", "3.13")
 
 
-@nox.session
+@nox.session(python=supported_python_versions)
 def tests(session):
     """
     Run tests with pytest.
