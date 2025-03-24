@@ -185,12 +185,12 @@ intersphinx_mapping = {
     ),
     "scipy": (
         "https://docs.scipy.org/doc/scipy/reference/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
+        (None, "https://docs.scipy.org/doc/scipy/objects.inv"),
     ),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
-    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
-    "sunpy": ("https://docs.sunpy.org/en/stable/", None),
+    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/objects.inv", None),
+    "sunpy": ("https://docs.sunpy.org/en/stable/objects.inv", None),
 }
 
 # -- Options for hoverxref -----------------------------------------------------
