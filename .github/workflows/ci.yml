@@ -10,6 +10,8 @@ on:
     - v*
   pull_request:
   workflow_dispatch:
+  schedule:
+  - cron: 37 8 * * 1
 
 jobs:
 
