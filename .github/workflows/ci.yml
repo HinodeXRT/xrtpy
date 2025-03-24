@@ -26,23 +26,23 @@ jobs:
 
         - name: Tests, Python 3.13, Windows
           os: windows-latest
-          noxenv: tests-3.13(all)
+          nox_session: tests-3.13(all)
           python: '3.13'
 
         - name: Tests, Python 3.12, macOS
           os: macos-latest
-          noxenv: tests-3.12(all)
+          nox_session: tests-3.12(all)
           python: '3.12'
 
         - name: Tests, Python 3.11, Ubuntu
           os: ubuntu-latest
-          noxenv: tests-3.11(all)
+          nox_session: tests-3.11(all)
           python: '3.11'
 
         - name: Import XRTpy, Python 3.11, Linux
           os: ubuntu-latest
           python: '3.11'
-          noxenv: build
+          nox_session: build
 
     steps:
 
@@ -58,7 +58,7 @@ jobs:
       run: python -m pip install --progress-bar off --upgrade nox
 
     - name: ${{ matrix.name }}
-      run: nox -s ${{ matrix.noxenv }} -- ${{ matrix.noxposargs }}
+      run: nox -s ${{ matrix.nox_session }} -- ${{ matrix.noxposargs }}
 
   documentation:
     name: ${{ matrix.name }}
