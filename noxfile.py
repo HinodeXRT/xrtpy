@@ -50,6 +50,7 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
     pytest_options: list[str] = (
         with_coverage if test_specifier == "with code coverage" else []
     )
+    )
 
     session.install("uv")
     session.install(".[tests]", *install_options)
@@ -92,7 +93,7 @@ def docs(session):
     sphinx_opts = (
         sphinx_paths + sphinx_fail_on_warnings + sphinx_builder + sphinx_nitpicky
     )
-    session.install(".[docs]", "--exclude-newer=2024-10-01")
+    session.install(".[docs]")
     session.run(
         "sphinx-build",
         *sphinx_opts,
