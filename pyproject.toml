@@ -18,15 +18,15 @@ classifiers = [
   "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Scientific/Engineering :: Physics",
 ]
 # SPEC 0 recommends that packages in the scientific pythoniverse support
 # versions of Python that have been released in the last ≤36 months
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["version"]
 authors = [
   {name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu"},
@@ -63,7 +63,7 @@ docs = [
   # and this comes from setuptools
   # This is a bug upstream in the extension which
   # has yet to be fixed.
-  "setuptools",
+  "setuptools >= 62.1, != 71.0.1",
   "sphinx >= 7.3.0",
   "sphinx_automodapi >= 0.17.0",
   "sphinx-copybutton >= 0.5.2",
