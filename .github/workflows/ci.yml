@@ -69,8 +69,6 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         python-version: ${{ matrix.python }}
-        enable-cache: true
-        cache-suffix: ${{ matrix.nox_session }}-${{ matrix.python }}-${{ runner.os }}
 
     - name: Run the check
       # Add --frozen back if adopting uv.lock ; see PlasmaPy's .github/workflows/ci.yml
