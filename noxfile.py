@@ -17,14 +17,38 @@ test_specifiers: list = [
     nox.param("with code coverage", id="cov"),
 ]
 
+pytest_command: tuple[str, ...] = (
+    "pytest",
+    "--pyargs",
+    "--durations=5",
+    "--tb=short",
+    "-n=auto",
+    "--dist=loadfile",
+)
+
+with_coverage: tuple[str, ...] = (
+    "--cov=plasmapy",
+    "--cov-report=xml",
+    "--cov-config=pyproject.toml",
+    "--cov-append",
+    "--cov-report",
+    "xml:coverage.xml",
+)
+
 
 @nox.session(python=supported_python_versions)
 @nox.parametrize("test_specifier", test_specifiers)
 def tests(session, test_specifier: nox._parametrize.Param) -> None:
     """Run tests with pytest."""
-    pytest_options: list[str] = []
-    session.install(".[tests]")
-    session.run("pytest", *pytest_options)
+
+    install_options = ["--resolution=lowest-direct"] if test_specifier == "lowest-direct" else []
+
+    pytest_options : list[str] = with_coverage if test_specifier == "with code coverage" else []
+
+    session.install("uv")
+    session.install(".[tests]", *install_options)
+
+    session.run("pytest", *pytest_options, *session.posargs)
 
 
 @nox.session
