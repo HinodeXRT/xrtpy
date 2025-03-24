@@ -9,7 +9,7 @@ minpython = min(supported_python_versions)
 current_python = f"{sys.version_info.major}.{sys.version_info.minor}"
 
 nox.options.sessions = [f"tests-{current_python}(all)"]
-nox.options.default_venv_backend = "uv|virtualenv"
+nox.options.default_venv_backend = "uv"
 
 
 pytest_command: tuple[str, ...] = (
