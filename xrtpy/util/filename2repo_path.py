@@ -76,7 +76,7 @@ def filename2repo_path(
     elif filename.name[:3] == "XRT":
         path = root / "level0" / yr / mo / dy / hr
         raise NotImplementedError(
-            "Level 0 data is not currently available on" " the CfA website"
+            "Level 0 data is not currently available on the CfA website"
         )
     elif filename.name[:8] == "comp_XRT":
         # Note "synop_XRT", i.e. non-composite synoptics, are not currently
@@ -93,7 +93,7 @@ def filename2repo_path(
     ):
         path = root / "level2" / "synoptics" / yr / mo / dy / hr
         raise NotImplementedError(
-            "Synoptics jpeg2000 data is not currently" " available on the CfA website"
+            "Synoptics jpeg2000 data is not currently available on the CfA website"
         )
     else:
         path = None
