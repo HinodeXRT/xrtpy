@@ -107,3 +107,49 @@ te,
 tne,
 ue
 """
+
+[tool.pytest.ini_options]
+testpaths = ['.']
+xfail_strict = true
+norecursedirs = [
+  '*egg-info*',
+  '.*cache*',
+  '.*env',
+  '.[tn]ox',
+  '.cov*',
+  '.git*',
+  '.hypothesis',
+  '.idea',
+  '.jupyter',
+  '.vscode',
+  '__pycache__',
+  '_dev',
+  'binder',
+  'build',
+  'changelog',
+  'dist',
+  'docs',
+  'licenses',
+  'node_modules',
+  'tools',
+  'venv',
+  '.venv',
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "if TYPE_CHECKING",
+  "if typing.TYPE_CHECKING",
+  "coverage: ignore",
+  "ImportError",
+  "ModuleNotFoundError",
+  "raise NotImplementedError",
+  "@abstractmethod",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+omit = [
+  "*/plasmapy/*version.py",
+]
