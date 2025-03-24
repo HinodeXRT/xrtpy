@@ -1,17 +1,28 @@
 import nox
-
-nox.options.sessions = ["tests"]
-nox.options.default_venv_backend = "uv|virtualenv"
+import sys
 
 supported_python_versions = ("3.11", "3.12", "3.13")
 
+maxpython = max(supported_python_versions)
+minpython = min(supported_python_versions)
+current_python = f"{sys.version_info.major}.{sys.version_info.minor}"
+
+nox.options.sessions = [f"tests-{current_python}(all)"]
+nox.options.default_venv_backend = "uv|virtualenv"
+
+
+test_specifiers: list = [
+    nox.param("run all tests", id="all"),
+    nox.param("lowest-direct", id="lowest-direct"),
+    nox.param("with code coverage", id="cov"),
+]
+
 
 @nox.session(python=supported_python_versions)
-def tests(session):
-    """
-    Run tests with pytest.
-    """
-    pytest_options = {}
+@nox.parametrize("test_specifier", test_specifiers)
+def tests(session, test_specifier: nox._parametrize.Param) -> None:
+    """Run tests with pytest."""
+    pytest_options: list[str] = []
     session.install(".[tests]")
     session.run("pytest", *pytest_options)
 
