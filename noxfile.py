@@ -2,16 +2,17 @@ import sys
 
 import nox
 
+nox.options.default_venv_backend = "uv"
+
 supported_python_versions = ("3.11", "3.12", "3.13")
 
 maxpython = max(supported_python_versions)
 minpython = min(supported_python_versions)
+docpython = "3.13"
 
 current_python = f"{sys.version_info.major}.{sys.version_info.minor}"
 
 nox.options.sessions = [f"tests-{current_python}(all)"]
-nox.options.default_venv_backend = "uv"
-
 
 pytest_command: tuple[str, ...] = (
     "pytest",
@@ -50,7 +51,6 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
     pytest_options: list[str] = (
         with_coverage if test_specifier == "with code coverage" else []
     )
-    )
 
     session.install("uv")
     session.install(".[tests]", *install_options)
@@ -81,10 +81,12 @@ def build(session: nox.Session) -> None:
     session.run("twine", "check", "dist/*", *session.posargs)
 
 
-@nox.session
+@nox.session(python=docpython)
 def docs(session):
     """
     Build documentation with Sphinx.
+
+    This session may require installation of pandoc and graphviz.
     """
     sphinx_paths = ["docs", "docs/_build/html"]
     sphinx_fail_on_warnings = ["-W", "--keep-going"]
