@@ -42,7 +42,7 @@ jobs:
         - name: Import XRTpy, Python 3.11, Linux
           os: ubuntu-latest
           python: '3.11'
-          noxenv: import_package
+          noxenv: build
 
     steps:
 
