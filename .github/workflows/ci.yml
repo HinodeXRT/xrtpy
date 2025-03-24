@@ -31,12 +31,12 @@ jobs:
 
         - name: Tests, Python 3.12, macOS
           os: macos-latest
-          nox_session: tests-3.12(all)
+          nox_session: tests-3.12(cov)
           python: '3.12'
 
         - name: Tests, Python 3.11, Ubuntu
           os: ubuntu-latest
-          nox_session: tests-3.11(all)
+          nox_session: tests-3.11(lowest-direct)
           python: '3.11'
 
         - name: Packaging, Python 3.13, Ubuntu
