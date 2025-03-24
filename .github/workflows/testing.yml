@@ -24,39 +24,30 @@ jobs:
       matrix:
         include:
 
-        - name: Tests, Python 3.12, Windows
+        - name: Tests, Python 3.13, Windows
           os: windows-latest
-          noxenv: tests
-          python: '3.12'
-          noxposargs: --durations=10
+          noxenv: tests-3.13(all)
+          python: '3.13'
 
-        - name: Tests, Python 3.11, Windows
-          os: windows-latest
-          noxenv: tests
-          python: '3.11'
-          noxposargs: --durations=10
-
-        - name: Tests, Python 3.10, macOS
+        - name: Tests, Python 3.12, macOS
           os: macos-latest
-          noxenv: tests
-          python: '3.10'
+          noxenv: tests-3.12(all)
+          python: '3.12'
 
-        - name: Tests, Python 3.10, Linux
+        - name: Tests, Python 3.11, Ubuntu
           os: ubuntu-latest
-          noxenv: tests
-          python: '3.10'
+          noxenv: tests-3.11(all)
+          python: '3.11'
 
-        - name: Import XRTpy, Python 3.10, Linux
+        - name: Import XRTpy, Python 3.11, Linux
           os: ubuntu-latest
-          python: '3.10'
+          python: '3.11'
           noxenv: import_package
 
     steps:
 
     - name: Checkout code
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -86,8 +77,6 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v4
