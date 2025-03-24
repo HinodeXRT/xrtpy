@@ -1,5 +1,6 @@
-import nox
 import sys
+
+import nox
 
 supported_python_versions = ("3.11", "3.12", "3.13")
 
@@ -41,9 +42,13 @@ with_coverage: tuple[str, ...] = (
 def tests(session, test_specifier: nox._parametrize.Param) -> None:
     """Run tests with pytest."""
 
-    install_options = ["--resolution=lowest-direct"] if test_specifier == "lowest-direct" else []
+    install_options = (
+        ["--resolution=lowest-direct"] if test_specifier == "lowest-direct" else []
+    )
 
-    pytest_options : list[str] = with_coverage if test_specifier == "with code coverage" else []
+    pytest_options: list[str] = (
+        with_coverage if test_specifier == "with code coverage" else []
+    )
 
     session.install("uv")
     session.install(".[tests]", *install_options)
@@ -62,6 +67,7 @@ def lint(session: nox.Session) -> None:
         "--show-diff-on-failure",
         *session.posargs,
     )
+
 
 @nox.session
 def build(session: nox.Session) -> None:
