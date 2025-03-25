@@ -95,6 +95,8 @@ def docs(session):
     sphinx_opts = (
         sphinx_paths + sphinx_fail_on_warnings + sphinx_builder + sphinx_nitpicky
     )
+    # The --exclude-newer option is used because using later versions of
+    # SunPy leads to a SunPyDeprecationWarning.
     session.install(".[docs]", "--exclude-newer=2025-02-20")
     session.run(
         "sphinx-build",
