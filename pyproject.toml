@@ -70,7 +70,7 @@ docs = [
   "sphinx-issues >= 4.1.0",
   "sphinxcontrib-bibtex >= 2.6.2",
   "sphinxext-opengraph>=0.6.0",
-  "sunpy[net] >= 5.0.0",
+  "sunpy[map,net] >= 5.0.0, < 6",
 ]
 
 [project.urls]
