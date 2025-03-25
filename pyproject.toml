@@ -18,15 +18,15 @@ classifiers = [
   "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Scientific/Engineering :: Physics",
 ]
 # SPEC 0 recommends that packages in the scientific pythoniverse support
 # versions of Python that have been released in the last ≤36 months
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["version"]
 authors = [
   {name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu"},
@@ -38,32 +38,32 @@ authors = [
 ]
 
 dependencies = [
-  "astropy >= 5.3.0",
-  "matplotlib >= 3.5.0",
-  "numpy >=1.23.5",
-  "scikit-image >= 0.19.0",
-  # !=1.10.0 due to https://github.com/scipy/scipy/issues/17718
-  "scipy >= 1.9.0 , != 1.10.0",
-  "sunpy[map] >= 5.0.0",
+  "astropy >= 6.0.0",
+  "matplotlib >= 3.7.0",
+  "numpy >=1.24.0",
+  "scikit-image >= 0.21.0",
+  "scipy >= 1.11.1",
+  "sunpy[map] >= 5.1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-  "xrtpy[tests,docs]",
-  "nox >= 2022.8.7",
+  "nox >= 2024.10.9",
 ]
 tests = [
-  "pytest >= 8.0.0",
-  "pytest-astropy",
+  "pytest >= 8.3.1",
+  "pytest-astropy >= 0.11.0",
   "pytest-xdist >= 3.6.1",
+  "pytest-cov >= 6.0.0",
 ]
 docs = [
+  "astropy >= 6",
   "pydata_sphinx_theme >= 0.15.0",
   # Need pkg_resources for sphinxcontrib-bibtex
   # and this comes from setuptools
   # This is a bug upstream in the extension which
   # has yet to be fixed.
-  "setuptools",
+  "setuptools > 71.0.1",
   "sphinx >= 7.3.0",
   "sphinx_automodapi >= 0.17.0",
   "sphinx-copybutton >= 0.5.2",
@@ -72,7 +72,7 @@ docs = [
   "sphinx-issues >= 4.1.0",
   "sphinxcontrib-bibtex >= 2.6.2",
   "sphinxext-opengraph>=0.6.0",
-  "sunpy[net] >= 5.0.0",
+  "sunpy[map,net] >= 5.0.0",
 ]
 
 [project.urls]
@@ -109,3 +109,49 @@ te,
 tne,
 ue
 """
+
+[tool.pytest.ini_options]
+testpaths = ['.']
+xfail_strict = true
+norecursedirs = [
+  '*egg-info*',
+  '.*cache*',
+  '.*env',
+  '.[tn]ox',
+  '.cov*',
+  '.git*',
+  '.hypothesis',
+  '.idea',
+  '.jupyter',
+  '.vscode',
+  '__pycache__',
+  '_dev',
+  'binder',
+  'build',
+  'changelog',
+  'dist',
+  'docs',
+  'licenses',
+  'node_modules',
+  'tools',
+  'venv',
+  '.venv',
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "if TYPE_CHECKING",
+  "if typing.TYPE_CHECKING",
+  "coverage: ignore",
+  "ImportError",
+  "ModuleNotFoundError",
+  "raise NotImplementedError",
+  "@abstractmethod",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["xrtpy"]
+omit = [
+  "*/*version.py",
+]
