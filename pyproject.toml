@@ -56,13 +56,13 @@ tests = [
   "pytest-xdist >= 3.6.1",
 ]
 docs = [
-  "astropy >= 6, <= 7",
+  "astropy >= 6",
   "pydata_sphinx_theme >= 0.15.0",
   # Need pkg_resources for sphinxcontrib-bibtex
   # and this comes from setuptools
   # This is a bug upstream in the extension which
   # has yet to be fixed.
-  "setuptools >= 62.1, != 71.0.1",
+  "setuptools > 71.0.1",
   "sphinx >= 7.3.0",
   "sphinx_automodapi >= 0.17.0",
   "sphinx-copybutton >= 0.5.2",
@@ -71,7 +71,7 @@ docs = [
   "sphinx-issues >= 4.1.0",
   "sphinxcontrib-bibtex >= 2.6.2",
   "sphinxext-opengraph>=0.6.0",
-  "sunpy[map,net] >= 5.0.0, < 6",
+  "sunpy[map,net] >= 5.0.0",
 ]
 
 [project.urls]
