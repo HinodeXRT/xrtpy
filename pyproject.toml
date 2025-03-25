@@ -56,6 +56,7 @@ tests = [
   "pytest-xdist >= 3.6.1",
 ]
 docs = [
+  "astropy >= 6, <= 7",
   "pydata_sphinx_theme >= 0.15.0",
   # Need pkg_resources for sphinxcontrib-bibtex
   # and this comes from setuptools
