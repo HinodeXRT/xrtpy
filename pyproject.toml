@@ -151,7 +151,7 @@ exclude_lines = [
 
 [tool.coverage.run]
 branch = true
-source = ["src"]
+source = ["xrtpy"]
 omit = [
-  "*/plasmapy/*version.py",
+  "*/*version.py",
 ]
