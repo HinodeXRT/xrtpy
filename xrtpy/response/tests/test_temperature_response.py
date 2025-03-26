@@ -10,40 +10,40 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 import matplotlib.pyplot as plt
 
-# def plot_xrtpy_vs_idl(
-#     filename,
-#     chianti_temp, 
-#     xrtpy_response,
-#     IDL_temperature,
-#     IDL_temperature_response,
-#     IDL_temperature_response_interp
-# ):
-#     # We'll do one figure, two lines:
-#     plt.figure()
+def plot_xrtpy_vs_idl(
+    filename,
+    chianti_temp, 
+    xrtpy_response,
+    IDL_temperature,
+    IDL_temperature_response,
+    IDL_temperature_response_interp
+):
+    # We'll do one figure, two lines:
+    plt.figure()
 
-#     # X-axis: log10 of temperature in K
-#     x_xrtpy = np.log10(chianti_temp.value)
+    # X-axis: log10 of temperature in K
+    x_xrtpy = np.log10(chianti_temp.value)
 
-#     # Plot XRTpy
-#     plt.plot(x_xrtpy, xrtpy_response.value, label="XRTpy response")
+    # Plot XRTpy
+    plt.plot(x_xrtpy, xrtpy_response.value, label="XRTpy response")
 
-#     # Plot IDL (interpolated) with a dashed line
-#     plt.plot(x_xrtpy, IDL_temperature_response_interp.value,
-#             "--", label="IDL (interp)")
+    # Plot IDL (interpolated) with a dashed line
+    plt.plot(x_xrtpy, IDL_temperature_response_interp.value,
+            "--", label="IDL (interp)")
 
-#     # Optionally, you could also show the raw IDL data 
-#     # (un-interpolated) on the same plot. 
-#     # That requires computing log10(IDL_temperature.value):
-#     x_idl_raw = np.log10(IDL_temperature.value)
-#     plt.plot(x_idl_raw, IDL_temperature_response.value, 
-#             "o", markersize=4, label="IDL raw (points)")
+    # Optionally, you could also show the raw IDL data 
+    # (un-interpolated) on the same plot. 
+    # That requires computing log10(IDL_temperature.value):
+    x_idl_raw = np.log10(IDL_temperature.value)
+    plt.plot(x_idl_raw, IDL_temperature_response.value, 
+            "o", markersize=4, label="IDL raw (points)")
 
-#     plt.xlabel("log10( Temperature [K] )")
-#     plt.ylabel("Temperature Response [DN cm^5 pix^-1 s^-1]")
-#     plt.title(f"Debug plot:\n{filename}")
-#     plt.legend()
-#     plt.grid()
-#     plt.show()
+    plt.xlabel("log10( Temperature [K] )")
+    plt.ylabel("Temperature Response [DN cm^5 pix^-1 s^-1]")
+    plt.title(f"Debug plot:\n{filename}")
+    plt.legend()
+    plt.grid()
+    plt.show()
     
 # def maybe_debug_plot(
 #     filename,
@@ -151,7 +151,7 @@ def test_temperature_response(filename):
 
     # rtol = .025#5e-2#0.1 
     # atol = 1e-7 * actual_temperature_response.max()
-    rtol = 0.03
+    rtol = 0.03#0.0275
     atol = 1e-7 * actual_temperature_response.max()
 
     assert u.allclose(
@@ -179,7 +179,7 @@ def test_temperature_response(filename):
     #     idl_resp_interp,
     # )
     
-    # # Check if they're close:
+    ##############################################################################
     # success = u.allclose(
     #     actual_temperature_response[i_valid],
     #     IDL_temperature_response_interp[i_valid],
