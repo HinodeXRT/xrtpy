@@ -1,7 +1,7 @@
 Temperature Response: IDL Results
-Abundance_model photospheric
+Abundance_model: Photospheric
 Filter Be-thick
-observation_date 22-Sept-2023 22:45:45
+observation_date 22-Sept-2023 21:45:45
 Temperature Temperature Response
       100000.       0.00000
       112202.       0.00000
@@ -48,7 +48,7 @@ Temperature Temperature Response
   1.25893e+07   2.87744e-29
   1.41254e+07   3.07852e-29
   1.58489e+07   3.21468e-29
-  1.77828e+07   3.30444e-29
+  1.77828e+07   3.30445e-29
   1.99526e+07   3.36836e-29
   2.23872e+07   3.42282e-29
   2.51189e+07   3.47770e-29

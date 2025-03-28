@@ -1,13 +1,13 @@
 Temperature Response: IDL Results
-Abundance_model photospheric
+Abundance_model: Photospheric
 Filter Al-med
-observation_date 22-Sept-2023 22:45:45
+observation_date 22-Sept-2023 21:45:45
 Temperature Temperature Response
       100000.   2.40106e-36
       112202.   2.98246e-36
       125893.   4.10704e-36
       141254.   6.17749e-36
-      158489.   9.50977e-36
+      158489.   9.50976e-36
       177828.   1.42926e-35
       199526.   2.04871e-35
       223872.   2.76043e-35
@@ -29,7 +29,7 @@ Temperature Temperature Response
   1.41254e+06   6.13450e-30
   1.58489e+06   1.43311e-29
   1.77828e+06   3.07102e-29
-  1.99526e+06   6.13113e-29
+  1.99526e+06   6.13114e-29
   2.23872e+06   1.14524e-28
   2.51189e+06   1.98143e-28
   2.81838e+06   3.17241e-28
