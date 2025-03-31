@@ -50,15 +50,15 @@ is_development = _version_.is_devrelease
 # -- General configuration ---------------------------------------------------
 
 # We want to make sure all the following warnings fail the build
-# warnings.filterwarnings("error", category=SunpyDeprecationWarning)#Feb272025 - Create new PR to fix
+warnings.filterwarnings("error", category=SunpyDeprecationWarning)#Feb272025 - Create new PR to fix
 warnings.filterwarnings("error", category=SunpyPendingDeprecationWarning)
 warnings.filterwarnings("error", category=MatplotlibDeprecationWarning)
 warnings.filterwarnings("error", category=AstropyDeprecationWarning)
 
-# TEMPORARY FIX: Suppress SunPy Deprecation Warnings for CTYPE1 ('solar-x')
-warnings.filterwarnings(
-    "ignore", category=SunpyDeprecationWarning
-)  # Feb272025 - Create new PR to fix
+# # TEMPORARY FIX: Suppress SunPy Deprecation Warnings for CTYPE1 ('solar-x')
+# warnings.filterwarnings(
+#     "ignore", category=SunpyDeprecationWarning
+# )  # Feb272025 - Create new PR to fix
 
 # For the linkcheck
 linkcheck_allowed_redirects = {
