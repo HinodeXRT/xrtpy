@@ -7,6 +7,7 @@ from astropy.utils.data import get_pkg_data_filenames
 
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
+
 def get_IDL_data_files(abundance):
     filter_data_files = []
     for dir in get_pkg_data_filenames(
@@ -16,11 +17,13 @@ def get_IDL_data_files(abundance):
         filter_data_files += list(Path(dir).glob("*.txt"))
     return sorted(filter_data_files)
 
+
 filenames = (
     get_IDL_data_files("coronal")
     + get_IDL_data_files("hybrid")
     + get_IDL_data_files("photospheric")
 )
+
 
 @pytest.mark.parametrize("filename", filenames)
 def test_temperature_response(filename):
@@ -42,8 +45,8 @@ def test_temperature_response(filename):
         filter_obs_date,
         abundance_model=abundance,
     )
-    
-    actual_temperature_response = instance.temperature_response() 
+
+    actual_temperature_response = instance.temperature_response()
 
     IDL_temperature_response_interp = np.interp(
         instance.CHIANTI_temperature.value,
@@ -57,7 +60,7 @@ def test_temperature_response(filename):
     i_valid = np.where(
         actual_temperature_response > 1e-8 * actual_temperature_response.max()
     )
-    
+
     assert u.allclose(
         actual_temperature_response[i_valid],
         IDL_temperature_response_interp[i_valid],
