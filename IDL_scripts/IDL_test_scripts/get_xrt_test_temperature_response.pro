@@ -77,8 +77,8 @@ pro write_xrt_tr
 ;
 ;   Comments, feedback, and bug reports regarding this routine may be
 ;   directed to this email address:
-;   xrt_manager ~at~ head.cfa.harvard.edu 
-;   For comments, feedback, and bug reports regarding xrtpy realted items -
+;   xrt_manager ~at~ head.cfa.harvard.edu
+;   For comments, feedback, and bug reports regarding xrtpy related items -
 ;   directed to this email address: xrtpy ~at~ cfa.harvard.edu
 ;
 ; MODIFICATION HISTORY:
@@ -113,7 +113,7 @@ pro write_xrt_tr
   ;'hybrid':       temp_resp = make_xrt_temp_resp(wave_resp, /chianti_defaul, /hybrid)
   ;'coronal':      temp_resp = make_xrt_temp_resp(wave_resp, /chianti_defaul, /coronal)
   temp_resp = make_xrt_temp_resp(wave_resp,/chianti_defaul,/photospheric)
-  
+
   ; === index is a list of numbers corresponding to each filter ===
   index = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
