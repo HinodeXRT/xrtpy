@@ -33,8 +33,9 @@ _channel_name_to_index_mapping = {
     "Al-poly/Be-thick": 12,
     "C-poly/Ti-poly": 13,
 }
+
 _genx_file = sunpy.io.special.genx.read_genx(
-    Path(__file__).parent.absolute() / "data" / "xrt_channels_v0016.genx"
+    Path(__file__).parent.absolute() / "data" / "xrt_channels_v0017.genx"
 )["SAVEGEN0"]
 
 
@@ -430,9 +431,7 @@ class CCD:
     @u.quantity_input
     def ccd_gain_right(self) -> u.electron / u.DN:
         """Gain when reading the right port of the CCD."""
-        # NOTE: Value for the right gain in the instrument data files is incorrect.
-        # See https://github.com/HinodeXRT/xrtpy/pull/76
-        return u.Quantity(57.5, u.electron / u.DN)
+        return u.Quantity(self._ccd_data["GAIN_R"], u.electron / u.DN)
 
     @property
     def ccd_name(self) -> str:
