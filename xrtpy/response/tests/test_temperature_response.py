@@ -54,16 +54,9 @@ def test_temperature_response(filename):
         IDL_temperature_response.value,
     ) * u.Unit("DN cm5 pix-1 s-1")
 
-    # NOTE: there may be small deviations where the response function is very small, likely
-    # due to differences in the interpolation schemes. These are not critical as the response
-    # is effectively zero in these regions anyway.
-    i_valid = np.where(
-        actual_temperature_response > 1e-8 * actual_temperature_response.max()
-    )
-
     assert u.allclose(
-        actual_temperature_response[i_valid],
-        IDL_temperature_response_interp[i_valid],
+        actual_temperature_response,
+        IDL_temperature_response_interp,
         rtol=0.005,
-        atol=1e-6 * actual_temperature_response.max(),
+        atol=1e-6 * actual_temperature_response.max()
     )
