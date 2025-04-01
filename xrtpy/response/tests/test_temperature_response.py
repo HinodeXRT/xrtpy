@@ -58,5 +58,5 @@ def test_temperature_response(filename):
         actual_temperature_response,
         IDL_temperature_response_interp,
         rtol=0.005,
-        atol=1e-6 * actual_temperature_response.max()
+        atol=1e-6 * actual_temperature_response.max(),
     )
