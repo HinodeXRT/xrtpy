@@ -5,10 +5,9 @@ Configuration file for the Sphinx documentation builder.
 # -- stdlib imports ------------------------------------------------------------
 import os
 import warnings
-#from datetime import UTC, datetime
+
 from datetime import datetime,timezone
 from pathlib import Path
-
 from packaging.version import Version
 
 # -- Read the Docs Specific Configuration --------------------------------------
