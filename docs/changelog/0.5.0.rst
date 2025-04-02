@@ -1,11 +1,21 @@
-XRTpy v0.5.0 (2025-04-01)
+XRTpy v0.5.0 (2025-04-02)
 =========================
 
+New Features
+------------
+- Introduced a new example notebook: *"Hinode-XRT: A Practical Guide to Data Extraction and Visualization"*. This tutorial provides a step-by-step guide for accessing and exploring Hinode-XRT data. (:pr:`210`)
+
 Deprecations and Removals
--------------------------
+--------------------------
+- Dropped support for Python 3.9. (:pr:`281`)
+- Removed outdated `xrt_contam_on_ccd.geny` file. This file has been replaced with updated contamination handling based on new GENX inputs. (:pr:`326`)
+- Removed legacy IDL script `get_xrt_test_temperature_response.pro`, replaced by a new version for generating test datasets used in validation. (:pr:`327`)
 
-Documentation
--------------
-
-Internal modifications and improvements
----------------------------------------
+Documentation Updates
+---------------------
+- Added guidelines for contributing to XRTpy, including instructions for filing issues, submitting pull requests, and improving documentation. (:pr:`248`)
+- Introduced a Code of Conduct for the XRTpy community. (:pr:`278`)
+- Expanded and clarified docstrings across the following classes:
+  - `~xrtpy.response.channel.Channel`
+  - `~xrtpy.response.EffectiveAreaFundamental`
+  - `~xrtpy.response.TemperatureResponseFundamental` (:pr:`253`, :pr:`250`, :pr:`249`)
