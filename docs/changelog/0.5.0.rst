@@ -19,3 +19,20 @@ Documentation Updates
   - `~xrtpy.response.channel.Channel`
   - `~xrtpy.response.EffectiveAreaFundamental`
   - `~xrtpy.response.TemperatureResponseFundamental` (:pr:`253`, :pr:`250`, :pr:`249`)
+
+Internal Modifications and Improvements
+---------------------------------------
+- Fully revamped temperature response test infrastructure to match XRTpy calculations with IDL outputs across all filter channels and abundance models (coronal, hybrid, photospheric).
+- Updated CCD Gain Right value in IDL GENX Version 17, now consistent across XRTpy and IDL. (:pr:`322`)
+- Switched XRTpy CHIANTI emission data to version 10 to match IDL configuration. (:pr:`293`)
+- Created and adopted `xrt_channels_v0017.genx` to align with updated channel configuration. (:pr:`317`, :pr:`324`)
+- Updated contamination model file (`xrt_contam_on_ccd.geny`) with 2025 values. (:pr:`268`)
+- Updated IDL result files used for testing:
+  - Effective Area test files: 2020–2024. (:pr:`218`)
+  - Temperature Response test files: 2020–2024. (:pr:`220`) . All temperature response tests now pass with <0.5% relative difference using high-confidence validation metrics.
+- Updated SunPy map imports in notebooks for consistency. (:pr:`237`)
+
+Miscellaneous
+-------------
+- Added `sunpy` as a dependency to the installation requirements. (:pr:`247`)
+- Clarified installation instructions for users of Bash and Zsh shells. (:pr:`251`)
