@@ -15,8 +15,9 @@ This is the documentation for XRTpy (version |version|), a Python_ package being
    :maxdepth: 1
    :caption: Contents:
 
-   about_xrt
    install
+   about_xrt
+   getting_started
    generated/gallery/index
    reference/index
    acknowledging_xrtpy
