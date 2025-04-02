@@ -5,7 +5,8 @@ Configuration file for the Sphinx documentation builder.
 # -- stdlib imports ------------------------------------------------------------
 import os
 import warnings
-from datetime import UTC, datetime
+#from datetime import UTC, datetime
+from datetime import datetime,timezone
 from pathlib import Path
 
 from packaging.version import Version
@@ -31,7 +32,7 @@ from sunpy.util.exceptions import (
 # -- Project information -------------------------------------------------------
 project = "XRTpy"
 author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
-copyright = f"2021-{datetime.now(tz=UTC).year}, {author}"
+copyright = f"2021-{datetime.now(tz=timezone.utc).year}, {author}"
 
 # The full version, including alpha/beta/rc tags
 from xrtpy import __version__
