@@ -25,11 +25,11 @@ There are several ways you can contribute to XRTpy:
 
    - Review the `SunPy Newcomers Guide <https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html>`_
    - Fork the repository on GitHub
-   - Create a new branch from the `main` branch
+   - Create a new branch from the ``main`` branch
    - Make your changes (add tests if adding new functionality)
    - Commit your changes with clear and descriptive messages
    - Push your branch to your forked repo
-   - Open a pull request to merge into `main`
+   - Open a pull request to merge into ``main``
 
 3. **Improving Documentation** 📝  
 
