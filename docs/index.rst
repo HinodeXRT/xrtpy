@@ -9,7 +9,10 @@ XRTpy Documentation
    :align: center
    :scale: 50%
 
-This is the documentation for XRTpy (version |version|), a Python_ package being developed for the analysis of observations made by the `X-Ray Telescope`_ (XRT) :cite:p:`golub:2007` on the Hinode_ spacecraft :cite:p:`kosugi:2007`.
+Welcome to the documentation for **XRTpy** (version |version|) — a Python_ package for analyzing data from the `X-Ray Telescope`_ (XRT) :cite:p:`golub:2007` aboard the Hinode_ spacecraft :cite:p:`kosugi:2007`.
+
+XRTpy is designed for solar physicists, astronomers, students, and anyone curious about the Sun’s dynamic outer atmosphere. 
+Whether you're conducting research or just beginning to explore the world of X-ray solar imaging, XRTpy gives you the tools to study the hot plasma of the solar corona using real space-based observations.
 
 .. toctree::
    :maxdepth: 1
