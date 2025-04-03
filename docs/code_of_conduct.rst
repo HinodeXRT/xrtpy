@@ -4,25 +4,21 @@
 Code of Conduct
 ***************
 
-XRTpy follows the Contributor Covenant Code of Conduct, which is a widely adopted standard for fostering an inclusive and respectful community.
+XRTpy follows the `Contributor Covenant Code of Conduct <https://www.contributor-covenant.org/version/2/1/code_of_conduct.html>`_, which is a widely adopted standard for fostering an inclusive and respectful community.
 Below are the key principles and standards that all contributors and community members are expected to adhere to.
 
 Our Pledge
 ==========
 
-We, as contributors and maintainers of XRTpy, pledge to make participation in our project and community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, education, socioeconomic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+We, as contributors and maintainers of XRTpy, pledge to make participation in our project and community a harassment-free experience for everyone. We are committed to ensuring respectful interactions across all roles and backgrounds, regardless of personal characteristics or beliefs. This includes, but is not limited to, differences in age, background, education, technical experience, nationality, religion, or personal identity.
+
+XRTpy welcomes contributions from a wide range of perspectives and values collaborative, constructive input from everyone involved.
 
 Respectful Communication
 ========================
 
 We expect all participants to communicate respectfully and constructively.
 This includes being polite, considerate, and welcoming, while avoiding any form of harassment, discrimination, or offensive behavior.
-
-Diversity and Inclusion
-=======================
-
-XRTpy values diversity and is dedicated to creating an inclusive environment.
-We welcome contributions from people of all backgrounds, regardless of gender, disability, ethnicity, religion, nationality, sexual orientation, or any other characteristic.
 
 Constructive Criticism
 ======================
@@ -42,10 +38,7 @@ Project maintainers are responsible for enforcing this code and taking appropria
 
 **Enforcement and Reporting**
 
-- Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers at `XRTpy@cfa.harvard.edu <mailto:XRTpy@cfa.harvard.edu>`_.
+- Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers at `xrtpy@cfa.harvard.edu <mailto:XRTpy@cfa.harvard.edu>`_.
   All complaints will be reviewed and investigated promptly and fairly.
 
 - Project maintainers are obligated to respect the privacy and security of the person reporting any incident.
-
-
-.. _Contributor Covenant : https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
