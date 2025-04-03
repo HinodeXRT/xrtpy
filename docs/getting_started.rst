@@ -62,8 +62,8 @@ Abundance Model Options
 
 By default, XRTpy uses CHIANTI coronal abundances (:cite:t:`feldman:1992`). You may also choose:
 
-- `"hybrid"` — based on :cite:t:`Fludra:1999`
-- `"photospheric"` — based on :cite:t:`Grevesse:2007`
+- ``"hybrid"`` — based on :cite:t:`Fludra:1999`
+- ``"photospheric"`` — based on :cite:t:`Grevesse:2007`
 
 To use a different abundance model:
 
@@ -77,7 +77,7 @@ To use a different abundance model:
       abundance_model='hybrid'
       )
 
-You may also pass the ``abundance_model`` keyword to `temperature_from_filter_ratio`.
+You may also pass the ``abundance_model`` keyword to ``temperature_from_filter_ratio``.
 
 .. note::
    In the future, XRTpy may support additional emission model libraries beyond CHIANTI.
@@ -87,7 +87,7 @@ Data Products
 
 XRT data products are available through the XRT website. These include:
 
-- `Level 1 Data`_ — Calibrated data using `xrt_prep`, in instrumental DN units.
+- `Level 1 Data`_ — Calibrated data using ``xrt_prep``, in instrumental DN units.
 - `Level 2 Synoptics`_ — Composite images from the synoptic observing program.
 
 For more information, visit the `XRT data products`_ page.
