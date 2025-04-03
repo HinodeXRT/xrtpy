@@ -35,17 +35,17 @@ Conflict Resolution and Enforcement
 ===================================
 
 Conflicts may arise in any collaborative environment.
-Participants should engage respectfully and with an open mind.
+We ask participants to engage respectfully and with an open mind.
 If unresolved, project maintainers will mediate to ensure a fair resolution.
 Violations of this Code of Conduct will result in appropriate consequences, including warnings, temporary bans, or permanent removal.
-Community leaders are responsible for enforcing these rules and taking corrective action as needed.
+Project maintainers are responsible for enforcing this code and taking appropriate action.
 
 **Enforcement and Reporting**
 
-- Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at ``XRTpy@cfa.harvard.edu``.
+- Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers at `XRTpy@cfa.harvard.edu <mailto:XRTpy@cfa.harvard.edu>`_.
   All complaints will be reviewed and investigated promptly and fairly.
-- Community leaders are obligated to respect the privacy and security of the reporter of any incident.
 
-This Code of Conduct is adapted from the `Contributor Covenant`_, version 2.1.
+- Project maintainers are obligated to respect the privacy and security of the person reporting any incident.
+
 
 .. _Contributor Covenant : https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
