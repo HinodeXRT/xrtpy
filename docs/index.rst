@@ -20,6 +20,7 @@ Whether you're conducting research or just beginning to explore the world of X-r
 
    about_xrt
    install
+   getting_started
    generated/gallery/index
    reference/index
    acknowledging_xrtpy
