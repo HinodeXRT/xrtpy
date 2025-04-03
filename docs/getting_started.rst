@@ -81,6 +81,7 @@ You may also pass the ``abundance_model`` keyword to ``temperature_from_filter_r
 
 .. note::
    In the future, XRTpy may support additional emission model libraries beyond CHIANTI.
+   This feature is planned for the **v0.6.0** release, expected later in **2025**. Stay tuned for exciting new capabilities!
 
 Data Products
 *************
