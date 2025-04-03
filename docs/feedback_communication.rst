@@ -7,17 +7,12 @@ Providing Feedback
 There are several ways to get in touch with the XRTpy development team — whether you have questions, suggestions, or have found a bug.
 
 
-Feedback
-========
+General Feedback
+================
 
 We welcome all forms of feedback about your experience with XRTpy! Whether you have ideas for new features, suggestions for improving documentation, or just want to share how you’re using the package, we’d love to hear from you.
 
 You can reach us via our `GitHub repository`_ or by sending an `email`_.
-
-Bugs
-====
-
-If you encounter a XRTpy error, flaw, or unexpected operation, please report it to us by creating a `GitHub-issue`_ or by sending an `email`_.
 
 Reporting Issues 
 ================
