@@ -26,7 +26,7 @@ Visit our Examples page for step-by-step Jupyter notebook guides on how to use e
 Channel
 -------
 
-The `Channel` class describes the configuration of a specific XRT filter channel. It includes details for the Charge-Coupled Device (CCD),
+The ``Channel`` class describes the configuration of a specific XRT filter channel. It includes details for the Charge-Coupled Device (CCD),
 Entrance Filter, Focal Plane Filters, Geometry, and Mirrors.
 
 Effective Area
@@ -45,17 +45,17 @@ XRTpy calculates the temperature response of XRT filter channels using the CHIAN
 Deriving Temperature and Emission Measure
 -----------------------------------------
 
-The `temperature_from_filter_ratio` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
+The ``temperature_from_filter_ratio``` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
 
 Image Deconvolution with the PSF
 --------------------------------
 
-The `deconvolve` function applies image deconvolution using the instrument’s Point Spread Function (PSF) to sharpen XRT images. This is especially useful for recovering detail around bright or sharp solar structures.
+The ``deconvolve`` function applies image deconvolution using the instrument’s Point Spread Function (PSF) to sharpen XRT images. This is especially useful for recovering detail around bright or sharp solar structures.
 
 Light Leak Correction
 ---------------------
 
-The `remove_lightleak` function subtracts visible stray light from XRT synoptic composite images. This correction improves the quality of long-term coronal evolution studies. See our Examples section for how to use this function.
+The ``remove_lightleak`` function subtracts visible stray light from XRT synoptic composite images. This correction improves the quality of long-term coronal evolution studies. See our Examples section for how to use this function.
 
 Abundance Model Options
 -----------------------
@@ -72,12 +72,12 @@ To use a different abundance model:
    from xrtpy.response import TemperatureResponseFundamental
 
    TemperatureResponseFundamental(
-       'Al-poly',
-       '2022-07-04T23:43:12',
-       abundance_model='hybrid'
-   )
+      'Al-poly',
+      '2022-07-04T23:43:12',
+      abundance_model='hybrid'
+      )
 
-You may also pass the `abundance_model` keyword to `temperature_from_filter_ratio`.
+You may also pass the ``abundance_model`` keyword to `temperature_from_filter_ratio`.
 
 .. note::
    In the future, XRTpy may support additional emission model libraries beyond CHIANTI.
@@ -98,26 +98,26 @@ X-Ray Filter Channels
 XRT uses two filter wheels to configure the imaging filter channel. Each wheel includes several filters and an open slot:
 
 Filter Wheel 1:
-  - *Open*
-  - Al-poly
-  - C-poly
-  - Be-thin
-  - Be-med
-  - Al-med
+   - *Open*
+   - Al-poly
+   - C-poly
+   - Be-thin
+   - Be-med
+   - Al-med
 
 Filter Wheel 2:
-  - *Open*
-  - Al-mesh
-  - Ti-poly
-  - G-band (visible)
-  - Al-thick
-  - Be-thick
+   - *Open*
+   - Al-mesh
+   - Ti-poly
+   - G-band (visible)
+   - Al-thick
+   - Be-thick
 
 .. note::
    - Each wheel has an *Open* slot used when the filter is in the opposite wheel.
    - XRTpy does not support G-band image processing or response calculations.
 
-Filter names in XRTpy are passed as strings like `'Ti-poly'`.
+Filter names in XRTpy are passed as strings like ``'Ti-poly'``.
 
 References
 **********
