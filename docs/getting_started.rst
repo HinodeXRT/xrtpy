@@ -50,7 +50,7 @@ The ``temperature_from_filter_ratio``` function allows you to derive plasma temp
 Image Deconvolution with the PSF
 --------------------------------
 
-The ``deconvolve`` function applies image deconvolution using the instrument’s Point Spread Function (PSF) to sharpen XRT images. This is especially useful for recovering detail around bright or sharp solar structures.
+The ``deconvolve`` function applies image deconvolution using the instrument's Point Spread Function (PSF) to sharpen XRT images. This is especially useful for recovering detail around bright or sharp solar structures.
 
 Light Leak Correction
 ---------------------
@@ -72,10 +72,8 @@ To use a different abundance model:
    from xrtpy.response import TemperatureResponseFundamental
 
    TemperatureResponseFundamental(
-      'Al-poly',
-      '2022-07-04T23:43:12',
-      abundance_model='hybrid'
-      )
+       "Al-poly", "2022-07-04T23:43:12", abundance_model="hybrid"
+   )
 
 You may also pass the ``abundance_model`` keyword to ``temperature_from_filter_ratio``.
 
