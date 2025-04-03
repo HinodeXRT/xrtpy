@@ -11,9 +11,9 @@ XRTpy Objects
 
 XRTpy currently provides access to the following core classes:
 
-- `Channel`
-- `Effective Area`
-- `Temperature Response`
+- ``xrtpy.response.Channel``
+- ``xrtpy.response.Effective Area``
+- ``xrtpy.response.Temperature Response``
 
 It also includes functionality to:
 
@@ -120,7 +120,7 @@ Filter Wheel 2:
 Filter names in XRTpy are passed as strings like `'Ti-poly'`.
 
 References
-==========
+**********
 
 Velasquez, J., Murphy, N., Reeves, K. K., Slavin, J., Weber, M., & Barnes, W. (2024).
 *XRTpy: A Hinode-X-Ray Telescope Python Package*. JOSS, 9(100), 6396.
