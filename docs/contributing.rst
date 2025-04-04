@@ -9,25 +9,32 @@ We welcome contributions from the community to improve and expand the functional
 
 There are several ways you can contribute to XRTpy:
 
-1. **Reporting Issues**:
-   If you encounter any bugs or have suggestions for improvements, please report them using the `GitHub-issue`_ page.
-   Provide as much detail as possible, including steps to reproduce the issue and any relevant screenshots or code snippets.
+1. **Reporting Issues** 🐛
 
-2. **Submitting Pull Requests**:
-   If you want to contribute code, follow these steps:
+   If you encounter bugs or have suggestions for improvements, please report them by opening a
+   `GitHub issue <https://github.com/HinodeXRT/xrtpy/issues>`_.
+   Include as much detail as possible, such as:
 
-      - Read the `sunpy Newcomers Guide <https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html>`__.
-      - Fork the repository on GitHub.
-      - Create a new branch from the "main" branch for your changes.
-      - Make your changes, ensuring that you follow the coding standards and include tests for any new functionality.
-      - Commit your changes with clear and descriptive commit messages.
-      - Push your branch to your forked repository.
-      - Create a pull request (PR) from your branch to the "main" branch of the original repository.
+   - Steps to reproduce the issue
+   - Screenshots or code snippets
+   - Your operating system and Python version
 
-3. **Improving Documentation**:
-   Good documentation is crucial for the usability of the package.
-   You can help by improving existing documentation, or writing new tutorials.
+2. **Submitting Pull Requests** 🤝
 
-Thank you for contributing to XRTpy!
+   If you'd like to contribute code:
 
-.. _GitHub-issue: https://github.com/HinodeXRT/xrtpy/issues
+   - Review the `SunPy Newcomers Guide <https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html>`_
+   - Fork the repository on GitHub
+   - Create a new branch from the ``main`` branch
+   - Make your changes (add tests if adding new functionality)
+   - Commit your changes with clear and descriptive messages
+   - Push your branch to your forked repo
+   - Open a pull request to merge into ``main``
+
+3. **Improving Documentation** 📝
+
+   Help make XRTpy more accessible by improving existing docs, fixing typos, or adding new tutorials and usage examples.
+
+---
+
+Thank you for helping make XRTpy better for the whole community ☀️!
