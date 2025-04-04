@@ -8,7 +8,7 @@ New Features
 Deprecations and Removals
 --------------------------
 - Dropped support for Python 3.9. (:pr:`281`)
-- Removed outdated ``xrt_contam_on_ccd`.geny`` file. This file has been replaced with updated contamination handling based on new GENX inputs. (:pr:`326`)
+- Removed outdated ``xrt_contam_on_ccd.geny`` file. This file has been replaced with updated contamination handling based on new GENX inputs. (:pr:`326`)
 - Removed legacy IDL script ``get_xrt_test_temperature_response.pro``, replaced by a new version for generating test datasets used in validation. (:pr:`327`)
 
 Documentation Updates
@@ -36,3 +36,4 @@ Miscellaneous
 -------------
 - Added `sunpy` as a dependency to the installation requirements. (:pr:`247`)
 - Clarified installation instructions for users of Bash and Zsh shells. (:pr:`251`)
+- Prior to finalizing v0.5.0, we conducted a complete inspection of the package in (:pr:'336').
