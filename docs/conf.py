@@ -5,7 +5,9 @@ Configuration file for the Sphinx documentation builder.
 # -- stdlib imports ------------------------------------------------------------
 import os
 import warnings
-from datetime import UTC, datetime
+from datetime import datetime, timezone
+
+UTC = timezone.utc  # Define UTC manually for Python 3.10 compatibility Feb2025
 from pathlib import Path
 
 from packaging.version import Version
