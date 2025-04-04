@@ -17,7 +17,7 @@ XRTpy is a Python package being developed for the analysis of observations made 
 
 ## Documentation
 
-Check out our full documentation site for examples, installation instructions, and how to get started:  
+Check out our full documentation site for examples, installation instructions, and how to get started:
 [XRTpy Documentation](https://xrtpy.readthedocs.io/en/latest/)
 
 
@@ -33,23 +33,23 @@ Found an issue or have suggestions? Open an issue on our [GitHub Issues page](ht
 
 ## Contributing
 
-We welcome contributions!  
+We welcome contributions!
 See our [Contributing Guide](https://xrtpy.readthedocs.io/en/latest/contributing.html) for how to get started.
 
 
 ## Contact
 
-For general questions, feel free to reach out to us at:  
+For general questions, feel free to reach out to us at:
 **XRTpy@cfa.harvard.edu**
 
 
 ## Citation
 
-If you use XRTpy in your research, please cite our software:  
+If you use XRTpy in your research, please cite our software:
 [DOI: 10.5281/zenodo.13157914](https://doi.org/10.5281/zenodo.13157914)
 
-Velasquez, Joy; Reeves, Katharine; Murphy, Nicholas; Slavin, Jonathan; Weber, Mark; Barnes, Will.  
-*XRTpy: A Hinode X-Ray Telescope Python Package*.  
+Velasquez, Joy; Reeves, Katharine; Murphy, Nicholas; Slavin, Jonathan; Weber, Mark; Barnes, Will.
+*XRTpy: A Hinode X-Ray Telescope Python Package*.
 Journal of Open Source Software, 2024.
 
 
