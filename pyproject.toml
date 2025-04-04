@@ -1,93 +1,90 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
-  "setuptools >=62.1 , != 71.0.1",
-  "setuptools_scm[toml] >=6.2",
-  "wheel >=0.34",
+  "setuptools>=62.1,!=71.0.1",
+  "setuptools-scm[toml]>=6.2",
+  "wheel>=0.34",
 ]
 
 [project]
-name = "XRTpy"
-readme = "README.md"
-keywords = ["Solar Physics", "x-ray", "Hinode", "XRT"]
+name = "xrtpy"
 description = "For analyzing data from the X-Ray Telescope (XRT) on the Hinode spacecraft."
-license = {file = "LICENSE"}
+readme = "README.md"
+keywords = [ "Hinode", "Solar Physics", "x-ray", "XRT" ]
+license = { file = "LICENSE" }
+authors = [
+  { name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu" },
+  { name = "Jonathan Slavin", email = "jslavin@cfa.harvard.edu" },
+  { name = "Nick Murpy", email = "namurphy@cfa.harvard.edu" },
+  { name = "Will Barnes" },
+  { name = "Nabil Freij", email = "nabil.freij@gmail.com" },
+  { name = "Stuart Mumford" },
+]
+
+# SPEC 0 recommends that packages in the scientific pythoniverse support
+# versions of Python that have been released in the last ≤36 months
+requires-python = ">=3.11"
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Scientific/Engineering :: Physics",
 ]
-# SPEC 0 recommends that packages in the scientific pythoniverse support
-# versions of Python that have been released in the last ≤36 months
-requires-python = ">=3.11"
-dynamic = ["version"]
-authors = [
-  {name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu"},
-  {name = "Jonathan Slavin", email = "jslavin@cfa.harvard.edu"},
-  {name = "Nick Murpy", email="namurphy@cfa.harvard.edu"},
-  {name = "Will Barnes"},
-  {name = "Nabil Freij", email="nabil.freij@gmail.com"},
-  {name = "Stuart Mumford"},
-]
-
+dynamic = [ "version" ]
 dependencies = [
-  "astropy >= 6.0.0",
-  "matplotlib >= 3.7.0",
-  "numpy >=1.24.0",
-  "scikit-image >= 0.21.0",
-  "scipy >= 1.11.1",
-  "sunpy[map] >= 5.1.0",
+  "astropy>=6",
+  "matplotlib>=3.7",
+  "numpy>=1.24",
+  "scikit-image>=0.21",
+  "scipy>=1.11.1",
+  "sunpy[map]>=5.1",
 ]
 
-[project.optional-dependencies]
-dev = [
-  "nox >= 2024.10.9",
+optional-dependencies.dev = [
+  "nox>=2024.10.9",
 ]
-tests = [
-  "pytest >= 8.3.1",
-  "pytest-astropy >= 0.11.0",
-  "pytest-xdist >= 3.6.1",
-  "pytest-cov >= 6.0.0",
-]
-docs = [
-  "astropy >= 6",
-  "pydata_sphinx_theme >= 0.15.0",
+optional-dependencies.docs = [
+  "astropy>=6",
+  "pydata-sphinx-theme>=0.15",
   # Need pkg_resources for sphinxcontrib-bibtex
   # and this comes from setuptools
   # This is a bug upstream in the extension which
   # has yet to be fixed.
-  "setuptools > 71.0.1",
-  "sphinx >= 7.3.0",
-  "sphinx_automodapi >= 0.17.0",
-  "sphinx-copybutton >= 0.5.2",
-  "sphinx-gallery >= 0.16.0",
-  "sphinx-hoverxref >= 1.4.0",
-  "sphinx-issues >= 4.1.0",
-  "sphinxcontrib-bibtex >= 2.6.2",
-  "sphinxext-opengraph>=0.6.0",
-  "sunpy[map,net] >= 5.0.0",
+  "setuptools>71.0.1",
+  "sphinx>=7.3",
+  "sphinx-automodapi>=0.17",
+  "sphinx-copybutton>=0.5.2",
+  "sphinx-gallery>=0.16",
+  "sphinx-hoverxref>=1.4",
+  "sphinx-issues>=4.1",
+  "sphinxcontrib-bibtex>=2.6.2",
+  "sphinxext-opengraph>=0.6",
+  "sunpy[map,net]>=5",
 ]
-
-[project.urls]
-Documentation = "https://xrtpy.readthedocs.io"
-Repository = "https://github.com/HinodeXRT/xrtpy"
-Issues = "https://github.com/HinodeXRT/xrtpy/issues"
-Changelog = "https://xrtpy.readthedocs.io/en/stable/changelog/index.html"
+optional-dependencies.tests = [
+  "pytest>=8.3.1",
+  "pytest-astropy>=0.11",
+  "pytest-cov>=6",
+  "pytest-xdist>=3.6.1",
+]
+urls.Changelog = "https://xrtpy.readthedocs.io/en/stable/changelog/index.html"
+urls.Documentation = "https://xrtpy.readthedocs.io"
+urls.Issues = "https://github.com/HinodeXRT/xrtpy/issues"
+urls.Repository = "https://github.com/HinodeXRT/xrtpy"
 
 [tool.setuptools]
-packages = ["xrtpy"]
+packages = [ "xrtpy" ]
 
 [tool.setuptools.package-data]
-"xrtpy" = ["data/*"]
-"xrtpy.response" = ["data/*.txt", "data/*.geny"]
-"xrtpy.response.tests" = ["data/*/*/*.txt"]
+"xrtpy" = [ "data/*" ]
+"xrtpy.response" = [ "data/*.txt", "data/*.geny" ]
+"xrtpy.response.tests" = [ "data/*/*/*.txt" ]
 
 [tool.setuptools_scm]
 write_to = "xrtpy/version.py"
@@ -111,7 +108,7 @@ ue
 """
 
 [tool.pytest.ini_options]
-testpaths = ['.']
+testpaths = [ '.' ]
 xfail_strict = true
 norecursedirs = [
   '*egg-info*',
@@ -151,7 +148,7 @@ exclude_lines = [
 
 [tool.coverage.run]
 branch = true
-source = ["xrtpy"]
+source = [ "xrtpy" ]
 omit = [
   "*/*version.py",
 ]
