@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="http://xrtpy.readthedocs.io/en/latest/">
+    <img src="docs/_static/images/XRTpy_logo.png" alt="XRTpy Logo" width="300"/>
+  </a>
+</p>
+
 # XRTpy
 
 [![License](https://img.shields.io/badge/License-BSD%202--Clause-blue.svg)](./LICENSE)
