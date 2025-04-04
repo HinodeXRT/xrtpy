@@ -8,6 +8,7 @@ If XRTpy has been useful in your research, we encourage you to consider includin
 Below are suggested formats to credit XRTpy in your scientific papers, posters, or presentations.
 While this is not required, it is greatly appreciated.
 
+
 For a scientific paper
 ======================
 
@@ -15,7 +16,8 @@ You may use the following format to cite XRTpy in your publications:
 
 .. code-block:: text
 
-    "We acknowledge the use of XRTpy (v0.4.1) for Hinode X-Ray Telescope data analysis, available at https://xrtpy.readthedocs.io/ (Velasquez et al. 2024, JOSS, DOI: 10.21105/joss.06396)."
+    "We acknowledge the use of XRTpy (v0.5.0) for Hinode X-Ray Telescope data analysis, available at https://xrtpy.readthedocs.io/en/latest/ (Velasquez et al. 2024, JOSS, DOI: 10.21105/joss.06396)."
+
 
 For a poster or presentation
 ============================
@@ -24,8 +26,8 @@ If you are presenting work that involves XRTpy in a poster or presentation, you 
 
 .. code-block:: text
 
-    "This work made use of XRTpy (v0.4.1), a Python package for solar
-    Hinode X-Ray Telescope data analysis, available at https://xrtpy.readthedocs.io/ (Velasquez et al. 2024, JOSS, DOI: 10.21105/joss.06396)."
+    "This work made use of XRTpy (v0.5.0), a Python package for solar
+    Hinode X-Ray Telescope data analysis, available at https://xrtpy.readthedocs.io/en/latest/ (Velasquez et al. 2024, JOSS, DOI: 10.21105/joss.06396)."
 
 References
 ==========
