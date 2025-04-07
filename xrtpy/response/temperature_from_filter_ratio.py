@@ -710,10 +710,8 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, extra_metadata):
     ]
     for kw in kw_to_copy:
         new_hdr[kw] = hdr1[kw]
-    # Ensure CTYPE1 and CTYPE2 use the updated coordinate system
     new_hdr["L1_file1"] = filename1
     new_hdr["L1_file2"] = filename2
-
     extra_values, extra_comments = split_values_comments(extra_metadata)
     new_hdr.update(extra_values)
     create_date = datetime.now().ctime()
