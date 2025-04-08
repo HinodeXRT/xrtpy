@@ -36,4 +36,4 @@ Miscellaneous
 -------------
 - Added `sunpy` as a dependency to the installation requirements. (:pr:`247`)
 - Clarified installation instructions for users of Bash and Zsh shells. (:pr:`251`)
-- Prior to finalizing v0.5.0, we conducted a complete inspection of the package in (:pr:`336``).
+- Prior to finalizing v0.5.0, we conducted a complete inspection of the package in (:pr:`336`).
