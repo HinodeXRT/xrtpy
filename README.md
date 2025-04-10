@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://xrtpy.readthedocs.io/en/latest/">
+  <a href="https://xrtpy.readthedocs.io/en/stable/">
     <img src="docs/_static/images/XRTpy_logo.png" alt="XRTpy Logo" width="300"/>
   </a>
 </p>
