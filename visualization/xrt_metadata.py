@@ -16,7 +16,7 @@ sys.path.append('/Users/ntrueba/SOLAR/code/xrtstuff/') #
 import xrt_metadata_plot as xplt
 import xrt_metadata_download as xfetch
 
-
+print('THIS IS A GITHUB TEST')
 
 from ipywidgets import Layout, interact, IntSlider,IntProgress, RadioButtons, FloatSlider,FloatRangeSlider,fixed
 
