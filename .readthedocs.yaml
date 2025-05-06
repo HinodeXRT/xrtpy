@@ -2,9 +2,8 @@
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html
 
 version: 2
-
-formats:
-- htmlzip
+sphinx:
+  configuration: docs/conf.py
 
 build:
   os: ubuntu-lts-latest
@@ -16,12 +15,12 @@ build:
     post_build:
     - echo $'\n'For help deciphering documentation build error messages, see:$'\n\n'\ \ https://xrtpy.readthedocs.io/en/latest/contributing.html#troubleshooting
 
-sphinx:
-  configuration: docs/conf.py #Feb2025
-
 python:
   install:
   - method: pip
     path: .
     extra_requirements:
     - docs
+
+formats:
+- htmlzip
