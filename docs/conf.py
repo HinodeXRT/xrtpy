@@ -6,8 +6,6 @@ Configuration file for the Sphinx documentation builder.
 import os
 import warnings
 from datetime import datetime, timezone
-
-UTC = timezone.utc  # Define UTC manually for Python 3.10 compatibility Feb2025
 from pathlib import Path
 
 from packaging.version import Version
@@ -33,7 +31,7 @@ from sunpy.util.exceptions import (
 # -- Project information -------------------------------------------------------
 project = "XRTpy"
 author = "Joy Velasquez, Nick Murphy, and Jonathan Slavin"
-copyright = f"2021-{datetime.now(tz=UTC).year}, {author}"
+copyright = f"2021-{datetime.now(tz=timezone.utc).year}, {author}"
 
 # The full version, including alpha/beta/rc tags
 from xrtpy import __version__
