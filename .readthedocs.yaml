@@ -2,9 +2,8 @@
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html
 
 version: 2
-
-formats:
-- htmlzip
+sphinx:
+  configuration: docs/conf.py
 
 build:
   os: ubuntu-lts-latest
@@ -22,3 +21,6 @@ python:
     path: .
     extra_requirements:
     - docs
+
+formats:
+- htmlzip
