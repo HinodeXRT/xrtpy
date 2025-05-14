@@ -5,7 +5,7 @@ import astropy.units as u
 import numpy as np
 
 from astropy.coordinates import SkyCoord
-
+import matplotlib.pyplot as plt
 from sunpy.coordinates import frames
 from astropy.time import Time
 import scipy.io as sio
@@ -13,11 +13,9 @@ from scipy.io import readsav
 import urllib.request
 import sys
 
-sys.path.append('/Users/ntrueba/SOLAR/code/GIT/xrtpy/xrtpy/visualization/fov/') 
+#sys.path.append('/Users/ntrueba/SOLAR/code/GIT/xrtpy/xrtpy/visualization/fov/') 
 import xrt_metadata_plot as xplt
 import xrt_metadata_download as xfetch
-
-print('THIS IS A GITHUB TEST')
 
 from ipywidgets import Layout, interact, IntSlider,IntProgress, RadioButtons, FloatSlider,FloatRangeSlider,fixed
 
@@ -208,7 +206,7 @@ class xrt_meta:
         return coords_out
     
 
-    def plot_preview(self):
+    def plot_preview(self, ani_bool  = True, d_mode = True,vertical_plot = True):
         # plot preamble here, needs to be cleaned up
         # because we want to have an interactive plot, we don't want to recalculate some of these basic things every time the plot refreshes, so we calculate it here
 
@@ -223,7 +221,7 @@ class xrt_meta:
         fov_lis = self.get_frame_lis()# FOV list (n_filters, n_frames(filter))
         time_lis0 = self.metadata['DELTA_TIME_LIST'] # Frame time in seconds relative to first frame (n_filters, n_frames(filter))
         time_lis_abs = self.metadata['TIME_LIST'] # Absolute time for each frame (n_filters, n_frames(filter))
-        col_vals = xplt.get_pcol(flen)
+        col_vals, col_vals2 = xplt.get_pcol(flen)
 
         # Set-up Solar limb and grid lines 
         ang_arr = np.linspace(0.0,6.28,100)
@@ -260,16 +258,24 @@ class xrt_meta:
         inputs['fill_bool']  =  fill_bool     
         inputs['filter_lis']  = filter_lis     
         inputs['time_lis0'] = time_lis0      
-        inputs['col_vals'] = col_vals       
+        inputs['col_vals'] = col_vals   
+        inputs['col_vals2'] = col_vals2       
         inputs['time_lis_abs'] = time_lis_abs 
 
         # need to generalize when to use interactive vs animation etc
-        interact(xplt.interactive_plot, 
+
+        if ani_bool:
+            interact(xplt.interactive_plot, 
                 mini_tline = True,
+                night_mode = d_mode,
                 filter_selection = RadioButtons(options=filter_lis_b,index=0),
                 zoom_v=FloatSlider(value=1.0,min=0.5,max=2.0, layout=Layout(width='70%')),
                 tzoom = FloatRangeSlider(value=[0.0,1.0],min=0,max=1.0,step=0.01, layout=Layout(width='70%')),
                 time_ind=IntSlider(value=50,min=0,max=99,step=1, layout=Layout(width='70%')),
-                inputs = fixed(inputs))
-
-        return
+                inputs = fixed(inputs),
+                nfilt = fixed(flen),
+                alt_bool = vertical_plot)
+        else:
+            ani = xplt.make_animation(filter_lis_b,inputs, d_mode, vertical_plot,flen)
+            return ani
+        return #axs_lis

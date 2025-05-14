@@ -1,16 +1,32 @@
 
 import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 import matplotlib.dates as mdates
 import matplotlib.colors as mcolors
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
+import matplotlib.animation as animation
+cmap_b = matplotlib.colors.LinearSegmentedColormap.from_list("", ['#01EA79',
+                                                                  '#01EAFF',
+                                                                  '#952EFC',
+                                                                  '#F51A8C',
+                                                                  '#FF9138'])
 
+cmap_w = matplotlib.colors.LinearSegmentedColormap.from_list("", ['#019488',
+                                                                  '#003066',
+                                                                  '#51389B',#'#3D318B',
+                                                                  '#B42D7E',
+                                                                  '#FF504D',
+                                                                  '#E59500'])
 
-def get_pcol(ndata):
-    cmap = plt.get_cmap('rainbow')
+def get_pcol(ndata, n_mode = True):
+    cmap = cmap_b#plt.get_cmap('rainbow')
+    cmap2 = cmap_w
     ndim = ndata#+1
     col_arr = np.linspace(0.0,1.0,ndim)
-    col_lis = cmap(col_arr)#[:-1])
-    return col_lis
+    col_lis, col_lis2 = cmap(col_arr), cmap2(col_arr)#[:-1])
+    return col_lis, col_lis2
 
 def lab_locs0(xc, yc):
     xlocs = np.asarray([np.min(xc.value), np.max(xc.value), np.max(xc.value), np.min(xc.value)])
@@ -58,16 +74,158 @@ def fix_col(col_in, dcol_v):
     colv3 = colv2 + dcol*(sum_v)/np.sum(dcol)
     return colv3        
 
-
-
-
 def interactive_plot(filter_selection, 
                      zoom_v, 
                      tzoom, 
                      time_ind, 
                      mini_tline,
-                     inputs):
+                     night_mode,
+                     inputs,
+                     nfilt,
+                     alt_bool):
+    #print('new interact2')
+    plt.close('all')
+    #alt_bool = False
+    if mini_tline:
+        if alt_bool:
+            fig, axs2 = plt.subplots(3,1,figsize=(9,8+nfilt*0.4), gridspec_kw={'height_ratios': [16, 1, nfilt]})
+            axs = [axs2[0],axs2[2],axs2[1]]
+        else:
+            fig, axs2 = plt.subplot_mosaic([['t1','t1','im'],['t1','t1','im'],['t2','t2','im']], figsize=(18,6))#,['im','t0','t0'],['im','t3','t3']]
+            #axs2['t0'].axis('off')
+            #axs2['t3'].axis('off')
+            axs = [axs2['im'],axs2['t1'],axs2['t2']]
+        jlen = 2
+        
+    else:
+        if alt_bool:
+            fig, axs = plt.subplots(2,1,figsize=(9,7+nfilt*0.4), gridspec_kw={'height_ratios': [16, nfilt]})
+
+        else:
+            fig, axs2 = plt.subplot_mosaic([['t1','t1','im'],['t1','t1','im']], figsize=(18,6))#,['im','t0','t0'],['im','t3','t3']]
+            #axs2['t0'].axis('off')
+            #axs2['t3'].axis('off')
+            #axs2['t2'].axis('off')
+            axs = [axs2['im'],axs2['t1']]
+        jlen = 1
+
+    axs, fig = fov_plotter(axs, fig,
+                filter_selection, 
+                zoom_v, 
+                tzoom, 
+                time_ind, 
+                mini_tline,
+                night_mode,
+                jlen,
+                inputs,
+                alt_bool)
+    plt.show()
+
+
+def get_frames(filter_selection, 
+                     zoom_v, 
+                     tzoom, 
+                     time_ind, 
+                     mini_tline,
+                     night_mode,
+                     inputs,
+                     nfilt,
+                     alt_bool):
+    #print('new interact2')
+    plt.close('all')
+    if mini_tline:
+        if alt_bool:
+            fig, axs2 = plt.subplots(3,1,figsize=(9,8+nfilt*0.4), gridspec_kw={'height_ratios': [16, 1, nfilt]})
+            axs = [axs2[0],axs2[2],axs2[1]]
+        else:
+            fig, axs2 = plt.subplot_mosaic([['t1','t1','im'],['t1','t1','im'],['t2','t2','im']], figsize=(18,6))#,['im','t0','t0'],['im','t3','t3']]
+            #axs2['t0'].axis('off')
+            #axs2['t3'].axis('off')
+            axs = [axs2['im'],axs2['t1'],axs2['t2']]
+        jlen = 2
+    else:
+        fig, axs = plt.subplots(2,1,figsize=(9,10), gridspec_kw={'height_ratios': [16, 4]})
+        jlen = 1
+
+    axs, fig = fov_plotter(axs, fig,
+                filter_selection, 
+                zoom_v, 
+                tzoom, 
+                time_ind, 
+                mini_tline,
+                night_mode,
+                jlen,
+                inputs,
+                alt_bool)
+    return axs, fig
+
+def make_animation(filter_lis_b,inputs, dmode, alt_bool,nfilt,tlen = 20):
     
+    axs_lis = []
+    
+    ti = np.linspace(0,99,tlen,dtype=int)
+    for i in range(tlen):
+        #print(ti[i])
+        axs, fig = get_frames(filter_lis_b[0],
+                        1.0,
+                        [0.0,1.0],
+                        ti[i],
+                        True,
+                        dmode,
+                        inputs,
+                        nfilt,
+                        alt_bool
+                        )
+        axs_lis.append(fig)
+        plt.close()
+    Xlis = []
+    for i in range(tlen):
+        fig = axs_lis[i]
+        canvas = FigureCanvasAgg(fig)
+    
+    
+        # Retrieve a view on the renderer buffer
+        canvas.draw()
+        buf = canvas.buffer_rgba()
+            # convert to a NumPy array
+        X = np.asarray(buf)
+        Xlis.append(X)
+        plt.close('all')
+    if alt_bool:
+        fig, ax = plt.subplots(figsize=(8,11))
+    else:
+        fig, ax = plt.subplots(figsize=(18,6))
+    plt.axis('off')
+    #plt.axis("tight")  # gets rid of white border
+    #plt.axis("image")
+    ims = []
+    for i in range(tlen):
+        # make a Figure and attach it to a canvas.
+        X = Xlis[i]
+        #print(i)
+        im = ax.imshow(X, animated=True)
+        #plt.axis("tight")
+        if i == 0:
+            ax.imshow(X)  # show an initial one first
+                #plt.close()
+        ims.append([im])
+    fig.subplots_adjust(left=0, bottom=0, right=1, top=1)#, wspace=None, hspace=None)
+    ani = animation.ArtistAnimation(fig, ims, interval=200, blit=True,
+                                repeat_delay=1000)
+    return ani #plt.show()
+
+    
+def fov_plotter(axs, fig,
+                filter_selection, 
+                     zoom_v, 
+                     tzoom, 
+                     time_ind, 
+                     mini_tline,
+                     night_mode,
+                     jlen,
+                     inputs,
+                     alt_bool):
+ 
 
     # interactive plot function
 
@@ -86,28 +244,38 @@ def interactive_plot(filter_selection,
     fill_bool  = inputs['fill_bool'] 
     filter_lis = inputs['filter_lis'] 
     time_lis0  = inputs['time_lis0']
-    col_vals   = inputs['col_vals']
+    col_vals1   = inputs['col_vals']
+    col_vals2   = inputs['col_vals2']
     time_lis_abs = inputs['time_lis_abs']
 
-    plt.close('all')
 
-    #Set up Figure
+    
+    if night_mode:
+        col_vals = col_vals1.copy()
 
-    if mini_tline:
-        fig, axs2 = plt.subplots(3,1,figsize=(8,11), gridspec_kw={'height_ratios': [16, 1, 4]})
-        axs = [axs2[0],axs2[2],axs2[1]]
-        jlen = 2
+        plot_col2 = '#0F121F'#'#272A35'#'#282C3B'#'dimgrey'
+        plot_col1 = '#272A35'#'#0F121F'#'#161820'
+        line_col = '#03FFFF'
+        gcol = 'w'
+        lab_col = 'white'
     else:
-        fig, axs = plt.subplots(2,1,figsize=(8,10), gridspec_kw={'height_ratios': [16, 4]})
-        jlen = 1
+        col_vals = col_vals2.copy()
+        plot_col2 = '#FFFFFF'#'#272A35'#'#282C3B'#'dimgrey'
+        plot_col1 = '#E9E9E9'#'#0F121F'#'#161820'
+        line_col = '#272A35'
+        gcol = 'k'
+        lab_col = 'black'
+    
+    
+    
         
     ##plot the solar limb and grid lines
-    axs[0].plot(xca, yca,'w-')
-    axs[0].plot(np.asarray([-1.0,1.0])*rsun_p,np.zeros(2),'w-',lw=0.5)
+    axs[0].plot(xca, yca,gcol+'-')
+    axs[0].plot(np.asarray([-1.0,1.0])*rsun_p,np.zeros(2),gcol+'-',lw=0.5)
     for j in range(len(lon_arr)):
-        axs[0].plot(xca*lon_arr[j],yca,'w-',lw=0.5)
-        axs[0].plot([-yla[j],yla[j]],[zla[j]]*2,'w-',lw=0.5)
-        axs[0].plot([-yla[j],yla[j]],[-zla[j]]*2,'w-',lw=0.5)
+        axs[0].plot(xca*lon_arr[j],yca,gcol+'-',lw=0.5)
+        axs[0].plot([-yla[j],yla[j]],[zla[j]]*2,gcol+'-',lw=0.5)
+        axs[0].plot([-yla[j],yla[j]],[-zla[j]]*2,gcol+'-',lw=0.5)
         
 
     # Zoom Button Affects this
@@ -121,21 +289,31 @@ def interactive_plot(filter_selection,
     alpha_arr2 = np.zeros(flen)
     
     if filter_selection == 'All':
+        fig_title = 'All Filters'
+        mini_title = ''
+        mini_col = lab_col
         alpha_arr = np.ones(flen)
         fbool = True
     else:
+        fig_title = 'Filter :'#filter_selection
+        mini_title = filter_selection
+        
         fbool = False
         fi = filter_lis.index(filter_selection)
+        mini_col = col_vals[fi]
         alpha_arr[fi] = 1.0
         alpha_arr2[fi] = 0.3
 
     # Current time for timeline
     time_ii = (np.timedelta64(int(np.round(time_arr[time_ind])),'s')+t0d)
 
+
     
     for j in range(jlen):
-        axs[1+j].plot([time_ii]*2, [-0.5, flen-0.5], 'w-',lw=4,zorder=1000)
-        axs[1+j].plot([time_ii]*2, [-0.5, flen-0.5], 'b-',zorder=1001)  
+        axs[1+j].plot([time_ii]*2, [-0.5, flen-0.5], color=line_col,lw=4,zorder=1000)
+        axs[1+j].plot([time_ii]*2, [-0.5, flen-0.5], gcol+'-',lw=1,zorder=1001)
+        
+        #axs[1+j].plot([time_ii]*2, [-0.5, flen-0.5], 'b-',zorder=1001)  
         
     xll, yll = [], []
     dtl = []
@@ -144,27 +322,33 @@ def interactive_plot(filter_selection,
     col_pvals = []
     # Range for the zoomed in timeline
     trp2 = [np.timedelta64(int(np.round(time_arr[0])),'s')+t0d,(np.timedelta64(int(np.round(time_arr[-1])),'s')+t0d)]
-
+    trp3 = [np.timedelta64(int(np.round(time_arr[1])),'s')+t0d,(np.timedelta64(int(np.round(time_arr[-2])),'s')+t0d)]
     if mini_tline:
-        axs[2].plot([trp2[0]]*2, [-0.5, flen-0.5], 'w-',lw=2,zorder=200)  
-        axs[2].plot([trp2[1]]*2, [-0.5, flen-0.5], 'w-',lw=2,zorder=200)  
+        x_vals = [trp3[0],trp2[0],trp2[0],trp3[0]]
+        y_vals = [-0.6,-0.4, flen-0.6, flen-0.4]
+        axs[2].plot(x_vals, y_vals,color=line_col,lw=2,zorder=200)  
+
+        x_vals = [trp3[1],trp2[1],trp2[1],trp3[1]]
+        y_vals = [-0.5,-0.5, flen-0.5, flen-0.5]
+        axs[2].plot(x_vals, y_vals,color=line_col,lw=2,zorder=200)  
     
         if fill_bool:
-            axs[2].fill_between([trp[0],trp2[0]],[-0.5]*2,[flen-0.5]*2,color='k',alpha = 0.5,zorder=100)
-            axs[2].fill_between([trp[1],trp2[1]],[-0.5]*2,[flen-0.5]*2,color='k',alpha = 0.5,zorder=100)
-    
-        lout = axs[2].plot([trp[0],trp2[0]],[-8.0,-0.5],'w-',lw=0.5)
-        lout2 = axs[2].plot([trp[1],trp2[1]],[-8.0,-0.5],'w-',lw=0.5)
+            axs[2].fill_between([trp[0],trp2[0]],[-0.5]*2,[flen-0.5]*2,color=plot_col2,alpha = 0.5,zorder=100)
+            axs[2].fill_between([trp[1],trp2[1]],[-0.5]*2,[flen-0.5]*2,color=plot_col2,alpha = 0.5,zorder=100)
+            axs[2].fill_between([trp2[0],trp2[1]],[-0.5]*2,[flen-0.5]*2,color=plot_col1,alpha = 1.0,zorder=0)
+        if False:
+            lout = axs[2].plot([trp[0],trp2[0]],[-8.0,-0.5],'w-',lw=0.5)
+            lout2 = axs[2].plot([trp[1],trp2[1]],[-8.0,-0.5],'w-',lw=0.5)
 
     
-        lout[0].set_clip_on(False)
-        lout2[0].set_clip_on(False)
+            lout[0].set_clip_on(False)
+            lout2[0].set_clip_on(False)
 
     #print(fov_lis[0][0])
     
     for i in range(flen):
         for j in range(jlen):
-            axs[1+j].plot(trp,i*np.ones(2),'w-',alpha = 1.0,lw=0.5,zorder=1)
+            axs[1+j].plot(trp,i*np.ones(2),gcol+'-',alpha = 1.0,lw=0.5,zorder=1)
             
         #Find nearest obs
         ti = np.argmin(np.abs(np.asarray(time_lis0[i])-time_arr[time_ind]))
@@ -213,20 +397,33 @@ def interactive_plot(filter_selection,
                 axs[0].fill_between([xc[0].value,xc[1].value],[yc[0].value]*2,[yc[2].value]*2,color=col_vals[i],alpha = alpha_arr2[i])
         
             #highlight the current frame in time line(only if it is plotted)
+
             axs[1].plot(tpl[ti], i, 'h',alpha = alpha_arr[i],color='white',markersize=15)
             axs[1].plot(tpl[ti], i, 'h',alpha = alpha_arr[i],color=col_vals[i],markersize=10)
 
         #Add label to the time line for each filter
-        axs[1].text(trp2[-1]+np.timedelta64(10,'s'), i, filter_lis[i],alpha = alpha_arr[i],
-                fontsize=12,color=col_vals[i],horizontalalignment='left',verticalalignment='center',fontweight='bold')
+        #+np.timedelta64(10,'s')
+        #time_ii = (np.timedelta64(int(np.round(time_arr[time_ind])),'s')+t0d)
+        dttt = trp2[-1] -  (np.timedelta64(int(np.round(time_arr[-2])),'s')+t0d)
+        if alt_bool:
+            ggg = axs[1].text(trp2[-1]+dttt, i, filter_lis[i],alpha = alpha_arr[i],
+                fontsize=15,color=col_vals[i],horizontalalignment='left',verticalalignment='center',fontweight='bold')
+        else:
+            ggg = axs[1].text(trp2[0]-dttt, i, filter_lis[i],alpha = alpha_arr[i],
+                fontsize=15,color=col_vals[i],horizontalalignment='right',verticalalignment='center',fontweight='bold')
+        ggg.set_clip_on(False)
    
     #This function makes sure the filter labels on the plot don't overlap and are legible  
 
     if (len(dtl) > 0):
         xlis, ylis, ylisb = mk_label_locs(xll, yll)
-    
+
+    xlim_out = np.asarray([-1300.0,1300.0])/zoom_v
+    ylim_out = np.asarray([-1300.0,1300.0])/zoom_v
+    dyl = (ylim_out[1]-ylim_out[0])*0.33
+    yh_lis = np.linspace(ylim_out[0]+dyl,ylim_out[1],flen+2)
+    #print(yh_lis)
     for i in range(len(dtl)):
-        
         if (np.abs(dtl[i]) < 60.0):
              #Pre-amble handles the delta T for each frame
             dyp = 50.0
@@ -241,48 +438,77 @@ def interactive_plot(filter_selection,
                 dtstr = sstr + str(np.round(10.0*np.abs(dtl[i]))/10.0)
     
                 
-       
-            axs[0].plot([xlis[i], xll[i]], [ylis[i]+dyp,ylisb[i]],'-',alpha = alpha_plis[i],color=col_rgb,lw=1)
-            if dt_bool:
-                axs[0].text( xlis[i], ylis[i]+dyp, '('+dtstr+'s)',alpha = alpha_plis[i],
-                        fontsize=10,color=col_tim,horizontalalignment='right',verticalalignment='bottom',fontweight='bold')
+            #dxt = -2000.0
+            
+            if alt_bool:
+                dxxx = 0.0#-2000.0
+            else:
+                dxxx= 0.0#-2000.0
+            if True:
+                axs[0].plot([xlis[i]+dxxx, xll[i]], [ylis[i]+dyp,ylisb[i]],'-',alpha = alpha_plis[i],color=col_rgb,lw=1)
+                if dt_bool:
+                    axs[0].text( xlis[i]+dxxx, ylis[i]+dyp, '('+dtstr+'s)',alpha = alpha_plis[i],
+                            fontsize=10,color=col_tim,horizontalalignment='right',verticalalignment='bottom',fontweight='bold')
         
         
         
-            axs[0].text( xlis[i], ylis[i]+dyp, fplis[i],alpha = alpha_plis[i],#*0.6,
-                        fontsize=15,color=col_rgb,horizontalalignment='left',fontweight='bold',verticalalignment='bottom')
+                axs[0].text( xlis[i]+dxxx, ylis[i]+dyp, fplis[i],alpha = alpha_plis[i],#*0.6,
+                        fontsize=15,color=col_rgb, horizontalalignment='left',fontweight='bold',verticalalignment='bottom')
+            else:
+                axs[0].plot([xlim_out[-1], xll[i]], [yh_lis[i+1],ylisb[i]],'-',alpha = alpha_plis[i],color=col_rgb,lw=2)
     for j in range(jlen):        
         axs[1+j].set_yticks([])
 
-    plot_col = 'dimgrey'
-    for j in range(jlen+1):   
-        axs[j].set_facecolor(plot_col)
     
-    fig.patch.set_facecolor(plot_col)
-    axs[0].set_title(str(time_ii),fontsize=20,color='white')
+    for j in range(jlen+1):   
+        axs[j].set_facecolor(plot_col1)
+    
+    fig.patch.set_facecolor(plot_col2)
+    #axs[0].set_title('UTC '+str(time_ii),fontsize=20,color=mini_col)
+    axs[0].set_title(fig_title+mini_title , fontsize=35,color=mini_col,weight='bold')
+    axs[1].set_title(''+str(time_ii),fontsize=20,color=line_col)#,loc =  'left')
+    
+    #axs[2].set_title('Mini Timeline',fontsize=10,color='white',loc =  'left')
+    
+
+    #fig.suptitle(fig_title+mini_title , fontsize=35,color=mini_col, x = 0.4,y = 0.98,weight='bold')#, ha = 'left'x = 0.15,
     axs[1].set_xlim(trp2)
     if (jlen > 1):
         axs[2].set_xlim(trp)
+        axs[2].set_title('Timeline Range Selection',fontsize=12,color=lab_col,zorder=2000)
     
     locator = mdates.AutoDateLocator(minticks=4, maxticks=9)
     formatter = mdates.ConciseDateFormatter(locator)
     axs[1].xaxis.set_major_locator(locator)
     axs[1].xaxis.set_major_formatter(formatter)
     if (jlen > 1):
-        locator = mdates.AutoDateLocator(minticks=4, maxticks=9)
-        formatter = mdates.ConciseDateFormatter(locator)
-        axs[2].xaxis.set_major_locator(locator)
-        axs[2].xaxis.set_major_formatter(formatter)
+        #locator = mdates.AutoDateLocator(minticks=4, maxticks=9)
+        #formatter = mdates.ConciseDateFormatter(locator)
+        #axs[2].xaxis.set_major_locator(locator)
+        #axs[2].xaxis.set_major_formatter(formatter)
+        #axs[2].set_xticks([])
         axs[2].set_ylim([-0.75, flen-0.25])
-    axs[0].set_xlim(np.asarray([-1300.0,1300.0])/zoom_v)#+x0r)
-    axs[0].set_ylim(np.asarray([-1300.0,1300.0])/zoom_v)#+y0r)
+        axs[2].axis('off')
+
+    
+    if True:
+        axs[0].text( xlim_out[0]*0.95,ylim_out[-1]*0.98,'UTC '+str(time_ii),alpha = 0.7,#*0.6,
+                        fontsize=15,color=mini_col, horizontalalignment='left',fontweight='bold',verticalalignment='top')
+    #if xlim_out[-1] < 1500:
+    #    xlim_out[-1] = 1500
+
+    axs[0].set_xlim(xlim_out)#+x0r)
+    axs[0].set_ylim(ylim_out)#+y0r)
     
     #axs[2].tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
     for ax in axs:
-        ax.tick_params(color='white', labelcolor='white')
+        ax.tick_params(color=lab_col, labelcolor=lab_col)
         for spine in ax.spines.values():
-            spine.set_edgecolor('white')
-
-    plt.show()#zebra
+            spine.set_edgecolor(line_col)#'white')
+    
+    plt.tight_layout()
+    return axs, fig
+    #plt.show()
+    ##zebra
     #plt.close('all')
 
