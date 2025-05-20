@@ -13,9 +13,8 @@ from scipy.io import readsav
 import urllib.request
 import sys
 
-#sys.path.append('/Users/ntrueba/SOLAR/code/GIT/xrtpy/xrtpy/visualization/fov/') 
-import xrt_metadata_plot as xplt
-import xrt_metadata_download as xfetch
+import metadata_plotting as xplt
+import metadata_downloader as xfetch
 
 from ipywidgets import Layout, interact, IntSlider,IntProgress, RadioButtons, FloatSlider,FloatRangeSlider,fixed
 
@@ -24,14 +23,14 @@ from ipywidgets import Layout, interact, IntSlider,IntProgress, RadioButtons, Fl
 # The first part contains the xrt_meta object, which is how we organize the metadata 
 # After this, we have the download functions
 
-class xrt_meta:
+class DatasetMetaManager:#xrt_meta:
     # The xrt_meta object accepts a list of .fits headers and organizes them
     # Crucially, it separates metadata quantities by xrt filter  
  
     def __init__(self, xrt_downloaded_files):
         header_lis = xfetch.fetch_metadata(xrt_downloaded_files)
         self.head_lis = header_lis # stores the unfiltered header list 
-        self.fkey_lis = ['EC_FW1_','EC_FW2_'] # xrt filter keywords in fits header, used by sort_xfilter function to do xrt filter sorting
+        self.fkey_lis = ['EC_FW1_','EC_FW2_'] # xrt filter keywords in fits header, used by sort_filter function to do xrt filter sorting
         self.check_bool = True # Testing parameter, remove
         # upon initialization, the object filters observations and creates the .metadata dictonary 
         self.metadata = self.organize_metadata()
@@ -45,7 +44,7 @@ class xrt_meta:
         # sort observations by filter.
         # filter_lis is a simple list containing strings for all filters in the data set (n_filter)
         # hbtest is a list of length n_filter, each containing a list of headers for all observations for each filter
-        hbtest, filter_lis = self.sort_xfilters()
+        hbtest, filter_lis = self.sort_filters()
 
 
         # Get list of DATE_OBS for each observation
@@ -72,11 +71,7 @@ class xrt_meta:
                        'DELTA_TIME_LIST': delta_t_lis}
         return xdata_set
         
-    def sort_xfilters(self):
-        #test statement
-        if self.check_bool:
-            print('X1')
-
+    def sort_filters(self):
         # this function separates an unfilted list of .fits headers from a set of xrt observations and separates them by filter
         hlen = len(self.head_lis) # length of input header list
         filter_lis = [] # this will store the list of xrt filters found in our data set
@@ -206,7 +201,7 @@ class xrt_meta:
         return coords_out
     
 
-    def plot_preview(self, ani_bool  = True, d_mode = True,vertical_plot = True):
+    def plot_preview(self, ani_bool  = True, d_mode = True, vertical_plot = True, demo = False):
         # plot preamble here, needs to be cleaned up
         # because we want to have an interactive plot, we don't want to recalculate some of these basic things every time the plot refreshes, so we calculate it here
 
@@ -276,6 +271,6 @@ class xrt_meta:
                 nfilt = fixed(flen),
                 alt_bool = vertical_plot)
         else:
-            ani = xplt.make_animation(filter_lis_b,inputs, d_mode, vertical_plot,flen)
+            ani = xplt.make_animation(filter_lis_b,inputs, d_mode, vertical_plot, flen, demo)
             return ani
         return #axs_lis
