@@ -160,61 +160,6 @@ def get_frames(filter_selection,
                 alt_bool)
     return axs, fig
 
-def make_animation2(filter_lis_b,inputs, dmode, alt_bool, nfilt, demo, tlen = 20):
-    
-    axs_lis = []
-    
-    ti = np.linspace(0,99,tlen,dtype=int)
-
-    for i in range(tlen):
-        #print(ti[i])
-        axs, fig = get_frames(filter_lis_b[0],
-                        1.0,
-                        [0.0,1.0],
-                        ti[i],
-                        demo,
-                        dmode,
-                        inputs,
-                        nfilt,
-                        alt_bool
-                        )
-        axs_lis.append(fig)
-        plt.close()
-    Xlis = []
-    for i in range(tlen):
-        fig = axs_lis[i]
-        canvas = FigureCanvasAgg(fig)
-    
-    
-        # Retrieve a view on the renderer buffer
-        canvas.draw()
-        buf = canvas.buffer_rgba()
-            # convert to a NumPy array
-        X = np.asarray(buf)
-        Xlis.append(X)
-        plt.close('all')
-    if alt_bool:
-        fig, ax = plt.subplots(figsize=(8,11))
-    else:
-        fig, ax = plt.subplots(figsize=(18,6))
-    plt.axis('off')
-    #plt.axis("tight")  # gets rid of white border
-    #plt.axis("image")
-    ims = []
-    for i in range(tlen):
-        # make a Figure and attach it to a canvas.
-        X = Xlis[i]
-        #print(i)
-        im = ax.imshow(X, animated=True)
-        #plt.axis("tight")
-        if i == 0:
-            ax.imshow(X)  # show an initial one first
-                #plt.close()
-        ims.append([im])
-    fig.subplots_adjust(left=0, bottom=0, right=1, top=1)#, wspace=None, hspace=None)
-    ani = animation.ArtistAnimation(fig, ims, interval=200, blit=True,
-                                repeat_delay=1000)
-    return ani #plt.show()
 
 def make_animation(filter_lis_b,inputs, dmode, alt_bool,nfilt, demo, tlen = 20):
     
@@ -259,7 +204,7 @@ def make_animation(filter_lis_b,inputs, dmode, alt_bool,nfilt, demo, tlen = 20):
         Xlis.append(X)
         plt.close('all')
     if alt_bool:
-        fig, ax = plt.subplots(figsize=(8,11))
+        fig, ax = plt.subplots(figsize=(9,8+nfilt*0.4))#(8,11))
     else:
         fig, ax = plt.subplots(figsize=(18,6))
     plt.axis('off')

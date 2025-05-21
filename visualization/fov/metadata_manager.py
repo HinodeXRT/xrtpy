@@ -15,7 +15,7 @@ import sys
 
 import metadata_plotting as xplt
 import metadata_downloader as xfetch
-
+#print('wut')
 from ipywidgets import Layout, interact, IntSlider,IntProgress, RadioButtons, FloatSlider,FloatRangeSlider,fixed
 
 #This module is designed to download and manage XRT observation metadata for previewing purposes

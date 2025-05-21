@@ -34,6 +34,7 @@ import metadata_manager as ObsMeta
 # Define the time range of interest for solar observations
 time_range_1 = a.Time("2011-06-07 06:00:00", "2011-06-07 06:45:54")
 time_range_2 = a.Time("2007-12-17 10:40:00", "2007-12-17 13:00:54")
+
 # Specify the instrument as 'xrt' to search for Hinode X-Ray Telescope data
 instrument = a.Instrument("xrt")
 
@@ -56,7 +57,7 @@ xrt_downloaded_files_2 = Fido.search(time_range_2, instrument)
 
 
 xrt_dset1 = ObsMeta.DatasetMetaManager(xrt_downloaded_files_1)
-xrt_dset2 = ObsMeta.DatasetMetaManager(xrt_downloaded_files_2)
+xrt_dset2 = ObsMeta.DatasetMetaManager(xrt_downloaded_files_2)##
 
 ##############################################################################
 #Plotting backend
@@ -70,7 +71,7 @@ plt.show()
 ###
 #We can also do nightmode 
 
-ani = xrt_dset1.plot_preview(ani_bool = False, d_mode=True, vertical_plot=True)
+ani = xrt_dset1.plot_preview(ani_bool = False, d_mode=True, vertical_plot=True)##
 plt.show()
 
 ##############################################################################
