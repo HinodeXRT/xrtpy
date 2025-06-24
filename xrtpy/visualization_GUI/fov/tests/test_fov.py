@@ -1,8 +1,6 @@
 import pytest
-import sys
-import pickle
-sys.path.append('/Users/ntrueba/SOLAR/code/GIT/xrtpy/xrtpy/visualization/fov/')  #
-import metadata_downloader as xfetch
+import xrtpy
+from xrtpy.visualization_GUI.fov import metadata_downloader as xfetch
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 
