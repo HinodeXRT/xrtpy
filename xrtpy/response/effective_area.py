@@ -144,40 +144,40 @@ class EffectiveAreaFundamental:
     """
 
     def __init__(self, filter_name, observation_date):
+
         self._raw_input_name = filter_name
         self._parsed_filter = parse_filter_input(filter_name)
-        # parsed = parse_filter_input(filter_name)
 
         self._filter1_name = self._parsed_filter.filter1
         self._filter2_name = self._parsed_filter.filter2
         self._is_combo = self._parsed_filter.is_combo
-
-        self.observation_date = observation_date
-
-        # resolve_filter_name(filter_name)
-        self._name = filter_name
-        # self._name = f"{self._filter1}/{self._filter2}" if self._is_combo else self._filter1
-
-        # self._channel = Channel(self.name)
-        # self._channel = Channel(self._filter1)
-
-        # Handle Channel object
-        # if self._is_combo and self._name in Channel.valid_channels():  # You'll define this below
-        #     self._channel = Channel(self._name)
-        #     print(f"[DEBUG] Using combo filter channel: {self._name}")
-        # elif not self._is_combo:
-        #     self._channel = Channel(self._filter1)
-        #     print(f"[DEBUG] Using single filter channel: {self._filter1}")
-        # else:
-        #     self._channel = None
-        #     print(f"[DEBUG] No valid Channel object for combo: {self._name}")
-
+        
+        # Store the standardized/resolved name
+        if self._is_combo:
+            self._name = f"{self._filter1_name}/{self._filter2_name}"
+        else:
+            self._name = self._filter1_name
+            
+        self._observation_date = sunpy.time.parse_time(observation_date)
+    
     @property
     def name(self) -> str:
         """
         The resolved name of the filter or filter combination.
         """
         return self._name
+
+    @property
+    def filter1_name(self) -> str:
+        return self._filter1_name
+
+    @property
+    def filter2_name(self) -> str:
+        return self._filter2_name
+
+    @property
+    def is_combo(self) -> bool:
+        return self._is_combo
 
     @property
     def observation_date(self) -> str:
