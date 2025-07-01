@@ -5,8 +5,6 @@ from astropy.io import fits
 from astropy.time import Time
 from scipy.io import readsav
 
-print("hey")
-
 
 def fetch_metadata(xrt_downloaded_files, fast_bool=True):
     """
