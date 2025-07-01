@@ -1,15 +1,6 @@
-<<<<<<< HEAD:xrtpy/visualization_GUI/fov/tests/test_fov.py
 import pytest
 import xrtpy
 from xrtpy.visualization_GUI.fov import metadata_downloader as xfetch
-=======
-import sys
-
-import pytest
-
-sys.path.append("/Users/ntrueba/SOLAR/code/GIT/xrtpy/xrtpy/visualization/fov/")  #
-import metadata_downloader as xfetch
->>>>>>> caf4c77b36f878d69bf16418c1691d12e81cbac6:visualization/fov/test/test_fov.py
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 
