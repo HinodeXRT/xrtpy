@@ -467,12 +467,36 @@ class EffectiveAreaFundamental:
             )
         return interpolater(self.filter_observation_date_to_seconds)
 
+    # @property
+    # def _filter_data(self):
+    #     """Collecting filter contamination data."""
+    #     return _filter_contamination[self._filter_index_mapping_to_name][
+    #         self._filter_wheel_number
+    #     ]
+    
+    
     @property
-    def _filter_data(self):
-        """Collecting filter contamination data."""
-        return _filter_contamination[self._filter_index_mapping_to_name][
-            self._filter_wheel_number
-        ]
+    def _filter1_data(self):
+        """Returns filter contamination data for filter 1."""
+        filter1_index = (
+            index_mapping_to_fw1_name.get(self.filter1_name)
+            if self._filter1_wheel == 0
+            else index_mapping_to_fw2_name.get(self.filter1_name)
+        )
+        return _filter_contamination[filter1_index][self._filter1_wheel]
+
+    @property
+    def _filter2_data(self):
+        """Returns filter contamination data for filter 2, if combo."""
+        if not self.is_combo or self.filter2_name is None:
+            return None
+        filter2_index = (
+            index_mapping_to_fw1_name.get(self.filter2_name)
+            if self._filter2_wheel == 0
+            else index_mapping_to_fw2_name.get(self.filter2_name)
+        )
+        return _filter_contamination[filter2_index][self._filter2_wheel]
+
 
     @property
     def contamination_on_filter(self) -> u.angstrom:
