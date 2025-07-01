@@ -317,40 +317,68 @@ class EffectiveAreaFundamental:
         return self._get_filter_wheel_number(self.filter2_name)
 
 
+    ##Remove once working
+    # @property
+    # def _combo_filter_index_mapping_to_name_filter1(self):
+    #     """Returns filter's corresponding number value."""
+    #     filter1, _ = self._combo_filter_name_split
 
-    @property
-    def _combo_filter_index_mapping_to_name_filter1(self):
-        """Returns filter's corresponding number value."""
-        filter1, _ = self._combo_filter_name_split
+    #     if filter1 in index_mapping_to_fw1_name:
+    #         return index_mapping_to_fw1_name.get(filter1)
+    #     elif filter1 in index_mapping_to_fw2_name:
+    #         return index_mapping_to_fw2_name.get(filter1)
 
-        if filter1 in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(filter1)
-        elif filter1 in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(filter1)
+    # @property
+    # def _combo_filter_index_mapping_to_name_filter2(self):
+    #     """Returns filter's corresponding number value."""
+    #     filter1, filter2 = self._combo_filter_name_split
 
-    @property
-    def _combo_filter_index_mapping_to_name_filter2(self):
-        """Returns filter's corresponding number value."""
-        filter1, filter2 = self._combo_filter_name_split
-
-        if filter2 in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(filter2)
-        elif filter2 in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(filter2)
+    #     if filter2 in index_mapping_to_fw1_name:
+    #         return index_mapping_to_fw1_name.get(filter2)
+    #     elif filter2 in index_mapping_to_fw2_name:
+    #         return index_mapping_to_fw2_name.get(filter2)
+    
+    @staticmethod
+    def _get_filter_index(filter_name: str) -> int:
+        """Returns the index value for a filter name from either wheel mapping."""
+        if filter_name in index_mapping_to_fw1_name:
+            return index_mapping_to_fw1_name[filter_name]
+        elif filter_name in index_mapping_to_fw2_name:
+            return index_mapping_to_fw2_name[filter_name]
+        else:
+            raise ValueError(f"Filter '{filter_name}' not found in filter index mappings.")
 
     @property
     def _combo_filter1_data(self):
-        """Collecting filter data."""
-        return _filter_contamination[self._combo_filter_index_mapping_to_name_filter1][
-            self._combo_filter1_wheel_number
-        ]
+        """Collecting filter1 contamination data."""
+        index = self._get_filter_index(self.filter1_name)
+        wheel = self._filter1_wheel
+        return _filter_contamination[index][wheel]
 
     @property
     def _combo_filter2_data(self):
-        """Collecting filter data."""
-        return _filter_contamination[self._combo_filter_index_mapping_to_name_filter2][
-            self._combo_filter2_wheel_number
-        ]
+        """Collecting filter2 contamination data."""
+        if not self.is_combo or self.filter2_name is None:
+            return None  # Optional: or raise an error if you prefer strict enforcement
+
+        index = self._get_filter_index(self.filter2_name)
+        wheel = self._filter2_wheel
+        return _filter_contamination[index][wheel]
+
+    # Remove once complete and working 
+    # @property
+    # def _combo_filter1_data(self):
+    #     """Collecting filter data."""
+    #     return _filter_contamination[self._combo_filter_index_mapping_to_name_filter1][
+    #         self._combo_filter1_wheel_number
+    #     ]
+
+    # @property
+    # def _combo_filter2_data(self):
+    #     """Collecting filter data."""
+    #     return _filter_contamination[self._combo_filter_index_mapping_to_name_filter2][
+    #         self._combo_filter2_wheel_number
+    #     ]
 
     @property
     def contamination_on_filter1_combo(self) -> u.angstrom:
@@ -380,10 +408,27 @@ class EffectiveAreaFundamental:
             If the observation date is outside the range of the available contamination data.
         """
 
+        # interpolater = scipy.interpolate.interp1d(
+        #     self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
+        # )
+        # return interpolater(self.filter_observation_date_to_seconds)
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
-        )
+            )
         return interpolater(self.filter_observation_date_to_seconds)
+
+
+    @property
+    def filter_data_dates_to_seconds(self):
+        """Returns the contamination file time axis in seconds (utime)."""
+        return _filter_contamination_file_time.utime
+
+    @property
+    def filter_observation_date_to_seconds(self):
+        """Returns the observation date in seconds (utime)."""
+        return self.observation_date.utime
+
+
 
     @property
     def contamination_on_filter2_combo(self) -> u.angstrom:
@@ -413,9 +458,13 @@ class EffectiveAreaFundamental:
             If the observation date is outside the range of the available contamination data.
         """
 
+        # interpolater = scipy.interpolate.interp1d(
+        #     self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
+        # )
+        # return interpolater(self.filter_observation_date_to_seconds)
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
-        )
+            )
         return interpolater(self.filter_observation_date_to_seconds)
 
     @property
