@@ -159,6 +159,10 @@ class EffectiveAreaFundamental:
             self._name = self._filter1_name
             
         self._observation_date = sunpy.time.parse_time(observation_date)
+        self._channel = Channel(self.name)
+        
+        self.observation_date = observation_date
+        self._channel = Channel(self.name)
     
     @property
     def name(self) -> str:
@@ -187,40 +191,37 @@ class EffectiveAreaFundamental:
         :noindex:
         """
         return self._observation_date
-
+    
     @observation_date.setter
     def observation_date(self, date):
-        """Validating users requested observation date."""
-
+        """Validates the user's requested observation date."""
+    
         observation_date = sunpy.time.parse_time(date)
-
+    
         if observation_date <= epoch:
             raise ValueError(
                 f"\nInvalid date: {observation_date.datetime}.\n"
                 f"Date must be after {epoch}."
             )
-
+    
         modified_time_path = Path(_ccd_contam_filename).stat().st_mtime
         modified_time = astropy.time.Time(modified_time_path, format="unix")
-        latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
-            "%Y/%m/%d"
-        )
-        modified_time_datetime = datetime.datetime.fromtimestamp(
-            modified_time_path
-        ).strftime("%Y/%m/%d")
-
+        latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime("%Y/%m/%d")
+        modified_time_datetime = datetime.datetime.fromtimestamp(modified_time_path).strftime("%Y/%m/%d")
+    
         if observation_date > modified_time:
             raise ValueError(
                 "\nNo contamination data is presently available for "
-                f"{observation_date.datetime}.\n The latest available data is on "
-                f"{latest_available_ccd_data}.\n Contamination data is "
+                f"{observation_date.datetime}.\nThe latest available data is on "
+                f"{latest_available_ccd_data}.\nContamination data is "
                 "updated periodically. The last update was on "
                 f"{modified_time_datetime}. If this is more "
                 "than one month ago, please raise an issue at: "
                 "https://github.com/HinodeXRT/xrtpy/issues/new"
             )
-
+    
         self._observation_date = observation_date
+    
 
     @property
     def contamination_on_CCD(self):
