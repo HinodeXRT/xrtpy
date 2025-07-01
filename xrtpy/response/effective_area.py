@@ -151,19 +151,19 @@ class EffectiveAreaFundamental:
         self._filter1_name = self._parsed_filter.filter1
         self._filter2_name = self._parsed_filter.filter2
         self._is_combo = self._parsed_filter.is_combo
-        
+
         # Store the standardized/resolved name
         if self._is_combo:
             self._name = f"{self._filter1_name}/{self._filter2_name}"
         else:
             self._name = self._filter1_name
-            
+
         self._observation_date = sunpy.time.parse_time(observation_date)
         self._channel = Channel(self.name)
-        
+
         self.observation_date = observation_date
         self._channel = Channel(self.name)
-    
+
     @property
     def name(self) -> str:
         """
@@ -191,24 +191,28 @@ class EffectiveAreaFundamental:
         :noindex:
         """
         return self._observation_date
-    
+
     @observation_date.setter
     def observation_date(self, date):
         """Validates the user's requested observation date."""
-    
+
         observation_date = sunpy.time.parse_time(date)
-    
+
         if observation_date <= epoch:
             raise ValueError(
                 f"\nInvalid date: {observation_date.datetime}.\n"
                 f"Date must be after {epoch}."
             )
-    
+
         modified_time_path = Path(_ccd_contam_filename).stat().st_mtime
         modified_time = astropy.time.Time(modified_time_path, format="unix")
-        latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime("%Y/%m/%d")
-        modified_time_datetime = datetime.datetime.fromtimestamp(modified_time_path).strftime("%Y/%m/%d")
-    
+        latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
+            "%Y/%m/%d"
+        )
+        modified_time_datetime = datetime.datetime.fromtimestamp(
+            modified_time_path
+        ).strftime("%Y/%m/%d")
+
         if observation_date > modified_time:
             raise ValueError(
                 "\nNo contamination data is presently available for "
@@ -219,9 +223,8 @@ class EffectiveAreaFundamental:
                 "than one month ago, please raise an issue at: "
                 "https://github.com/HinodeXRT/xrtpy/issues/new"
             )
-    
+
         self._observation_date = observation_date
-    
 
     @property
     def contamination_on_CCD(self):
@@ -252,8 +255,18 @@ class EffectiveAreaFundamental:
             _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
         )
         return interpolater(self.observation_date.utime)
+    
+    @staticmethod
+    def _get_filter_wheel_number(filter_name: str) -> int:  #*********
+        """Returns 0 if the filter is in FW1, 1 if in FW2. Raises error if unknown."""
+        if filter_name in index_mapping_to_fw1_name:
+            return 0
+        elif filter_name in index_mapping_to_fw2_name:
+            return 1
+        else:
+            raise ValueError(f"Filter '{filter_name}' not found in FW1 or FW2.")
 
-    @property
+    @property 
     def _filter_index_mapping_to_name(self):
         """Returns filter's corresponding number value."""
         if self.name in index_mapping_to_fw1_name:
@@ -261,29 +274,49 @@ class EffectiveAreaFundamental:
         elif self.name in index_mapping_to_fw2_name:
             return index_mapping_to_fw2_name.get(self.name)
 
-    @property
-    def _filter_wheel_number(self):
+    @property 
+    def _filter_wheel_number(self): 
         """Defining chosen filter to its corresponding filter wheel."""
         return 0 if self.name in index_mapping_to_fw1_name else 1
 
-    @property
+    # @property
+    # def _combo_filter_name_split(self):
+    #     """Defining chosen filters to its corresponding filter wheel."""
+    #     name = (self.name).split("/")
+    #     filter1, filter2 = name[0], name[1]
+    #     return filter1, filter2
+    
+    @property #*********
     def _combo_filter_name_split(self):
-        """Defining chosen filters to its corresponding filter wheel."""
-        name = (self.name).split("/")
-        filter1, filter2 = name[0], name[1]
-        return filter1, filter2
+        """Returns (filter1, filter2) even for a single filter (filter2 is None)."""
+        return self.filter1_name, self.filter2_name
+
+
+    # @property
+    # def _combo_filter1_wheel_number(self):
+    #     """Defining chosen filter to its corresponding filter wheel."""
+    #     filter1, _ = self._combo_filter_name_split
+    #     return 0 if filter1 in index_mapping_to_fw1_name else 1
+
+    # @property
+    # def _combo_filter2_wheel_number(self):
+    #     """Defining chosen filter to its corresponding filter wheel."""
+    #     _, filter2 = self._combo_filter_name_split
+    #     return 0 if filter2 in index_mapping_to_fw1_name else 1
 
     @property
-    def _combo_filter1_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        filter1, _ = self._combo_filter_name_split
-        return 0 if filter1 in index_mapping_to_fw1_name else 1
+    def _filter1_wheel(self):
+        """Returns filter wheel number for filter1 (0 or 1)."""
+        return self._get_filter_wheel_number(self.filter1_name)
 
     @property
-    def _combo_filter2_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        _, filter2 = self._combo_filter_name_split
-        return 0 if filter2 in index_mapping_to_fw1_name else 1
+    def _filter2_wheel(self):
+        """Returns filter wheel number for filter2 if combo; otherwise None."""
+        if not self.is_combo or self.filter2_name is None:
+            return None
+        return self._get_filter_wheel_number(self.filter2_name)
+
+
 
     @property
     def _combo_filter_index_mapping_to_name_filter1(self):
