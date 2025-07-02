@@ -505,7 +505,7 @@ class EffectiveAreaFundamental:
         ]
     
     @cached_property
-    def _filterwheel_angular_wavenumber(self):
+    def _filter_contamination_angular_wavenumber(self):
         """Define angular wavenumber for the filter(s), considering contamination thickness."""
         index, _, cos_a, _, _, _, _ = self._transmission_equation
 
@@ -611,24 +611,62 @@ class EffectiveAreaFundamental:
             self._CCD_contamination_transmission,
         )
 
+    # @cached_property
+    # def _filter_contamination_transmission(self):
+    #     """Calculate transmission matrix coefficient and transmittance on a filter."""
+
+    #     index, _, _, _, n_o, n_t, _ = self._transmission_equation
+
+    #     i_i = complex(0, 1)  # Define complex number
+
+    #     # Define transfer matrix
+    #     M = [
+    #         [
+    #             [
+    #                 np.cos(self._filter_contamination_angular_wavenumber[i]),
+    #                 (-i_i * np.sin(self._filter_contamination_angular_wavenumber[i])) / index[i],
+    #             ],
+    #             [
+    #                 -i_i * np.sin(self._filter_contamination_angular_wavenumber[i]) * index[i],
+    #                 np.cos(self._filter_contamination_angular_wavenumber[i]),
+    #             ],
+    #         ]
+    #         for i in range(4000)
+    #     ]
+
+    #     transmittance = [
+    #         2
+    #         * n_o
+    #         / (
+    #             (M[i][0][0] * n_o)
+    #             + (M[i][0][1] * n_o * n_t)
+    #             + (M[i][1][0])
+    #             + (M[i][1][1] * n_t)
+    #         )
+    #         for i in range(4000)
+    #     ]
+
+    #     return [abs(transmittance[i] ** 2) for i in range(4000)]
+
     @cached_property
     def _filter_contamination_transmission(self):
-        """Calculate transmission matrix coefficient and transmittance on a filter."""
+        """Calculate transmission matrix coefficient and transmittance on the filter(s)."""
 
         index, _, _, _, n_o, n_t, _ = self._transmission_equation
+        i_i = complex(0, 1)
 
-        i_i = complex(0, 1)  # Define complex number
+        #angular_wave = self._filterwheel_angular_wavenumber  #handles both cases - filter 1 or 2 or
+        angular_wave = self._filter_contamination_angular_wavenumber
 
-        # Define transfer matrix
         M = [
             [
                 [
-                    np.cos(self._filterwheel_angular_wavenumber[i]),
-                    (-i_i * np.sin(self._filterwheel_angular_wavenumber[i])) / index[i],
+                    np.cos(angular_wave[i]),
+                    (-i_i * np.sin(angular_wave[i])) / index[i],
                 ],
                 [
-                    -i_i * np.sin(self._filterwheel_angular_wavenumber[i]) * index[i],
-                    np.cos(self._filterwheel_angular_wavenumber[i]),
+                    -i_i * np.sin(angular_wave[i]) * index[i],
+                    np.cos(angular_wave[i]),
                 ],
             ]
             for i in range(4000)
@@ -646,7 +684,9 @@ class EffectiveAreaFundamental:
             for i in range(4000)
         ]
 
-        return [abs(transmittance[i] ** 2) for i in range(4000)]
+        return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
+
+
 
     @property
     def _interpolated_filter_contamination_transmission(self):
