@@ -324,38 +324,6 @@ class EffectiveAreaFundamental:
         return _filter_contamination[index][wheel]
 
     @property
-    def contamination_on_filter1_combo(self) -> u.angstrom:
-        """
-        Calculate the thickness of the contamination layer on the first filter in a filter combination.
-
-        This property interpolates the contamination data over time to determine the thickness
-        of the contamination layer on the first filter of a specified filter combination at the
-        observation date.
-
-        Returns
-        -------
-        astropy.units.Quantity
-            The thickness of the contamination layer on the first filter, in Angstroms.
-
-        Notes
-        -----
-        The interpolation is performed using a linear interpolation method over the
-        available contamination data points. The ``filter_data_dates_to_seconds`` and
-        ``_combo_filter1_data`` attributes are used to provide the data for interpolation,
-        and ``filter_observation_date_to_seconds`` provides the point at which to
-        evaluate the interpolation.
-
-        Raises
-        ------
-        ValueError
-            If the observation date is outside the range of the available contamination data.
-        """
-        interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
-        )
-        return interpolater(self.filter_observation_date_to_seconds)
-
-    @property
     def filter_data_dates_to_seconds(self):
         """Returns the contamination file time axis in seconds (utime)."""
         return _filter_contamination_file_time.utime
@@ -365,37 +333,7 @@ class EffectiveAreaFundamental:
         """Returns the observation date in seconds (utime)."""
         return self.observation_date.utime
 
-    @property
-    def contamination_on_filter2_combo(self) -> u.angstrom:
-        """
-        Calculate the thickness of the contamination layer on the second filter in a filter combination.
 
-        This property interpolates the contamination data over time to determine the thickness
-        of the contamination layer on the second filter of a specified filter combination at the
-        observation date.
-
-        Returns
-        -------
-        astropy.units.Quantity
-            The thickness of the contamination layer on the second filter, in Angstroms.
-
-        Notes
-        -----
-        The interpolation is performed using a linear interpolation method over the
-        available contamination data points. The ``filter_data_dates_to_seconds`` and
-        ``_combo_filter2_data`` attributes are used to provide the data for interpolation,
-        and ``filter_observation_date_to_seconds`` provides the point at which to
-        evaluate the interpolation.
-
-        Raises
-        ------
-        ValueError
-            If the observation date is outside the range of the available contamination data.
-        """
-        interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
-        )
-        return interpolater(self.filter_observation_date_to_seconds)
     
     @property
     def _filter1_data(self):
