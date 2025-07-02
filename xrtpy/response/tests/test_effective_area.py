@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 from astropy import units as u
-
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
 
@@ -86,7 +85,8 @@ def test_EffectiveArea_contamination_on_CCD(name, date):
 def test_EffectiveArea_contamination_on_filter1(name, date):
     instance = EffectiveAreaFundamental(name, date)
     assert 0 <= instance.contamination_on_filter1 <= 2901
-    
+
+
 @pytest.mark.parametrize("date", valid_dates)
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_contamination_on_filter2(name, date):
@@ -105,13 +105,13 @@ def test_EffectiveArea_exception_is_raised(name, date):
         EffectiveAreaFundamental(name, date)
 
 
-
 def get_IDL_data_files():
     data_dir = Path(__file__).parent / "data" / "effective_area_IDL_testing_files"
     assert data_dir.exists(), f"Data directory {data_dir} does not exist."
     files = sorted(data_dir.glob("**/*.txt"))
-    #print(f"\n\n\nFound files: {files}\n\n")  # Debugging output
+    # print(f"\n\n\nFound files: {files}\n\n")  # Debugging output
     return files
+
 
 # NOTE: This is marked as xfail because the IDL results that this test compares against
 # are incorrect due to the use of quadratic interpolation in the contamination curves
@@ -140,10 +140,10 @@ def test_effective_area_compare_idl(filename):
         )
         * u.cm**2
     )
-    
+
     assert u.allclose(
         XRTpy_effective_area,
         IDL_effective_area,
         rtol=1e-4,
-        atol=1.0e-2 * u.cm**2,#atol=1.0e-4 * u.cm**2, 
+        atol=1.0e-2 * u.cm**2,  # atol=1.0e-4 * u.cm**2, Revisit after getting Temp Resp working-JV
     )
