@@ -145,5 +145,6 @@ def test_effective_area_compare_idl(filename):
         XRTpy_effective_area,
         IDL_effective_area,
         rtol=1e-4,
-        atol=1.0e-2 * u.cm**2,  # atol=1.0e-4 * u.cm**2, Revisit after getting Temp Resp working-JV
+        atol=1.0e-2
+        * u.cm**2,  # atol=1.0e-4 * u.cm**2, Revisit after getting Temp Resp working-JV
     )
