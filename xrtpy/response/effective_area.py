@@ -350,11 +350,6 @@ class EffectiveAreaFundamental:
         ValueError
             If the observation date is outside the range of the available contamination data.
         """
-
-        # interpolater = scipy.interpolate.interp1d(
-        #     self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
-        # )
-        # return interpolater(self.filter_observation_date_to_seconds)
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
         )
@@ -397,23 +392,11 @@ class EffectiveAreaFundamental:
         ValueError
             If the observation date is outside the range of the available contamination data.
         """
-
-        # interpolater = scipy.interpolate.interp1d(
-        #     self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
-        # )
-        # return interpolater(self.filter_observation_date_to_seconds)
         interpolater = scipy.interpolate.interp1d(
             self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
         )
         return interpolater(self.filter_observation_date_to_seconds)
-
-    # @property
-    # def _filter_data(self):
-    #     """Collecting filter contamination data."""
-    #     return _filter_contamination[self._filter_index_mapping_to_name][
-    #         self._filter_wheel_number
-    #     ]
-
+    
     @property
     def _filter1_data(self):
         """Returns filter contamination data for filter 1."""
@@ -435,38 +418,7 @@ class EffectiveAreaFundamental:
             else index_mapping_to_fw2_name.get(self.filter2_name)
         )
         return _filter_contamination[filter2_index][self._filter2_wheel]
-
-    # @property
-    # def contamination_on_filter(self) -> u.angstrom:
-    #     """
-    #     Calculate the thickness of the contamination layer on a filter.
-
-    #     This property interpolates the contamination data over time to determine the thickness
-    #     of the contamination layer on the specified filter at the observation date. The contamination layer
-    #     is measured in Angstroms (Å).
-
-    #     Returns
-    #     -------
-    #     astropy.units.Quantity
-    #         The thickness of the contamination layer on the filter, in Angstroms.
-
-    #     Notes
-    #     -----
-    #     The interpolation is performed using a linear interpolation method over the available
-    #     contamination data points. The `observation_date` attribute is used to provide the point
-    #     at which to evaluate the interpolation. The data used for interpolation is specific to
-    #     the filter defined by the ``filter_name`` attribute.
-
-    #     Raises
-    #     ------
-    #     ValueError
-    #         If the observation date is outside the range of the available contamination data.
-    #     """
-    #     interpolater = scipy.interpolate.interp1d(
-    #         _filter_contamination_file_time.utime, self._filter_data, kind="linear"
-    #     )
-    #     return interpolater(self.observation_date.utime)
-
+    
     @property
     def contamination_on_filter1(self) -> u.angstrom:
         """
@@ -613,31 +565,7 @@ class EffectiveAreaFundamental:
             (complex(real_angular_wavenumber[i], imaginary_angular_wavenumber[i]))
             for i in range(4000)
         ]
-
-    # @cached_property
-    # def _filterwheel_angular_wavenumber(self):
-    #     """Define angular wavenumber for a filter."""
-    #     index, _, cos_a, _, _, _, _ = self._transmission_equation
-
-    #     # Define wavevector
-    #     angular_wavenumber = np.array(
-    #         [
-    #             (2.0 * math.pi * index[i] * cos_a) / self.n_DEHP_wavelength[i]
-    #             for i in range(4000)
-    #         ]
-    #     )
-
-    #     # Multiply by thickness
-    #     angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_filter
-
-    #     real_angular_wavenumber = angular_wavenumber_thickness.real
-    #     imaginary_angular_wavenumber = angular_wavenumber_thickness.imag
-
-    #     return [
-    #         (complex(real_angular_wavenumber[i], imaginary_angular_wavenumber[i]))
-    #         for i in range(4000)
-    #     ]
-
+    
     @cached_property
     def _filterwheel_angular_wavenumber(self):
         """Define angular wavenumber for the filter(s), considering contamination thickness."""
