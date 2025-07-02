@@ -20,57 +20,6 @@ from scipy import interpolate
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.util.time import epoch
 
-
-def parse_filter_input(filter_string):
-    """
-    Parses and validates a filter input string using official filter mappings.
-
-    Parameters
-    ----------
-    filter_string : str
-        A string representing either a single filter (e.g., "Al-poly")
-        or a filter combo (e.g., "Al-poly/Ti-poly").
-
-    Returns
-    -------
-    ParsedFilter
-        Named tuple with 'filter1', 'filter2', and 'is_combo' boolean.
-
-    Raises
-    ------
-    ValueError
-        If the filter or combo is invalid.
-    """
-    if not isinstance(filter_string, str):
-        raise TypeError("Filter name must be a string.")
-
-    standardized = resolve_filter_name(filter_string.strip())
-
-    # Check if it's a combo filter
-    if "/" in standardized:
-        if standardized not in index_mapping_to_multi_filter:
-            raise ValueError(
-                f"'{standardized}' is not a valid filter combination.\n"
-                f"Valid combinations are: {sorted(index_mapping_to_multi_filter)}"
-            )
-        f1, f2 = standardized.split("/")
-        return ParsedFilter(filter1=f1, filter2=f2, is_combo=True)
-
-    # Otherwise check if it's in either filter wheel
-    elif (
-        standardized in index_mapping_to_fw1_name
-        or standardized in index_mapping_to_fw2_name
-    ):
-        return ParsedFilter(filter1=standardized, filter2=None, is_combo=False)
-
-    else:
-        raise ValueError(
-            f"'{standardized}' is not a recognized filter in either filter wheel.\n"
-            f"Valid FW1 filters: {sorted(index_mapping_to_fw1_name)}\n"
-            f"Valid FW2 filters: {sorted(index_mapping_to_fw2_name)}"
-        )
-
-
 index_mapping_to_fw1_name = {
     "Open": 0,
     "Al-poly": 1,
@@ -124,6 +73,54 @@ _filter_contamination = _filter_contam_file["p2"]
 ParsedFilter = namedtuple("ParsedFilter", ["filter1", "filter2", "is_combo"])
 
 
+def parse_filter_input(filter_string):
+    """
+    Parses and validates a filter input string using official filter mappings.
+
+    Parameters
+    ----------
+    filter_string : str
+        A string representing either a single filter (e.g., "Al-poly")
+        or a filter combo (e.g., "Al-poly/Ti-poly").
+
+    Returns
+    -------
+    ParsedFilter
+        Named tuple with 'filter1', 'filter2', and 'is_combo' boolean.
+
+    Raises
+    ------
+    ValueError
+        If the filter or combo is invalid.
+    """
+    if not isinstance(filter_string, str):
+        raise TypeError("Filter name must be a string.")
+
+    standardized = resolve_filter_name(filter_string.strip())
+
+    if "/" in standardized:
+        if standardized not in index_mapping_to_multi_filter:
+            raise ValueError(
+                f"'{standardized}' is not a valid filter combination.\n"
+                f"Valid combinations are: {sorted(index_mapping_to_multi_filter)}"
+            )
+        f1, f2 = standardized.split("/")
+        return ParsedFilter(filter1=f1, filter2=f2, is_combo=True)
+
+    elif (
+        standardized in index_mapping_to_fw1_name
+        or standardized in index_mapping_to_fw2_name
+    ):
+        return ParsedFilter(filter1=standardized, filter2=None, is_combo=False)
+
+    else:
+        raise ValueError(
+            f"'{standardized}' is not a recognized filter in either filter wheel.\n"
+            f"Valid FW1 filters: {sorted(index_mapping_to_fw1_name)}\n"
+            f"Valid FW2 filters: {sorted(index_mapping_to_fw2_name)}"
+        )
+
+
 class EffectiveAreaFundamental:
     """
     Class for calculating the effective area for an XRT filter at a specific observation date.
@@ -171,28 +168,37 @@ class EffectiveAreaFundamental:
 
     @property
     def filter1_name(self) -> str:
+        """
+        Name of the first filter given.
+        """
         return self._filter1_name
 
     @property
     def filter2_name(self) -> str:
+        """
+        Name of the second filter given.
+        """
         return self._filter2_name
 
     @property
     def is_combo(self) -> bool:
+        """
+        Name of the both filters given.
+        """
         return self._is_combo
 
     @property
     def observation_date(self) -> str:
         """
         Date of observation.
-
-        :noindex:
         """
         return self._observation_date
 
     @observation_date.setter
     def observation_date(self, date):
-        """Validates the user's requested observation date."""
+        """
+        Validates the user's requested observation date.
+        """
 
         observation_date = sunpy.time.parse_time(date)
 
@@ -333,8 +339,6 @@ class EffectiveAreaFundamental:
         """Returns the observation date in seconds (utime)."""
         return self.observation_date.utime
 
-
-    
     @property
     def _filter1_data(self):
         """Returns filter contamination data for filter 1."""
@@ -356,7 +360,7 @@ class EffectiveAreaFundamental:
             else index_mapping_to_fw2_name.get(self.filter2_name)
         )
         return _filter_contamination[filter2_index][self._filter2_wheel]
-    
+
     @property
     def contamination_on_filter1(self) -> u.angstrom:
         """
@@ -503,7 +507,7 @@ class EffectiveAreaFundamental:
             (complex(real_angular_wavenumber[i], imaginary_angular_wavenumber[i]))
             for i in range(4000)
         ]
-    
+
     @cached_property
     def _filter_contamination_angular_wavenumber(self):
         """Define angular wavenumber for the filter(s), considering contamination thickness."""
@@ -611,43 +615,6 @@ class EffectiveAreaFundamental:
             self._CCD_contamination_transmission,
         )
 
-    # @cached_property
-    # def _filter_contamination_transmission(self):
-    #     """Calculate transmission matrix coefficient and transmittance on a filter."""
-
-    #     index, _, _, _, n_o, n_t, _ = self._transmission_equation
-
-    #     i_i = complex(0, 1)  # Define complex number
-
-    #     # Define transfer matrix
-    #     M = [
-    #         [
-    #             [
-    #                 np.cos(self._filter_contamination_angular_wavenumber[i]),
-    #                 (-i_i * np.sin(self._filter_contamination_angular_wavenumber[i])) / index[i],
-    #             ],
-    #             [
-    #                 -i_i * np.sin(self._filter_contamination_angular_wavenumber[i]) * index[i],
-    #                 np.cos(self._filter_contamination_angular_wavenumber[i]),
-    #             ],
-    #         ]
-    #         for i in range(4000)
-    #     ]
-
-    #     transmittance = [
-    #         2
-    #         * n_o
-    #         / (
-    #             (M[i][0][0] * n_o)
-    #             + (M[i][0][1] * n_o * n_t)
-    #             + (M[i][1][0])
-    #             + (M[i][1][1] * n_t)
-    #         )
-    #         for i in range(4000)
-    #     ]
-
-    #     return [abs(transmittance[i] ** 2) for i in range(4000)]
-
     @cached_property
     def _filter_contamination_transmission(self):
         """Calculate transmission matrix coefficient and transmittance on the filter(s)."""
@@ -655,7 +622,7 @@ class EffectiveAreaFundamental:
         index, _, _, _, n_o, n_t, _ = self._transmission_equation
         i_i = complex(0, 1)
 
-        #angular_wave = self._filterwheel_angular_wavenumber  #handles both cases - filter 1 or 2 or
+        # angular_wave = self._filterwheel_angular_wavenumber  #handles both cases - filter 1 or 2 or
         angular_wave = self._filter_contamination_angular_wavenumber
 
         M = [
@@ -685,8 +652,6 @@ class EffectiveAreaFundamental:
         ]
 
         return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
-
-
 
     @property
     def _interpolated_filter_contamination_transmission(self):
