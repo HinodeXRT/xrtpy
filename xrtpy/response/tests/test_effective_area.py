@@ -81,11 +81,28 @@ def test_EffectiveArea_contamination_on_CCD(name, date):
     assert 0 <= instance.contamination_on_CCD <= 1206
 
 
+# @pytest.mark.parametrize("date", valid_dates)
+# @pytest.mark.parametrize("name", channel_single_filter_names)
+# def test_EffectiveArea_contamination_on_filter(name, date):
+#     instance = EffectiveAreaFundamental(name, date)
+#     assert 0 <= instance.contamination_on_filter <= 2901
 @pytest.mark.parametrize("date", valid_dates)
 @pytest.mark.parametrize("name", channel_single_filter_names)
-def test_EffectiveArea_contamination_on_filter(name, date):
+def test_EffectiveArea_contamination_on_filter1(name, date):
     instance = EffectiveAreaFundamental(name, date)
-    assert 0 <= instance.contamination_on_filter <= 2901
+    assert 0 <= instance.contamination_on_filter1 <= 2901
+    
+@pytest.mark.parametrize("date", valid_dates)
+@pytest.mark.parametrize("name", channel_names)
+def test_EffectiveArea_contamination_on_filter2(name, date):
+    instance = EffectiveAreaFundamental(name, date)
+    if instance.is_combo:
+        result = instance.contamination_on_filter2
+        assert result is None or (0 <= result <= 2901)
+    else:
+        assert instance.contamination_on_filter2 is None
+
+
 
 
 @pytest.mark.parametrize("date", invalid_dates)
