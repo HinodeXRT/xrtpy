@@ -351,13 +351,18 @@ class EffectiveAreaFundamental:
         return interpolater(self.observation_date.utime)
 
     @property
-    def contamination_on_filter2(self) -> u.angstrom:
+    def contamination_on_filter2(self) -> u.Quantity | None:
         """
-        Interpolates contamination layer thickness on filter2, if combo.
-        Returns None if this is a single-filter case.
+        Interpolates the contamination thickness on filter2, if using a combo filter.
+
+        Returns
+        -------
+        astropy.units.Quantity or None
+            Contamination thickness in Angstroms for filter2 if present; otherwise None.
         """
         if not self.is_combo or self._filter2_data is None:
             return None
+
         interpolater = scipy.interpolate.interp1d(
             _filter_contamination_file_time.utime, self._filter2_data, kind="linear"
         )
