@@ -304,19 +304,6 @@ class EffectiveAreaFundamental:
                 f"Filter '{filter_name}' not found in filter index mappings."
             )
 
-    @property
-    def _combo_filter1_data(self):
-        """Collecting filter1 contamination data."""
-        index = self._get_filter_index(self.filter1_name)
-        wheel = self._filter1_wheel
-        return _filter_contamination[index][wheel]
-
-    @property
-    def _combo_filter2_data(self):
-        """Collecting filter2 contamination data."""
-        if not self.is_combo or self.filter2_name is None:
-            return None  # Optional: or raise an error if you prefer strict enforcement
-
         index = self._get_filter_index(self.filter2_name)
         wheel = self._filter2_wheel
         return _filter_contamination[index][wheel]
