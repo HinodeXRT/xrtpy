@@ -183,7 +183,7 @@ class EffectiveAreaFundamental:
     @property
     def is_combo(self) -> bool:
         """
-        Name of the both filters given.
+        True if the filter is a combination (e.g., 'Al-poly/Ti-poly'), False otherwise.
         """
         return self._is_combo
 
@@ -269,14 +269,6 @@ class EffectiveAreaFundamental:
             return 1
         else:
             raise ValueError(f"Filter '{filter_name}' not found in FW1 or FW2.")
-
-    @property
-    def _filter_index_mapping_to_name(self):
-        """Returns filter's corresponding number value."""
-        if self.name in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(self.name)
-        elif self.name in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(self.name)
 
     @property
     def _filter_wheel_number(self):
