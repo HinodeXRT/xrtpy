@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from astropy import units as u
+
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental
 

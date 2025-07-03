@@ -1,6 +1,6 @@
 Filter: Al-poly/Al-mesh
 observation_date 22-Sept-2008 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.14278e-10
       1.10000   6.11577e-10
       1.20000   1.58948e-09

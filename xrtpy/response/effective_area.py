@@ -17,6 +17,7 @@ import sunpy.time
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 from scipy import interpolate
+
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.util.time import epoch
 
@@ -139,7 +140,6 @@ class EffectiveAreaFundamental:
     """
 
     def __init__(self, filter_name, observation_date):
-
         self._raw_input_name = filter_name
         self._parsed_filter = parse_filter_input(filter_name)
 

@@ -1,6 +1,6 @@
 Filter: Al-poly/Al-thick
 observation_date 22-Sept-2019 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.52639e-10
       1.10000   6.98656e-10
       1.20000   1.74869e-09

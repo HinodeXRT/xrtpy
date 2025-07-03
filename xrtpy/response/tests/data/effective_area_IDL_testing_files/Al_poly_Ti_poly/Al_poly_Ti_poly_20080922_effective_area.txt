@@ -1,6 +1,6 @@
 Filter: Al-poly/Ti-poly
 observation_date 22-Sept-2008 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.76605e-10
       1.10000   7.87992e-10
       1.20000   2.04351e-09

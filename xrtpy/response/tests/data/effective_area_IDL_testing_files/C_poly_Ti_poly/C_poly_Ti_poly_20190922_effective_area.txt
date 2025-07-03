@@ -1,6 +1,6 @@
 Filter: C-poly/Ti-poly
 observation_date 22-Sept-2019 22:40:45
-wavelength effective area 
+wavelength effective area
       1.00000   2.76716e-10
       1.10000   7.88414e-10
       1.20000   2.04493e-09
