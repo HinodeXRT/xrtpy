@@ -4,9 +4,9 @@ __all__ = [
 
 import datetime
 import math
-from collections import namedtuple
 from functools import cached_property
 from pathlib import Path
+from typing import NamedTuple
 
 import astropy.time
 import numpy as np
@@ -72,8 +72,6 @@ _filter_contamination = _filter_contam_file["p2"]
 
 
 #ParsedFilter = namedtuple("ParsedFilter", ["filter1", "filter2", "is_combo"])
-from typing import NamedTuple
-
 class ParsedFilter(NamedTuple):
     filter1: str
     filter2: str | None
@@ -309,9 +307,9 @@ class EffectiveAreaFundamental:
                 f"Filter '{filter_name}' not found in filter index mappings."
             )
 
-        index = self._get_filter_index(self.filter2_name)
-        wheel = self._filter2_wheel
-        return _filter_contamination[index][wheel]
+        # index = self._get_filter_index(self.filter2_name)
+        # wheel = self._filter2_wheel
+        # return _filter_contamination[index][wheel]
 
     @property
     def filter_data_dates_to_seconds(self):
