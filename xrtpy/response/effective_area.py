@@ -71,8 +71,13 @@ _filter_contamination_file_time = astropy.time.Time(
 _filter_contamination = _filter_contam_file["p2"]
 
 
-ParsedFilter = namedtuple("ParsedFilter", ["filter1", "filter2", "is_combo"])
+#ParsedFilter = namedtuple("ParsedFilter", ["filter1", "filter2", "is_combo"])
+from typing import NamedTuple
 
+class ParsedFilter(NamedTuple):
+    filter1: str
+    filter2: str | None
+    is_combo: bool
 
 def parse_filter_input(filter_string):
     """
