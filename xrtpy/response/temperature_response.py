@@ -11,7 +11,8 @@ from astropy import units as u
 from scipy import interpolate
 
 from xrtpy.response.channel import Channel, resolve_filter_name
-from xrtpy.response.effective_area import EffectiveAreaFundamental
+from xrtpy.response.effective_area import EffectiveAreaFundamental, parse_filter_input
+
 
 _abundance_model_file_path = {
     "coronal_abundance_path": Path(__file__).parent.absolute()
@@ -70,12 +71,43 @@ class TemperatureResponseFundamental:
         abundance_model : str, optional
             The abundance model to use. Options are 'coronal' (default), 'hybrid', and 'photospheric'. Default abundance model is coronal.
         """
-        self._name = resolve_filter_name(filter_name)
-        self._channel = Channel(self.filter_name)
+        parsed_filter = parse_filter_input(filter_name)
+        self._name = filter_name  # keep original name (like "Al-poly/Ti-poly")
+        self.filter1_name = parsed_filter.filter1
+        self.filter2_name = parsed_filter.filter2
+        self.is_combo = parsed_filter.is_combo
+        self._channel = Channel(self.filter1_name)
+
+
         self._abundance_model = _resolve_abundance_model_type(abundance_model)
         self._effective_area_fundamental = EffectiveAreaFundamental(
-            self._name, observation_date
+            filter_name, observation_date
         )
+        print(f"\nFilter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}\n")
+
+
+
+        # self._raw_input_name = filter_name
+        # self._parsed_filter = parse_filter_input(filter_name)
+
+        # self._filter1_name = self._parsed_filter.filter1
+        # self._filter2_name = self._parsed_filter.filter2
+        # self._is_combo = self._parsed_filter.is_combo
+
+        # # Standardized name for display and internal use
+        # self._name = (
+        #     f"{self._filter1_name}/{self._filter2_name}"
+        #     if self._is_combo
+        #     else self._filter1_name
+        # )
+
+        # self._channel = Channel(self._name)
+        # self._abundance_model = _resolve_abundance_model_type(abundance_model)
+
+        # # This now supports both single and double filters
+        # self._effective_area_fundamental = EffectiveAreaFundamental(self._name, observation_date)
+
+
 
     @property
     def filter_name(self):
