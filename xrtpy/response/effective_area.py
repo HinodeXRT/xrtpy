@@ -6,6 +6,7 @@ import datetime
 import math
 from functools import cached_property
 from pathlib import Path
+from typing import NamedTuple
 
 import astropy.time
 import numpy as np
@@ -38,6 +39,14 @@ index_mapping_to_fw2_name = {
     "Be-thick": 5,
 }
 
+index_mapping_to_multi_filter = {
+    "Al-poly/Al-mesh": 9,
+    "Al-poly/Ti-poly": 10,
+    "Al-poly/Al-thick": 11,
+    "Al-poly/Be-thick": 12,
+    "C-poly/Ti-poly": 13,
+}
+
 _ccd_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
 )
@@ -62,6 +71,60 @@ _filter_contamination_file_time = astropy.time.Time(
 _filter_contamination = _filter_contam_file["p2"]
 
 
+class ParsedFilter(NamedTuple):
+    filter1: str
+    filter2: str | None
+    is_combo: bool
+
+
+def parse_filter_input(filter_string):
+    """
+    Parses and validates a filter input string using official filter mappings.
+
+    Parameters
+    ----------
+    filter_string : str
+        A string representing either a single filter (e.g., "Al-poly")
+        or a filter combo (e.g., "Al-poly/Ti-poly").
+
+    Returns
+    -------
+    ParsedFilter
+        Named tuple with 'filter1', 'filter2', and 'is_combo' boolean.
+
+    Raises
+    ------
+    ValueError
+        If the filter or combo is invalid.
+    """
+    if not isinstance(filter_string, str):
+        raise TypeError("Filter name must be a string.")
+
+    standardized = resolve_filter_name(filter_string.strip())
+
+    if "/" in standardized:
+        if standardized not in index_mapping_to_multi_filter:
+            raise ValueError(
+                f"'{standardized}' is not a valid filter combination.\n"
+                f"Valid combinations are: {sorted(index_mapping_to_multi_filter)}"
+            )
+        f1, f2 = standardized.split("/")
+        return ParsedFilter(filter1=f1, filter2=f2, is_combo=True)
+
+    elif (
+        standardized in index_mapping_to_fw1_name
+        or standardized in index_mapping_to_fw2_name
+    ):
+        return ParsedFilter(filter1=standardized, filter2=None, is_combo=False)
+
+    else:
+        raise ValueError(
+            f"'{standardized}' is not a recognized filter in either filter wheel.\n"
+            f"Valid FW1 filters: {sorted(index_mapping_to_fw1_name)}\n"
+            f"Valid FW2 filters: {sorted(index_mapping_to_fw2_name)}"
+        )
+
+
 class EffectiveAreaFundamental:
     """
     Class for calculating the effective area for an XRT filter at a specific observation date.
@@ -80,31 +143,65 @@ class EffectiveAreaFundamental:
     """
 
     def __init__(self, filter_name, observation_date):
-        self._name = resolve_filter_name(filter_name)
+        self._raw_input_name = filter_name
+        self._parsed_filter = parse_filter_input(filter_name)
+
+        self._filter1_name = self._parsed_filter.filter1
+        self._filter2_name = self._parsed_filter.filter2
+        self._is_combo = self._parsed_filter.is_combo
+
+        # Store the standardized/resolved name
+        if self._is_combo:
+            self._name = f"{self._filter1_name}/{self._filter2_name}"
+        else:
+            self._name = self._filter1_name
+
+        self._observation_date = sunpy.time.parse_time(observation_date)
+        self._channel = Channel(self.name)
+
         self.observation_date = observation_date
         self._channel = Channel(self.name)
 
     @property
     def name(self) -> str:
         """
-        Name of XRT X-Ray channel filter.
-
-        :noindex:
+        The resolved name of the filter or filter combination.
         """
         return self._name
+
+    @property
+    def filter1_name(self) -> str:
+        """
+        Name of the first filter given.
+        """
+        return self._filter1_name
+
+    @property
+    def filter2_name(self) -> str:
+        """
+        Name of the second filter given.
+        """
+        return self._filter2_name
+
+    @property
+    def is_combo(self) -> bool:
+        """
+        True if the filter is a combination (e.g., 'Al-poly/Ti-poly'), False otherwise.
+        """
+        return self._is_combo
 
     @property
     def observation_date(self) -> str:
         """
         Date of observation.
-
-        :noindex:
         """
         return self._observation_date
 
     @observation_date.setter
     def observation_date(self, date):
-        """Validating users requested observation date."""
+        """
+        Validates the user's requested observation date.
+        """
 
         observation_date = sunpy.time.parse_time(date)
 
@@ -126,8 +223,8 @@ class EffectiveAreaFundamental:
         if observation_date > modified_time:
             raise ValueError(
                 "\nNo contamination data is presently available for "
-                f"{observation_date.datetime}.\n The latest available data is on "
-                f"{latest_available_ccd_data}.\n Contamination data is "
+                f"{observation_date.datetime}.\nThe latest available data is on "
+                f"{latest_available_ccd_data}.\nContamination data is "
                 "updated periodically. The last update was on "
                 f"{modified_time_datetime}. If this is more "
                 "than one month ago, please raise an issue at: "
@@ -166,13 +263,15 @@ class EffectiveAreaFundamental:
         )
         return interpolater(self.observation_date.utime)
 
-    @property
-    def _filter_index_mapping_to_name(self):
-        """Returns filter's corresponding number value."""
-        if self.name in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(self.name)
-        elif self.name in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(self.name)
+    @staticmethod
+    def _get_filter_wheel_number(filter_name: str) -> int:  # *********
+        """Returns 0 if the filter is in FW1, 1 if in FW2. Raises error if unknown."""
+        if filter_name in index_mapping_to_fw1_name:
+            return 0
+        elif filter_name in index_mapping_to_fw2_name:
+            return 1
+        else:
+            raise ValueError(f"Filter '{filter_name}' not found in FW1 or FW2.")
 
     @property
     def _filter_wheel_number(self):
@@ -181,158 +280,90 @@ class EffectiveAreaFundamental:
 
     @property
     def _combo_filter_name_split(self):
-        """Defining chosen filters to its corresponding filter wheel."""
-        name = (self.name).split("/")
-        filter1, filter2 = name[0], name[1]
-        return filter1, filter2
+        """Returns (filter1, filter2) even for a single filter (filter2 is None)."""
+        return self.filter1_name, self.filter2_name
 
     @property
-    def _combo_filter1_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        filter1, _ = self._combo_filter_name_split
-        return 0 if filter1 in index_mapping_to_fw1_name else 1
+    def _filter1_wheel(self):
+        """Returns filter wheel number for filter1 (0 or 1)."""
+        return self._get_filter_wheel_number(self.filter1_name)
 
     @property
-    def _combo_filter2_wheel_number(self):
-        """Defining chosen filter to its corresponding filter wheel."""
-        _, filter2 = self._combo_filter_name_split
-        return 0 if filter2 in index_mapping_to_fw1_name else 1
+    def _filter2_wheel(self):
+        """Returns filter wheel number for filter2 if combo; otherwise None."""
+        if not self.is_combo or self.filter2_name is None:
+            return None
+        return self._get_filter_wheel_number(self.filter2_name)
+
+    @staticmethod
+    def _get_filter_index(filter_name: str) -> int:
+        """Returns the index value for a filter name from either wheel mapping."""
+        if filter_name in index_mapping_to_fw1_name:
+            return index_mapping_to_fw1_name[filter_name]
+        elif filter_name in index_mapping_to_fw2_name:
+            return index_mapping_to_fw2_name[filter_name]
+        else:
+            raise ValueError(
+                f"Filter '{filter_name}' not found in filter index mappings."
+            )
 
     @property
-    def _combo_filter_index_mapping_to_name_filter1(self):
-        """Returns filter's corresponding number value."""
-        filter1, _ = self._combo_filter_name_split
-
-        if filter1 in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(filter1)
-        elif filter1 in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(filter1)
+    def filter_data_dates_to_seconds(self):
+        """Returns the contamination file time axis in seconds (utime)."""
+        return _filter_contamination_file_time.utime
 
     @property
-    def _combo_filter_index_mapping_to_name_filter2(self):
-        """Returns filter's corresponding number value."""
-        filter1, filter2 = self._combo_filter_name_split
-
-        if filter2 in index_mapping_to_fw1_name:
-            return index_mapping_to_fw1_name.get(filter2)
-        elif filter2 in index_mapping_to_fw2_name:
-            return index_mapping_to_fw2_name.get(filter2)
+    def filter_observation_date_to_seconds(self):
+        """Returns the observation date in seconds (utime)."""
+        return self.observation_date.utime
 
     @property
-    def _combo_filter1_data(self):
-        """Collecting filter data."""
-        return _filter_contamination[self._combo_filter_index_mapping_to_name_filter1][
-            self._combo_filter1_wheel_number
-        ]
-
-    @property
-    def _combo_filter2_data(self):
-        """Collecting filter data."""
-        return _filter_contamination[self._combo_filter_index_mapping_to_name_filter2][
-            self._combo_filter2_wheel_number
-        ]
-
-    @property
-    def contamination_on_filter1_combo(self) -> u.angstrom:
-        """
-        Calculate the thickness of the contamination layer on the first filter in a filter combination.
-
-        This property interpolates the contamination data over time to determine the thickness
-        of the contamination layer on the first filter of a specified filter combination at the
-        observation date.
-
-        Returns
-        -------
-        astropy.units.Quantity
-            The thickness of the contamination layer on the first filter, in Angstroms.
-
-        Notes
-        -----
-        The interpolation is performed using a linear interpolation method over the
-        available contamination data points. The ``filter_data_dates_to_seconds`` and
-        ``_combo_filter1_data`` attributes are used to provide the data for interpolation,
-        and ``filter_observation_date_to_seconds`` provides the point at which to
-        evaluate the interpolation.
-
-        Raises
-        ------
-        ValueError
-            If the observation date is outside the range of the available contamination data.
-        """
-
-        interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self._combo_filter1_data, kind="linear"
+    def _filter1_data(self):
+        """Returns filter contamination data for filter 1."""
+        filter1_index = (
+            index_mapping_to_fw1_name.get(self.filter1_name)
+            if self._filter1_wheel == 0
+            else index_mapping_to_fw2_name.get(self.filter1_name)
         )
-        return interpolater(self.filter_observation_date_to_seconds)
+        return _filter_contamination[filter1_index][self._filter1_wheel]
 
     @property
-    def contamination_on_filter2_combo(self) -> u.angstrom:
-        """
-        Calculate the thickness of the contamination layer on the second filter in a filter combination.
-
-        This property interpolates the contamination data over time to determine the thickness
-        of the contamination layer on the second filter of a specified filter combination at the
-        observation date.
-
-        Returns
-        -------
-        astropy.units.Quantity
-            The thickness of the contamination layer on the second filter, in Angstroms.
-
-        Notes
-        -----
-        The interpolation is performed using a linear interpolation method over the
-        available contamination data points. The ``filter_data_dates_to_seconds`` and
-        ``_combo_filter2_data`` attributes are used to provide the data for interpolation,
-        and ``filter_observation_date_to_seconds`` provides the point at which to
-        evaluate the interpolation.
-
-        Raises
-        ------
-        ValueError
-            If the observation date is outside the range of the available contamination data.
-        """
-
-        interpolater = scipy.interpolate.interp1d(
-            self.filter_data_dates_to_seconds, self._combo_filter2_data, kind="linear"
+    def _filter2_data(self):
+        """Returns filter contamination data for filter 2, if combo."""
+        if not self.is_combo or self.filter2_name is None:
+            return None
+        filter2_index = (
+            index_mapping_to_fw1_name.get(self.filter2_name)
+            if self._filter2_wheel == 0
+            else index_mapping_to_fw2_name.get(self.filter2_name)
         )
-        return interpolater(self.filter_observation_date_to_seconds)
+        return _filter_contamination[filter2_index][self._filter2_wheel]
 
     @property
-    def _filter_data(self):
-        """Collecting filter contamination data."""
-        return _filter_contamination[self._filter_index_mapping_to_name][
-            self._filter_wheel_number
-        ]
-
-    @property
-    def contamination_on_filter(self) -> u.angstrom:
+    def contamination_on_filter1(self) -> u.angstrom:
         """
-        Calculate the thickness of the contamination layer on a filter.
+        Interpolates contamination layer thickness on filter1.
+        """
+        interpolater = scipy.interpolate.interp1d(
+            _filter_contamination_file_time.utime, self._filter1_data, kind="linear"
+        )
+        return interpolater(self.observation_date.utime)
 
-        This property interpolates the contamination data over time to determine the thickness
-        of the contamination layer on the specified filter at the observation date. The contamination layer
-        is measured in Angstroms (Å).
+    @property
+    def contamination_on_filter2(self) -> u.Quantity | None:
+        """
+        Interpolates the contamination thickness on filter2, if using a combo filter.
 
         Returns
         -------
-        astropy.units.Quantity
-            The thickness of the contamination layer on the filter, in Angstroms.
-
-        Notes
-        -----
-        The interpolation is performed using a linear interpolation method over the available
-        contamination data points. The `observation_date` attribute is used to provide the point
-        at which to evaluate the interpolation. The data used for interpolation is specific to
-        the filter defined by the ``filter_name`` attribute.
-
-        Raises
-        ------
-        ValueError
-            If the observation date is outside the range of the available contamination data.
+        astropy.units.Quantity or None
+            Contamination thickness in Angstroms for filter2 if present; otherwise None.
         """
+        if not self.is_combo or self._filter2_data is None:
+            return None
+
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self._filter_data, kind="linear"
+            _filter_contamination_file_time.utime, self._filter2_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
@@ -461,11 +492,10 @@ class EffectiveAreaFundamental:
         ]
 
     @cached_property
-    def _filterwheel_angular_wavenumber(self):
-        """Define angular wavenumber for a filter."""
+    def _filter_contamination_angular_wavenumber(self):
+        """Define angular wavenumber for the filter(s), considering contamination thickness."""
         index, _, cos_a, _, _, _, _ = self._transmission_equation
 
-        # Define wavevector
         angular_wavenumber = np.array(
             [
                 (2.0 * math.pi * index[i] * cos_a) / self.n_DEHP_wavelength[i]
@@ -473,16 +503,34 @@ class EffectiveAreaFundamental:
             ]
         )
 
-        # Multiply by thickness
-        angular_wavenumber_thickness = angular_wavenumber * self.contamination_on_filter
+        if self.is_combo:
+            angular_wavenumber_thickness_f1 = (
+                angular_wavenumber * self.contamination_on_filter1
+            )
+            angular_wavenumber_thickness_f2 = (
+                angular_wavenumber * self.contamination_on_filter2
+            )
 
-        real_angular_wavenumber = angular_wavenumber_thickness.real
-        imaginary_angular_wavenumber = angular_wavenumber_thickness.imag
+            real_angular_f1 = angular_wavenumber_thickness_f1.real
+            imag_angular_f1 = angular_wavenumber_thickness_f1.imag
+            real_angular_f2 = angular_wavenumber_thickness_f2.real
+            imag_angular_f2 = angular_wavenumber_thickness_f2.imag
 
-        return [
-            (complex(real_angular_wavenumber[i], imaginary_angular_wavenumber[i]))
-            for i in range(4000)
-        ]
+            angular_wavenumber_combo = [
+                complex(
+                    real_angular_f1[i] + real_angular_f2[i],
+                    imag_angular_f1[i] + imag_angular_f2[i],
+                )
+                for i in range(4000)
+            ]
+            return angular_wavenumber_combo
+        else:
+            angular_wavenumber_thickness = (
+                angular_wavenumber * self.contamination_on_filter1
+            )
+            real_angular = angular_wavenumber_thickness.real
+            imag_angular = angular_wavenumber_thickness.imag
+            return [complex(real_angular[i], imag_angular[i]) for i in range(4000)]
 
     @cached_property
     def _CCD_contamination_transmission(self):
@@ -552,22 +600,23 @@ class EffectiveAreaFundamental:
 
     @cached_property
     def _filter_contamination_transmission(self):
-        """Calculate transmission matrix coefficient and transmittance on a filter."""
+        """Calculate transmission matrix coefficient and transmittance on the filter(s)."""
 
         index, _, _, _, n_o, n_t, _ = self._transmission_equation
+        i_i = complex(0, 1)
 
-        i_i = complex(0, 1)  # Define complex number
+        # angular_wave = self._filterwheel_angular_wavenumber  #handles both cases - filter 1 or 2 or
+        angular_wave = self._filter_contamination_angular_wavenumber
 
-        # Define transfer matrix
         M = [
             [
                 [
-                    np.cos(self._filterwheel_angular_wavenumber[i]),
-                    (-i_i * np.sin(self._filterwheel_angular_wavenumber[i])) / index[i],
+                    np.cos(angular_wave[i]),
+                    (-i_i * np.sin(angular_wave[i])) / index[i],
                 ],
                 [
-                    -i_i * np.sin(self._filterwheel_angular_wavenumber[i]) * index[i],
-                    np.cos(self._filterwheel_angular_wavenumber[i]),
+                    -i_i * np.sin(angular_wave[i]) * index[i],
+                    np.cos(angular_wave[i]),
                 ],
             ]
             for i in range(4000)
@@ -585,7 +634,7 @@ class EffectiveAreaFundamental:
             for i in range(4000)
         ]
 
-        return [abs(transmittance[i] ** 2) for i in range(4000)]
+        return np.array([abs(transmittance[i] ** 2) for i in range(4000)])
 
     @property
     def _interpolated_filter_contamination_transmission(self):
