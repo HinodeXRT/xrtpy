@@ -9,10 +9,8 @@ import numpy as np
 import scipy.io
 from astropy import units as u
 from scipy import interpolate
-
 from xrtpy.response.channel import Channel, resolve_filter_name
 from xrtpy.response.effective_area import EffectiveAreaFundamental, parse_filter_input
-
 
 _abundance_model_file_path = {
     "coronal_abundance_path": Path(__file__).parent.absolute()
@@ -78,14 +76,13 @@ class TemperatureResponseFundamental:
         self.is_combo = parsed_filter.is_combo
         self._channel = Channel(self.filter1_name)
 
-
         self._abundance_model = _resolve_abundance_model_type(abundance_model)
         self._effective_area_fundamental = EffectiveAreaFundamental(
             filter_name, observation_date
         )
-        print(f"\nFilter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}\n")
-
-
+        print(
+            f"\nFilter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}\n"
+        )
 
         # self._raw_input_name = filter_name
         # self._parsed_filter = parse_filter_input(filter_name)
@@ -106,8 +103,6 @@ class TemperatureResponseFundamental:
 
         # # This now supports both single and double filters
         # self._effective_area_fundamental = EffectiveAreaFundamental(self._name, observation_date)
-
-
 
     @property
     def filter_name(self):
