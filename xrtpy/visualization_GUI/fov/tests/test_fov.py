@@ -24,7 +24,7 @@ def test_html():
 
 
 @pytest.mark.parametrize(
-    "argument, expected_result",
+    ("argument", "expected_result"),
     [
         (
             "20061017",
@@ -60,7 +60,7 @@ def test_date_to_metafile_d():
 
 
 @pytest.mark.parametrize(
-    "argument, expected_result",
+    ("argument", "expected_result"),
     [
         (True, n_files),  # pair the argument with the expected result
         (False, n_files),
