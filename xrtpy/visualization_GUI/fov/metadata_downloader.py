@@ -30,9 +30,10 @@ def fetch_metadata(xrt_downloaded_files, fast_bool=True):
     else:
         print("Slow Metadata (Level 1)")
         hdul = _download_metadata_slow(xrt_downloaded_files)
-        hlis = []
-        for i in range(len(xrt_downloaded_files[0])):
-            hlis.append(hdul[i + 2].header)
+        #hlis = []
+        #for i in range(len(xrt_downloaded_files[0])):
+        #    hlis.append(hdul[i + 2].header)
+        hlis = [hdul[i+2].header for i in range(len(xrt_downloaded_files[0]))]
         return hlis
 
 
@@ -52,11 +53,11 @@ def _download_metadata_slow(xrt_downloaded_files):
     """
 
     url_lis = xrt_downloaded_files[0][:]["fileid"]
-    url_str_lis = []
+    #url_str_lis = []
 
-    for i in range(len(url_lis)):
-        url_str_lis.append(url_lis[i])
-
+    #for i in range(len(url_lis)):
+    #    url_str_lis.append(url_lis[i])
+    url_str_lis = list(url_lis)
     primary_hdu = fits.PrimaryHDU(data=np.ones((3, 3)))
     c1 = fits.Column(name="URL", array=url_str_lis, format="100A")
     c2 = fits.Column(
@@ -121,7 +122,7 @@ def _get_html_str():
         list of strings for daily xrtcat .geny files
     """
     url_start = "https://sot.lmsal.com/data/sot/metadata/sswdb/hinode/xrt/xrt_genxcat/"
-    with urllib.request.urlopen(url_start) as response:
+    with urllib.request.urlopen(url_start) as response: # noqa : S310
         html = response.read()
         html_str = html.decode("utf-8")
     return html_str
@@ -220,7 +221,7 @@ def _get_metafile(geny_lis):
     data_dict_lis = []
     for i in range(ngeny):
         gen_fn = geny_lis[i]
-        f, h = urllib.request.urlretrieve(url_start + gen_fn)
+        f, h = urllib.request.urlretrieve(url_start + gen_fn) # noqa : S310
         data2 = readsav(f)["p0"]
         data_dict2 = {k: data2[k] for k in data2.dtype.names}
         data_dict_lis.append(data_dict2)
@@ -250,10 +251,11 @@ def _match_vso_to_cat(data_dict_lis, cat_fi, xrt_download):
     for i in range(n_dict):
         data_dict = data_dict_lis[i]
         date_obs_cat = data_dict["DATE_OBS"]
-        cat_len = len(date_obs_cat)
-        cat_str = []
-        for cat_bin in date_obs_cat:
-            cat_str.append(cat_bin.decode("ascii"))
+        #cat_len = len(date_obs_cat)
+        #cat_str = []
+        #for cat_bin in date_obs_cat:
+        #    cat_str.append(cat_bin.decode("ascii"))
+        cat_str = [cat_bin.decode("ascii") for cat_bin in date_obs_cat]
         cat_time = Time(np.asarray(cat_str), format="isot", scale="utc")
         cat_time_lis.append(cat_time)
 
@@ -273,7 +275,7 @@ def _match_vso_to_cat(data_dict_lis, cat_fi, xrt_download):
         try:
             delt_lisp.append(dealt[min_ti + 1])
             delt_lism.append(dealt[min_ti - 1])
-        except:
+        except IndexError:
             print()
         header_lis.append(_meta_to_dict(data_dict_lis[cat_fi[i]], min_ti))
     return header_lis
@@ -302,6 +304,6 @@ def _meta_to_dict(data_dict, di):
     for dki in dkeys:
         try:
             hdict[dki] = data_dict[dki][di].decode("ascii")
-        except:
+        except IndexError: # noqa : PERF203
             hdict[dki] = data_dict[dki][di]
     return hdict
