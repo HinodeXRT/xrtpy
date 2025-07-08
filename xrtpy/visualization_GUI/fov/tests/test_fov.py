@@ -1,8 +1,13 @@
+import sys
+
 import pytest
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 
 from xrtpy.visualization_GUI.fov import metadata_downloader as xfetch
+
+pytestmark = pytest.mark.skipif(sys.version_info >= (3, 13), reason="zeep/lxml is not installable on Python 3.13 due to missing prebuilt wheels"
+)
 
 time_range = a.Time("2011-06-07 06:00:00", "2011-06-07 07:30:54")
 instrument = a.Instrument("xrt")
