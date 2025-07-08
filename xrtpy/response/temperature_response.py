@@ -9,7 +9,8 @@ import numpy as np
 import scipy.io
 from astropy import units as u
 from scipy import interpolate
-from xrtpy.response.channel import Channel, resolve_filter_name
+
+from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental, parse_filter_input
 
 _abundance_model_file_path = {
