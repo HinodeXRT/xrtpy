@@ -68,8 +68,8 @@ optional-dependencies.docs = [
 ]
 optional-dependencies.tests = [
   "beautifulsoup4",
-  "lxml",
   "drms",
+  "lxml",
   "pytest>=8.3.1",
   "pytest-astropy>=0.11",
   "pytest-cov>=6",
