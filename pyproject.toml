@@ -74,7 +74,7 @@ optional-dependencies.tests = [
   "pytest-astropy>=0.11",
   "pytest-cov>=6",
   "pytest-xdist>=3.6.1",
-  "zeep",
+  "zeep>=4.1.0",
 ]
 urls.Changelog = "https://xrtpy.readthedocs.io/en/stable/changelog/index.html"
 urls.Documentation = "https://xrtpy.readthedocs.io"
