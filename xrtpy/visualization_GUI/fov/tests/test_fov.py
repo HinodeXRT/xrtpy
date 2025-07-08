@@ -1,8 +1,8 @@
 import pytest
-import xrtpy
-from xrtpy.visualization_GUI.fov import metadata_downloader as xfetch
 from sunpy.net import Fido
 from sunpy.net import attrs as a
+
+from xrtpy.visualization_GUI.fov import metadata_downloader as xfetch
 
 time_range = a.Time("2011-06-07 06:00:00", "2011-06-07 07:30:54")
 instrument = a.Instrument("xrt")
