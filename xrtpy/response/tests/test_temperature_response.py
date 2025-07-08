@@ -29,10 +29,12 @@ def get_tolerances_for_filter(filter_name, default_rtol=0.005, default_atol_scal
     """
     Return test tolerances based on filter name.
 
-    For known double filter combinations (e.g., 'C-poly/Ti-poly', 'Al-poly/Ti-poly'),
-    use a looser absolute tolerance due to known small differences that are currently
+    For the 'C-poly/Ti-poly' and 'Al-poly/Ti-poly' combinations under the
+    **coronal** abundance model, apply a looser absolute tolerance due to known *small* differences that are currently
     under investigation. These differences might originate from CHIANTI emissivity
     interpolation methods or IDL vs Python floating-point differences.
+
+
 
     NOTE: This is a temporary workaround. See GitHub issue #XXX (TBD) for tracking.
     We/I (Joy Velasquez) plan to revisit this after finalizing testing across all filters before version six release.
