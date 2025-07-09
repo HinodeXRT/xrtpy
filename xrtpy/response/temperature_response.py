@@ -9,7 +9,6 @@ import numpy as np
 import scipy.io
 from astropy import units as u
 from scipy import interpolate
-
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental, parse_filter_input
 
@@ -84,26 +83,6 @@ class TemperatureResponseFundamental:
         print(
             f"\nFilter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}\n"
         )
-
-        # self._raw_input_name = filter_name
-        # self._parsed_filter = parse_filter_input(filter_name)
-
-        # self._filter1_name = self._parsed_filter.filter1
-        # self._filter2_name = self._parsed_filter.filter2
-        # self._is_combo = self._parsed_filter.is_combo
-
-        # # Standardized name for display and internal use
-        # self._name = (
-        #     f"{self._filter1_name}/{self._filter2_name}"
-        #     if self._is_combo
-        #     else self._filter1_name
-        # )
-
-        # self._channel = Channel(self._name)
-        # self._abundance_model = _resolve_abundance_model_type(abundance_model)
-
-        # # This now supports both single and double filters
-        # self._effective_area_fundamental = EffectiveAreaFundamental(self._name, observation_date)
 
     @property
     def filter_name(self):
