@@ -36,7 +36,7 @@ def get_tolerances_for_filter(filter_name, default_rtol=0.005, default_atol_scal
 
 
 
-    NOTE: This is a temporary workaround. See GitHub issue #XXX (TBD) for tracking.
+    NOTE: This is a temporary workaround. See GitHub issue #358 (TBD) for tracking.
     We/I (Joy Velasquez) plan to revisit this after finalizing testing across all filters before version six release.
     """
     if "C-poly/Ti-poly" in filter_name or "Al-poly/Ti-poly" in filter_name:
@@ -82,10 +82,3 @@ def test_temperature_response(filename):
         rtol=rtol,
         atol=atol,
     )
-
-    # assert u.allclose(
-    #     actual_temperature_response,
-    #     IDL_temperature_response_interp,
-    #     rtol=0.005,
-    #     atol=1e-6 * actual_temperature_response.max(),
-    # )
