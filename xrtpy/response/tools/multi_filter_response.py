@@ -4,18 +4,18 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
 @dataclass
-class TemperatureResponseData:
+class _TemperatureResponseData:
     """
-    Dataclass representing the temperature response for a single XRT filter channel.
+    Internal dataclass representing the temperature response for a single XRT filter channel.
     
     Attributes
     ----------
     filter_name : str
-        Name of the XRT filter (standardized by TemperatureResponseFundamental).
+        Name of the XRT filter.
     temperature : astropy.units.Quantity
-        Temperature grid in Kelvin (K).
+        Temperature grid in Kelvin.
     response : astropy.units.Quantity
-        Instrument response in units of DN cm^5 / (pix s).
+        Instrument response in DN cm^5 / (pix s).
     """
     filter_name: str
     temperature: u.Quantity
@@ -51,7 +51,7 @@ def generate_temperature_responses(filters, obs_date, abundance="Coronal"):
     for f in filters:
         obj = TemperatureResponseFundamental(f, obs_date, abundance)
         responses.append(
-            TemperatureResponseData(
+            _TemperatureResponseData(
                 filter_name=obj.filter_name,
                 temperature=obj.CHIANTI_temperature,
                 response=obj.temperature_response()
