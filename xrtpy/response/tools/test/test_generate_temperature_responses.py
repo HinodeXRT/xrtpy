@@ -1,7 +1,9 @@
 import astropy.units as u
 import pytest
 from astropy.time import Time
+
 from xrtpy.response.tools import generate_temperature_responses
+
 
 @pytest.mark.parametrize(
     "filters",
@@ -13,8 +15,11 @@ from xrtpy.response.tools import generate_temperature_responses
     ],
 )
 def test_response_length_matches_filters(filters):
-    responses = generate_temperature_responses(filters, "2011-01-28T11:02:31", "Photospheric")
+    responses = generate_temperature_responses(
+        filters, "2011-01-28T11:02:31", "Photospheric"
+    )
     assert len(responses) == len(filters)
+
 
 @pytest.mark.parametrize(
     "obs_date",
@@ -32,28 +37,36 @@ def test_responses_for_different_dates(obs_date):
         assert isinstance(r.temperature, u.Quantity)
         assert isinstance(r.response, u.Quantity)
 
+
 @pytest.mark.parametrize("abundance", ["Coronal", "Photospheric", "Hybrid"])
 def test_responses_for_different_abundance_models(abundance):
     filters = ["Al-mesh", "Be-thick"]
-    responses = generate_temperature_responses(filters, "2011-01-28T11:02:31", abundance)
+    responses = generate_temperature_responses(
+        filters, "2011-01-28T11:02:31", abundance
+    )
     assert len(responses) == len(filters)
     for r in responses:
         assert r.temperature.unit.is_equivalent(u.K)
         assert r.response.unit.is_equivalent(u.DN * u.cm**5 / (u.pix * u.s))
 
+
 def test_shape_and_units_consistency():
     filters = ["Al-poly", "Ti-poly"]
-    responses = generate_temperature_responses(filters, "2011-01-28T11:02:31", "Coronal")
+    responses = generate_temperature_responses(
+        filters, "2011-01-28T11:02:31", "Coronal"
+    )
     for r in responses:
         assert len(r.temperature) == len(r.response)
         assert r.temperature.unit.is_equivalent(u.K)
         assert r.response.unit.is_equivalent(u.DN * u.cm**5 / (u.pix * u.s))
+
 
 def test_astropy_time_input():
     filters = ["Al-mesh"]
     time_obj = Time("2011-01-28T11:02:31")
     responses = generate_temperature_responses(filters, time_obj, "Coronal")
     assert len(responses) == len(filters)
+
 
 def test_invalid_filter_raises_exception():
     filters = ["Not-a-real-filter"]
