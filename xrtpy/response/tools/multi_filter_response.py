@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+
 from astropy import units as u
+
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
 
@@ -7,7 +9,7 @@ from xrtpy.response.temperature_response import TemperatureResponseFundamental
 class _TemperatureResponseData:
     """
     Internal dataclass representing the temperature response for a single XRT filter channel.
-    
+
     Attributes
     ----------
     filter_name : str
@@ -17,10 +19,10 @@ class _TemperatureResponseData:
     response : astropy.units.Quantity
         Instrument response in DN cm^5 / (pix s).
     """
+
     filter_name: str
     temperature: u.Quantity
     response: u.Quantity
-
 
 
 def generate_temperature_responses(filters, obs_date, abundance="Coronal"):
@@ -54,7 +56,7 @@ def generate_temperature_responses(filters, obs_date, abundance="Coronal"):
             _TemperatureResponseData(
                 filter_name=obj.filter_name,
                 temperature=obj.CHIANTI_temperature,
-                response=obj.temperature_response()
+                response=obj.temperature_response(),
             )
         )
     return responses
