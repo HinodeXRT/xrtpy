@@ -67,6 +67,7 @@ def test_astropy_time_input():
     responses = generate_temperature_responses(filters, time_obj, "Coronal")
     assert len(responses) == len(filters)
 
+
 def test_invalid_filter_raises_exception():
     """
     Test that passing an invalid filter name raises a ValueError.
