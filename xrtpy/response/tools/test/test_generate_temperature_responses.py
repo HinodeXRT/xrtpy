@@ -83,4 +83,4 @@ def test_invalid_filter_raises_exception():
     """
     filters = ["Not-a-real-filter"]
     with pytest.raises(Exception):
-        get_temp_responses(filters, "2011-01-28T11:02:31", "Coronal")
+        generate_temperature_responses(filters, "2011-01-28T11:02:31", "Coronal")
