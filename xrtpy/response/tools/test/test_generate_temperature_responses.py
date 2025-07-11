@@ -75,3 +75,12 @@ def test_astropy_time_input():
 #     filters = ["Not-a-real-filter"]
 #     with pytest.raises(ValueError, match="Invalid filter name"):
 #         generate_temperature_responses(filters, "2011-01-28T11:02:31", "Coronal")
+
+
+def test_invalid_filter_raises_exception():
+    """
+    Test that passing an invalid filter name raises an exception.
+    """
+    filters = ["Not-a-real-filter"]
+    with pytest.raises(Exception):
+        get_temp_responses(filters, "2011-01-28T11:02:31", "Coronal")
