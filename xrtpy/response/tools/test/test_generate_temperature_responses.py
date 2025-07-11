@@ -82,5 +82,5 @@ def test_invalid_filter_raises_exception():
     Test that passing an invalid filter name raises an exception.
     """
     filters = ["Not-a-real-filter"]
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         generate_temperature_responses(filters, "2011-01-28T11:02:31", "Coronal")
