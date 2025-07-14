@@ -45,7 +45,7 @@ XRTpy calculates the temperature response of XRT filter channels using the CHIAN
 Deriving Temperature and Emission Measure
 -----------------------------------------
 
-The ``temperature_from_filter_ratio``` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
+The ``temperature_from_filter_ratio`` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
 
 Image Deconvolution with the PSF
 --------------------------------
@@ -85,7 +85,7 @@ You may also pass the ``abundance_model`` keyword to ``temperature_from_filter_r
 Tools
 *****
 
-The ``xrtpy.response.tools`` module includes helpful utility functions to streamline workflows. As of version 0.5.0, it includes the following:
+The ``xrtpy.response.tools`` module includes helpful utility functions to streamline workflows. It includes the following:
 
 Generate Temperature Responses
 ------------------------------
@@ -110,7 +110,7 @@ This function returns a list of ``TemperatureResponseFundamental`` objects, one 
        print(f"Filter: {resp.filter_name}")
        print(f"  Temperatures: {resp.temperature[:3]}")
        print(f"  Response: {resp.response[:3]}")
-       print()
+
 
 **Example Output:**
 
@@ -135,7 +135,6 @@ Each response object has the following attributes:
 - ``response`` — Temperature response function (Astropy Quantity in cm⁵ DN / (pix s))
 
 This tool is useful on its own, but it also serves as a foundation for upcoming **Differential Emission Measure (DEM)** workflows in XRTpy.
-
 
 
 Data Products
