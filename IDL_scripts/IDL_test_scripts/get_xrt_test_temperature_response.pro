@@ -1,134 +1,91 @@
 pro write_xrt_tr
-; ==============================================
+; ===============================================================================
+; get_xrt_test_temperature_response.pro
 ;
 ; PROJECT:
-;   Solar-B / XRT / XRTpy
+;   Solar-B / Hinode / XRT / XRTpy Testing Utilities
 ;
 ; NAME:
-;
-;   MAKE_XRT_TR
+;   write_xrt_tr
 ;
 ; PURPOSE:
-;   Generates temperature response test text files to be used for validation
-;   comparisons with XRTpy. For each selected XRT channel, it produces a
-;   text file containing:
-;     - Header metadata (filter, observation date, abundance)
+;   Generates temperature response test text files for XRTpy validation. 
+;   Supports both single and double filter channels. For each filter, creates a text file with:
+;     - Header metadata (filter, observation date, abundance model)
 ;     - Two columns: temperature [K] and temperature response [DN cm^5 pix^-1 s^-1]
 ;
-; CATEGORY:
-;   XRTpy testing support
-;
 ; CALLING SEQUENCE:
-;   get_xrt_test_temperature_response
+;   IDL> .compile get_xrt_test_temperature_response
+;   IDL> write_xrt_tr
 ;
+; REQUIRED SETUP:
+;   - `make_xrt_wave_resp` and `make_xrt_temp_resp` must be in your IDL path
+;   - Ensure CHIANTI environment is properly configured
 ;
-; INPUTS:
-;   None directly. You must set `observation_date` and optional `abundance_model`
-;   manually inside the script for now.
+; PARAMETERS:
+;   observation_date - String, e.g., '22-Sept-2010 21:45:45'
+;   abundance        - One of 'photospheric', 'hybrid', or 'coronal'
 ;
-; MODIFIABLE PARAMETERS:
-;   observation_date - (String) Required. Format: 'DD-MMM-YYYY HH:MM:SS'
-;                      Example: '22-Sept-2023 21:45:45'
-;
-;   abundance_model  - (String) One of 'photospheric', 'hybrid', or 'coronal'
-;
-;   chn_filename     - GENX filename to use (e.g. 'xrt_channels_v0017')
-;
-; KEYWORDS:
-;
-;   Index - This keyword is a list of numbers that correspond to
-;           a filter. A text file will be created for the
-;           filters in the list. Currently set to all filters.
-;           Al-mesh = 0
-;           Al-poly = 1
-;           C-poly = 2
-;           Ti-poly = 3
-;           Be-thin = 4
-;           Be-med = 5
-;           Al-med = 6
-;           Al-thick = 7
-;           Be-thick = 8
-;
-;
-; OUTPUTS:
-;   Creates text files in the current directory named:
+; OUTPUT:
+;   Creates a series of files named:
 ;     <FILTER>_<DATE>_temperature_response_<ABUNDANCE>.txt
+;   in the current working directory.
 ;
-; NOTES:
-;   - Make sure CHIANTI abundance flags match the chosen model.
-;   - This script uses make_xrt_wave_resp and make_xrt_temp_resp under the hood.
-;   - Files are formatted for use by automated test routines in XRTpy.
-;
-;
-; INFORMATION EXTENSION:
-;
-;   make_xrt_wave_resp - Reference make_xrt_temp_resp.pro for the
-;                        procedure to calculate the effective areas and
-;                        spectral responses for a set of XRT x-ray channel
-;                        accounting for some thickness of the CCD
-;                        contamination layer. The spectral response is
-;                        directly calculated from the effective area, and both are
-;                        functions of wavelength.
-;
-;   make_xrt_temp_resp - Reference make_xrt_temp_resp.pro for the
-;                        procedure to calculate the temperature response.
+; NOTE:
+;   - Double filters use a hyphen in filenames (e.g., Al-poly/Ti-poly → Al-poly-Ti-poly)
+;   - Text files are formatted for automated comparison testing against XRTpy outputs
 ;
 ; CONTACT:
-;
-;   Comments, feedback, and bug reports regarding this routine may be
-;   directed to this email address:
-;   xrt_manager ~at~ head.cfa.harvard.edu
-;   For comments, feedback, and bug reports regarding xrtpy related items -
-;   directed to this email address: xrtpy ~at~ cfa.harvard.edu
+;   xrtpy ~at~ cfa.harvard.edu
 ;
 ; MODIFICATION HISTORY:
-;
-;   'v2025-April-1' ;--- (J.Velasquez) Create
-;                     get_xrt_test_temperature_response to create
-;                     testing text files of the temperature response
-;                     for XRTpy
-;   NOTE: After first run:
-;         IDL> retall
-;         IDL> .compile get_xrt_test_temperature_response
-;         IDL> write_xrt_tr
-;
-; ==============================================
-;
-;
-; === Insert an observation date to test ======================
+;   v2025-July-14 — J.Velasquez — Updated to support abundance selection and better documentation
+; ==============================================================================
 
-  observation_date = '22-Sept-2023 21:45:45'
+  ; === Insert an observation date to test ======================
+  observation_date = '22-Sept-2010 21:45:45'
 
-  ; ==== Individual string of the observation date created for text file title==
+  ; === Create observation date string for text file naming ====
   year = strmid(observation_date, 0, 2)
   month = strmid(observation_date, 3, 4)
   day = strmid(observation_date, 8, 4)
-  observation_date_str = year + month + day ; format for string file title
+  observation_date_str = year + month + day ; e.g. 22Sept2010
 
-  ;Generate wavelength response using selected channel file and contamination date
+  ; === Generate wavelength response ===
   wave_resp = make_xrt_wave_resp(contam_time=observation_date, chn_filename='xrt_channels_v0017')
 
-  ;Calculate temperature response with selected CHIANTI model
-  ;'photospheric': temp_resp = make_xrt_temp_resp(wave_resp, /chianti_defaul, /photospheric)
-  ;'hybrid':       temp_resp = make_xrt_temp_resp(wave_resp, /chianti_defaul, /hybrid)
-  ;'coronal':      temp_resp = make_xrt_temp_resp(wave_resp, /chianti_defaul, /coronal)
-  temp_resp = make_xrt_temp_resp(wave_resp,/chianti_defaul,/photospheric)
+  ; === Define abundance model as variable ===
+  abundance = 'hybrid'
 
-  ; === index is a list of numbers corresponding to each filter ===
-  index = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+  ; === Choose CHIANTI model ===
+  if abundance eq 'photospheric' then $
+      temp_resp = make_xrt_temp_resp(wave_resp, /chianti_default, /photospheric) $
+  else if abundance eq 'hybrid' then $
+      temp_resp = make_xrt_temp_resp(wave_resp, /chianti_default, /hybrid) $
+  else if abundance eq 'coronal' then $
+      temp_resp = make_xrt_temp_resp(wave_resp, /chianti_default, /coronal) $
+  else begin
+      message, 'Invalid abundance model. Use "photospheric", "hybrid", or "coronal".'
+  endelse
 
-  ; === IDL for loop creating a text file containing what is stated in
-  ; OUTPUTS ===
+  ; === List of filter indices (0–13) ===
+  index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]  ; All filters
+
+  ; === Loop through filters and write files ===
   for i = 0, n_elements(index) - 1 do begin
-    openw, unit, wave_resp[index[i]].name + '_' + observation_date_str + '_temperature_response_photospheric.txt', /get_lun
+    filter_name = wave_resp[index[i]].name
+    safe_name = str_replace(filter_name, '/', '-')
+    filename = safe_name + '_' + observation_date_str + '_temperature_response_' + abundance + '.txt'
+
+    openw, unit, filename, /get_lun
 
     printf, unit, 'Temperature Response: IDL Results'
-    printf, unit , 'Abundance_model: Photospheric'
-    printf, unit, 'Filter ', wave_resp[index[i]].name
+    printf, unit, 'Abundance_model: ' + abundance
+    printf, unit, 'Filter ', filter_name
     printf, unit, 'observation_date ', observation_date
     printf, unit, 'Temperature', ' ', 'Temperature Response'
 
-    for j = 0, n_elements(temp_resp[index[i]].temp_resp) - 1 do begin ; -1
+    for j = 0, n_elements(temp_resp[index[i]].temp_resp) - 1 do begin
       printf, unit, temp_resp[index[i]].temp[j], ' ', temp_resp[index[i]].temp_resp[j]
     endfor
 
