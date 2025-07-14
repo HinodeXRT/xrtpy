@@ -91,6 +91,32 @@ XRT data products are available through the XRT website. These include:
 
 For more information, visit the `XRT data products`_ page.
 
+Double Filter Combinations
+**************************
+
+XRTpy now supports **double filter combinations** such as ``"Al-poly/Ti-poly"`` in both the `EffectiveAreaFundamental` and `TemperatureResponseFundamental` classes. This allows users to calculate responses for compound optical paths where one filter is in each of the two wheels.
+
+**Examples:**
+
+.. code-block:: python
+
+   from xrtpy.response import EffectiveAreaFundamental, TemperatureResponseFundamental
+
+   eff_area = EffectiveAreaFundamental("Al-poly/Ti-poly", "2022-07-04T00:00:00")
+   temp_resp = TemperatureResponseFundamental("Al-poly/Ti-poly", "2022-07-04T00:00:00")
+
+The following combinations are currently supported:
+
+- ``"Al-poly/Al-mesh"``
+- ``"Al-poly/Ti-poly"``
+- ``"Al-poly/Al-thick"``
+- ``"Al-poly/Be-thick"``
+- ``"C-poly/Ti-poly"``
+
+.. note::
+   Only a subset of double filter combinations is currently supported. If you'd like to request additional combinations, please open an issue on GitHub or email the development team.
+
+
 X-Ray Filter Channels
 *********************
 
