@@ -150,7 +150,7 @@ For more information, visit the `XRT data products`_ page.
 Double Filter Combinations
 **************************
 
-XRTpy now supports **double filter combinations** such as ``"Al-poly/Ti-poly"`` in both the `EffectiveAreaFundamental` and `TemperatureResponseFundamental` classes. This allows users to calculate responses for compound optical paths where one filter is in each of the two wheels.
+XRTpy now supports double filter combinations such as ``"Al-poly/Ti-poly"`` in both the :obj:`EffectiveAreaFundamental <xrtpy.response.EffectiveAreaFundamental>` and :obj:`TemperatureResponseFundamental <xrtpy.response.TemperatureResponseFundamental>` classes.
 
 **Examples:**
 
@@ -158,8 +158,8 @@ XRTpy now supports **double filter combinations** such as ``"Al-poly/Ti-poly"`` 
 
    from xrtpy.response import EffectiveAreaFundamental, TemperatureResponseFundamental
 
-   eff_area = EffectiveAreaFundamental("Al-poly/Ti-poly", "2022-07-04T00:00:00")
-   temp_resp = TemperatureResponseFundamental("Al-poly/Ti-poly", "2022-07-04T00:00:00")
+   eff_area = EffectiveAreaFundamental("Al-poly/Ti-poly", "2020-08-17T09:00:00", abundance_model="photospheric")
+   temp_resp = TemperatureResponseFundamental("C-poly/Ti-poly", "2025-07-10T12:00:00", abundance_model="coronal")
 
 The following combinations are currently supported:
 
