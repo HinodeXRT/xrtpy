@@ -103,7 +103,7 @@ This function returns a list of ``TemperatureResponseFundamental`` objects, one 
    responses = generate_temperature_responses(
        filters=["Al-poly", "Be-thick", "Al-poly/Ti-poly"],
        obs_date="2020-07-04T00:00:00",
-       abundance="Hybrid"
+       abundance="Hybrid",
    )
 
    for resp in responses:
