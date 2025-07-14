@@ -9,7 +9,7 @@ pro write_xrt_tr
 ;   write_xrt_tr
 ;
 ; PURPOSE:
-;   Generates temperature response test text files for XRTpy validation. 
+;   Generates temperature response test text files for XRTpy validation.
 ;   Supports both single and double filter channels. For each filter, creates a text file with:
 ;     - Header metadata (filter, observation date, abundance model)
 ;     - Two columns: temperature [K] and temperature response [DN cm^5 pix^-1 s^-1]
