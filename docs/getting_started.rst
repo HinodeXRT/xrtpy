@@ -158,8 +158,12 @@ XRTpy now supports double filter combinations such as ``"Al-poly/Ti-poly"`` in b
 
    from xrtpy.response import EffectiveAreaFundamental, TemperatureResponseFundamental
 
-   eff_area = EffectiveAreaFundamental("Al-poly/Ti-poly", "2020-08-17T09:00:00", abundance_model="photospheric")
-   temp_resp = TemperatureResponseFundamental("C-poly/Ti-poly", "2025-07-10T12:00:00", abundance_model="coronal")
+   eff_area = EffectiveAreaFundamental(
+       "Al-poly/Ti-poly", "2020-08-17T09:00:00", abundance_model="photospheric"
+   )
+   temp_resp = TemperatureResponseFundamental(
+       "C-poly/Ti-poly", "2025-07-10T12:00:00", abundance_model="coronal"
+   )
 
 The following combinations are currently supported:
 
