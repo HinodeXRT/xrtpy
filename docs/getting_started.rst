@@ -85,7 +85,7 @@ You may also pass the ``abundance_model`` keyword to ``temperature_from_filter_r
 Tools
 *****
 
-The `xrtpy.response.tools` module includes helpful utility functions to streamline workflows. As of version 0.5.0, it includes the following:
+The ``xrtpy.response.tools`` module includes helpful utility functions to streamline workflows. As of version 0.5.0, it includes the following:
 
 Generate Temperature Responses
 ------------------------------
