@@ -27,10 +27,10 @@ Glossary
 
    Emission Measure
       A quantity proportional to the square of the electron density integrated along the line of sight, used to infer the amount of emitting plasma.
-   
+
    FilterRatio Method
       A technique used to estimate plasma temperature and emission measure by comparing the intensity of X-ray images taken with two different XRT filters. Assumes an isothermal plasma and relies on accurate temperature response functions.
-   
+
    Light Leak
       Refers to periodic increases in visible stray light contamination in XRT images, likely caused by a pinhole or defect in the entrance filter. This results in unwanted signal contributions, particularly affecting synoptic composites and thin filters. Users are encouraged to consult the `SolarSoft XRT Analysis Guide`_ (see Table 2.2) and use `xrtpy.image_correction.remove_lightleak` for correction.
 
