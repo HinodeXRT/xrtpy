@@ -12,8 +12,8 @@ XRTpy Objects
 XRTpy currently provides access to the following core classes:
 
 - ``xrtpy.response.Channel``
-- ``xrtpy.response.Effective Area``
-- ``xrtpy.response.Temperature Response``
+- ``xrtpy.response.EffectiveAreaFundamental``
+- ``xrtpy.response.TemperatureResponseFundamental``
 
 It also includes functionality to:
 
@@ -45,7 +45,7 @@ XRTpy calculates the temperature response of XRT filter channels using the CHIAN
 Deriving Temperature and Emission Measure
 -----------------------------------------
 
-The ``temperature_from_filter_ratio``` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
+The ``temperature_from_filter_ratio`` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
 
 Image Deconvolution with the PSF
 --------------------------------
