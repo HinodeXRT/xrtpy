@@ -12,8 +12,8 @@ XRTpy Objects
 XRTpy currently provides access to the following core classes:
 
 - ``xrtpy.response.Channel``
-- ``xrtpy.response.Effective Area``
-- ``xrtpy.response.Temperature Response``
+- ``xrtpy.response.EffectiveAreaFundamental``
+- ``xrtpy.response.TemperatureResponseFundamental``
 
 It also includes functionality to:
 
