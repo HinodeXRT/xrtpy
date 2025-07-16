@@ -67,7 +67,9 @@ def validate_and_format_filters(filters):
     >>> validate_and_format_filters("al_poly")
     ['Al-Poly']
 
-    >>> validate_and_format_filters(["be_thin", "be_thin"]) # doctest: +IGNORE_EXCEPTION_DETAIL
+    >>> validate_and_format_filters(["be_thin", "be_thin"])  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
     ValueError: Duplicate filters detected: ['Be-Thin', 'Be-Thin']
     """
     if isinstance(filters, str):
