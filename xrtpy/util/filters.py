@@ -35,7 +35,8 @@ def solve_filter_name(name):
 
     name = name.replace("_", "-")
     parts = name.split("/")
-    new_parts = [part.capitalize() for part in parts]
+    #new_parts = [part.capitalize() for part in parts]
+    new_parts = [part.title() for part in parts]
     return "/".join(new_parts)
 
 
@@ -78,8 +79,8 @@ def validate_and_format_filters(filters):
 
     formatted = [solve_filter_name(f) for f in filters]
 
-    # Check for duplicates
-    if len(set(formatted)) != len(formatted):
-        raise ValueError(f"Duplicate filters detected: {formatted}")
+    # Check for duplicates - move it to a pytest test instead
+    # if len(set(formatted)) != len(formatted):
+    #     raise ValueError(f"Duplicate filters detected: {formatted}")
 
     return formatted
