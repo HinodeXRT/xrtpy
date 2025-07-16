@@ -24,11 +24,12 @@ def solve_filter_name(name):
 
     Examples
     --------
-        solve_filter_name("al_poly")
+    >>> solve_filter_name("al_poly")
     'Al-Poly'
 
-        solve_filter_name("be_thin/al_mesh")
+    >>> solve_filter_name("be_thin/al_mesh")
     'Be-Thin/Al-Mesh'
+
     """
     if not isinstance(name, str):
         raise TypeError("name must be a string")
@@ -66,7 +67,7 @@ def validate_and_format_filters(filters):
     >>> validate_and_format_filters("al_poly")
     ['Al-Poly']
 
-    >>> validate_and_format_filters(["be_thin", "be_thin"])
+    >>> validate_and_format_filters(["be_thin", "be_thin"]) # doctest: +IGNORE_EXCEPTION_DETAIL
     ValueError: Duplicate filters detected: ['Be-Thin', 'Be-Thin']
     """
     if isinstance(filters, str):
@@ -79,8 +80,8 @@ def validate_and_format_filters(filters):
 
     formatted = [solve_filter_name(f) for f in filters]
 
-    # Check for duplicates - move it to a pytest test instead
-    # if len(set(formatted)) != len(formatted):
-    #     raise ValueError(f"Duplicate filters detected: {formatted}")
+    # Check for duplicates - move it to a pytest test instead.
+    if len(set(formatted)) != len(formatted):
+        raise ValueError(f"Duplicate filters detected: {formatted}")
 
     return formatted
