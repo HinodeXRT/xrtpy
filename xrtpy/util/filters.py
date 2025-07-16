@@ -36,3 +36,49 @@ def solve_filter_name(name):
     parts = name.split("/")
     new_parts = [part.capitalize() for part in parts]
     return "/".join(new_parts)
+
+
+def validate_and_format_filters(filters):
+    """
+    Validates and formats XRT filter names. Ensures no duplicates.
+
+    Parameters
+    ----------
+    filters : str or list of str
+        One or more filter names provided by the user.
+
+    Returns
+    -------
+    list of str
+        A list of unique, standardized filter names.
+
+    Raises
+    ------
+    TypeError
+        If input is not a string or list of strings.
+    ValueError
+        If duplicate filters are found after formatting.
+
+    Examples
+    --------
+    >>> validate_and_format_filters("al_poly")
+    ['Al-Poly']
+
+    >>> validate_and_format_filters(["be_thin", "be_thin"])
+    ValueError: Duplicate filters detected: ['Be-Thin', 'Be-Thin']
+    """
+    if isinstance(filters, str):
+        filters = [filters]
+    elif not isinstance(filters, list):
+        raise TypeError("Input must be a string or list of strings.")
+    
+    if not all(isinstance(f, str) for f in filters):
+        raise TypeError("All filter names must be strings.")
+
+    formatted = [solve_filter_name(f) for f in filters]
+
+    # Check for duplicates
+    if len(set(formatted)) != len(formatted):
+        raise ValueError(f"Duplicate filters detected: {formatted}")
+
+    return formatted
