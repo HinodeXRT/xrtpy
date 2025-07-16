@@ -15,7 +15,7 @@ Hinode is a joint mission involving the space agencies of Japan, the United Stat
 It is depicted in the *illustration shown above*.
 The spacecraft is equipped with three instruments: the Solar Optical Telescope (SOT), the Extreme Ultraviolet Imaging Spectrometer (EIS), and the X-Ray Telescope (XRT).
 These instruments are designed to provide multi-wavelength data from the photosphere to the upper corona.
-The solar spacecraft spacecraft was launched at 6:36 a.m on September 23, 2006 (Japan Standard Time) and placed into a polar,  sun-synchronous orbit, enabling continuous observations of the Sun.
+The solar spacecraft was launched at 6:36 a.m on September 23, 2006 (Japan Standard Time) and placed into a polar,  sun-synchronous orbit, enabling continuous observations of the Sun.
 For further information, visit `NASA's Hinode space mission to the Sun`_.
 
 
@@ -43,7 +43,7 @@ By rotating these wheels, scientists can select different filters to study the S
 Refer to Section 3 in the "X-Ray Telescope Instrument Guide" in the `SolarSoft XRT Analysis Guide`_ for more information abo[ut the XRT filters.
 The existing filters are structured as follows:
 
-#. Filter Configuration
+#. Filter Wheel Configuration
     #. Filter position
         #. Filter Wheel 1:
             -  *Open*
