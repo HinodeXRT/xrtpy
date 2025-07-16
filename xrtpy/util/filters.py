@@ -2,6 +2,7 @@
 Utility functions for validating and standardizing Hinode/XRT filter names.
 """
 
+
 def solve_filter_name(name):
     """
     Standardizes an XRT filter name to match expected format.
@@ -71,7 +72,7 @@ def validate_and_format_filters(filters):
         filters = [filters]
     elif not isinstance(filters, list):
         raise TypeError("Input must be a string or list of strings.")
-    
+
     if not all(isinstance(f, str) for f in filters):
         raise TypeError("All filter names must be strings.")
 
