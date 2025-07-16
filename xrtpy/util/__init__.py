@@ -10,7 +10,7 @@ __all__ = [
     "make_exposure_map",
     "SSW_MIRRORS",
     "solve_filter_name",
-    "validate_and_format_filters"
+    "validate_and_format_filters",
 ]
 
 SSW_MIRRORS = (

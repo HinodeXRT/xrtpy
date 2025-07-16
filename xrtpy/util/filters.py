@@ -35,7 +35,7 @@ def solve_filter_name(name):
 
     name = name.replace("_", "-")
     parts = name.split("/")
-    #new_parts = [part.capitalize() for part in parts]
+    # new_parts = [part.capitalize() for part in parts]
     new_parts = [part.title() for part in parts]
     return "/".join(new_parts)
 
