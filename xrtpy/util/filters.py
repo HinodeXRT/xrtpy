@@ -82,7 +82,6 @@ def validate_and_format_filters(filters):
 
     formatted = [solve_filter_name(f) for f in filters]
 
-    # Check for duplicates - move it to a pytest test instead.
     if len(set(formatted)) != len(formatted):
         raise ValueError(f"Duplicate filters detected: {formatted}")
 
