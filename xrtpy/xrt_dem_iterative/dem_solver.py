@@ -1,5 +1,5 @@
 __all__ = [
-#    "",
+    "XRTDEMIterative",
 ]
 
 import astropy.time
@@ -78,3 +78,22 @@ class XRTDEMIterative:
         # Store error model parameters
         self.min_error = min_error
         self.relative_error = relative_error
+        
+    
+    @property  #Removed if not used
+    def name(self) -> str:
+        """
+        The XRT filter channel name, standardized (e.g. "Al-mesh").
+        """
+        return self._name
+
+    @property
+    def observed_intensities(self) -> u.Quantity:
+        """
+        Observed intensities with physical units.
+        Returns
+        -------
+        `~astropy.units.Quantity`
+            Intensities in DN/s for each filter channel.
+        """
+        return self._observed_intensities * (u.DN / u.s)
