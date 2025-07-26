@@ -70,6 +70,18 @@ class XRTDEMIterative:
         # Store temperature response objects
         self.responses = temperature_responses
 
+        # Check consistency between inputs
+        if not (
+            len(self._observed_intensities)
+            == len(self.responses)
+            == len(self._name)
+        ):
+            raise ValueError(
+                f"\nLength mismatch in inputs:\n"
+                f"  Observed intensities: {len(self._observed_intensities)}\n"
+                f"  Responses:            {len(self.responses)}\n"
+                f"  Filter channels:      {len(self._name)}\n"
+            )
         # Store temperature grid parameters
         self.min_T = min_T
         self.max_T = max_T
