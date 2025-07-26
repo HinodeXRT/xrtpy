@@ -15,6 +15,7 @@ from xrtpy.util.filters import solve_filter_name, validate_and_format_filters
 from xrtpy.util.time import epoch
 
 
+
 class XRTDEMIterative:
     """
     Estimate the differential emission measure (DEM) from Hinode/XRT data
@@ -88,7 +89,7 @@ class XRTDEMIterative:
         return self._name
 
     @property
-    def observed_intensities(self) -> u.Quantity:
+    def observed_intensities(self) -> u.Quantity: #Add method to account for known values not worth observed_intensities
         """
         Observed intensities with physical units.
         Returns
@@ -97,3 +98,24 @@ class XRTDEMIterative:
             Intensities in DN/s for each filter channel.
         """
         return self._observed_intensities * (u.DN / u.s)
+    
+    @property
+    def filter_names(self):
+        """
+        Returns a list of filter names from the temperature responses.
+        """
+        return [r.filter_name for r in self.responses]
+
+    @property
+    def response_temperatures(self):
+        """
+        Returns a list of temperature grids (K) for each filter response.
+        """
+        return [r.temperature for r in self.responses]
+
+    @property
+    def response_values(self):
+        """
+        Returns a list of response values (DN cm^5 / pix / s) for each filter.
+        """
+        return [r.response for r in self.responses]
