@@ -68,9 +68,31 @@ class XRTDEMIterative:
                 raise ValueError("Length of intensity_errors must match observed_intensities.")
         else:
             self._intensity_errors = None  # Will be computed later
-
+            
+        
+        # Store temperature grid parameters
+        self._min_T = float(min_T)
+        self._max_T = float(max_T)
+        self._dT = float(dT)
+        
+        # Check dT is positive
+        if self._dT <= 0:
+            raise ValueError("dT must be a positive scalar.")
+        
+        
         # Store temperature response objects
         self.responses = temperature_responses
+        
+        # Validate that the temperature grid falls within the responses
+        for r in self.responses:
+            logT_grid = np.log10(r.temperature.value)
+            if not (self._min_T >= logT_grid.min() and self._max_T <= logT_grid.max()):
+                raise ValueError(
+                    f"The specified temperature range [{min_T}, {max_T}] is outside the bounds of one or more filter response grids.\n"
+                    "Please ensure the temperature range fits within all responses.\n"
+                    "Hint: Default response range is logT = 5.5 to 8.0. You can view each response's logT range via: [r.temperature for r in responses]"
+                    )
+
 
         # Check consistency between inputs
         if not (
@@ -85,10 +107,6 @@ class XRTDEMIterative:
                 f"  Filter channels:      {len(self.observed_channel)}\n"
             )
         
-        # Store temperature grid parameters
-        self._min_T = float(min_T)
-        self._max_T = float(max_T)
-        self._dT = float(dT)
         self.logT = np.arange(self._min_T, self._max_T + self._dT / 2, self._dT)
 
         
@@ -103,6 +121,10 @@ class XRTDEMIterative:
                 raise ValueError("Length of intensity_errors must match observed_intensities.")
         else:
             self._intensity_errors = None
+    
+
+    def __repr__(self):
+        return f"<XRTDEMIterative(filters={self.filter_names}, logT={self.min_T}–{self.max_T}, dT={self.dT})>"
         
     # @property  #Removed if not used
     # def name(self) -> str:
@@ -202,3 +224,17 @@ class XRTDEMIterative:
             self.min_error,
         )
         return estimated * (u.DN / u.s)
+
+
+    def summary(self):
+        print("XRTpy DEM Iterative Setup Summary")
+        print("-" * 40)
+        print(f" Filters:           {self.filter_names}")
+        print(f" Obs Intensities:   {self.observed_intensities}")
+        print(f" Intensity Errors:  {self.intensity_errors}")
+        print(f" Temp Grid:         logT {self.min_T} to {self.max_T} (step {self.dT})")
+        print(f" Temp bins:         {len(self.logT)}")
+        print(f" Error model used:  {'User-provided' if self._intensity_errors is not None else 'Auto (obs * 0.03, min=2 DN/s)'}")
+        if self._intensity_errors is None:
+            print("For more info: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro")
+        print("-" * 40)
