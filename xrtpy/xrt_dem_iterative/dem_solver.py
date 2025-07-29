@@ -59,14 +59,15 @@ class XRTDEMIterative:
         self.observed_channel = validate_and_format_filters(observed_channel)
 
         # Store intensity and error arrays
-        self.observed_intensities = np.asarray(observed_intensities, dtype=float)
+        self._observed_intensities = np.asarray(observed_intensities, dtype=float)
+
         #Errors
         if intensity_errors is not None:
-            self.intensity_errors = np.asarray(intensity_errors, dtype=float)
-            if self.intensity_errors.shape != self.observed_intensities.shape:
+            self._intensity_errors = np.asarray(intensity_errors, dtype=float)
+            if self._intensity_errors.shape != self.observed_intensities.shape:
                 raise ValueError("Length of intensity_errors must match observed_intensities.")
         else:
-            self.intensity_errors = None  # Will be computed later
+            self._intensity_errors = None  # Will be computed later
 
         # Store temperature response objects
         self.responses = temperature_responses
@@ -75,13 +76,13 @@ class XRTDEMIterative:
         if not (
             len(self._observed_intensities)
             == len(self.responses)
-            == len(self._name)
+            == len(self.observed_channel)
         ):
             raise ValueError(
                 f"\nLength mismatch in inputs:\n"
                 f"  Observed intensities: {len(self._observed_intensities)}\n"
                 f"  Responses:            {len(self.responses)}\n"
-                f"  Filter channels:      {len(self._name)}\n"
+                f"  Filter channels:      {len(self.observed_channel)}\n"
             )
         
         # Store temperature grid parameters
@@ -95,13 +96,20 @@ class XRTDEMIterative:
         self._min_error = float(min_error)
         self._relative_error = float(relative_error)
         
-    
-    @property  #Removed if not used
-    def name(self) -> str:
-        """
-        The XRT filter channel name, standardized (e.g. "Al-mesh").
-        """
-        return self._name
+        # Validate and store intensity errors
+        if intensity_errors is not None:
+            self._intensity_errors = np.asarray(intensity_errors, dtype=float)
+            if self._intensity_errors.shape != self._observed_intensities.shape:
+                raise ValueError("Length of intensity_errors must match observed_intensities.")
+        else:
+            self._intensity_errors = None
+        
+    # @property  #Removed if not used
+    # def name(self) -> str:
+    #     """
+    #     The XRT filter channel name, standardized (e.g. "Al-mesh").
+    #     """
+    #     return self._name
 
     @property
     def observed_intensities(self) -> u.Quantity: #Add method to account for known values not worth observed_intensities
@@ -159,3 +167,38 @@ class XRTDEMIterative:
     def relative_error(self):
         """Relative error (%) used to scale intensity if error is not provided."""
         return self._relative_error
+    
+    
+    @property
+    def intensity_errors(self) -> u.Quantity:
+        """
+        Returns the intensity uncertainties, either user-provided or model-based.
+
+        If not provided, errors are estimated using:
+            max(relative_error * observed_intensity, min_error)
+
+        For details, see: 
+        https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro
+
+        Returns
+        -------
+        `~astropy.units.Quantity`
+            Intensity errors in DN/s for each filter.
+        """
+        if self._intensity_errors is not None:
+            return self._intensity_errors * (u.DN / u.s)
+
+        print(
+            "\n[INFO] No intensity_errors provided. "
+            "Using default model: max(relative_error * observed_intensity, min_error)\n"
+            "       => relative_error = {:.2f}, min_error = {:.1f} DN/s\n"
+            "       => For details: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n".format(
+                self.relative_error, self.min_error
+            )
+        )
+
+        estimated = np.maximum(
+            self.relative_error * self._observed_intensities,
+            self.min_error,
+        )
+        return estimated * (u.DN / u.s)
