@@ -35,6 +35,10 @@ class XRTDEMIterative:
         Minimum absolute intensity error (default: 2.0 DN/s/pix).
     relative_error : float
         Relative error for model-based uncertainty estimate (default: 0.03).
+    monte_carlo_runs : int, optional
+        Number of Monte Carlo runs to perform (default: 0, disabled).
+        Each run perturbs `observed_intensities` using `intensity_errors` 
+        as Gaussian sigma and re-solves the DEM.
     """
 
     def __init__(
@@ -48,6 +52,7 @@ class XRTDEMIterative:
         dT=0.1,
         min_error=2.0,
         relative_error=0.03,
+        monte_carlo_runs =0
     ):
         """
         Args:
@@ -102,6 +107,27 @@ class XRTDEMIterative:
         self._min_T = float(min_T)
         self._max_T = float(max_T)
         self._dT = float(dT)
+        
+        # Validate Monte Carlo setting
+        if isinstance(monte_carlo_runs, bool):
+            raise ValueError("monte_carlo_runs must be a non-negative whole number, not a boolean.")
+        elif isinstance(monte_carlo_runs, (int, np.integer)):
+            self._monte_carlo_runs = int(monte_carlo_runs)
+        elif isinstance(monte_carlo_runs, float) and monte_carlo_runs.is_integer():
+            self._monte_carlo_runs = int(monte_carlo_runs)
+        else:
+            raise ValueError(
+                "monte_carlo_runs must be a non-negative whole number (e.g., 0, 1, 100). "
+                "Decimal values are not allowed."
+            )
+
+        if self._monte_carlo_runs < 0:
+            raise ValueError("monte_carlo_runs must be ≥ 0.")
+
+        
+        
+
+        
 
         # Check dT is positive
         if self._dT <= 0:
@@ -151,7 +177,9 @@ class XRTDEMIterative:
                 )
         else:
             self._intensity_errors = None
+        
 
+        
     def __repr__(self):
         return f"<XRTDEMIterative(filters={self.filter_names}, logT={self.min_T}–{self.max_T}, dT={self.dT})>"
 
@@ -266,12 +294,22 @@ class XRTDEMIterative:
         )
         return estimated * (u.DN / u.s)
 
+    @property
+    def monte_carlo_runs(self) -> int:
+        """
+        Number of Monte Carlo runs to perform (0 = disabled).
+        """
+        return self._monte_carlo_runs
+
+
+
     def summary(self):
         print("XRTpy DEM Iterative Setup Summary")
         print("-" * 40)
         print(f" Filters:           {self.filter_names}")
         print(f" Obs Intensities:   {self.observed_intensities}")
         print(f" Number of observations (Nobs): {len(self._observed_intensities)}")
+        print(f" Monte Carlo runs:  {self.monte_carlo_runs if self.monte_carlo_runs > 0 else 'None'}")
         print(f" Intensity Errors:  {self.intensity_errors}")
         print(f" Temp Grid:         logT {self.min_T} to {self.max_T} (step {self.dT})")
         print(f" Temp bins:         {len(self.logT)}")
