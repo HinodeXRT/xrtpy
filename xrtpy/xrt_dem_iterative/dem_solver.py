@@ -83,14 +83,16 @@ class XRTDEMIterative:
                 f"  Filter channels:      {len(self._name)}\n"
             )
         # Store temperature grid parameters
-        self.min_T = min_T
-        self.max_T = max_T
-        self.dT = dT
+
         self.logT = np.arange(min_T, max_T + dT / 2, dT)
 
+        self.min_T = float(min_T)
+        self.max_T = float(max_T)
+        self.dT = float(dT)
+        
         # Store error model parameters
-        self.min_error = min_error
-        self.relative_error = relative_error
+        self.min_error = float(min_error)
+        self.relative_error = float(relative_error)
         
     
     @property  #Removed if not used
@@ -131,3 +133,28 @@ class XRTDEMIterative:
         Returns a list of response values (DN cm^5 / pix / s) for each filter.
         """
         return [r.response for r in self.responses]
+    
+    @property
+    def min_T(self):
+        """Lower bound of log10 temperature grid."""
+        return self._min_T
+
+    @property
+    def max_T(self):
+        """Upper bound of log10 temperature grid."""
+        return self._max_T
+
+    @property
+    def dT(self):
+        """Bin width of log10 temperature grid."""
+        return self._dT
+    
+    @property
+    def min_error(self):
+        """Minimum error applied to DN/s when intensity error is not provided."""
+        return self._min_error
+
+    @property
+    def relative_error(self):
+        """Relative error (%) used to scale intensity if error is not provided."""
+        return self._relative_error
