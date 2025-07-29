@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from lmfit import Parameters , minimize
 from scipy.interpolate import interp1d, CubicSpline
-
+import warnings
 from numpy import trapezoid #np.trapz Deprecation
 
 from xrtpy.util.filters import solve_filter_name, validate_and_format_filters
@@ -55,11 +55,45 @@ class XRTDEMIterative:
         min_error=2.0,
         relative_error=0.03,
     ):
+        """
+        Args:
+            observed_channel (_type_): _description_
+            observed_intensities (_type_): _description_
+            temperature_responses (_type_): _description_
+            intensity_errors (_type_, optional): _description_. Defaults to None.
+            min_T (float, optional): _description_. Defaults to 5.5.
+            max_T (float, optional): _description_. Defaults to 8.0.
+            dT (float, optional): _description_. Defaults to 0.1.
+            min_error (float, optional): _description_. Defaults to 2.0.
+            relative_error (float, optional): _description_. Defaults to 0.03.
+        
+        Notes
+        -----
+        - All input lists (`observed_channel`, `observed_intensities`, and `temperature_responses`)
+        must be the same length. Each entry should correspond to one filter.
+
+        - The temperature grid range (`min_T`, `max_T`) must lie entirely within the
+        response temperature ranges for **all** filters provided.
+
+        - If `intensity_errors` is not provided, a model-based error estimate is used:
+        max(relative_error * observed_intensity, min_error), as in the IDL original.
+
+        - Default XRT filter names include:
+        {'Al-mesh', 'Al-poly', 'C-poly', 'Ti-poly', 'Be-thin', 'Be-med', 'Al-med', 'Al-thick', 'Be-thick',
+        'Al-poly/Al-mesh', 'Al-poly/Ti-poly', 'Al-poly/Al-thick', 'Al-poly/Be-thick'}
+        """
         # Validate and store filter names
         self.observed_channel = validate_and_format_filters(observed_channel)
 
+        if observed_channel is None or len(observed_channel) == 0:
+            raise ValueError("`observed_channel` is required and cannot be empty.")
+
         # Store intensity and error arrays
         self._observed_intensities = np.asarray(observed_intensities, dtype=float)
+
+        if observed_intensities is None or len(observed_intensities) == 0:
+            raise ValueError("`observed_intensities` is required and cannot be empty.")
+
 
         #Errors
         if intensity_errors is not None:
@@ -82,6 +116,9 @@ class XRTDEMIterative:
         
         # Store temperature response objects
         self.responses = temperature_responses
+
+        if temperature_responses is None or len(temperature_responses) == 0:
+            raise ValueError("`temperature_responses` is required and cannot be empty.")
         
         # Validate that the temperature grid falls within the responses
         for r in self.responses:
@@ -209,15 +246,13 @@ class XRTDEMIterative:
         """
         if self._intensity_errors is not None:
             return self._intensity_errors * (u.DN / u.s)
-
-        print(
-            "\n[INFO] No intensity_errors provided. "
-            "Using default model: max(relative_error * observed_intensity, min_error)\n"
-            "       => relative_error = {:.2f}, min_error = {:.1f} DN/s\n"
-            "       => For details: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n".format(
-                self.relative_error, self.min_error
-            )
-        )
+        
+        warnings.warn(
+            "No intensity_errors provided. Using default model: "
+            f"max(relative_error * observed_intensity, min_error)\n"
+            f"=> relative_error = {self.relative_error}, min_error = {self.min_error} DN/s\n"
+            "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
+            UserWarning)
 
         estimated = np.maximum(
             self.relative_error * self._observed_intensities,
@@ -231,6 +266,7 @@ class XRTDEMIterative:
         print("-" * 40)
         print(f" Filters:           {self.filter_names}")
         print(f" Obs Intensities:   {self.observed_intensities}")
+        print(f" Number of observations (Nobs): {len(self._observed_intensities)}")
         print(f" Intensity Errors:  {self.intensity_errors}")
         print(f" Temp Grid:         logT {self.min_T} to {self.max_T} (step {self.dT})")
         print(f" Temp bins:         {len(self.logT)}")
