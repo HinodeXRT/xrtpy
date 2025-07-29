@@ -60,6 +60,7 @@ class XRTDEMIterative:
 
         # Store intensity and error arrays
         self.observed_intensities = np.asarray(observed_intensities, dtype=float)
+        #Errors
         if intensity_errors is not None:
             self.intensity_errors = np.asarray(intensity_errors, dtype=float)
             if self.intensity_errors.shape != self.observed_intensities.shape:
@@ -82,17 +83,17 @@ class XRTDEMIterative:
                 f"  Responses:            {len(self.responses)}\n"
                 f"  Filter channels:      {len(self._name)}\n"
             )
+        
         # Store temperature grid parameters
+        self._min_T = float(min_T)
+        self._max_T = float(max_T)
+        self._dT = float(dT)
+        self.logT = np.arange(self._min_T, self._max_T + self._dT / 2, self._dT)
 
-        self.logT = np.arange(min_T, max_T + dT / 2, dT)
-
-        self.min_T = float(min_T)
-        self.max_T = float(max_T)
-        self.dT = float(dT)
         
         # Store error model parameters
-        self.min_error = float(min_error)
-        self.relative_error = float(relative_error)
+        self._min_error = float(min_error)
+        self._relative_error = float(relative_error)
         
     
     @property  #Removed if not used
