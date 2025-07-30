@@ -53,6 +53,7 @@ class XRTDEMIterative:
         min_error=2.0,
         relative_error=0.03,
         monte_carlo_runs=0,
+        max_iterations=2000,
     ):
         """
         Args:
@@ -125,6 +126,14 @@ class XRTDEMIterative:
 
         if self._monte_carlo_runs < 0:
             raise ValueError("monte_carlo_runs must be ≥ 0.")
+        
+        # Validate max_iterations
+        if not isinstance(max_iterations, (int, np.integer)) or max_iterations <= 0:
+            raise ValueError("max_iterations must be a positive integer.")
+
+        self._max_iterations = int(max_iterations)
+
+
 
         # Check dT is positive
         if self._dT <= 0:
@@ -295,6 +304,14 @@ class XRTDEMIterative:
         Number of Monte Carlo runs to perform (0 = disabled).
         """
         return self._monte_carlo_runs
+    
+    @property
+    def max_iterations(self):
+        """
+        Maximum number of iterations used in the least-squares DEM solver.
+        """
+        return self._max_iterations
+
 
     def summary(self):
         print("XRTpy DEM Iterative Setup Summary")
@@ -305,6 +322,7 @@ class XRTDEMIterative:
         print(
             f" Monte Carlo runs:  {self.monte_carlo_runs if self.monte_carlo_runs > 0 else 'None'}"
         )
+        print(f" Max Iterations:    {self.max_iterations}")
         print(f" Intensity Errors:  {self.intensity_errors}")
         print(f" Temp Grid:         logT {self.min_T} to {self.max_T} (step {self.dT})")
         print(f" Temp bins:         {len(self.logT)}")
