@@ -54,6 +54,7 @@ class XRTDEMIterative:
         relative_error=0.03,
         monte_carlo_runs=0,
         max_iterations=2000,
+        solv_factor=1e21
     ):
         """
         Args:
@@ -114,9 +115,7 @@ class XRTDEMIterative:
             raise ValueError(
                 "monte_carlo_runs must be a non-negative whole number, not a boolean."
             )
-        elif isinstance(monte_carlo_runs, (int, np.integer)):
-            self._monte_carlo_runs = int(monte_carlo_runs)
-        elif isinstance(monte_carlo_runs, float) and monte_carlo_runs.is_integer():
+        elif isinstance(monte_carlo_runs, (int, np.integer)) or isinstance(monte_carlo_runs, float) and monte_carlo_runs.is_integer():
             self._monte_carlo_runs = int(monte_carlo_runs)
         else:
             raise ValueError(
@@ -126,14 +125,12 @@ class XRTDEMIterative:
 
         if self._monte_carlo_runs < 0:
             raise ValueError("monte_carlo_runs must be ≥ 0.")
-        
+
         # Validate max_iterations
         if not isinstance(max_iterations, (int, np.integer)) or max_iterations <= 0:
             raise ValueError("max_iterations must be a positive integer.")
 
         self._max_iterations = int(max_iterations)
-
-
 
         # Check dT is positive
         if self._dT <= 0:
@@ -184,6 +181,14 @@ class XRTDEMIterative:
         else:
             self._intensity_errors = None
 
+
+        try:
+            self._solv_factor = float(solv_factor)
+            if self._solv_factor <= 0:
+                raise ValueError("solv_factor must be a positive number.")
+        except Exception as e:
+            raise ValueError(f"Invalid solv_factor: {e}")
+        
     def __repr__(self):
         return f"<XRTDEMIterative(filters={self.filter_names}, logT={self.min_T}–{self.max_T}, dT={self.dT})>"
 
@@ -251,7 +256,7 @@ class XRTDEMIterative:
         """
         return self._dT
 
-    @property
+    @property 
     def min_error(self):
         """
         Minimum error applied to DN/s when intensity error is not provided.
@@ -304,7 +309,16 @@ class XRTDEMIterative:
         Number of Monte Carlo runs to perform (0 = disabled).
         """
         return self._monte_carlo_runs
-    
+
+    @property
+    def solv_factor(self):
+        """
+        Normalization factor used during DEM fitting to stabilize the solver.
+        Default is 1e21.
+        """
+        return self._solv_factor
+
+
     @property
     def max_iterations(self):
         """
@@ -313,12 +327,24 @@ class XRTDEMIterative:
         return self._max_iterations
 
 
+    def create_logT_grid(self):
+        """
+        Build the DEM temperature grid *exactly* from min to max in steps of dT.
+        """
+        n_bins = int(round((self._max_T - self._min_T) / self._dT)) + 1
+        self.logT = np.linspace(self._min_T, self._max_T, n_bins)
+        self.T = (10**self.logT) * u.K
+
+
+
+
     def summary(self):
         print("XRTpy DEM Iterative Setup Summary")
         print("-" * 40)
         print(f" Filters:           {self.filter_names}")
         print(f" Obs Intensities:   {self.observed_intensities}")
         print(f" Number of observations (Nobs): {len(self._observed_intensities)}")
+        print(f" Solver Normalization Factor: {self.solv_factor:.1e}")
         print(
             f" Monte Carlo runs:  {self.monte_carlo_runs if self.monte_carlo_runs > 0 else 'None'}"
         )
