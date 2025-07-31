@@ -6,6 +6,7 @@ import warnings
 
 import astropy.units as u
 import numpy as np
+from scipy.interpolate import interp1d, CubicSpline
 
 from xrtpy.util.filters import validate_and_format_filters
 
@@ -360,6 +361,16 @@ class XRTDEMIterative:
             self.interpolated_responses.append(R_interp)
 
 
+    @property
+    def response_matrix(self):
+        """
+        Returns the response matrix after interpolation.
+
+        Shape: (n_filters, n_temperatures)
+        """
+        if not hasattr(self, "_response_matrix"):
+            raise AttributeError("Response matrix has not been built yet. Call _build_response_matrix().")
+        return self._response_matrix
 
 
     def _build_response_matrix(self):
@@ -387,6 +398,78 @@ class XRTDEMIterative:
         
         print(f"Built response matrix: shape = {self._response_matrix.shape} (filters * logT bins)")
 
+
+
+    def _estimate_initial_dem(self, smooth=False, logscale=False, plot=True): #mirrors xrt_dem_iter_estim.pro
+        """
+        Estimates an initial DEM by inverting I ≈ R @ DEM. 
+        An initial estimate of how much plasma is emitting at each temperature
+        
+        Sets
+        -----
+        self.initial_dem : np.ndarray
+            First-guess DEM estimate across logT grid (length = n_temperatures)
+
+        Parameters
+        ----------
+        smooth : bool
+            If True, applies mild Gaussian smoothing (future option).
+        logscale : bool
+            If True, computes log10(DEM) and exponentiates to suppress spikes.
+        plot : bool
+            If True, shows a diagnostic plot of the initial DEM.
+        """
+
+        #Define inputs - xrt_dem_iter_estim.pro
+        if not hasattr(self, "response_matrix"):
+            raise RuntimeError("Run _build_response_matrix() before estimating DEM.")
+
+        I_obs = np.asarray(self._observed_intensities, dtype=float)
+        R = self.response_matrix
+        n_filters, n_temps = R.shape
+
+        print(f"Estimating DEM from {n_filters} intensities across {n_temps} temperature bins...")
+
+        with np.errstate(divide="ignore", invalid="ignore"):
+            estimates = np.zeros(n_temps)
+            for i in range(n_filters):
+                row = R[i, :]
+                ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)
+                estimates += ratio
+
+            estimates /= n_filters
+            estimates /= self._dT  # Convert to per-logT-bin definition
+
+            if logscale:
+                # Suppress large dynamic range and spikes
+                estimates = 10 ** np.log10(estimates + 1e-30)
+
+            if smooth:
+                from scipy.ndimage import gaussian_filter1d
+                estimates = gaussian_filter1d(estimates, sigma=1.0)
+
+        # Apply units
+        self.initial_dem = estimates * (u.cm**-5 / u.K)
+
+        # Diagnostics
+        print(f"Initial DEM estimate complete")
+        print(f"Peak DEM: {self.initial_dem.max():.2e}")
+        print(f" Mean DEM: {self.initial_dem.mean():.2e}")
+
+        # Plotting
+        if plot:
+            import matplotlib.pyplot as plt
+            plt.figure(figsize=(8, 4))
+            plt.plot(self.logT, self.initial_dem.value, drawstyle="steps-mid", label="Initial DEM")
+            plt.xlabel("log₁₀ T [K]")
+            plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
+            plt.title("Initial DEM Estimate")
+            plt.grid(True)
+            plt.legend()
+            plt.tight_layout()
+            plt.show()
+            
+        print("Initial DEM estimate complete")
 
 
     def summary(self):
