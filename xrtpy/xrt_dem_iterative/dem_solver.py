@@ -336,6 +336,57 @@ class XRTDEMIterative:
         self.T = (10**self.logT) * u.K
 
 
+    def _interpolate_responses_to_grid(self): #This mirrors what xrt_dem_iter_estim.pro does.
+        """
+        Interpolates each filter's temperature response onto the DEM temperature grid (self.logT).
+        """
+        self.interpolated_responses = []
+
+        for i, (T_orig, R_orig, fname) in enumerate(
+            zip(self.response_temperatures, self.response_values, self.filter_names)
+        ):
+            logT_orig = np.log10(T_orig.to_value(u.K))
+            response_vals = R_orig.to_value(u.DN * u.cm**5 / (u.pix * u.s))
+
+            interp_func = interp1d(
+                logT_orig,
+                response_vals,
+                kind="linear",
+                bounds_error=False,
+                fill_value=0.0,
+            )
+
+            R_interp = interp_func(self.logT)
+            self.interpolated_responses.append(R_interp)
+
+
+
+
+    def _build_response_matrix(self):
+        """
+        Builds the response matrix from interpolated responses.
+        
+        Sets:
+        -------
+        self.response_matrix : ndarray
+            2D array of shape (n_filters, n_temperatures)
+            Stack your self.interpolated_responses into a 2D NumPy array
+            
+        Personal notes: The response matrix is a 2D array that relates temperature to observed intensity
+        For numerical DEM:
+            -You approximate the integral as a matrix multiplication
+            -Each filter contributes one equation (row)
+            -Each temperature bin contributes one unknown (column)
+            - Intergal DEM(T) * R(T) dT = sum[DEM_i * R_i * dT]
+        """
+        if not hasattr(self, "interpolated_responses"):
+            raise RuntimeError("Call _interpolate_responses_to_grid() before building the response matrix.")
+        
+        #self._response_matrix = np.vstack(self.interpolated_responses) # matrix
+        self._response_matrix = np.vstack(self.interpolated_responses).astype(float) # matrix
+        
+        print(f"Built response matrix: shape = {self._response_matrix.shape} (filters * logT bins)")
+
 
 
     def summary(self):
