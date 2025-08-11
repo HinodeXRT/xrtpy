@@ -70,9 +70,7 @@ linkcheck_anchors_ignore = []
 ogp_image = "https://raw.githubusercontent.com/HinodeXRT/xrtpy/main/docs/_static/images/xrtpy_logo.png"
 ogp_use_first_image = True
 ogp_description_length = 160
-ogp_custom_meta_tags = [
-    '<meta property="og:ignore_canonical" content="true" />',
-]
+ogp_custom_meta_tags = ('<meta property="og:ignore_canonical" content="true" />',)
 
 # Suppress warnings about overriding directives as we overload some of the
 # doctest extensions.
@@ -84,7 +82,6 @@ suppress_warnings = [
 # extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
 extensions = [
-    "hoverxref.extension",
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
     "sphinx_copybutton",
@@ -191,41 +188,6 @@ intersphinx_mapping = {
     "matplotlib": ("https://matplotlib.org/stable", None),
     "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
     "sunpy": ("https://docs.sunpy.org/en/stable/", None),
-}
-
-# -- Options for hoverxref -----------------------------------------------------
-
-if os.environ.get("READTHEDOCS"):
-    hoverxref_api_host = "https://readthedocs.org"
-
-    if os.environ.get("PROXIED_API_ENDPOINT"):
-        # Use the proxied API endpoint
-        # A RTD thing to avoid a CSRF block when docs are using a custom domain
-        hoverxref_api_host = "/_"
-
-hoverxref_auto_ref = True
-hoverxref_domains = ["py", "cite"]
-hoverxref_roles = ["confval", "term"]
-hoverxref_mathjax = True
-hoverxref_modal_hover_delay = 500
-hoverxref_tooltip_maxwidth = 600  # RTD main window is 696px
-hoverxref_intersphinx = list(intersphinx_mapping.keys())
-hoverxref_role_types = {
-    # Roles within the py domain
-    "attr": "tooltip",
-    "class": "tooltip",
-    "const": "tooltip",
-    "data": "tooltip",
-    "exc": "tooltip",
-    "func": "tooltip",
-    "meth": "tooltip",
-    "mod": "tooltip",
-    "obj": "tooltip",
-    # Roles within the std domain
-    "confval": "tooltip",
-    "hoverxref": "tooltip",
-    "ref": "tooltip",  # Would be used by hoverxref_auto_ref if we set it to True
-    "term": "tooltip",
 }
 
 # -- Options for HTML output ---------------------------------------------------

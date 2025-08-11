@@ -16,6 +16,9 @@ Glossary
    Deconvolution
       A numerical image processing technique used to correct for the blurring caused by the telescope's Point Spread Function (PSF), improving sharpness and visibility of fine structures.
 
+   DEM
+      Differential Emission Measure (DEM) — a function that describes the distribution of plasma as a function of temperature along the line of sight. XRTpy will support DEM modeling in future versions.
+
    DN
       Data Number (DN) — the digital value recorded by the CCD, representing the detected photon flux, usually in DN s\ :sup:`−1`\ .
 
@@ -24,6 +27,9 @@ Glossary
 
    Emission Measure
       A quantity proportional to the square of the electron density integrated along the line of sight, used to infer the amount of emitting plasma.
+
+   FilterRatio Method
+      A technique used to estimate plasma temperature and emission measure by comparing the intensity of X-ray images taken with two different XRT filters. Assumes an isothermal plasma and relies on accurate temperature response functions.
 
    Light Leak
       Refers to periodic increases in visible stray light contamination in XRT images, likely caused by a pinhole or defect in the entrance filter. This results in unwanted signal contributions, particularly affecting synoptic composites and thin filters. Users are encouraged to consult the `SolarSoft XRT Analysis Guide`_ (see Table 2.2) and use `xrtpy.image_correction.remove_lightleak` for correction.
@@ -36,7 +42,7 @@ Glossary
       Point Spread Function — describes the response of the telescope to a point source of light. In XRTpy, it is used in deconvolution routines to sharpen images.
 
    Solar Emission Spectra
-      Emission spectra produced by solar plasma across a range of temperatures, calculated using spectral models such as CHIANTI. These are used in temperature response and filter ratio methods.
+      Emission spectra produced by solar plasma across a range of temperatures, calculated using spectral models such as CHIANTI. These spectra are used in temperature response and filter ratio methods
 
    Temperature Response
       The expected response of the instrument to isothermal plasma as a function of temperature, given in units of DN cm\ :sup:`5` s\ :sup:`−1` pix\ :sup:`−1` for each filter channel. Calculated using CHIANTI atomic models and user-defined abundances.

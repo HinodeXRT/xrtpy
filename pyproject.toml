@@ -62,7 +62,6 @@ optional-dependencies.docs = [
   "sphinx-automodapi>=0.17",
   "sphinx-copybutton>=0.5.2",
   "sphinx-gallery>=0.16",
-  "sphinx-hoverxref>=1.4",
   "sphinx-issues>=4.1",
   "sphinxcontrib-bibtex>=2.6.2",
   "sphinxext-opengraph>=0.6",
