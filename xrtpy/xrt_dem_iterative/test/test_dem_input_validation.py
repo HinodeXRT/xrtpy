@@ -5,6 +5,7 @@ import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
+from importlib.resources import files
 
 from xrtpy.response.channel import Channel
 
@@ -26,13 +27,18 @@ channel_names = [
 ]
 
 
+
+
+
+
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_name(channel_name):
     channel = Channel(channel_name)
     assert channel.name == channel_name
 
 
-filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0017.genx"
+#filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0017.genx"
+filename = files("xrtpy.response.data") / "xrt_channels_v0017.genx"
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)
 v6_genx_s = v6_genx["SAVEGEN0"]
