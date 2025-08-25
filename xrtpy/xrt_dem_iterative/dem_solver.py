@@ -6,6 +6,7 @@ import warnings
 
 import astropy.units as u
 import numpy as np
+from lmfit import Parameters, minimize
 from scipy.interpolate import interp1d, CubicSpline
 
 from xrtpy.util.filters import validate_and_format_filters
@@ -355,7 +356,7 @@ class XRTDEMIterative:
                 kind="linear",
                 bounds_error=False,
                 fill_value=0.0,
-            )
+            )  #kind = 'cubic' )  kind="linear",
 
             R_interp = interp_func(self.logT)
             self.interpolated_responses.append(R_interp)
@@ -419,6 +420,7 @@ class XRTDEMIterative:
         plot : bool
             If True, shows a diagnostic plot of the initial DEM.
         """
+        print(self.response_temperatures, self.response_values, self.filter_names)
 
         #Define inputs - xrt_dem_iter_estim.pro
         if not hasattr(self, "response_matrix"):
@@ -439,6 +441,8 @@ class XRTDEMIterative:
 
             estimates /= n_filters
             estimates /= self._dT  # Convert to per-logT-bin definition
+            assert estimates.shape[0] == len(self.logT)
+
 
             if logscale:
                 # Suppress large dynamic range and spikes
@@ -450,26 +454,220 @@ class XRTDEMIterative:
 
         # Apply units
         self.initial_dem = estimates * (u.cm**-5 / u.K)
+        print("  Max:", np.max(estimates))
+        print("  Min:", np.min(estimates))
+        print("  dT (logT bin size):", self._dT)
 
         # Diagnostics
         print(f"Initial DEM estimate complete")
         print(f"Peak DEM: {self.initial_dem.max():.2e}")
         print(f" Mean DEM: {self.initial_dem.mean():.2e}")
+        print(f"I_obs: {I_obs}")  # Observed intensities
+        print(f"R (response matrix): {R.shape}")
+        print(f"Sum of response rows: {[np.sum(R[i]) for i in range(R.shape[0])]}")
+        print(f"dT: {self._dT}")
+        print("[DEBUG] DEM before dT division:")
+
+        print("[DEBUG] Response row sums:")
+        for i, row in enumerate(R):
+            print(f"  {self.filter_names[i]}: sum={np.sum(row):.2e}, max={np.max(row):.2e}")
+        
+        print(f"[DEBUG] dT: {self._dT:.3f}")
+        
+    
+
+
+
+
 
         # Plotting
         if plot:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(8, 4))
-            plt.plot(self.logT, self.initial_dem.value, drawstyle="steps-mid", label="Initial DEM")
+            ylabel = "DEM [cm⁻⁵ K⁻¹]"
+
+            # Custom label with filters and date
+            filters_str = ", ".join(self.observed_channel)
+            label_str = f"Initial DEM\n{filters_str}\n"#{self.date_obs}"
+
+            if logscale:
+                log_dem_vals = np.log10(self.initial_dem.value + 1e-30)
+                plt.plot(self.logT, log_dem_vals, drawstyle="steps-mid", label=label_str, color="purple")
+                ylabel = "log₁₀ DEM [cm⁻⁵ K⁻¹]"
+            else:
+                plt.plot(self.logT, self.initial_dem.value, drawstyle="steps-mid", label=label_str, color="purple")
+                plt.yscale("log")
+
             plt.xlabel("log₁₀ T [K]")
-            plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
+            plt.ylabel(ylabel)
             plt.title("Initial DEM Estimate")
             plt.grid(True)
-            plt.legend()
+            plt.legend(loc="upper right", fontsize=8)
             plt.tight_layout()
             plt.show()
-            
+
         print("Initial DEM estimate complete")
+
+
+
+
+
+    #STEP 1 - Each temperature bin gets its own parameter, initialized with your initial DEM estimate
+    def _build_lmfit_parameters(self):
+        """
+        Initializes lmfit Parameters from the initial DEM guess.
+
+        Sets:
+        -------
+        self.lmfit_params : lmfit.Parameters
+            Each temperature bin gets a parameter (free by default).
+        """
+        if not hasattr(self, "initial_dem"):
+            raise RuntimeError("Call _estimate_initial_dem() before building parameters.")
+
+        params = Parameters()
+        
+        # for i, val in enumerate(self.initial_dem):
+        #     # You could add bounds here if needed (e.g., min=0)
+        #     params.add(f"dem_{i}", value=val, min=0)
+        for i, val in enumerate(self.initial_dem):
+            # Convert to float if it's a Quantity
+            if hasattr(val, 'unit'):
+                val = val.to_value()  # default: returns value in current unit
+            params.add(f"dem_{i}", value=val, min=0)
+            
+    
+        self.lmfit_params = params
+        print(f"Built {len(params)} lmfit parameters for DEM fit")
+
+    #STEP 2: Build the residual function
+    #This function computes how far off your DEM model’s predicted intensities are from your observed ones, normalized by the uncertainty.
+    def _residuals(self, params):
+        """
+        Computes the residuals between modeled and observed intensities.
+
+        Parameters
+        ----------
+        params : lmfit.Parameters
+            DEM values at each temperature bin.
+
+        Returns
+        -------
+        np.ndarray
+            Residuals = (I_model - I_obs) / sigma
+        """
+        # 1. Get DEM vector from lmfit Parameters
+        dem_vector = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
+
+        # 2. Compute modeled intensities: I_model = R · DEM
+        I_model = self.response_matrix @ dem_vector
+
+        # 3. Determine observational errors (user-provided or fallback)
+        if self._intensity_errors is not None:
+            errors = np.array(self._intensity_errors)
+        else:
+            errors = np.maximum(
+                self.min_error,
+                self.relative_error * self._observed_intensities
+            )
+
+        # 4. Return normalized residuals
+        residuals = (I_model - self._observed_intensities) / errors
+        print("[•] Residuals stats → mean: {:.2e}, std: {:.2e}".format(np.mean(residuals), np.std(residuals)))
+        return residuals
+
+    def fit_dem(self):
+        """
+        Runs the DEM fitting using lmfit's least-squares minimization.
+
+        Sets:
+        -------
+        self.fitted_dem : np.ndarray
+            Best-fit DEM solution (length = n_temps)
+        self.result : lmfit.MinimizerResult
+            Full fit result object from lmfit
+        """
+        # if not hasattr(self, "lmfit_params"):
+        #     self._build_lmfit_parameters()
+
+        if not hasattr(self, "lmfit_params"):
+            raise RuntimeError("Call _build_lmfit_parameters() before fitting.")
+
+        print( "Starting DEM optimization..")
+        result = minimize(self._residuals, self.lmfit_params, method='least_squares', max_nfev=self.max_iterations)
+
+        self.result = result
+
+        if not result.success:
+            print("[⚠️] DEM fit did not fully converge:")
+            print("  →", result.message)
+            
+        #self.fitted_dem = np.array([result.params[f"dem_{i}"].value for i in range(len(self.logT))])
+        self.fitted_dem = np.array([result.params[f"dem_{i}"].value for i in range(len(self.logT))]) * (u.cm**-5 / u.K)
+
+        print(f"[✓] DEM fit complete — reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}")
+        
+        print("[✓] DEM fit complete")
+        print(f"  → Reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}")
+        print(f"  → Total iterations: {result.nfev}")
+
+        return result
+
+
+    def print_residual_diagnostics(self, params):
+        dem_vector = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
+        I_model = self.response_matrix @ dem_vector
+        residuals = (I_model - self._observed_intensities) / self._intensity_errors
+
+        print("Observed Intensities:", self._observed_intensities)
+        print("Modeled Intensities:", I_model)
+        print("Errors:", self._intensity_errors)
+        print("Residuals:", residuals)
+        print(f"[•] Residuals stats → mean: {residuals.mean():.2e}, std: {residuals.std():.2e}")
+
+    def plot_dem_fit(self, logscale=True):
+        """
+        Plots the initial and fitted DEM on the same logT grid.
+
+        Parameters
+        ----------
+        logscale : bool
+            If True, uses a logarithmic y-axis.
+        """
+        import matplotlib.pyplot as plt
+
+        if not hasattr(self, "initial_dem"):
+            raise RuntimeError("Initial DEM not computed. Run _estimate_initial_dem() first.")
+        if not hasattr(self, "result"):
+            raise RuntimeError("DEM fit result not available. Run fit_dem() first.")
+
+        # Extract best-fit DEM from lmfit result
+        best_fit_vals = np.array([self.result.params[f"dem_{i}"].value for i in range(len(self.logT))])
+        initial_dem_vals = self.initial_dem.value if hasattr(self.initial_dem, "value") else self.initial_dem
+        #log_initial_dem_vals = np.log10(self.initial_dem.value) if hasattr( np.log10(self.initial_dem), "value") else np.log10(self.initial_dem)
+
+
+
+
+        plt.figure(figsize=(10, 5))
+        plt.plot(self.logT, initial_dem_vals, drawstyle="steps-mid", label="Initial DEM", linestyle="--", color="gray")
+        plt.plot(self.logT, best_fit_vals, drawstyle="steps-mid", label="Fitted DEM", color="blue")
+
+        plt.xlabel("log₁₀ T [K]")
+        #plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
+        plt.title("Initial vs Fitted DEM")
+        plt.legend()
+        plt.grid(True)
+        if logscale:
+            plt.yscale("log")
+            plt.ylabel(r"DEM [cm$^{-5}$ K$^{-1}$] (log-scaled)")
+        else:
+            plt.ylabel(r"DEM [cm$^{-5}$ K$^{-1}$]")
+        plt.tight_layout()
+        plt.show()
+        
+        print(f"[Plot] Peak Initial DEM: {np.max(initial_dem_vals):.2e}")
+        print(f"[Plot] Peak Fitted DEM: {np.max(best_fit_vals):.2e}")
 
 
     def summary(self):
