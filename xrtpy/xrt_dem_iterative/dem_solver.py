@@ -56,7 +56,7 @@ class XRTDEMIterative:
         relative_error=0.03,
         monte_carlo_runs=0,
         max_iterations=2000,
-        solv_factor=1e21
+        solv_factor=1e21,
     ):
         """
         Args:
@@ -117,7 +117,11 @@ class XRTDEMIterative:
             raise ValueError(
                 "monte_carlo_runs must be a non-negative whole number, not a boolean."
             )
-        elif isinstance(monte_carlo_runs, (int, np.integer)) or isinstance(monte_carlo_runs, float) and monte_carlo_runs.is_integer():
+        elif (
+            isinstance(monte_carlo_runs, (int, np.integer))
+            or isinstance(monte_carlo_runs, float)
+            and monte_carlo_runs.is_integer()
+        ):
             self._monte_carlo_runs = int(monte_carlo_runs)
         else:
             raise ValueError(
@@ -183,14 +187,13 @@ class XRTDEMIterative:
         else:
             self._intensity_errors = None
 
-
         try:
             self._solv_factor = float(solv_factor)
             if self._solv_factor <= 0:
                 raise ValueError("solv_factor must be a positive number.")
         except Exception as e:
             raise ValueError(f"Invalid solv_factor: {e}")
-        
+
     def __repr__(self):
         return f"<XRTDEMIterative(filters={self.filter_names}, logT={self.min_T}–{self.max_T}, dT={self.dT})>"
 
@@ -258,7 +261,7 @@ class XRTDEMIterative:
         """
         return self._dT
 
-    @property 
+    @property
     def min_error(self):
         """
         Minimum error applied to DN/s when intensity error is not provided.
@@ -320,14 +323,12 @@ class XRTDEMIterative:
         """
         return self._solv_factor
 
-
     @property
     def max_iterations(self):
         """
         Maximum number of iterations used in the least-squares DEM solver.
         """
         return self._max_iterations
-
 
     def create_logT_grid(self):
         """
@@ -337,8 +338,9 @@ class XRTDEMIterative:
         self.logT = np.linspace(self._min_T, self._max_T, n_bins)
         self.T = (10**self.logT) * u.K
 
-
-    def _interpolate_responses_to_grid(self): #This mirrors what xrt_dem_iter_estim.pro does.
+    def _interpolate_responses_to_grid(
+        self,
+    ):  # This mirrors what xrt_dem_iter_estim.pro does.
         """
         Interpolates each filter's temperature response onto the DEM temperature grid (self.logT).
         """
@@ -356,11 +358,10 @@ class XRTDEMIterative:
                 kind="linear",
                 bounds_error=False,
                 fill_value=0.0,
-            )  #kind = 'cubic' )  kind="linear",
+            )  # kind = 'cubic' )  kind="linear",
 
             R_interp = interp_func(self.logT)
             self.interpolated_responses.append(R_interp)
-
 
     @property
     def response_matrix(self):
@@ -370,20 +371,21 @@ class XRTDEMIterative:
         Shape: (n_filters, n_temperatures)
         """
         if not hasattr(self, "_response_matrix"):
-            raise AttributeError("Response matrix has not been built yet. Call _build_response_matrix().")
+            raise AttributeError(
+                "Response matrix has not been built yet. Call _build_response_matrix()."
+            )
         return self._response_matrix
-
 
     def _build_response_matrix(self):
         """
         Builds the response matrix from interpolated responses.
-        
+
         Sets:
         -------
         self.response_matrix : ndarray
             2D array of shape (n_filters, n_temperatures)
             Stack your self.interpolated_responses into a 2D NumPy array
-            
+
         Personal notes: The response matrix is a 2D array that relates temperature to observed intensity
         For numerical DEM:
             -You approximate the integral as a matrix multiplication
@@ -392,20 +394,26 @@ class XRTDEMIterative:
             - Intergal DEM(T) * R(T) dT = sum[DEM_i * R_i * dT]
         """
         if not hasattr(self, "interpolated_responses"):
-            raise RuntimeError("Call _interpolate_responses_to_grid() before building the response matrix.")
-        
-        #self._response_matrix = np.vstack(self.interpolated_responses) # matrix
-        self._response_matrix = np.vstack(self.interpolated_responses).astype(float) # matrix
-        
-        print(f"Built response matrix: shape = {self._response_matrix.shape} (filters * logT bins)")
+            raise RuntimeError(
+                "Call _interpolate_responses_to_grid() before building the response matrix."
+            )
 
+        # self._response_matrix = np.vstack(self.interpolated_responses) # matrix
+        self._response_matrix = np.vstack(self.interpolated_responses).astype(
+            float
+        )  # matrix
 
+        print(
+            f"Built response matrix: shape = {self._response_matrix.shape} (filters * logT bins)"
+        )
 
-    def _estimate_initial_dem(self, smooth=False, logscale=False, plot=True): #mirrors xrt_dem_iter_estim.pro
+    def _estimate_initial_dem(
+        self, smooth=False, logscale=False, plot=True
+    ):  # mirrors xrt_dem_iter_estim.pro
         """
-        Estimates an initial DEM by inverting I ≈ R @ DEM. 
+        Estimates an initial DEM by inverting I ≈ R @ DEM.
         An initial estimate of how much plasma is emitting at each temperature
-        
+
         Sets
         -----
         self.initial_dem : np.ndarray
@@ -422,7 +430,7 @@ class XRTDEMIterative:
         """
         print(self.response_temperatures, self.response_values, self.filter_names)
 
-        #Define inputs - xrt_dem_iter_estim.pro
+        # Define inputs - xrt_dem_iter_estim.pro
         if not hasattr(self, "response_matrix"):
             raise RuntimeError("Run _build_response_matrix() before estimating DEM.")
 
@@ -430,7 +438,9 @@ class XRTDEMIterative:
         R = self.response_matrix
         n_filters, n_temps = R.shape
 
-        print(f"Estimating DEM from {n_filters} intensities across {n_temps} temperature bins...")
+        print(
+            f"Estimating DEM from {n_filters} intensities across {n_temps} temperature bins..."
+        )
 
         with np.errstate(divide="ignore", invalid="ignore"):
             estimates = np.zeros(n_temps)
@@ -443,13 +453,13 @@ class XRTDEMIterative:
             estimates /= self._dT  # Convert to per-logT-bin definition
             assert estimates.shape[0] == len(self.logT)
 
-
             if logscale:
                 # Suppress large dynamic range and spikes
                 estimates = 10 ** np.log10(estimates + 1e-30)
 
             if smooth:
                 from scipy.ndimage import gaussian_filter1d
+
                 estimates = gaussian_filter1d(estimates, sigma=1.0)
 
         # Apply units
@@ -470,32 +480,41 @@ class XRTDEMIterative:
 
         print("[DEBUG] Response row sums:")
         for i, row in enumerate(R):
-            print(f"  {self.filter_names[i]}: sum={np.sum(row):.2e}, max={np.max(row):.2e}")
-        
+            print(
+                f"  {self.filter_names[i]}: sum={np.sum(row):.2e}, max={np.max(row):.2e}"
+            )
+
         print(f"[DEBUG] dT: {self._dT:.3f}")
-        
-    
-
-
-
-
 
         # Plotting
         if plot:
             import matplotlib.pyplot as plt
+
             plt.figure(figsize=(8, 4))
             ylabel = "DEM [cm⁻⁵ K⁻¹]"
 
             # Custom label with filters and date
             filters_str = ", ".join(self.observed_channel)
-            label_str = f"Initial DEM\n{filters_str}\n"#{self.date_obs}"
+            label_str = f"Initial DEM\n{filters_str}\n"  # {self.date_obs}"
 
             if logscale:
                 log_dem_vals = np.log10(self.initial_dem.value + 1e-30)
-                plt.plot(self.logT, log_dem_vals, drawstyle="steps-mid", label=label_str, color="purple")
+                plt.plot(
+                    self.logT,
+                    log_dem_vals,
+                    drawstyle="steps-mid",
+                    label=label_str,
+                    color="purple",
+                )
                 ylabel = "log₁₀ DEM [cm⁻⁵ K⁻¹]"
             else:
-                plt.plot(self.logT, self.initial_dem.value, drawstyle="steps-mid", label=label_str, color="purple")
+                plt.plot(
+                    self.logT,
+                    self.initial_dem.value,
+                    drawstyle="steps-mid",
+                    label=label_str,
+                    color="purple",
+                )
                 plt.yscale("log")
 
             plt.xlabel("log₁₀ T [K]")
@@ -508,11 +527,7 @@ class XRTDEMIterative:
 
         print("Initial DEM estimate complete")
 
-
-
-
-
-    #STEP 1 - Each temperature bin gets its own parameter, initialized with your initial DEM estimate
+    # STEP 1 - Each temperature bin gets its own parameter, initialized with your initial DEM estimate
     def _build_lmfit_parameters(self):
         """
         Initializes lmfit Parameters from the initial DEM guess.
@@ -523,25 +538,26 @@ class XRTDEMIterative:
             Each temperature bin gets a parameter (free by default).
         """
         if not hasattr(self, "initial_dem"):
-            raise RuntimeError("Call _estimate_initial_dem() before building parameters.")
+            raise RuntimeError(
+                "Call _estimate_initial_dem() before building parameters."
+            )
 
         params = Parameters()
-        
+
         # for i, val in enumerate(self.initial_dem):
         #     # You could add bounds here if needed (e.g., min=0)
         #     params.add(f"dem_{i}", value=val, min=0)
         for i, val in enumerate(self.initial_dem):
             # Convert to float if it's a Quantity
-            if hasattr(val, 'unit'):
+            if hasattr(val, "unit"):
                 val = val.to_value()  # default: returns value in current unit
             params.add(f"dem_{i}", value=val, min=0)
-            
-    
+
         self.lmfit_params = params
         print(f"Built {len(params)} lmfit parameters for DEM fit")
 
-    #STEP 2: Build the residual function
-    #This function computes how far off your DEM model’s predicted intensities are from your observed ones, normalized by the uncertainty.
+    # STEP 2: Build the residual function
+    # This function computes how far off your DEM model’s predicted intensities are from your observed ones, normalized by the uncertainty.
     def _residuals(self, params):
         """
         Computes the residuals between modeled and observed intensities.
@@ -567,13 +583,16 @@ class XRTDEMIterative:
             errors = np.array(self._intensity_errors)
         else:
             errors = np.maximum(
-                self.min_error,
-                self.relative_error * self._observed_intensities
+                self.min_error, self.relative_error * self._observed_intensities
             )
 
         # 4. Return normalized residuals
         residuals = (I_model - self._observed_intensities) / errors
-        print("[•] Residuals stats → mean: {:.2e}, std: {:.2e}".format(np.mean(residuals), np.std(residuals)))
+        print(
+            "[•] Residuals stats → mean: {:.2e}, std: {:.2e}".format(
+                np.mean(residuals), np.std(residuals)
+            )
+        )
         return residuals
 
     def fit_dem(self):
@@ -593,26 +612,36 @@ class XRTDEMIterative:
         if not hasattr(self, "lmfit_params"):
             raise RuntimeError("Call _build_lmfit_parameters() before fitting.")
 
-        print( "Starting DEM optimization..")
-        result = minimize(self._residuals, self.lmfit_params, method='least_squares', max_nfev=self.max_iterations)
+        print("Starting DEM optimization..")
+        result = minimize(
+            self._residuals,
+            self.lmfit_params,
+            method="least_squares",
+            max_nfev=self.max_iterations,
+        )
 
         self.result = result
 
         if not result.success:
             print("[⚠️] DEM fit did not fully converge:")
             print("  →", result.message)
-            
-        #self.fitted_dem = np.array([result.params[f"dem_{i}"].value for i in range(len(self.logT))])
-        self.fitted_dem = np.array([result.params[f"dem_{i}"].value for i in range(len(self.logT))]) * (u.cm**-5 / u.K)
 
-        print(f"[✓] DEM fit complete — reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}")
-        
+        # self.fitted_dem = np.array([result.params[f"dem_{i}"].value for i in range(len(self.logT))])
+        self.fitted_dem = np.array(
+            [result.params[f"dem_{i}"].value for i in range(len(self.logT))]
+        ) * (u.cm**-5 / u.K)
+
+        print(
+            f"[✓] DEM fit complete — reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}"
+        )
+
         print("[✓] DEM fit complete")
-        print(f"  → Reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}")
+        print(
+            f"  → Reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}"
+        )
         print(f"  → Total iterations: {result.nfev}")
 
         return result
-
 
     def print_residual_diagnostics(self, params):
         dem_vector = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
@@ -623,7 +652,9 @@ class XRTDEMIterative:
         print("Modeled Intensities:", I_model)
         print("Errors:", self._intensity_errors)
         print("Residuals:", residuals)
-        print(f"[•] Residuals stats → mean: {residuals.mean():.2e}, std: {residuals.std():.2e}")
+        print(
+            f"[•] Residuals stats → mean: {residuals.mean():.2e}, std: {residuals.std():.2e}"
+        )
 
     def plot_dem_fit(self, logscale=True):
         """
@@ -637,24 +668,42 @@ class XRTDEMIterative:
         import matplotlib.pyplot as plt
 
         if not hasattr(self, "initial_dem"):
-            raise RuntimeError("Initial DEM not computed. Run _estimate_initial_dem() first.")
+            raise RuntimeError(
+                "Initial DEM not computed. Run _estimate_initial_dem() first."
+            )
         if not hasattr(self, "result"):
             raise RuntimeError("DEM fit result not available. Run fit_dem() first.")
 
         # Extract best-fit DEM from lmfit result
-        best_fit_vals = np.array([self.result.params[f"dem_{i}"].value for i in range(len(self.logT))])
-        initial_dem_vals = self.initial_dem.value if hasattr(self.initial_dem, "value") else self.initial_dem
-        #log_initial_dem_vals = np.log10(self.initial_dem.value) if hasattr( np.log10(self.initial_dem), "value") else np.log10(self.initial_dem)
-
-
-
+        best_fit_vals = np.array(
+            [self.result.params[f"dem_{i}"].value for i in range(len(self.logT))]
+        )
+        initial_dem_vals = (
+            self.initial_dem.value
+            if hasattr(self.initial_dem, "value")
+            else self.initial_dem
+        )
+        # log_initial_dem_vals = np.log10(self.initial_dem.value) if hasattr( np.log10(self.initial_dem), "value") else np.log10(self.initial_dem)
 
         plt.figure(figsize=(10, 5))
-        plt.plot(self.logT, initial_dem_vals, drawstyle="steps-mid", label="Initial DEM", linestyle="--", color="gray")
-        plt.plot(self.logT, best_fit_vals, drawstyle="steps-mid", label="Fitted DEM", color="blue")
+        plt.plot(
+            self.logT,
+            initial_dem_vals,
+            drawstyle="steps-mid",
+            label="Initial DEM",
+            linestyle="--",
+            color="gray",
+        )
+        plt.plot(
+            self.logT,
+            best_fit_vals,
+            drawstyle="steps-mid",
+            label="Fitted DEM",
+            color="blue",
+        )
 
         plt.xlabel("log₁₀ T [K]")
-        #plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
+        # plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
         plt.title("Initial vs Fitted DEM")
         plt.legend()
         plt.grid(True)
@@ -665,10 +714,9 @@ class XRTDEMIterative:
             plt.ylabel(r"DEM [cm$^{-5}$ K$^{-1}$]")
         plt.tight_layout()
         plt.show()
-        
+
         print(f"[Plot] Peak Initial DEM: {np.max(initial_dem_vals):.2e}")
         print(f"[Plot] Peak Fitted DEM: {np.max(best_fit_vals):.2e}")
-
 
     def summary(self):
         print("XRTpy DEM Iterative Setup Summary")

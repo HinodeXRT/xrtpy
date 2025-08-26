@@ -7,9 +7,7 @@ import numpy as np
 
 class Monte_Carlo_Iteration:
 
-
-    #def __init__( ):
-
+    # def __init__( ):
 
     def generate_mc_realizations(self, n_realizations=100, seed=None):
         """
@@ -31,15 +29,16 @@ class Monte_Carlo_Iteration:
             np.random.seed(seed)
 
         # Compute error bars
-        abs_error = np.maximum(self.min_error, self.relative_error * self._observed_intensities)
+        abs_error = np.maximum(
+            self.min_error, self.relative_error * self._observed_intensities
+        )
 
         # Draw random perturbations for each intensity
         self.mc_intensity_sets = np.random.normal(
             loc=self._observed_intensities,
             scale=abs_error,
-            size=(n_realizations, len(self._observed_intensities))
+            size=(n_realizations, len(self._observed_intensities)),
         )
-
 
     def run_mc_simulation(self, n_realizations=100, seed=None):
         """
@@ -60,19 +59,19 @@ class Monte_Carlo_Iteration:
         if seed is not None:
             np.random.seed(seed)
 
-
-        #Use user-provided or fallback error model
+        # Use user-provided or fallback error model
         if self._intensity_errors is not None:
-            errors = np.array(self._intensity_errors,dtype=float)#Covering given user error in pyton array
-            #errors = self._intensity_errors
+            errors = np.array(
+                self._intensity_errors, dtype=float
+            )  # Covering given user error in pyton array
+            # errors = self._intensity_errors
         else:
             errors = np.maximum(
-                self.min_error,
-                self.relative_error * self._observed_intensities
+                self.min_error, self.relative_error * self._observed_intensities
             )
 
         self.mc_intensity_sets = np.random.normal(
             loc=self._observed_intensities[:, None],  # shape (5, 1)
-            scale=errors[:, None],                    # shape (5, 1)
-            size=(len(self._observed_intensities), n_realizations)  # shape (5, 20)
-            )
+            scale=errors[:, None],  # shape (5, 1)
+            size=(len(self._observed_intensities), n_realizations),  # shape (5, 20)
+        )
