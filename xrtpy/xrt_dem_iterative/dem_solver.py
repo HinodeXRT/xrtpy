@@ -337,6 +337,9 @@ class XRTDEMIterative:
         n_bins = int(round((self._max_T - self._min_T) / self._dT)) + 1
         self.logT = np.linspace(self._min_T, self._max_T, n_bins)
         self.T = (10**self.logT) * u.K
+        self.dlogT = self._dT  # dimensionless - convenience-27
+        
+        
 
     def _interpolate_responses_to_grid(
         self,
@@ -443,25 +446,48 @@ class XRTDEMIterative:
         )
 
         with np.errstate(divide="ignore", invalid="ignore"):
-            estimates = np.zeros(n_temps)
+            # First estimate DEM per-logT (cm^-5)
+            dem_logT = np.zeros(n_temps) #27
             for i in range(n_filters):
                 row = R[i, :]
-                ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)
-                estimates += ratio
+                ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)  # cm^-5
+                dem_logT += ratio
+                
+            dem_logT /= n_filters
+            
+        # DO NOT divide by self._dT here.
+        # Optional smoothing in per-logT space:
+        if smooth:
+            from scipy.ndimage import gaussian_filter1d
+            dem_logT = gaussian_filter1d(dem_logT, sigma=1.0)
 
-            estimates /= n_filters
-            estimates /= self._dT  # Convert to per-logT-bin definition
-            assert estimates.shape[0] == len(self.logT)
+        # Store canonical DEM (per-logT) for fitting/forward model
+        self.initial_dem_logT = dem_logT * (u.cm**-5)
 
-            if logscale:
-                # Suppress large dynamic range and spikes
-                estimates = 10 ** np.log10(estimates + 1e-30)
+        # For plotting PER-K if you want that axis:
+        dem_perK = (dem_logT / (np.log(10.0) * self.T.to_value(u.K)))  # cm^-5 K^-1
+        self.initial_dem = dem_perK * (u.cm**-5 / u.K)
+    
+            #estimates = np.zeros(n_temps)
+            # for i in range(n_filters):
+            #     row = R[i, :]
+            #     ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)
+            #     estimates += ratio
 
-            if smooth:
-                from scipy.ndimage import gaussian_filter1d
+            # estimates /= n_filters
+            # estimates /= self._dT  # Convert to per-logT-bin definition
+            # assert estimates.shape[0] == len(self.logT)
 
-                estimates = gaussian_filter1d(estimates, sigma=1.0)
+            # if logscale:
+            #     # Suppress large dynamic range and spikes
+            #     estimates = 10 ** np.log10(estimates + 1e-30)
 
+            # if smooth:
+            #     from scipy.ndimage import gaussian_filter1d
+
+            #     estimates = gaussian_filter1d(estimates, sigma=1.0)
+
+        estimates =dem_logT
         # Apply units
         self.initial_dem = estimates * (u.cm**-5 / u.K)
         print("  Max:", np.max(estimates))
@@ -498,24 +524,33 @@ class XRTDEMIterative:
             label_str = f"Initial DEM\n{filters_str}\n"  # {self.date_obs}"
 
             if logscale:
-                log_dem_vals = np.log10(self.initial_dem.value + 1e-30)
-                plt.plot(
-                    self.logT,
-                    log_dem_vals,
-                    drawstyle="steps-mid",
-                    label=label_str,
-                    color="purple",
-                )
-                ylabel = "log₁₀ DEM [cm⁻⁵ K⁻¹]"
+                plt.plot(self.logT, np.log10(self.initial_dem.value), drawstyle="steps-mid",
+                        label=label_str, color="purple")
+                ylabel = r"log$_{10}$ DEM [cm$^{-5}$ K$^{-1}$]"
             else:
-                plt.plot(
-                    self.logT,
-                    self.initial_dem.value,
-                    drawstyle="steps-mid",
-                    label=label_str,
-                    color="purple",
-                )
+                plt.plot(self.logT, self.initial_dem.value, drawstyle="steps-mid",
+                        label=label_str, color="purple")
                 plt.yscale("log")
+
+            # if logscale:
+            #     log_dem_vals = np.log10(self.initial_dem.value + 1e-30)
+            #     plt.plot(
+            #         self.logT,
+            #         log_dem_vals,
+            #         drawstyle="steps-mid",
+            #         label=label_str,
+            #         color="purple",
+            #     )
+            #     ylabel = "log₁₀ DEM [cm⁻⁵ K⁻¹]"
+            # else:
+            #     plt.plot(
+            #         self.logT,
+            #         self.initial_dem.value,
+            #         drawstyle="steps-mid",
+            #         label=label_str,
+            #         color="purple",
+            #     )
+            #     plt.yscale("log")
 
             plt.xlabel("log₁₀ T [K]")
             plt.ylabel(ylabel)
@@ -547,12 +582,20 @@ class XRTDEMIterative:
         # for i, val in enumerate(self.initial_dem):
         #     # You could add bounds here if needed (e.g., min=0)
         #     params.add(f"dem_{i}", value=val, min=0)
-        for i, val in enumerate(self.initial_dem):
-            # Convert to float if it's a Quantity
-            if hasattr(val, "unit"):
-                val = val.to_value()  # default: returns value in current unit
-            params.add(f"dem_{i}", value=val, min=0)
+        
+        #27
+        # for i, val in enumerate(self.initial_dem):
+        #     # Convert to float if it's a Quantity
+        #     if hasattr(val, "unit"):
+        #         val = val.to_value()  # default: returns value in current unit
+        #     params.add(f"dem_{i}", value=val, min=0)
 
+        # self.lmfit_params = params
+        # print(f"Built {len(params)} lmfit parameters for DEM fit")
+
+
+        for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
+            params.add(f"dem_{i}", value=float(val), min=0.0)
         self.lmfit_params = params
         print(f"Built {len(params)} lmfit parameters for DEM fit")
 
@@ -575,8 +618,13 @@ class XRTDEMIterative:
         # 1. Get DEM vector from lmfit Parameters
         dem_vector = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
 
+        # DEM per-logT (cm^-5)
+        dem_logT = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
+
+
         # 2. Compute modeled intensities: I_model = R · DEM
-        I_model = self.response_matrix @ dem_vector
+        #I_model = self.response_matrix @ dem_vector
+        I_model = self.response_matrix @ (dem_logT * self.dlogT) #27
 
         # 3. Determine observational errors (user-provided or fallback)
         if self._intensity_errors is not None:
@@ -609,8 +657,16 @@ class XRTDEMIterative:
         # if not hasattr(self, "lmfit_params"):
         #     self._build_lmfit_parameters()
 
-        if not hasattr(self, "lmfit_params"):
-            raise RuntimeError("Call _build_lmfit_parameters() before fitting.")
+        # if not hasattr(self, "lmfit_params"):
+        #     raise RuntimeError("Call _build_lmfit_parameters() before fitting.")
+
+        #27
+        if not hasattr(self, "initial_dem_logT"):
+            raise RuntimeError("Call _estimate_initial_dem() first.")
+        params = Parameters()
+        for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
+            params.add(f"dem_{i}", value=float(val), min=0.0)
+        self.lmfit_params = params
 
         print("Starting DEM optimization..")
         result = minimize(
@@ -621,6 +677,11 @@ class XRTDEMIterative:
         )
 
         self.result = result
+        
+        dem_best_logT = np.array([self.result.params[f"dem_{i}"].value for i in range(len(self.logT))])
+
+        self.fitted_dem_logT = dem_best_logT * (u.cm**-5)
+        self.fitted_dem = (dem_best_logT / (np.log(10.0) * self.T.to_value(u.K))) * (u.cm**-5 / u.K)
 
         if not result.success:
             print("[⚠️] DEM fit did not fully converge:")
@@ -675,15 +736,20 @@ class XRTDEMIterative:
             raise RuntimeError("DEM fit result not available. Run fit_dem() first.")
 
         # Extract best-fit DEM from lmfit result
-        best_fit_vals = np.array(
-            [self.result.params[f"dem_{i}"].value for i in range(len(self.logT))]
-        )
-        initial_dem_vals = (
-            self.initial_dem.value
-            if hasattr(self.initial_dem, "value")
-            else self.initial_dem
-        )
+        # best_fit_vals = np.array(
+        #     [self.result.params[f"dem_{i}"].value for i in range(len(self.logT))]
+        # )
+        # initial_dem_vals = (
+        #     self.initial_dem.value
+        #     if hasattr(self.initial_dem, "value")
+        #     else self.initial_dem
+        # )
         # log_initial_dem_vals = np.log10(self.initial_dem.value) if hasattr( np.log10(self.initial_dem), "value") else np.log10(self.initial_dem)
+
+        initial_vals = self.initial_dem_logT.to_value(u.cm**-5)
+        best_vals    = self.fitted_dem_logT.to_value(u.cm**-5)
+        
+
 
         plt.figure(figsize=(10, 5))
         plt.plot(
@@ -704,6 +770,7 @@ class XRTDEMIterative:
 
         plt.xlabel("log₁₀ T [K]")
         # plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
+        ylabel = r"DEM per $\log_{10}T$ [cm$^{-5}$]"
         plt.title("Initial vs Fitted DEM")
         plt.legend()
         plt.grid(True)
