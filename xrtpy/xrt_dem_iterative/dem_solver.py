@@ -193,16 +193,6 @@ class XRTDEMIterative:
         self._min_error = float(min_error)
         self._relative_error = float(relative_error)
 
-        # Validate and store intensity errors
-        if intensity_errors is not None:
-            self._intensity_errors = np.asarray(intensity_errors, dtype=float)
-            if self._intensity_errors.shape != self._observed_intensities.shape:
-                raise ValueError(
-                    "Length of intensity_errors must match observed_intensities."
-                )
-        else:
-            self._intensity_errors = None
-
         try:
             self._solv_factor = float(solv_factor)
             if self._solv_factor <= 0:
