@@ -82,11 +82,10 @@ class XRTDEMIterative:
             raise ValueError("`observed_channel` is required and cannot be empty.")
         self.observed_channel = validate_and_format_filters(observed_channel)
 
-        # Store intensity and error arrays       
+        # Store intensity and error arrays
         if observed_intensities is None or len(observed_intensities) == 0:
             raise ValueError("`observed_intensities` is required and cannot be empty.")
         self._observed_intensities = np.asarray(observed_intensities, dtype=float)
-
 
         if not np.all(np.isfinite(self._observed_intensities)):
             raise ValueError("`observed_intensities` must be finite numbers.")
@@ -111,12 +110,10 @@ class XRTDEMIterative:
         self._max_T = float(max_T)
         if not (self._min_T < self._max_T):
             raise ValueError("min_T must be < max_T.")
-        
+
         n_pts = int(np.floor((self._max_T - self._min_T) / dT + 1e-9)) + 1
         if n_pts < 4:
             raise ValueError("Temperature grid must have at least 4 points.")
-
-
 
         # Validate Monte Carlo setting
         if isinstance(monte_carlo_runs, bool):
@@ -340,23 +337,24 @@ class XRTDEMIterative:
         Build the DEM temperature grid *exactly* from min to max in steps of dT.
         """
         n_bins = int(round((self._max_T - self._min_T) / self._dT)) + 1
-        #self.logT = np.linspace(self._min_T, self._max_T, n_bins) #28
-        #self.T = (10**self.logT) * u.K #28
-        #self.dlogT = self._dT  # dimensionless - convenience-27
-        #self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
-        
+        # self.logT = np.linspace(self._min_T, self._max_T, n_bins) #28
+        # self.T = (10**self.logT) * u.K #28
+        # self.dlogT = self._dT  # dimensionless - convenience-27
+        # self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
+
         # inclusive grid with float-safe endpoint
-        self.logT = np.arange(self._min_T, self._max_T + self._dT/2.0, self._dT)
-        self.T = (10.0 ** self.logT) * u.K
+        self.logT = np.arange(self._min_T, self._max_T + self._dT / 2.0, self._dT)
+        self.T = (10.0**self.logT) * u.K
 
         # scalar spacing (dimensionless)
         self.dlogT = float(self._dT)
-        self.dlnT = np.log(10.0) * self.dlogT  # for IDL-style ∫ DEM(T) * R(T) * T dlnT
+        self.dlnT = (
+            np.log(10.0) * self.dlogT
+        )  # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
-    
     def _dem_per_log10T(self, dem_per_K):
         """Convert DEM per K → DEM per log10 T (cm^-5)."""
-        #return (np.log(10.0) * self.T) * dem_per_K
+        # return (np.log(10.0) * self.T) * dem_per_K
         return np.log(10.0) * self.T.to_value(u.K) * dem_per_K
 
     def _interpolate_responses_to_grid(
