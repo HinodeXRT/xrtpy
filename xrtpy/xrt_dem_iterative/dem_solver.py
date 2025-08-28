@@ -338,8 +338,14 @@ class XRTDEMIterative:
         self.logT = np.linspace(self._min_T, self._max_T, n_bins)
         self.T = (10**self.logT) * u.K
         self.dlogT = self._dT  # dimensionless - convenience-27
+        self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
         
         
+    def _dem_per_log10T(self, dem_per_K):
+        """Convert DEM per K → DEM per log10 T (cm^-5)."""
+
+        return (np.log(10.0) * self.T) * dem_per_K
+
 
     def _interpolate_responses_to_grid(
         self,
@@ -487,17 +493,23 @@ class XRTDEMIterative:
 
             #     estimates = gaussian_filter1d(estimates, sigma=1.0)
 
-        estimates =dem_logT
-        # Apply units
-        self.initial_dem = estimates * (u.cm**-5 / u.K)
-        print("  Max:", np.max(estimates))
-        print("  Min:", np.min(estimates))
-        print("  dT (logT bin size):", self._dT)
+        # estimates =dem_logT
+        # # Apply units
+        # self.initial_dem = estimates * (u.cm**-5 / u.K)
+        # print("  Max:", np.max(estimates))
+        # print("  Min:", np.min(estimates))
+        # print("  dT (logT bin size):", self._dT)
+
+        print("  Max DEM_per_logT:", np.max(dem_logT))
+        print("  Min DEM_per_logT:", np.min(dem_logT))
+        print("  dlog10T:", self.dlogT)
+
+        print("Initial DEM estimate complete")
+        print(f"Peak DEM_per_logT: {self.initial_dem_logT.max():.2e}")
+        print(f" Mean DEM_per_logT: {self.initial_dem_logT.mean():.2e}")
 
         # Diagnostics
-        print(f"Initial DEM estimate complete")
-        print(f"Peak DEM: {self.initial_dem.max():.2e}")
-        print(f" Mean DEM: {self.initial_dem.mean():.2e}")
+
         print(f"I_obs: {I_obs}")  # Observed intensities
         print(f"R (response matrix): {R.shape}")
         print(f"Sum of response rows: {[np.sum(R[i]) for i in range(R.shape[0])]}")
@@ -572,12 +584,12 @@ class XRTDEMIterative:
         self.lmfit_params : lmfit.Parameters
             Each temperature bin gets a parameter (free by default).
         """
-        if not hasattr(self, "initial_dem"):
-            raise RuntimeError(
-                "Call _estimate_initial_dem() before building parameters."
-            )
+        # if not hasattr(self, "initial_dem"):
+        #     raise RuntimeError(
+        #         "Call _estimate_initial_dem() before building parameters."
+        #     )
 
-        params = Parameters()
+        # params = Parameters()
 
         # for i, val in enumerate(self.initial_dem):
         #     # You could add bounds here if needed (e.g., min=0)
@@ -594,10 +606,15 @@ class XRTDEMIterative:
         # print(f"Built {len(params)} lmfit parameters for DEM fit")
 
 
+
+        if not hasattr(self, "initial_dem_logT"):
+            raise RuntimeError("Call _estimate_initial_dem() before building parameters.")
+        params = Parameters()
         for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
             params.add(f"dem_{i}", value=float(val), min=0.0)
         self.lmfit_params = params
         print(f"Built {len(params)} lmfit parameters for DEM fit")
+
 
     # STEP 2: Build the residual function
     # This function computes how far off your DEM model’s predicted intensities are from your observed ones, normalized by the uncertainty.
@@ -615,8 +632,8 @@ class XRTDEMIterative:
         np.ndarray
             Residuals = (I_model - I_obs) / sigma
         """
-        # 1. Get DEM vector from lmfit Parameters
-        dem_vector = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
+        # # 1. Get DEM vector from lmfit Parameters
+        # dem_vector = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
 
         # DEM per-logT (cm^-5)
         dem_logT = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
@@ -688,9 +705,6 @@ class XRTDEMIterative:
             print("  →", result.message)
 
         # self.fitted_dem = np.array([result.params[f"dem_{i}"].value for i in range(len(self.logT))])
-        self.fitted_dem = np.array(
-            [result.params[f"dem_{i}"].value for i in range(len(self.logT))]
-        ) * (u.cm**-5 / u.K)
 
         print(
             f"[✓] DEM fit complete — reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}"
@@ -705,10 +719,11 @@ class XRTDEMIterative:
         return result
 
     def print_residual_diagnostics(self, params):
-        dem_vector = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
-        I_model = self.response_matrix @ dem_vector
-        residuals = (I_model - self._observed_intensities) / self._intensity_errors
 
+        dem_logT = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
+        I_model = self.response_matrix @ (dem_logT * self.dlogT)
+        residuals = (I_model - self._observed_intensities) / self._intensity_errors
+        
         print("Observed Intensities:", self._observed_intensities)
         print("Modeled Intensities:", I_model)
         print("Errors:", self._intensity_errors)
@@ -718,72 +733,102 @@ class XRTDEMIterative:
         )
 
     def plot_dem_fit(self, logscale=True):
-        """
-        Plots the initial and fitted DEM on the same logT grid.
-
-        Parameters
-        ----------
-        logscale : bool
-            If True, uses a logarithmic y-axis.
-        """
         import matplotlib.pyplot as plt
-
-        if not hasattr(self, "initial_dem"):
-            raise RuntimeError(
-                "Initial DEM not computed. Run _estimate_initial_dem() first."
-            )
+        if not hasattr(self, "initial_dem_logT"):
+            raise RuntimeError("Initial DEM not computed. Run _estimate_initial_dem() first.")
         if not hasattr(self, "result"):
             raise RuntimeError("DEM fit result not available. Run fit_dem() first.")
 
-        # Extract best-fit DEM from lmfit result
-        # best_fit_vals = np.array(
-        #     [self.result.params[f"dem_{i}"].value for i in range(len(self.logT))]
-        # )
-        # initial_dem_vals = (
-        #     self.initial_dem.value
-        #     if hasattr(self.initial_dem, "value")
-        #     else self.initial_dem
-        # )
-        # log_initial_dem_vals = np.log10(self.initial_dem.value) if hasattr( np.log10(self.initial_dem), "value") else np.log10(self.initial_dem)
-
+        # Choose per-logT plotting (recommended for XRT)
         initial_vals = self.initial_dem_logT.to_value(u.cm**-5)
         best_vals    = self.fitted_dem_logT.to_value(u.cm**-5)
-        
-
+        ylabel = r"DEM per $\log_{10}T$ [cm$^{-5}$]"
 
         plt.figure(figsize=(10, 5))
-        plt.plot(
-            self.logT,
-            initial_dem_vals,
-            drawstyle="steps-mid",
-            label="Initial DEM",
-            linestyle="--",
-            color="gray",
-        )
-        plt.plot(
-            self.logT,
-            best_fit_vals,
-            drawstyle="steps-mid",
-            label="Fitted DEM",
-            color="blue",
-        )
+        plt.plot(self.logT, initial_vals, drawstyle="steps-mid", label="Initial DEM", linestyle="--", color="gray")
+        plt.plot(self.logT, best_vals,    drawstyle="steps-mid", label="Fitted DEM",  color="blue")
 
         plt.xlabel("log₁₀ T [K]")
-        # plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
-        ylabel = r"DEM per $\log_{10}T$ [cm$^{-5}$]"
         plt.title("Initial vs Fitted DEM")
         plt.legend()
         plt.grid(True)
         if logscale:
             plt.yscale("log")
-            plt.ylabel(r"DEM [cm$^{-5}$ K$^{-1}$] (log-scaled)")
-        else:
-            plt.ylabel(r"DEM [cm$^{-5}$ K$^{-1}$]")
+        plt.ylabel(ylabel)
         plt.tight_layout()
         plt.show()
 
-        print(f"[Plot] Peak Initial DEM: {np.max(initial_dem_vals):.2e}")
-        print(f"[Plot] Peak Fitted DEM: {np.max(best_fit_vals):.2e}")
+        print(f"[Plot] Peak Initial DEM (per-logT): {np.max(initial_vals):.2e}")
+        print(f"[Plot] Peak Fitted  DEM (per-logT): {np.max(best_vals):.2e}")
+
+
+    # def plot_dem_fit(self, logscale=True):
+    #     """
+    #     Plots the initial and fitted DEM on the same logT grid.
+
+    #     Parameters
+    #     ----------
+    #     logscale : bool
+    #         If True, uses a logarithmic y-axis.
+    #     """
+    #     import matplotlib.pyplot as plt
+
+    #     if not hasattr(self, "initial_dem"):
+    #         raise RuntimeError(
+    #             "Initial DEM not computed. Run _estimate_initial_dem() first."
+    #         )
+    #     if not hasattr(self, "result"):
+    #         raise RuntimeError("DEM fit result not available. Run fit_dem() first.")
+
+    #     # Extract best-fit DEM from lmfit result
+    #     # best_fit_vals = np.array(
+    #     #     [self.result.params[f"dem_{i}"].value for i in range(len(self.logT))]
+    #     # )
+    #     # initial_dem_vals = (
+    #     #     self.initial_dem.value
+    #     #     if hasattr(self.initial_dem, "value")
+    #     #     else self.initial_dem
+    #     # )
+    #     # log_initial_dem_vals = np.log10(self.initial_dem.value) if hasattr( np.log10(self.initial_dem), "value") else np.log10(self.initial_dem)
+
+    #     initial_vals = self.initial_dem_logT.to_value(u.cm**-5)
+    #     best_vals    = self.fitted_dem_logT.to_value(u.cm**-5)
+        
+
+
+    #     plt.figure(figsize=(10, 5))
+    #     plt.plot(
+    #         self.logT,
+    #         initial_dem_vals,
+    #         drawstyle="steps-mid",
+    #         label="Initial DEM",
+    #         linestyle="--",
+    #         color="gray",
+    #     )
+    #     plt.plot(
+    #         self.logT,
+    #         best_fit_vals,
+    #         drawstyle="steps-mid",
+    #         label="Fitted DEM",
+    #         color="blue",
+    #     )
+
+    #     plt.xlabel("log₁₀ T [K]")
+    #     # plt.ylabel("DEM [cm⁻⁵ K⁻¹]")
+    #     ylabel = r"DEM per $\log_{10}T$ [cm$^{-5}$]"
+    #     plt.title("Initial vs Fitted DEM")
+    #     plt.legend()
+    #     plt.grid(True)
+    #     if logscale:
+    #         plt.yscale("log")
+    #         plt.ylabel(r"DEM [cm$^{-5}$ K$^{-1}$] (log-scaled)")
+    #     else:
+    #         plt.ylabel(r"DEM [cm$^{-5}$ K$^{-1}$]")
+    #     plt.tight_layout()
+    #     plt.show()
+
+    #     print(f"[Plot] Peak Initial DEM: {np.max(initial_dem_vals):.2e}")
+    #     print(f"[Plot] Peak Fitted DEM: {np.max(best_fit_vals):.2e}")
 
     def summary(self):
         print("XRTpy DEM Iterative Setup Summary")
