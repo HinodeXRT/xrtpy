@@ -119,7 +119,9 @@ class XRTDEMIterative:
         self._max_T = float(max_T)
         if not (self._min_T < self._max_T):
             raise ValueError("min_T must be < max_T.")
-        
+        if n_pts < 4:
+            raise ValueError("Temperature grid must have at least 4 points.")
+
         self._dT = float(dT)
 
         # Validate Monte Carlo setting
