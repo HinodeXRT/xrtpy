@@ -97,20 +97,29 @@ class XRTDEMIterative:
 
         if observed_intensities is None or len(observed_intensities) == 0:
             raise ValueError("`observed_intensities` is required and cannot be empty.")
+        
+        if not np.all(np.isfinite(self._observed_intensities)):
+            raise ValueError("`observed_intensities` must be finite numbers.")
 
         # Errors
         if intensity_errors is not None:
             self._intensity_errors = np.asarray(intensity_errors, dtype=float)
-            if self._intensity_errors.shape != self.observed_intensities.shape:
-                raise ValueError(
-                    "Length of intensity_errors must match observed_intensities."
-                )
+            if self._intensity_errors.shape != self._observed_intensities.shape:
+                raise ValueError("Length of intensity_errors must match observed_intensities.")
+            if not np.all(np.isfinite(self._intensity_errors)) or np.any(self._intensity_errors < 0):
+                raise ValueError("`intensity_errors` must be finite and >= 0.")
         else:
-            self._intensity_errors = None  # Will be computed later
+            self._intensity_errors = None # Will be computed later
+
+
+
 
         # Store temperature grid parameters
         self._min_T = float(min_T)
         self._max_T = float(max_T)
+        if not (self._min_T < self._max_T):
+            raise ValueError("min_T must be < max_T.")
+        
         self._dT = float(dT)
 
         # Validate Monte Carlo setting
