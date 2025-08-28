@@ -404,7 +404,7 @@ class XRTDEMIterative:
         """
         if not hasattr(self, "_response_matrix"):
             raise AttributeError(
-                "Response matrix has not been built yet. Call _build_response_matrix()."
+                "Response matrix has not been built . Call _build_response_matrix() first."
             )
         return self._response_matrix
 
@@ -433,7 +433,7 @@ class XRTDEMIterative:
         # self._response_matrix = np.vstack(self.interpolated_responses) # matrix
         self._response_matrix = np.vstack(self.interpolated_responses).astype(
             float
-        )  # matrix
+        )  # matrix - this is what IDL does when stacking per-filter response vectors.
 
         print(
             f"Built response matrix: shape = {self._response_matrix.shape} (filters * logT bins)"
@@ -479,11 +479,13 @@ class XRTDEMIterative:
             dem_logT = np.zeros(n_temps)  # 27
             for i in range(n_filters):
                 row = R[i, :]
-                ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)  # cm^-5
+                ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)  # cm^-5 first  estimate for the DEM
                 dem_logT += ratio
-
             dem_logT /= n_filters
-
+            #IDL - for i=0,n_channels-1 do dem += obs_val[i] / response[i,*]
+            #IDL - dem = dem / n_channels
+            
+            
         # DO NOT divide by self._dT here.
         # Optional smoothing in per-logT space:
         if smooth:
@@ -500,34 +502,6 @@ class XRTDEMIterative:
         # For plotting PER-K if you want that axis:
         dem_perK = dem_logT / (np.log(10.0) * self.T.to_value(u.K))  # cm^-5 K^-1
         self.initial_dem = dem_perK * (u.cm**-5 / u.K)
-
-        # self.dem_initial = dem_per_K_on_grid  # (N,), per-K (cm^-5 K^-1), np.ndarray or Quantity
-
-        # estimates = np.zeros(n_temps)
-        # for i in range(n_filters):
-        #     row = R[i, :]
-        #     ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)
-        #     estimates += ratio
-
-        # estimates /= n_filters
-        # estimates /= self._dT  # Convert to per-logT-bin definition
-        # assert estimates.shape[0] == len(self.logT)
-
-        # if logscale:
-        #     # Suppress large dynamic range and spikes
-        #     estimates = 10 ** np.log10(estimates + 1e-30)
-
-        # if smooth:
-        #     from scipy.ndimage import gaussian_filter1d
-
-        #     estimates = gaussian_filter1d(estimates, sigma=1.0)
-
-        # estimates =dem_logT
-        # # Apply units
-        # self.initial_dem = estimates * (u.cm**-5 / u.K)
-        # print("  Max:", np.max(estimates))
-        # print("  Min:", np.min(estimates))
-        # print("  dT (logT bin size):", self._dT)
 
         print("  Max DEM_per_logT:", np.max(dem_logT))
         print("  Min DEM_per_logT:", np.min(dem_logT))
@@ -613,6 +587,7 @@ class XRTDEMIterative:
 
         print("Initial DEM estimate complete")
 
+
     # STEP 1 - Each temperature bin gets its own parameter, initialized with your initial DEM estimate
     def _build_lmfit_parameters(self):
         """
@@ -652,6 +627,7 @@ class XRTDEMIterative:
         for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
             params.add(f"dem_{i}", value=float(val), min=0.0)
         self.lmfit_params = params
+        
         print(f"Built {len(params)} lmfit parameters for DEM fit")
 
     # STEP 2: Build the residual function
@@ -681,12 +657,13 @@ class XRTDEMIterative:
         I_model = self.response_matrix @ (dem_logT * self.dlogT)  # 27
 
         # 3. Determine observational errors (user-provided or fallback)
-        if self._intensity_errors is not None:
-            errors = np.array(self._intensity_errors)
-        else:
-            errors = np.maximum(
-                self.min_error, self.relative_error * self._observed_intensities
-            )
+        errors = self.intensity_errors.to_value(u.DN / u.s)
+        # if self._intensity_errors is not None:
+        #     errors = np.array(self._intensity_errors)
+        # else:
+        #     errors = np.maximum(
+        #         self.min_error, self.relative_error * self._observed_intensities
+        #     )
 
         # 4. Return normalized residuals
         residuals = (I_model - self._observed_intensities) / errors
@@ -717,11 +694,16 @@ class XRTDEMIterative:
         # 27
         if not hasattr(self, "initial_dem_logT"):
             raise RuntimeError("Call _estimate_initial_dem() first.")
-        params = Parameters()
-        for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
-            params.add(f"dem_{i}", value=float(val), min=0.0)
-        self.lmfit_params = params
+        if not hasattr(self, "lmfit_params"):
+            self._build_lmfit_parameters()
 
+        #Mimght not need- already using in _build_lmfit_parameters().    
+        # params = Parameters()
+        # for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
+        #     params.add(f"dem_{i}", value=float(val), min=0.0)
+        # self.lmfit_params = params
+
+        
         print("Starting DEM optimization..")
         result = minimize(
             self._residuals,
