@@ -352,36 +352,49 @@ class XRTDEMIterative:
             np.log(10.0) * self.dlogT
         )  # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
-    def _dem_per_log10T(self, dem_per_K):
-        """Convert DEM per K → DEM per log10 T (cm^-5)."""
-        # return (np.log(10.0) * self.T) * dem_per_K
-        return np.log(10.0) * self.T.to_value(u.K) * dem_per_K
 
-    def _interpolate_responses_to_grid(
-        self,
-    ):  # This mirrors what xrt_dem_iter_estim.pro does.
+    def _interpolate_responses_to_grid(self):
         """
-        Interpolates each filter's temperature response onto the DEM temperature grid (self.logT).
+        Interpolate each filter's temperature response onto self.logT (log10 K).
+        Stores a dense matrix with shape (n_filters, n_temperatures), unitless numeric.
         """
-        self.interpolated_responses = []
+        if not hasattr(self, "logT"):
+            raise AttributeError("Temperature grid missing. Call create_logT_grid() first.")
 
-        for i, (T_orig, R_orig, fname) in enumerate(
-            zip(self.response_temperatures, self.response_values, self.filter_names)
-        ):
+        rows = []
+        for i, (T_orig, R_orig, fname) in enumerate(zip(self.response_temperatures, self.response_values, self.filter_names)):
             logT_orig = np.log10(T_orig.to_value(u.K))
-            response_vals = R_orig.to_value(u.DN * u.cm**5 / (u.pix * u.s))
+            #response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
+            response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
 
-            interp_func = interp1d(
-                logT_orig,
-                response_vals,
-                kind="linear",
-                bounds_error=False,
-                fill_value=0.0,
-            )  # kind = 'cubic' )  kind="linear",
+            #Remove later
+            print(f"→ Channel {i}: {fname}")
+            print(f"   logT_orig.shape = {logT_orig.shape}, response_vals.shape = {response_vals.shape}")
+            print(f"   logT range: {logT_orig.min():.2f}–{logT_orig.max():.2f}, grid: {self.logT.min():.2f}–{self.logT.max():.2f}")
 
-            R_interp = interp_func(self.logT)
-            self.interpolated_responses.append(R_interp)
+            try:
+                interp_func = interp1d(
+                    logT_orig,
+                    response_vals,
+                    kind="linear",
+                    bounds_error=False,
+                    fill_value=0.0,
+                    assume_sorted=True,
+                )
+                interp_row = interp_func(self.logT)
+                print(f"   Interpolated length: {len(interp_row)}")
+                rows.append(interp_row)
+            except Exception as e:
+                print(f"   Interpolation failed: {e}")
+                raise
 
+        self.interpolated_responses = rows
+        self._response_matrix = np.vstack(rows)
+
+        if self._response_matrix.shape != (len(self.responses), self.logT.size):
+            raise RuntimeError("Interpolated response matrix has unexpected shape.")
+
+            
     @property
     def response_matrix(self):
         """
