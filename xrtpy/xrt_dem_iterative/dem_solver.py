@@ -59,17 +59,6 @@ class XRTDEMIterative:
         solv_factor=1e21,
     ):
         """
-        Args:
-            observed_channel (_type_): _description_
-            observed_intensities (_type_): _description_
-            temperature_responses (_type_): _description_
-            intensity_errors (_type_, optional): _description_. Defaults to None.
-            min_T (float, optional): _description_. Defaults to 5.5.
-            max_T (float, optional): _description_. Defaults to 8.0.
-            dT (float, optional): _description_. Defaults to 0.1.
-            min_error (float, optional): _description_. Defaults to 2.0.
-            relative_error (float, optional): _description_. Defaults to 0.03.
-
         Notes
         -----
         - All input lists (`observed_channel`, `observed_intensities`, and `temperature_responses`)
@@ -93,11 +82,11 @@ class XRTDEMIterative:
             raise ValueError("`observed_channel` is required and cannot be empty.")
         self.observed_channel = validate_and_format_filters(observed_channel)
 
-        # Store intensity and error arrays
-        self._observed_intensities = np.asarray(observed_intensities, dtype=float)
-
+        # Store intensity and error arrays       
         if observed_intensities is None or len(observed_intensities) == 0:
             raise ValueError("`observed_intensities` is required and cannot be empty.")
+        self._observed_intensities = np.asarray(observed_intensities, dtype=float)
+
 
         if not np.all(np.isfinite(self._observed_intensities)):
             raise ValueError("`observed_intensities` must be finite numbers.")
@@ -117,6 +106,7 @@ class XRTDEMIterative:
             self._intensity_errors = None  # Will be computed later
 
         # Store temperature grid parameters
+        self._dT = float(dT)
         self._min_T = float(min_T)
         self._max_T = float(max_T)
         if not (self._min_T < self._max_T):
@@ -126,7 +116,7 @@ class XRTDEMIterative:
         if n_pts < 4:
             raise ValueError("Temperature grid must have at least 4 points.")
 
-        self._dT = float(dT)
+
 
         # Validate Monte Carlo setting
         if isinstance(monte_carlo_runs, bool):
@@ -166,7 +156,7 @@ class XRTDEMIterative:
 
         # Validate that the temperature grid falls within the responses
         for r in self.responses:
-            logT_grid = np.log10(r.temperature.value)
+            logT_grid = np.log10(r.temperature.to_value(u.K))
             if not (self._min_T >= logT_grid.min() and self._max_T <= logT_grid.max()):
                 raise ValueError(
                     f"The specified temperature range [{min_T}, {max_T}] is outside the bounds of one or more filter response grids.\n"
