@@ -293,13 +293,15 @@ class XRTDEMIterative:
         if self._intensity_errors is not None:
             return self._intensity_errors * (u.DN / u.s)
 
-        warnings.warn(
-            "No intensity_errors provided. Using default model: "
-            f"max(relative_error * observed_intensity, min_error)\n"
-            f"=> relative_error = {self.relative_error}, min_error = {self.min_error} DN/s\n"
-            "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
-            UserWarning,
-        )
+        if self._using_estimated_errors:
+            warnings.warn(
+                "No intensity_errors provided. Using default model: "
+                f"max(relative_error * observed_intensity, min_error)\n"
+                f"=> relative_error = {self.relative_error}, min_error = {self.min_error} DN/s\n"
+                "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
+                UserWarning,
+            )
+        self._using_estimated_errors = False  # suppress future warnings
 
         estimated = np.maximum(
             self.relative_error * self._observed_intensities,
