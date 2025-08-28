@@ -191,7 +191,10 @@ class XRTDEMIterative:
             raise ValueError(f"Invalid solv_factor: {e}")
 
     def __repr__(self):
-        return f"<XRTDEMIterative(filters={self.filter_names}, logT={self.min_T}–{self.max_T}, dT={self.dT})>"
+        return (
+            f"<XRTDEMIterative(filters={self.filter_names}, "
+            f"logT={self._min_T:.2f}–{self._max_T:.2f}, dT={self._dT:.3f})>"
+        )
 
     # @property  #Removed if not used
     # def name(self) -> str:
@@ -211,28 +214,28 @@ class XRTDEMIterative:
         Returns
         -------
         `~astropy.units.Quantity`
-            Intensities in DN/s for each filter channel.
+            Intensities in DN/s/pix for each filter channel.
         """
         return self._observed_intensities * (u.DN / u.s)
 
     @property
     def filter_names(self):
         """
-        Returns a list of filter names from the temperature responses.
+        List of filter names from the temperature responses.
         """
         return [r.filter_name for r in self.responses]
 
     @property
     def response_temperatures(self):
         """
-        Returns a list of temperature grids (K) for each filter response.
+        List of temperature grids (K) for each filter response.
         """
         return [r.temperature for r in self.responses]
 
     @property
     def response_values(self):
         """
-        Returns a list of response values (DN cm^5 / pix / s) for each filter.
+        List of response values (DN cm^5 / pix / s) for each filter.
         """
         return [r.response for r in self.responses]
 
@@ -267,7 +270,7 @@ class XRTDEMIterative:
     @property
     def relative_error(self):
         """
-        Relative error (%) used to scale intensity if error is not provided.
+        Relative error used to scale intensity if error is not provided.
         """
         return self._relative_error
 
