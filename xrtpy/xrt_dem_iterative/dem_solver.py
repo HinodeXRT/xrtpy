@@ -85,11 +85,12 @@ class XRTDEMIterative:
         {'Al-mesh', 'Al-poly', 'C-poly', 'Ti-poly', 'Be-thin', 'Be-med', 'Al-med', 'Al-thick', 'Be-thick',
         'Al-poly/Al-mesh', 'Al-poly/Ti-poly', 'Al-poly/Al-thick', 'Al-poly/Be-thick'}
         """
+        
         # Validate and store filter names
+        if observed_channel is None or (hasattr(observed_channel, "__len__") and len(observed_channel) == 0):
+            raise ValueError("`observed_channel` is required and cannot be empty.")
         self.observed_channel = validate_and_format_filters(observed_channel)
 
-        if observed_channel is None or len(observed_channel) == 0:
-            raise ValueError("`observed_channel` is required and cannot be empty.")
 
         # Store intensity and error arrays
         self._observed_intensities = np.asarray(observed_intensities, dtype=float)
@@ -340,7 +341,6 @@ class XRTDEMIterative:
         self.dlogT = self._dT  # dimensionless - convenience-27
         self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
         
-        
     def _dem_per_log10T(self, dem_per_K):
         """Convert DEM per K → DEM per log10 T (cm^-5)."""
 
@@ -468,11 +468,15 @@ class XRTDEMIterative:
             dem_logT = gaussian_filter1d(dem_logT, sigma=1.0)
 
         # Store canonical DEM (per-logT) for fitting/forward model
-        self.initial_dem_logT = dem_logT * (u.cm**-5)
+        self.initial_dem_logT = dem_logT * (u.cm**-5) ##################################
+        #self.initial_dem_logT = (np.log(10.0) * self.T) * self.dem_initial * u.cm**-5  # (N,), per-log10T #28
 
         # For plotting PER-K if you want that axis:
         dem_perK = (dem_logT / (np.log(10.0) * self.T.to_value(u.K)))  # cm^-5 K^-1
         self.initial_dem = dem_perK * (u.cm**-5 / u.K)
+        
+        #self.dem_initial = dem_per_K_on_grid  # (N,), per-K (cm^-5 K^-1), np.ndarray or Quantity    
+        
     
             #estimates = np.zeros(n_temps)
             # for i in range(n_filters):
@@ -697,8 +701,11 @@ class XRTDEMIterative:
         
         dem_best_logT = np.array([self.result.params[f"dem_{i}"].value for i in range(len(self.logT))])
 
-        self.fitted_dem_logT = dem_best_logT * (u.cm**-5)
+        self.fitted_dem_logT = dem_best_logT * (u.cm**-5) #28
         self.fitted_dem = (dem_best_logT / (np.log(10.0) * self.T.to_value(u.K))) * (u.cm**-5 / u.K)
+        
+        #self.dem_fit = dem_per_K_on_grid  # (N,), per-K (cm^-5 K^-1)
+        #self.fitted_dem_logT = (np.log(10.0) * self.T) * self.dem_fit * u.cm**-5  # (N,), per-log10T
 
         if not result.success:
             print("[⚠️] DEM fit did not fully converge:")
@@ -732,34 +739,139 @@ class XRTDEMIterative:
             f"[•] Residuals stats → mean: {residuals.mean():.2e}, std: {residuals.std():.2e}"
         )
 
-    def plot_dem_fit(self, logscale=True):
+
+    def plot_dem_fit(
+        self,
+        logscale: bool = True,
+        scale: str = "per_K",        # "per_K" or "per_log10T"
+        show_initial: bool = True,
+        ax=None,
+        title: str | None = None,
+    ):
+        """
+        Plot the fitted DEM (and optional initial DEM) using a consistent scale.
+
+        logscale=True  -> semilogy of linear values
+        logscale=False -> linear plot of log10(values)
+
+        scale="per_K"       -> DEM [cm^-5 K^-1]
+        scale="per_log10T"  -> phi = DEM * T * ln(10) [cm^-5]
+        """
+        import numpy as np
         import matplotlib.pyplot as plt
-        if not hasattr(self, "initial_dem_logT"):
-            raise RuntimeError("Initial DEM not computed. Run _estimate_initial_dem() first.")
-        if not hasattr(self, "result"):
-            raise RuntimeError("DEM fit result not available. Run fit_dem() first.")
 
-        # Choose per-logT plotting (recommended for XRT)
-        initial_vals = self.initial_dem_logT.to_value(u.cm**-5)
-        best_vals    = self.fitted_dem_logT.to_value(u.cm**-5)
-        ylabel = r"DEM per $\log_{10}T$ [cm$^{-5}$]"
+        if ax is None:
+            fig, ax = plt.subplots()
 
-        plt.figure(figsize=(10, 5))
-        plt.plot(self.logT, initial_vals, drawstyle="steps-mid", label="Initial DEM", linestyle="--", color="gray")
-        plt.plot(self.logT, best_vals,    drawstyle="steps-mid", label="Fitted DEM",  color="blue")
+        # Grid
+        logT = self.logT
+        T = 10.0 ** logT
 
-        plt.xlabel("log₁₀ T [K]")
-        plt.title("Initial vs Fitted DEM")
-        plt.legend()
-        plt.grid(True)
+        # --- find fitted DEM (prefer canonical names; fall back to legacy) ---
+        linear_candidates = ["dem_fit", "dem", "fitted_dem", "dem_solved", "dem_solution"]
+        log_candidates    = ["logdem_fit", "logdem", "fitted_logdem", "logdem_solved"]
+
+        dem_fit_perK = None
+        for name in linear_candidates:
+            if hasattr(self, name) and getattr(self, name) is not None:
+                dem_fit_perK = np.asarray(getattr(self, name), dtype=float)
+                break
+        if dem_fit_perK is None:
+            for name in log_candidates:
+                if hasattr(self, name) and getattr(self, name) is not None:
+                    dem_fit_perK = 10.0 ** np.asarray(getattr(self, name), dtype=float)
+                    break
+        if dem_fit_perK is None:
+            raise RuntimeError(
+                "No fitted DEM found. Expected one of "
+                f"{linear_candidates + log_candidates} to exist on the object."
+            )
+
+        # --- initial DEM (optional) ---
+        dem_init_perK = None
+        if show_initial:
+            init_linear_candidates = ["initial_dem", "dem_initial"]
+            init_log_candidates    = ["initial_logdem", "logdem_initial"]
+            for name in init_linear_candidates:
+                if hasattr(self, name) and getattr(self, name) is not None:
+                    dem_init_perK = np.asarray(getattr(self, name), dtype=float)
+                    break
+            if dem_init_perK is None:
+                for name in init_log_candidates:
+                    if hasattr(self, name) and getattr(self, name) is not None:
+                        dem_init_perK = 10.0 ** np.asarray(getattr(self, name), dtype=float)
+                        break
+
+        # --- choose scientific scale ---
+        if scale == "per_K":
+            y_fit_linear  = np.clip(dem_fit_perK, np.finfo(float).tiny, None)
+            y_init_linear = None if dem_init_perK is None else np.clip(dem_init_perK, np.finfo(float).tiny, None)
+            y_label_lin   = r"DEM per K  [cm$^{-5}$ K$^{-1}$]"
+            y_label_log10 = r"$\log_{10}$ DEM per K  [cm$^{-5}$ K$^{-1}$]"
+        elif scale == "per_log10T":
+            y_fit_linear  = np.clip(dem_fit_perK * T * np.log(10.0), np.finfo(float).tiny, None)
+            y_init_linear = None if dem_init_perK is None else np.clip(dem_init_perK * T * np.log(10.0), np.finfo(float).tiny, None)
+            y_label_lin   = r"DEM per $\log_{10}T$  [cm$^{-5}$]"
+            y_label_log10 = r"$\log_{10}$ DEM per $\log_{10}T$  [cm$^{-5}$]"
+        else:
+            raise ValueError("scale must be 'per_K' or 'per_log10T'")
+
+        # --- plot without double-logging ---
         if logscale:
-            plt.yscale("log")
-        plt.ylabel(ylabel)
-        plt.tight_layout()
-        plt.show()
+            ax.semilogy(logT, y_fit_linear, label="Fitted DEM")
+            if y_init_linear is not None:
+                ax.semilogy(logT, y_init_linear, "--", alpha=0.7, label="Initial DEM")
+            ax.set_ylabel(y_label_lin)
+        else:
+            ax.plot(logT, np.log10(y_fit_linear), label="Fitted DEM")
+            if y_init_linear is not None:
+                ax.plot(logT, np.log10(y_init_linear), "--", alpha=0.7, label="Initial DEM")
+            ax.set_ylabel(y_label_log10)
 
-        print(f"[Plot] Peak Initial DEM (per-logT): {np.max(initial_vals):.2e}")
-        print(f"[Plot] Peak Fitted  DEM (per-logT): {np.max(best_vals):.2e}")
+        ax.set_xlabel(r"$\log_{10} T$ [K]")
+        ax.set_title(title or ("Initial vs Fitted DEM" if show_initial else "Fitted DEM"))
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+
+    # def plot_dem_fit(self, logscale=True):
+    #     import matplotlib.pyplot as plt
+    #     # if not hasattr(self, "initial_dem_logT"):
+    #     #     raise RuntimeError("Initial DEM not computed. Run _estimate_initial_dem() first.")
+    #     # if not hasattr(self, "result"):
+    #     #     raise RuntimeError("DEM fit result not available. Run fit_dem() first.")
+
+
+    #     # --- grid sanity ---
+    #     if not hasattr(self, "logT"):
+    #         raise RuntimeError("Temperature grid missing. Run create_logT_grid() first.")
+    #     # ensure we have linear T for conversion if needed
+    #     if not hasattr(self, "T"):
+    #         self.T = np.power(10.0, self.logT)
+        
+    #     ln10T = np.log(10.0) * self.T
+        
+    #     # Choose per-logT plotting (recommended for XRT)
+    #     initial_vals = self.initial_dem_logT.to_value(u.cm**-5)
+    #     best_vals    = self.fitted_dem_logT.to_value(u.cm**-5)
+    #     ylabel = r"DEM per $\log_{10}T$ [cm$^{-5}$]"
+
+    #     plt.figure(figsize=(10, 5))
+    #     plt.plot(self.logT, initial_vals, drawstyle="steps-mid", label="Initial DEM", linestyle="--", color="gray")
+    #     plt.plot(self.logT, best_vals,    drawstyle="steps-mid", label="Fitted DEM",  color="blue")
+
+    #     plt.xlabel("log₁₀ T [K]")
+    #     plt.title("Initial vs Fitted DEM")
+    #     plt.legend()
+    #     plt.grid(True)
+    #     if logscale:
+    #         plt.yscale("log")
+    #     plt.ylabel(ylabel)
+    #     plt.tight_layout()
+    #     plt.show()
+
+    #     print(f"[Plot] Peak Initial DEM (per-logT): {np.max(initial_vals):.2e}")
+    #     print(f"[Plot] Peak Fitted  DEM (per-logT): {np.max(best_vals):.2e}")
 
 
     # def plot_dem_fit(self, logscale=True):
@@ -793,8 +905,6 @@ class XRTDEMIterative:
 
     #     initial_vals = self.initial_dem_logT.to_value(u.cm**-5)
     #     best_vals    = self.fitted_dem_logT.to_value(u.cm**-5)
-        
-
 
     #     plt.figure(figsize=(10, 5))
     #     plt.plot(
