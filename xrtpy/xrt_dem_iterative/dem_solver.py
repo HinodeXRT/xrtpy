@@ -347,8 +347,8 @@ class XRTDEMIterative:
 
     def _dem_per_log10T(self, dem_per_K):
         """Convert DEM per K → DEM per log10 T (cm^-5)."""
-
-        return (np.log(10.0) * self.T) * dem_per_K
+        #return (np.log(10.0) * self.T) * dem_per_K
+        return np.log(10.0) * self.T.to_value(u.K) * dem_per_K
 
     def _interpolate_responses_to_grid(
         self,
