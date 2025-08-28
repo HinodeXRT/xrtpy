@@ -340,11 +340,20 @@ class XRTDEMIterative:
         Build the DEM temperature grid *exactly* from min to max in steps of dT.
         """
         n_bins = int(round((self._max_T - self._min_T) / self._dT)) + 1
-        self.logT = np.linspace(self._min_T, self._max_T, n_bins)
-        self.T = (10**self.logT) * u.K
-        self.dlogT = self._dT  # dimensionless - convenience-27
-        self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
+        #self.logT = np.linspace(self._min_T, self._max_T, n_bins) #28
+        #self.T = (10**self.logT) * u.K #28
+        #self.dlogT = self._dT  # dimensionless - convenience-27
+        #self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
+        
+        # inclusive grid with float-safe endpoint
+        self.logT = np.arange(self._min_T, self._max_T + self._dT/2.0, self._dT)
+        self.T = (10.0 ** self.logT) * u.K
 
+        # scalar spacing (dimensionless)
+        self.dlogT = float(self._dT)
+        self.dlnT = np.log(10.0) * self.dlogT  # for IDL-style ∫ DEM(T) * R(T) * T dlnT
+
+    
     def _dem_per_log10T(self, dem_per_K):
         """Convert DEM per K → DEM per log10 T (cm^-5)."""
         #return (np.log(10.0) * self.T) * dem_per_K
