@@ -312,22 +312,26 @@ class XRTDEMIterative:
     @property
     def monte_carlo_runs(self) -> int:
         """
-        Number of Monte Carlo runs to perform (0 = disabled).
+        Return
+        ------
+        int
+            Number of Monte Carlo runs to perform (0 = disabled).
         """
         return self._monte_carlo_runs
 
     @property
     def solv_factor(self):
         """
-        Normalization factor used during DEM fitting to stabilize the solver.
-        Default is 1e21.
+        Scaling factor used during DEM optimization to stabilize the spline fit.
+        Corresponds to `solv_factor` in IDL (typically 1e21).
         """
         return self._solv_factor
 
     @property
     def max_iterations(self):
         """
-        Maximum number of iterations used in the least-squares DEM solver.
+        Maximum number of iterations allowed in the least-squares DEM solver
+        (e.g., when using `lmfit.minimize`). Default is 2000.
         """
         return self._max_iterations
 
