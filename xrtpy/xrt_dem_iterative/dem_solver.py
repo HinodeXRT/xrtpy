@@ -742,17 +742,21 @@ class XRTDEMIterative:
         )
         print(f"  → Total iterations: {result.nfev}")
 
+        if return_dem:
+            return self.fitted_dem
         return result
+
 
     def print_residual_diagnostics(self, params):
 
         dem_logT = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
         I_model = self.response_matrix @ (dem_logT * self.dlogT)
-        residuals = (I_model - self._observed_intensities) / self._intensity_errors
+        errors = self.intensity_errors.to_value(u.DN / u.s)
+        residuals = (I_model - self._observed_intensities) / errors
 
         print("Observed Intensities:", self._observed_intensities)
         print("Modeled Intensities:", I_model)
-        print("Errors:", self._intensity_errors)
+        print("Errors:", errors)
         print("Residuals:", residuals)
         print(
             f"[•] Residuals stats → mean: {residuals.mean():.2e}, std: {residuals.std():.2e}"
