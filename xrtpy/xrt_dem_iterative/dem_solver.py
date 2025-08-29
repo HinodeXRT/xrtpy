@@ -18,65 +18,7 @@ from xrtpy.xrt_dem_iterative.monte_carlo_iteration import MonteCarloIteration
 from xrtpy.xrt_dem_iterative.xrt_dem_statistics import ComputeDEMStatistics
 
 
-def validate_inputs(self) -> None:
-    """
-    Validate user-provided inputs. Raises ValueError on any issue.
 
-    This is intentionally separate from __init__ so tests and users can
-    construct the object first, then explicitly validate.
-    """
-    # 1) observed_channel non-empty
-    if self.observed_channel is None or len(self.observed_channel) == 0:
-        raise ValueError("`observed_channel` is required and cannot be empty.")
-
-    # 2) intensities: length & finite
-    if self._observed_intensities is None or len(self._observed_intensities) == 0:
-        raise ValueError("`observed_intensities` is required and cannot be empty.")
-    if not np.all(np.isfinite(self._observed_intensities)):
-        raise ValueError("`observed_intensities` must be finite numbers.")
-
-    # 3) responses present
-    if self.responses is None or len(self.responses) == 0:
-        raise ValueError("`temperature_responses` is required and cannot be empty.")
-
-    # 4) lengths consistent between filters/intensities/responses
-    if not (
-        len(self._observed_intensities) == len(self.responses) == len(self.observed_channel)
-    ):
-        raise ValueError(
-            "Length mismatch: intensities, responses, and observed_channel must match."
-        )
-
-    # 5) temperature grid sanity
-    if not (self._min_T < self._max_T):
-        raise ValueError("min_T must be < max_T.")
-    if self._dT <= 0:
-        raise ValueError("dT must be a positive scalar.")
-    n_pts = int(np.floor((self._max_T - self._min_T) / self._dT + 1e-9)) + 1
-    if n_pts < 4:
-        raise ValueError("Temperature grid must have at least 4 points.")
-
-    # 6) grid range inside every response
-    for r in self.responses:
-        logT_grid = np.log10(r.temperature.value)
-        if not (self._min_T >= logT_grid.min() and self._max_T <= logT_grid.max()):
-            raise ValueError(
-                f"The specified temperature range [{self._min_T}, {self._max_T}] "
-                "is outside the bounds of one or more filter response grids."
-            )
-
-    # 7) intensity_errors length (only if provided)
-    if self._intensity_errors is not None:
-        if self._intensity_errors.shape != self._observed_intensities.shape:
-            raise ValueError(
-                "Length of intensity_errors must match observed_intensities."
-            )
-        if not np.all(np.isfinite(self._intensity_errors)) or np.any(self._intensity_errors < 0):
-            raise ValueError("`intensity_errors` must be finite and >= 0.")
-
-    # 8) monte_carlo_runs, max_iterations already checked earlier in __init__ (keep if you prefer)
-    # Nothing to return; success means no exception raised.
-    return None
 
 
 class XRTDEMIterative:
@@ -260,6 +202,69 @@ class XRTDEMIterative:
         except Exception as e:
             raise ValueError(f"Invalid solv_factor: {e}")
 
+
+
+    #### TEST GIT CI TEST #####
+        
+    def validate_inputs(self) -> None:
+        """
+        Validate user-provided inputs. Raises ValueError on any issue.
+
+        Intentionally separate from __init__ so tests and users can construct
+        the object first, then explicitly validate (matches test expectations).
+        """
+        # 1) observed_channel non-empty
+        if self.observed_channel is None or len(self.observed_channel) == 0:
+            raise ValueError("`observed_channel` is required and cannot be empty.")
+
+        # 2) intensities: length & finite
+        if self._observed_intensities is None or len(self._observed_intensities) == 0:
+            raise ValueError("`observed_intensities` is required and cannot be empty.")
+        if not np.all(np.isfinite(self._observed_intensities)):
+            raise ValueError("`observed_intensities` must be finite numbers.")
+
+        # 3) responses present
+        if self.responses is None or len(self.responses) == 0:
+            raise ValueError("`temperature_responses` is required and cannot be empty.")
+
+        # 4) lengths consistent between filters/intensities/responses
+        if not (
+            len(self._observed_intensities) == len(self.responses) == len(self.observed_channel)
+        ):
+            raise ValueError(
+                "Length mismatch: intensities, responses, and observed_channel must match."
+            )
+
+        # 5) temperature grid sanity
+        if not (self._min_T < self._max_T):
+            raise ValueError("min_T must be < max_T.")
+        if self._dT <= 0:
+            raise ValueError("dT must be a positive scalar.")
+        n_pts = int(np.floor((self._max_T - self._min_T) / self._dT + 1e-9)) + 1
+        if n_pts < 4:
+            raise ValueError("Temperature grid must have at least 4 points.")
+
+        # 6) grid range inside every response
+        for r in self.responses:
+            logT_grid = np.log10(r.temperature.value)
+            if not (self._min_T >= logT_grid.min() and self._max_T <= logT_grid.max()):
+                raise ValueError(
+                    f"The specified temperature range [{self._min_T}, {self._max_T}] "
+                    "is outside the bounds of one or more filter response grids."
+                )
+
+        # 7) intensity_errors length & finiteness (only if provided)
+        if self._intensity_errors is not None:
+            if self._intensity_errors.shape != self._observed_intensities.shape:
+                raise ValueError(
+                    "Length of intensity_errors must match observed_intensities."
+                )
+            if not np.all(np.isfinite(self._intensity_errors)) or np.any(self._intensity_errors < 0):
+                raise ValueError("`intensity_errors` must be finite and >= 0.")
+
+        # success ⇒ no return value
+        return None
+    ###########################
     def __repr__(self):
         return (
             f"<XRTDEMIterative(filters={self.filter_names}, "
