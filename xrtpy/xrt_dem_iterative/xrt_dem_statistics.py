@@ -21,7 +21,7 @@ class ComputeDEMStatistics:
     print_residuals()
         Print modeled vs. observed intensities and residuals (normalized by error).
     """
-    
+
     def __init__(self, dem_solver):
         self.dem_solver = dem_solver
 

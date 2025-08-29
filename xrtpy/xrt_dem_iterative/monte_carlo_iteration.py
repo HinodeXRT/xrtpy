@@ -6,7 +6,7 @@ import numpy as np
 
 
 class MonteCarloIteration:
-    
+
     def __init__(self, dem_solver):
         """
         Parameters
