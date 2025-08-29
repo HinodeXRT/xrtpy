@@ -1,15 +1,30 @@
 __all__ = [
-    "Monte_Carlo_Iteration",
+    "MonteCarloIteration",
 ]
 
 import numpy as np
 
 
-class Monte_Carlo_Iteration:
+class MonteCarloIteration:
+    
+    def __init__(self, dem_solver):
+        """
+        Parameters
+        ----------
+        dem_solver : XRTDEMIterative
+            A fitted DEM object with observed intensities, errors, and temperature grid.
+        """
+        self.dem_solver = dem_solver
 
-    # def __init__( ):
+        if not hasattr(dem_solver, "logT"):
+            raise RuntimeError("DEM solver must have a defined temperature grid.")
+        if not hasattr(dem_solver, "intensity_errors"):
+            raise RuntimeError("DEM solver must define intensity errors.")
 
-    def generate_mc_realizations(self, n_realizations=100, seed=None):
+        self.n_bins = len(dem_solver.logT)
+        self.n_filters = len(dem_solver.observed_intensities)
+
+    def generate_mc_realizations(self, n_realizations=100, seed=None,reject_negative=True)
         """
         Generate randomized intensity realizations for Monte Carlo uncertainty estimation.
 
