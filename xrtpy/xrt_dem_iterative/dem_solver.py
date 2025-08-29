@@ -2,23 +2,18 @@ __all__ = [
     "XRTDEMIterative",
 ]
 
-#import pdb; pdb.set_trace()
+# import pdb; pdb.set_trace()
 
 import warnings
 
 import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
-from scipy.interpolate import interp1d, CubicSpline
+from scipy.interpolate import interp1d
 
 from xrtpy.util.filters import validate_and_format_filters
 
 # DEM specific
-from xrtpy.xrt_dem_iterative.monte_carlo_iteration import MonteCarloIteration
-from xrtpy.xrt_dem_iterative.xrt_dem_statistics import ComputeDEMStatistics
-
-
-
 
 
 class XRTDEMIterative:
@@ -202,10 +197,8 @@ class XRTDEMIterative:
         except Exception as e:
             raise ValueError(f"Invalid solv_factor: {e}")
 
-
-
     #### TEST GIT CI TEST #####
-        
+
     def validate_inputs(self) -> None:
         """
         Validate user-provided inputs. Raises ValueError on any issue.
@@ -229,7 +222,9 @@ class XRTDEMIterative:
 
         # 4) lengths consistent between filters/intensities/responses
         if not (
-            len(self._observed_intensities) == len(self.responses) == len(self.observed_channel)
+            len(self._observed_intensities)
+            == len(self.responses)
+            == len(self.observed_channel)
         ):
             raise ValueError(
                 "Length mismatch: intensities, responses, and observed_channel must match."
@@ -259,11 +254,14 @@ class XRTDEMIterative:
                 raise ValueError(
                     "Length of intensity_errors must match observed_intensities."
                 )
-            if not np.all(np.isfinite(self._intensity_errors)) or np.any(self._intensity_errors < 0):
+            if not np.all(np.isfinite(self._intensity_errors)) or np.any(
+                self._intensity_errors < 0
+            ):
                 raise ValueError("`intensity_errors` must be finite and >= 0.")
 
         # success ⇒ no return value
         return None
+
     ###########################
     def __repr__(self):
         return (
@@ -442,7 +440,7 @@ class XRTDEMIterative:
 
         rows = []
         for i, (T_orig, R_orig, fname) in enumerate(
-            zip(self.response_temperatures, self.response_values, self.filter_names)
+            zip(self.response_temperatures, self.response_values, self.filter_names, strict=False)
         ):
             logT_orig = np.log10(T_orig.to_value(u.K))
             # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
@@ -752,9 +750,7 @@ class XRTDEMIterative:
         # 4. Return normalized residuals
         residuals = (I_model - self._observed_intensities) / errors
         print(
-            "[-Residuals stats > mean: {:.2e}, std: {:.2e}".format(
-                np.mean(residuals), np.std(residuals)
-            )
+            f"[-Residuals stats > mean: {np.mean(residuals):.2e}, std: {np.std(residuals):.2e}"
         )
         return residuals
 
@@ -855,8 +851,8 @@ class XRTDEMIterative:
         Plot the fitted DEM (and optional initial DEM) using a consistent scale.
 
         """
-        import numpy as np
         import matplotlib.pyplot as plt
+        import numpy as np
 
         if ax is None:
             fig, ax = plt.subplots()
