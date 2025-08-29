@@ -1,11 +1,11 @@
-from pathlib import Path
+
+from importlib.resources import files
 
 import numpy as np
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
-from importlib.resources import files
 
 from xrtpy.response.channel import Channel
 
