@@ -11,10 +11,9 @@ from scipy.interpolate import interp1d, CubicSpline
 
 from xrtpy.util.filters import validate_and_format_filters
 
-#DEM specific
+# DEM specific
 from xrtpy.xrt_dem_iterative.monte_carlo_iteration import MonteCarloIteration
 from xrtpy.xrt_dem_iterative.xrt_dem_statistics import ComputeDEMStatistics
-
 
 
 class XRTDEMIterative:
@@ -357,25 +356,32 @@ class XRTDEMIterative:
             np.log(10.0) * self.dlogT
         )  # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
-
     def _interpolate_responses_to_grid(self):
         """
         Interpolate each filter's temperature response onto self.logT (log10 K).
         Stores a dense matrix with shape (n_filters, n_temperatures), unitless numeric.
         """
         if not hasattr(self, "logT"):
-            raise AttributeError("Temperature grid missing. Call create_logT_grid() first.")
+            raise AttributeError(
+                "Temperature grid missing. Call create_logT_grid() first."
+            )
 
         rows = []
-        for i, (T_orig, R_orig, fname) in enumerate(zip(self.response_temperatures, self.response_values, self.filter_names)):
+        for i, (T_orig, R_orig, fname) in enumerate(
+            zip(self.response_temperatures, self.response_values, self.filter_names)
+        ):
             logT_orig = np.log10(T_orig.to_value(u.K))
-            #response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
+            # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
             response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
 
-            #Remove later
+            # Remove later
             print(f"→ Channel {i}: {fname}")
-            print(f"   logT_orig.shape = {logT_orig.shape}, response_vals.shape = {response_vals.shape}")
-            print(f"   logT range: {logT_orig.min():.2f}–{logT_orig.max():.2f}, grid: {self.logT.min():.2f}–{self.logT.max():.2f}")
+            print(
+                f"   logT_orig.shape = {logT_orig.shape}, response_vals.shape = {response_vals.shape}"
+            )
+            print(
+                f"   logT range: {logT_orig.min():.2f}–{logT_orig.max():.2f}, grid: {self.logT.min():.2f}–{self.logT.max():.2f}"
+            )
 
             try:
                 interp_func = interp1d(
@@ -399,7 +405,6 @@ class XRTDEMIterative:
         if self._response_matrix.shape != (len(self.responses), self.logT.size):
             raise RuntimeError("Interpolated response matrix has unexpected shape.")
 
-            
     @property
     def response_matrix(self):
         """
@@ -484,13 +489,14 @@ class XRTDEMIterative:
             dem_logT = np.zeros(n_temps)  # 27
             for i in range(n_filters):
                 row = R[i, :]
-                ratio = np.where(row > 1e-30, I_obs[i] / row, 0.0)  # cm^-5 first  estimate for the DEM
+                ratio = np.where(
+                    row > 1e-30, I_obs[i] / row, 0.0
+                )  # cm^-5 first  estimate for the DEM
                 dem_logT += ratio
             dem_logT /= n_filters
-            #IDL - for i=0,n_channels-1 do dem += obs_val[i] / response[i,*]
-            #IDL - dem = dem / n_channels
-            
-            
+            # IDL - for i=0,n_channels-1 do dem += obs_val[i] / response[i,*]
+            # IDL - dem = dem / n_channels
+
         # DO NOT divide by self._dT here.
         # Optional smoothing in per-logT space:
         if smooth:
@@ -592,7 +598,6 @@ class XRTDEMIterative:
 
         print("Initial DEM estimate complete")
 
-
     # STEP 1 - Each temperature bin gets its own parameter, initialized with your initial DEM estimate
     def _build_lmfit_parameters(self):
         """
@@ -632,7 +637,7 @@ class XRTDEMIterative:
         for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
             params.add(f"dem_{i}", value=float(val), min=0.0)
         self.lmfit_params = params
-        
+
         print(f"Built {len(params)} lmfit parameters for DEM fit")
 
     # STEP 2: Build the residual function
@@ -702,13 +707,12 @@ class XRTDEMIterative:
         if not hasattr(self, "lmfit_params"):
             self._build_lmfit_parameters()
 
-        #Mimght not need- already using in _build_lmfit_parameters().    
+        # Mimght not need- already using in _build_lmfit_parameters().
         # params = Parameters()
         # for i, val in enumerate(self.initial_dem_logT.to_value(u.cm**-5)):
         #     params.add(f"dem_{i}", value=float(val), min=0.0)
         # self.lmfit_params = params
 
-        
         print("Starting DEM optimization..")
         result = minimize(
             self._residuals,
@@ -749,7 +753,6 @@ class XRTDEMIterative:
 
         return result
 
-
     def print_residual_diagnostics(self, params):
 
         dem_logT = np.array([params[f"dem_{i}"].value for i in range(len(self.logT))])
@@ -772,7 +775,7 @@ class XRTDEMIterative:
         show_initial: bool = True,
         ax=None,
         title: str | None = None,
-        show: bool = True
+        show: bool = True,
     ):
         """
         Plot the fitted DEM (and optional initial DEM) using a consistent scale.
@@ -859,15 +862,21 @@ class XRTDEMIterative:
 
         # --- plot without double-logging ---
         if logscale:
-            ax.semilogy(logT, y_fit_linear, linestyle='-', label="Fitted DEM")
+            ax.semilogy(logT, y_fit_linear, linestyle="-", label="Fitted DEM")
             if y_init_linear is not None:
-                ax.semilogy(logT, y_init_linear,linestyle='-', alpha=0.7, label="Initial DEM")
+                ax.semilogy(
+                    logT, y_init_linear, linestyle="-", alpha=0.7, label="Initial DEM"
+                )
             ax.set_ylabel(y_label_lin)
         else:
-            ax.plot(logT, np.log10(y_fit_linear),linestyle='-', label="Fitted DEM")
+            ax.plot(logT, np.log10(y_fit_linear), linestyle="-", label="Fitted DEM")
             if y_init_linear is not None:
                 ax.plot(
-                    logT, np.log10(y_init_linear), linestyle='-', alpha=0.7, label="Initial DEM"
+                    logT,
+                    np.log10(y_init_linear),
+                    linestyle="-",
+                    alpha=0.7,
+                    label="Initial DEM",
                 )
             ax.set_ylabel(y_label_log10)
 
@@ -879,10 +888,9 @@ class XRTDEMIterative:
         ax.grid(True, alpha=0.3)
         return ax
 
-
     def solve(self):
-        print("[•] Running DEM fit...")
-        
+        print("Running DEM fit...")
+
         # Build spline parameters
         self._build_lmfit_parameters()
 
@@ -897,37 +905,32 @@ class XRTDEMIterative:
         self.result = result
 
         # Extract fitted DEM from lmfit parameters
-        dem_best_logT = np.array([result.params[f"dem_{i}"].value for i in range(len(self.logT))])
+        dem_best_logT = np.array(
+            [result.params[f"dem_{i}"].value for i in range(len(self.logT))]
+        )
         self.fitted_dem_logT = dem_best_logT * u.cm**-5
-        self.fitted_dem = (dem_best_logT / (np.log(10.0) * self.T.to_value(u.K))) * u.cm**-5 / u.K
+        self.fitted_dem = (
+            (dem_best_logT / (np.log(10.0) * self.T.to_value(u.K))) * u.cm**-5 / u.K
+        )
 
-        if not result.success:
-            print("[⚠️] DEM fit did not fully converge:")
-            print("  →", result.message)
+        # if not result.success:
+        #     print(" DEM fit did not fully converge:")
+        #     print("  >", result.message)
 
-        print("[✓] DEM fit complete")
-        print(f"  → Reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}")
-        print(f"  → Total iterations: {result.nfev}")
+        # print(" DEM fit complete")
+        # print(f"  > Reduced chi-squared: {result.chisqr / len(self._observed_intensities):.2f}")
+        # print(f"  > Total iterations: {result.nfev}")
 
+        # # Automatically run MC if enabled
+        # if self.monte_carlo_runs > 0:
+        #     print(f"Running Monte Carlo with {self.monte_carlo_runs} trials...")
+        #     from .monte_carlo_iteration import MonteCarloIteration
+        #     mc = MonteCarloIteration(self)
+        #     mc.run_mc_simulation(n_draws=self.monte_carlo_runs)
+        #     self.mc_results = mc
+        #     self.mc_stats = mc.mc_stats
 
-        # Automatically run MC if enabled
-        if self.monte_carlo_runs > 0:
-            print(f"[•] Running Monte Carlo with {self.monte_carlo_runs} trials...")
-            from .monte_carlo_iteration import MonteCarloIteration
-            mc = MonteCarloIteration(self)
-            mc.run_mc_simulation(n_draws=self.monte_carlo_runs)
-            self.mc_results = mc
-            self.mc_stats = mc.mc_stats
-
-        # #Stats
-        # self.dem_stats = ComputeDEMStatistics(self)
-        # chi2, chi2_red = self.dem_stats.compute_chi_squared()
-        # print(f"[χ²] Total χ²: {chi2:.2f}, Reduced χ²: {chi2_red:.2f}")
-        # self.dem_stats.print_residuals()
-        
         return result
-
-
 
     def summary(self):
         print("XRTpy DEM Iterative Setup Summary")
