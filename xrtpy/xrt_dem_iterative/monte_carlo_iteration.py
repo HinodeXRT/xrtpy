@@ -24,7 +24,7 @@ class MonteCarloIteration:
         self.n_bins = len(dem_solver.logT)
         self.n_filters = len(dem_solver.observed_intensities)
 
-    def generate_mc_realizations(self, n_realizations=100, seed=None,reject_negative=True)
+    def generate_mc_realizations(self, n_realizations=100, seed=None,reject_negative=True):
         """
         Generate randomized intensity realizations for Monte Carlo uncertainty estimation.
 
