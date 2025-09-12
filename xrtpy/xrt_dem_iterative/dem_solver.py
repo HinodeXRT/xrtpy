@@ -23,12 +23,17 @@ class XRTDEMIterative:
 
     Parameters
     ----------
-    observed_channel : str or list of str
+    observed_channel : str or list of str (required)
         Filter names used in the observation (e.g., 'Al-mesh', 'Be-thin').
-    observed_intensities : array-like
-        Observed intensities in DN/s/pix for each channel.
-    temperature_responses : list
+        Must match the provided temperature responses.
+    observed_intensities : array-like (required)
+        Observed intensities for each channel.
+        Units = DN/s/pix.
+    temperature_responses : list (required)
         List of `TemperatureResponseFundamental` objects matching the filters.
+        Units = DN s^-1 pix^-1 EM^-1.
+        Can be generated using `xrtpy.response.tools.generate_temperature_responses` 
+        for one or more filters. See: https://xrtpy.readthedocs.io/en/latest/getting_started.html
     intensity_errors : array-like, optional
         Intensity uncertainties. If None, will use a model-based estimate.
     min_T : float
@@ -241,7 +246,8 @@ class XRTDEMIterative:
 
         # 6) grid range inside every response
         for r in self.responses:
-            logT_grid = np.log10(r.temperature.value)
+            #logT_grid = np√.log10(r.temperature.value)
+            logT_grid = np.log10(r.temperature.to_value(u.K))
             if not (self._min_T >= logT_grid.min() and self._max_T <= logT_grid.max()):
                 raise ValueError(
                     f"The specified temperature range [{self._min_T}, {self._max_T}] "
