@@ -44,7 +44,7 @@ The DEM workflow requires three main inputs, each with specific type, shape, and
     - Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
     - Units: DN s\ :sup:`-1` pix\ :sup:`-1` EM\ :sup:`-1`  
     - Description: Instrument temperature responses matching the filters.  
-        These can be generated with :func:`xrtpy.response.tools.generate_temperature_responses` 
+        These can be generated with ``xrtpy.response.tools.generate_temperature_responses``
         See :doc:`getting_started` for details.
 
 Example
