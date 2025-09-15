@@ -27,7 +27,7 @@ Why DEM?
 DEM in XRTpy
 ------------
 XRTpy provides a Python implementation of the iterative spline-fitting method 
-(originally available in IDL as `xrt_dem_iterative2.pro`).  
+(originally available in IDL as ``xrt_dem_iterative2.pro``).  
 
 The DEM workflow requires three main inputs, each with specific type, shape, and units:
 
@@ -41,10 +41,10 @@ The DEM workflow requires three main inputs, each with specific type, shape, and
     - Description: Measured intensities corresponding to each filter.  
 
 3. **Temperature response functions**  
-    - Type: ``list`` of :class:`~xrtpy.response.fundamentals.TemperatureResponseFundamental`  
+    - Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
     - Units: DN s\ :sup:`-1` pix\ :sup:`-1` EM\ :sup:`-1`  
     - Description: Instrument temperature responses matching the filters.  
-        These can be generated with :func:`xrtpy.response.tools.generate_temperature_responses`.  
+        These can be generated with :func:`xrtpy.response.tools.generate_temperature_responses` 
         See :doc:`getting_started` for details.
 
 Example
@@ -165,8 +165,8 @@ References
 - Golub, L., et al. (2004), *Solar Physics*, 243, 63. :cite:p:`golub:2004`
 - Weber, M. A., et al. (2004), *ApJ*, 605, 528. :cite:p:`weber:2004`.
 
-Next Steps
-----------
-- See :ref:`API Reference <xrtpy.xrt_dem_iterative>` for details on 
-    ``XRTDEMIterative``. Coming soon. 
-- Explore example notebooks in the `examples/` directory. Coming soon. 
+.. Next Steps
+.. ----------
+.. - See :ref:`API Reference <xrtpy.xrt_dem_iterative>` for details on 
+..     ``XRTDEMIterative``. Coming soon. 
+.. - Explore example notebooks in the `examples/` directory. Coming soon. 
