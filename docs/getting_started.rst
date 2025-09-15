@@ -12,8 +12,8 @@ XRTpy Objects
 XRTpy currently provides access to the following core classes:
 
 - ``xrtpy.response.Channel``
-- ``xrtpy.response.Effective Area``
-- ``xrtpy.response.Temperature Response``
+- ``xrtpy.response.EffectiveAreaFundamental``
+- ``xrtpy.response.TemperatureResponseFundamental``
 
 It also includes functionality to:
 
@@ -45,7 +45,7 @@ XRTpy calculates the temperature response of XRT filter channels using the CHIAN
 Deriving Temperature and Emission Measure
 -----------------------------------------
 
-The ``temperature_from_filter_ratio``` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
+The ``temperature_from_filter_ratio`` function allows you to derive plasma temperature and emission measure from a pair of XRT images using the filter-ratio method. This mirrors the logic in the SolarSoft IDL routine of the same name. A usage example is available in the Examples section.
 
 Image Deconvolution with the PSF
 --------------------------------
@@ -81,6 +81,62 @@ You may also pass the ``abundance_model`` keyword to ``temperature_from_filter_r
    In the future, XRTpy may support additional emission model libraries beyond CHIANTI.
    This feature is planned for the **v0.6.0** release, expected later in **2025**. Stay tuned for exciting new capabilities!
 
+
+Tools
+*****
+
+The ``xrtpy.response.tools`` module includes helpful utility functions to streamline workflows. It includes the following:
+
+Generate Temperature Responses
+------------------------------
+
+Use the ``generate_temperature_responses`` tool to compute the temperature response for one or more filters — including combinations like ``"Al-poly/Ti-poly"`` — with a single command.
+
+This function returns a list of ``TemperatureResponseFundamental`` objects, one for each specified filter.
+
+**Function:**
+
+.. code-block:: python
+
+   from xrtpy.response.tools import generate_temperature_responses
+
+   responses = generate_temperature_responses(
+       filters=["Al-poly", "Be-thick", "Al-poly/Ti-poly"],
+       obs_date="2020-07-04T00:00:00",
+       abundance="Hybrid",
+   )
+
+   for resp in responses:
+       print(f"Filter: {resp.filter_name}")
+       print(f"  Temperatures: {resp.temperature[:3]}")
+       print(f"  Response: {resp.response[:3]}")
+
+
+**Example Output:**
+
+.. code-block:: text
+
+   Filter: Al-poly
+     Temperatures: [100000. 112201.9 125892.516] K
+     Response: [8.34e-31 1.07e-30 1.53e-30] cm5 DN / (pix s)
+
+   Filter: Be-thick
+     Temperatures: [100000. 112201.9 125892.516] K
+     Response: [0.00e+00 1.73e-94 2.43e-84] cm5 DN / (pix s)
+
+   Filter: Al-poly/Ti-poly
+     Temperatures: [100000. 112201.9 125892.516] K
+     Response: [5.34e-34 7.24e-34 1.11e-33] cm5 DN / (pix s)
+
+Each response object has the following attributes:
+
+- ``filter_name`` — Filter label (e.g., ``"Be-thick"`` or ``"Al-poly/Ti-poly"``)
+- ``temperature`` — Temperature grid (Astropy Quantity in K)
+- ``response`` — Temperature response function (Astropy Quantity in cm⁵ DN / (pix s))
+
+This tool is useful on its own, but it also serves as a foundation for upcoming **Differential Emission Measure (DEM)** workflows in XRTpy.
+
+
 Data Products
 *************
 
@@ -90,6 +146,36 @@ XRT data products are available through the XRT website. These include:
 - `Level 2 Synoptics`_ — Composite images from the synoptic observing program.
 
 For more information, visit the `XRT data products`_ page.
+
+Double Filter Combinations
+**************************
+
+XRTpy now supports double filter combinations such as ``"Al-poly/Ti-poly"`` in both the :obj:`EffectiveAreaFundamental <xrtpy.response.EffectiveAreaFundamental>` and :obj:`TemperatureResponseFundamental <xrtpy.response.TemperatureResponseFundamental>` classes.
+
+**Examples:**
+
+.. code-block:: python
+
+   from xrtpy.response import EffectiveAreaFundamental, TemperatureResponseFundamental
+
+   eff_area = EffectiveAreaFundamental(
+       "Al-poly/Ti-poly", "2020-08-17T09:00:00", abundance_model="photospheric"
+   )
+   temp_resp = TemperatureResponseFundamental(
+       "C-poly/Ti-poly", "2025-07-10T12:00:00", abundance_model="coronal"
+   )
+
+The following combinations are currently supported:
+
+- ``"Al-poly/Al-mesh"``
+- ``"Al-poly/Ti-poly"``
+- ``"Al-poly/Al-thick"``
+- ``"Al-poly/Be-thick"``
+- ``"C-poly/Ti-poly"``
+
+.. note::
+   Only a subset of double filter combinations is currently supported. If you'd like to request additional combinations, please open an issue on GitHub or email the development team.
+
 
 X-Ray Filter Channels
 *********************
