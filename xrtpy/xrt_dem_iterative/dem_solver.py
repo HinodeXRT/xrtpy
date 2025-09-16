@@ -394,42 +394,41 @@ class XRTDEMIterative:
         (e.g., when using `lmfit.minimize`). Default is 2000.
         """
         return self._max_iterations
-
+    
     def create_logT_grid(self):
         """
-        Build the DEM temperature grid *exactly* from min to max in steps of dT.
-            Construct the temperature grid for DEM calculations.
-
+        Construct the regular log10 temperature grid for DEM calculations.
+        
         This builds a regularly spaced grid in log10(temperature), then converts it
         to linear temperature for use in the DEM integral.
-
+        
         Notes
         -----
-        - IDL's `xrt_dem_iterative2.pro` and the DEM_Solver PDF documentation
-        describe this as the "regular logT grid".
+        - IDL's `xrt_dem_iterative2.pro` describes this as the "regular logT grid".
         - Two forms of the temperature grid are stored:
             * self.logT : log10(T) values (dimensionless)
             * self.T    : linear temperatures (Kelvin, astropy.units.Quantity)
         - The grid is inclusive of both `min_T` and `max_T`, with step size `dT`.
-        
-    
+
+        Additional attributes created:
+        - self.dlogT : float
+            Step size in log10(T) (dimensionless).
+        - self.dlnT : float
+            Step size in natural log(T). Useful for IDL-style integrals of the form:
+                F = int. DEM(T) * R(T) * T d(ln T)
         """
-        #xrt_dem_iter_solver.pro
+        # number of bins including endpoints
         n_bins = int(round((self._max_T - self._min_T) / self._dT)) + 1
-        # self.logT = np.linspace(self._min_T, self._max_T, n_bins) #28
-        # self.T = (10**self.logT) * u.K #28
-        # self.dlogT = self._dT  # dimensionless - convenience-27
-        # self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
 
-        # inclusive grid with float-safe endpoint 
-        self.logT = np.arange(self._min_T, self._max_T + self._dT / 2.0, self._dT) #Defines grid in log space - dimensionless
-        self.T = (10.0**self.logT) * u.K #Converts to linear temperatur
+        # inclusive logT grid (IDL-style regular grid)
+        self.logT = np.linspace(self._min_T, self._max_T, n_bins)
 
-        # scalar spacing (dimensionless)
-        self.dlogT = float(self._dT)
-        self.dlnT = (
-            np.log(10.0) * self.dlogT
-        )  # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
+        # linear temperature grid in Kelvin
+        self.T = (10.0 ** self.logT) * u.K
+
+        self.dlogT = float(self._dT)  # scalar spacing (dimensionless and natural-log equivalent)
+        self.dlnT = np.log(10.0) * self.dlogT # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
+
 
     def _interpolate_responses_to_grid(self):
         """
