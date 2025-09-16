@@ -13,9 +13,6 @@ from scipy.interpolate import interp1d
 
 from xrtpy.util.filters import validate_and_format_filters
 
-# DEM specific
-
-
 class XRTDEMIterative:
     """
     Estimate the differential emission measure (DEM) from Hinode/XRT data
@@ -105,20 +102,7 @@ class XRTDEMIterative:
             self._intensity_errors = np.asarray(intensity_errors, dtype=float)
         else:
             self._intensity_errors = None
-
-        # if intensity_errors is not None:
-        #     self._intensity_errors = np.asarray(intensity_errors, dtype=float)
-        #     if self._intensity_errors.shape != self._observed_intensities.shape:
-        #         raise ValueError(
-        #             "Length of intensity_errors must match observed_intensities."
-        #         )
-        #     if not np.all(np.isfinite(self._intensity_errors)) or np.any(
-        #         self._intensity_errors < 0
-        #     ):
-        #         raise ValueError("`intensity_errors` must be finite and >= 0.")
-        # else:
-        #     self._intensity_errors = None  # Will be computed later
-
+        
         # Store temperature grid parameters
         self._dT = float(dT)
         self._min_T = float(min_T)
@@ -282,12 +266,9 @@ class XRTDEMIterative:
     #     """
     #     return self._name
 
+    #######################################################################################################################################
     @property
-    def observed_intensities(
-        self,
-    ) -> (
-        u.Quantity
-    ):  # Add method to account for known values not worth observed_intensities
+    def observed_intensities(self,) -> ( u.Quantity):  # Add method to account for known values not worth observed_intensities
         """
         Observed intensities with physical units.
         Returns
@@ -380,7 +361,7 @@ class XRTDEMIterative:
                 "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
                 UserWarning,
             )
-        self._using_estimated_errors = False  # suppress future warnings
+        self._using_estimated_errors = True  # suppress future warnings
 
         estimated = np.maximum(
             self.relative_error * self._observed_intensities,
@@ -417,16 +398,32 @@ class XRTDEMIterative:
     def create_logT_grid(self):
         """
         Build the DEM temperature grid *exactly* from min to max in steps of dT.
+            Construct the temperature grid for DEM calculations.
+
+        This builds a regularly spaced grid in log10(temperature), then converts it
+        to linear temperature for use in the DEM integral.
+
+        Notes
+        -----
+        - IDL's `xrt_dem_iterative2.pro` and the DEM_Solver PDF documentation
+        describe this as the "regular logT grid".
+        - Two forms of the temperature grid are stored:
+            * self.logT : log10(T) values (dimensionless)
+            * self.T    : linear temperatures (Kelvin, astropy.units.Quantity)
+        - The grid is inclusive of both `min_T` and `max_T`, with step size `dT`.
+        
+    
         """
+        #xrt_dem_iter_solver.pro
         n_bins = int(round((self._max_T - self._min_T) / self._dT)) + 1
         # self.logT = np.linspace(self._min_T, self._max_T, n_bins) #28
         # self.T = (10**self.logT) * u.K #28
         # self.dlogT = self._dT  # dimensionless - convenience-27
         # self.dlnT = np.log(10.0) * self.dlogT  # needed for IDL-style integrals
 
-        # inclusive grid with float-safe endpoint
-        self.logT = np.arange(self._min_T, self._max_T + self._dT / 2.0, self._dT)
-        self.T = (10.0**self.logT) * u.K
+        # inclusive grid with float-safe endpoint 
+        self.logT = np.arange(self._min_T, self._max_T + self._dT / 2.0, self._dT) #Defines grid in log space - dimensionless
+        self.T = (10.0**self.logT) * u.K #Converts to linear temperatur
 
         # scalar spacing (dimensionless)
         self.dlogT = float(self._dT)
