@@ -185,6 +185,7 @@ class XRTDEMIterative:
                 raise ValueError("solv_factor must be a positive number.")
         except Exception as e:
             raise ValueError(f"Invalid solv_factor: {e}")
+        
 
     #### TEST GIT CI TEST #####
 
@@ -432,9 +433,41 @@ class XRTDEMIterative:
 
     def _interpolate_responses_to_grid(self):
         """
-        Interpolate each filter's temperature response onto self.logT (log10 K).
-        Stores a dense matrix with shape (n_filters, n_temperatures), unitless numeric.
+        Interpolate each filter's temperature response onto the common logT grid.
+
+        This prepares the response matrix (`_response_matrix`) used in DEM fitting.
+        Each filter's original response (on its native temperature grid) is
+        interpolated onto `self.logT`, the regular log10 temperature grid built
+        by `create_logT_grid`.
+
+        Notes
+        -----
+        - In IDL (`xrt_dem_iterative2.pro`) and the DEM_Solver PDF documentation,
+        this corresponds to constructing `Res_Mat`, where each row represents
+        one filter's response on the shared logT grid.
+        - Extrapolation beyond the original response grid is set to 0.0
+        (same behavior as IDL).
+        - Units are preserved during interpolation:
+            DN s⁻¹ pix⁻¹ cm⁵ (per emission measure).
+        - Shape of `_response_matrix`:
+            (n_filters, n_temperatures)
+
+        Attributes Created
+        ------------------
+        interpolated_responses : list of ndarray
+            Individual interpolated response arrays (debugging convenience).
+        _response_matrix : ndarray
+            Final stacked response matrix with shape (n_filters, n_temperatures).
+
+        Raises
+        ------
+        AttributeError
+            If `create_logT_grid()` has not been called before this method.
+        RuntimeError
+            If the interpolated matrix shape does not match expectations.
+
         """
+        #In IDL, Res_LogTemp_arr must exist before responses can be interpolated
         if not hasattr(self, "logT"):
             raise AttributeError(
                 "Temperature grid missing. Call create_logT_grid() first."
@@ -1004,25 +1037,42 @@ class XRTDEMIterative:
 
         return result
 
+
     def summary(self):
-        print("XRTpy DEM Iterative Setup Summary")
-        print("-" * 40)
+        print("\nXRTpy DEM Iterative Setup Summary\n")
+        print("-" * 50)
         print(f" Filters:           {self.filter_names}")
         print(f" Obs Intensities:   {self.observed_intensities}")
-        print(f" Number of observations (Nobs): {len(self._observed_intensities)}")
-        print(f" Solver Normalization Factor: {self.solv_factor:.1e}")
-        print(
-            f" Monte Carlo runs:  {self.monte_carlo_runs if self.monte_carlo_runs > 0 else 'None'}"
-        )
-        print(f" Max Iterations:    {self.max_iterations}")
+        print(f" Number of obs:     {len(self._observed_intensities)}")
         print(f" Intensity Errors:  {self.intensity_errors}")
-        print(f" Temp Grid:         logT {self.min_T} to {self.max_T} (step {self.dT})")
+        print(f" Error model used:  {'User-provided' if self._intensity_errors is not None else f'Auto (obs * {self.relative_error}, min={self.min_error} DN/s)'}")
+        print(f" Temp Grid:         logT {self.min_T}–{self.max_T}, step {self.dT}")
         print(f" Temp bins:         {len(self.logT)}")
-        print(
-            f" Error model used:  {'User-provided' if self._intensity_errors is not None else 'Auto (obs * 0.03, min=2 DN/s)'}"
-        )
-        if self._intensity_errors is None:
-            print(
-                "For more info: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro"
-            )
-        print("-" * 40)
+        print(f" Solver factor:     {self.solv_factor:.1e}")
+        print(f" Monte Carlo runs:  {self.monte_carlo_runs or 'None'}")
+        print(f" Max Iterations:    {self.max_iterations}")
+        print("-" * 50)
+
+
+    # def summary(self):
+    #     print("XRTpy DEM Iterative Setup Summary")
+    #     print("-" * 40)
+    #     print(f" Filters:           {self.filter_names}")
+    #     print(f" Obs Intensities:   {self.observed_intensities}")
+    #     print(f" Number of observations (Nobs): {len(self._observed_intensities)}")
+    #     print(f" Solver Normalization Factor: {self.solv_factor:.1e}")
+    #     print(
+    #         f" Monte Carlo runs:  {self.monte_carlo_runs if self.monte_carlo_runs > 0 else 'None'}"
+    #     )
+    #     print(f" Max Iterations:    {self.max_iterations}")
+    #     print(f" Intensity Errors:  {self.intensity_errors}")
+    #     print(f" Temp Grid:         logT {self.min_T} to {self.max_T} (step {self.dT})")
+    #     print(f" Temp bins:         {len(self.logT)}")
+    #     print(
+    #         f" Error model used:  {'User-provided' if self._intensity_errors is not None else 'Auto (obs * 0.03, min=2 DN/s)'}"
+    #     )
+    #     if self._intensity_errors is None:
+    #         print(
+    #             "For more info: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro"
+    #         )
+    #     print("-" * 40)
