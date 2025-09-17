@@ -431,130 +431,157 @@ class XRTDEMIterative:
         self.dlnT = np.log(10.0) * self.dlogT # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
 
+    # def _interpolate_responses_to_grid(self):
+    #     """
+    #     Interpolate each filter's temperature response onto the common logT grid.
+
+    #     This prepares the response matrix (`_response_matrix`) used in DEM fitting.
+    #     Each filter's original response (on its native temperature grid) is
+    #     interpolated onto `self.logT`, the regular log10 temperature grid built
+    #     by `create_logT_grid`.
+
+    #     Notes
+    #     -----
+    #     - In IDL (`xrt_dem_iterative2.pro`) and the DEM_Solver PDF documentation,
+    #     this corresponds to constructing `Res_Mat`, where each row represents
+    #     one filter's response on the shared logT grid.
+    #     - Extrapolation beyond the original response grid is set to 0.0
+    #     (same behavior as IDL).
+    #     - Units are preserved during interpolation:
+    #         DN s⁻¹ pix⁻¹ cm⁵ (per emission measure).
+    #     - Shape of `_response_matrix`:
+    #         (n_filters, n_temperatures)
+
+    #     Attributes Created
+    #     ------------------
+    #     interpolated_responses : list of ndarray
+    #         Individual interpolated response arrays (debugging convenience).
+    #     _response_matrix : ndarray
+    #         Final stacked response matrix with shape (n_filters, n_temperatures).
+
+    #     Raises
+    #     ------
+    #     AttributeError
+    #         If `create_logT_grid()` has not been called before this method.
+    #     RuntimeError
+    #         If the interpolated matrix shape does not match expectations.
+
+    #     """
+    #     #In IDL, Res_LogTemp_arr must exist before responses can be interpolated
+    #     if not hasattr(self, "logT"):
+    #         raise AttributeError(
+    #             "Temperature grid missing. Call create_logT_grid() first."
+    #         )
+
+    #     rows = []
+    #     for i, (T_orig, R_orig, fname) in enumerate(
+    #         zip(self.response_temperatures, self.response_values, self.filter_names, strict=False)
+    #     ):
+    #         logT_orig = np.log10(T_orig.to_value(u.K))
+    #         # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
+    #         response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
+
+    #         # Remove later
+    #         print(f"→ Channel {i}: {fname}")
+    #         print(
+    #             f"   logT_orig.shape = {logT_orig.shape}, response_vals.shape = {response_vals.shape}"
+    #         )
+    #         print(
+    #             f"   logT range: {logT_orig.min():.2f}–{logT_orig.max():.2f}, grid: {self.logT.min():.2f}–{self.logT.max():.2f}"
+    #         )
+
+    #         try:
+    #             interp_func = interp1d(
+    #                 logT_orig,
+    #                 response_vals,
+    #                 kind="linear",
+    #                 bounds_error=False,
+    #                 fill_value=0.0,
+    #                 assume_sorted=True,
+    #             )
+    #             interp_row = interp_func(self.logT)
+    #             print(f"   Interpolated length: {len(interp_row)}")
+    #             rows.append(interp_row)
+    #         except Exception as e:
+    #             print(f"   Interpolation failed: {e}")
+    #             raise
+
+    #     self.interpolated_responses = rows
+    #     self._response_matrix = np.vstack(rows)
+
+    #     if self._response_matrix.shape != (len(self.responses), self.logT.size):
+    #         raise RuntimeError("Interpolated response matrix has unexpected shape.")
+
     def _interpolate_responses_to_grid(self):
         """
-        Interpolate each filter's temperature response onto the common logT grid.
+        Interpolate all filter responses onto the common logT grid and build
+        the response matrix.
 
-        This prepares the response matrix (`_response_matrix`) used in DEM fitting.
-        Each filter's original response (on its native temperature grid) is
-        interpolated onto `self.logT`, the regular log10 temperature grid built
-        by `create_logT_grid`.
+        Equivalent to constructing `Res_Mat` in IDL's `xrt_dem_iterative2.pro`
+        and in the DEM_Solver PDF documentation.
 
         Notes
         -----
-        - In IDL (`xrt_dem_iterative2.pro`) and the DEM_Solver PDF documentation,
-        this corresponds to constructing `Res_Mat`, where each row represents
-        one filter's response on the shared logT grid.
-        - Extrapolation beyond the original response grid is set to 0.0
-        (same behavior as IDL).
-        - Units are preserved during interpolation:
-            DN s⁻¹ pix⁻¹ cm⁵ (per emission measure).
-        - Shape of `_response_matrix`:
-            (n_filters, n_temperatures)
+        - Each filter's response is interpolated to `self.logT` (regular log10 grid).
+        - Extrapolation beyond the native response grid is set to 0.0.
+        - Units: DN s⁻¹ pix⁻¹ cm⁵ (per emission measure).
+        - Shape of `_response_matrix`: (n_filters, n_temperatures)
+        Rows = filters, Columns = temperature bins.
 
         Attributes Created
         ------------------
         interpolated_responses : list of ndarray
-            Individual interpolated response arrays (debugging convenience).
+            Interpolated response arrays for each filter.
         _response_matrix : ndarray
-            Final stacked response matrix with shape (n_filters, n_temperatures).
-
-        Raises
-        ------
-        AttributeError
-            If `create_logT_grid()` has not been called before this method.
-        RuntimeError
-            If the interpolated matrix shape does not match expectations.
-
+            Final stacked matrix (n_filters x n_temperatures).
         """
-        #In IDL, Res_LogTemp_arr must exist before responses can be interpolated
         if not hasattr(self, "logT"):
-            raise AttributeError(
-                "Temperature grid missing. Call create_logT_grid() first."
-            )
+            raise AttributeError("Temperature grid missing. Call create_logT_grid() first.")
 
         rows = []
-        for i, (T_orig, R_orig, fname) in enumerate(
-            zip(self.response_temperatures, self.response_values, self.filter_names, strict=False)
-        ):
+        for T_orig, R_orig in zip(self.response_temperatures, self.response_values):
             logT_orig = np.log10(T_orig.to_value(u.K))
-            # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
             response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
 
-            # Remove later
-            print(f"→ Channel {i}: {fname}")
-            print(
-                f"   logT_orig.shape = {logT_orig.shape}, response_vals.shape = {response_vals.shape}"
+            interp_func = interp1d(
+                logT_orig,
+                response_vals,
+                kind="linear",
+                bounds_error=False,
+                fill_value=0.0,
+                assume_sorted=True,
             )
-            print(
-                f"   logT range: {logT_orig.min():.2f}–{logT_orig.max():.2f}, grid: {self.logT.min():.2f}–{self.logT.max():.2f}"
-            )
-
-            try:
-                interp_func = interp1d(
-                    logT_orig,
-                    response_vals,
-                    kind="linear",
-                    bounds_error=False,
-                    fill_value=0.0,
-                    assume_sorted=True,
-                )
-                interp_row = interp_func(self.logT)
-                print(f"   Interpolated length: {len(interp_row)}")
-                rows.append(interp_row)
-            except Exception as e:
-                print(f"   Interpolation failed: {e}")
-                raise
+            rows.append(interp_func(self.logT))
 
         self.interpolated_responses = rows
-        self._response_matrix = np.vstack(rows)
+        self._response_matrix = np.vstack(rows).astype(float)
 
+        # Quick sanity check
         if self._response_matrix.shape != (len(self.responses), self.logT.size):
             raise RuntimeError("Interpolated response matrix has unexpected shape.")
+
 
     @property
     def response_matrix(self):
         """
-        Returns the response matrix after interpolation.
+        Response matrix (n_filters x n_temperatures) after interpolation.
 
-        Shape: (n_filters, n_temperatures)
+        Units: DN s^-1 pix^-1 cm⁵ per emission measure.
+
+        Equivalent to `Res_Mat` in IDL's `xrt_dem_iterative2.pro`.
+
+        Raises
+        ------
+        AttributeError
+            If `_interpolate_responses_to_grid()` has not been called yet.
         """
         if not hasattr(self, "_response_matrix"):
             raise AttributeError(
-                "Response matrix has not been built . Call _build_response_matrix() first."
+                "Response matrix not available. Call _interpolate_responses_to_grid() first."
             )
         return self._response_matrix
 
-    def _build_response_matrix(self):
-        """
-        Builds the response matrix from interpolated responses.
 
-        Sets:
-        -------
-        self.response_matrix : ndarray
-            2D array of shape (n_filters, n_temperatures)
-            Stack your self.interpolated_responses into a 2D NumPy array
-
-        Personal notes: The response matrix is a 2D array that relates temperature to observed intensity
-        For numerical DEM:
-            -You approximate the integral as a matrix multiplication
-            -Each filter contributes one equation (row)
-            -Each temperature bin contributes one unknown (column)
-            - Intergal DEM(T) * R(T) dT = sum[DEM_i * R_i * dT]
-        """
-        if not hasattr(self, "interpolated_responses"):
-            raise RuntimeError(
-                "Call _interpolate_responses_to_grid() before building the response matrix."
-            )
-
-        # self._response_matrix = np.vstack(self.interpolated_responses) # matrix
-        self._response_matrix = np.vstack(self.interpolated_responses).astype(
-            float
-        )  # matrix - this is what IDL does when stacking per-filter response vectors.
-
-        print(
-            f"Built response matrix: shape = {self._response_matrix.shape} (filters * logT bins)"
-        )
 
     def _estimate_initial_dem(
         self, smooth=False, logscale=False, plot=True
