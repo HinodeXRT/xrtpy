@@ -431,87 +431,6 @@ class XRTDEMIterative:
         self.dlnT = np.log(10.0) * self.dlogT # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
 
-    # def _interpolate_responses_to_grid(self):
-    #     """
-    #     Interpolate each filter's temperature response onto the common logT grid.
-
-    #     This prepares the response matrix (`_response_matrix`) used in DEM fitting.
-    #     Each filter's original response (on its native temperature grid) is
-    #     interpolated onto `self.logT`, the regular log10 temperature grid built
-    #     by `create_logT_grid`.
-
-    #     Notes
-    #     -----
-    #     - In IDL (`xrt_dem_iterative2.pro`) and the DEM_Solver PDF documentation,
-    #     this corresponds to constructing `Res_Mat`, where each row represents
-    #     one filter's response on the shared logT grid.
-    #     - Extrapolation beyond the original response grid is set to 0.0
-    #     (same behavior as IDL).
-    #     - Units are preserved during interpolation:
-    #         DN s⁻¹ pix⁻¹ cm⁵ (per emission measure).
-    #     - Shape of `_response_matrix`:
-    #         (n_filters, n_temperatures)
-
-    #     Attributes Created
-    #     ------------------
-    #     interpolated_responses : list of ndarray
-    #         Individual interpolated response arrays (debugging convenience).
-    #     _response_matrix : ndarray
-    #         Final stacked response matrix with shape (n_filters, n_temperatures).
-
-    #     Raises
-    #     ------
-    #     AttributeError
-    #         If `create_logT_grid()` has not been called before this method.
-    #     RuntimeError
-    #         If the interpolated matrix shape does not match expectations.
-
-    #     """
-    #     #In IDL, Res_LogTemp_arr must exist before responses can be interpolated
-    #     if not hasattr(self, "logT"):
-    #         raise AttributeError(
-    #             "Temperature grid missing. Call create_logT_grid() first."
-    #         )
-
-    #     rows = []
-    #     for i, (T_orig, R_orig, fname) in enumerate(
-    #         zip(self.response_temperatures, self.response_values, self.filter_names, strict=False)
-    #     ):
-    #         logT_orig = np.log10(T_orig.to_value(u.K))
-    #         # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
-    #         response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
-
-    #         # Remove later
-    #         print(f"→ Channel {i}: {fname}")
-    #         print(
-    #             f"   logT_orig.shape = {logT_orig.shape}, response_vals.shape = {response_vals.shape}"
-    #         )
-    #         print(
-    #             f"   logT range: {logT_orig.min():.2f}–{logT_orig.max():.2f}, grid: {self.logT.min():.2f}–{self.logT.max():.2f}"
-    #         )
-
-    #         try:
-    #             interp_func = interp1d(
-    #                 logT_orig,
-    #                 response_vals,
-    #                 kind="linear",
-    #                 bounds_error=False,
-    #                 fill_value=0.0,
-    #                 assume_sorted=True,
-    #             )
-    #             interp_row = interp_func(self.logT)
-    #             print(f"   Interpolated length: {len(interp_row)}")
-    #             rows.append(interp_row)
-    #         except Exception as e:
-    #             print(f"   Interpolation failed: {e}")
-    #             raise
-
-    #     self.interpolated_responses = rows
-    #     self._response_matrix = np.vstack(rows)
-
-    #     if self._response_matrix.shape != (len(self.responses), self.logT.size):
-    #         raise RuntimeError("Interpolated response matrix has unexpected shape.")
-
     def _interpolate_responses_to_grid(self):
         """
         Interpolate all filter responses onto the common logT grid and build
@@ -524,7 +443,7 @@ class XRTDEMIterative:
         -----
         - Each filter's response is interpolated to `self.logT` (regular log10 grid).
         - Extrapolation beyond the native response grid is set to 0.0.
-        - Units: DN s⁻¹ pix⁻¹ cm⁵ (per emission measure).
+        - Units: DN s^-1 pix^-1 cm^5 (per emission measure).
         - Shape of `_response_matrix`: (n_filters, n_temperatures)
         Rows = filters, Columns = temperature bins.
 
