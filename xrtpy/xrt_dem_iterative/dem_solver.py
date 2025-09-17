@@ -13,6 +13,7 @@ from scipy.interpolate import interp1d
 
 from xrtpy.util.filters import validate_and_format_filters
 
+
 class XRTDEMIterative:
     """
     Estimate the differential emission measure (DEM) from Hinode/XRT data
@@ -29,7 +30,7 @@ class XRTDEMIterative:
     temperature_responses : list (required)
         List of `TemperatureResponseFundamental` objects matching the filters.
         Units = DN s^-1 pix^-1 EM^-1.
-        Can be generated using `xrtpy.response.tools.generate_temperature_responses` 
+        Can be generated using `xrtpy.response.tools.generate_temperature_responses`
         for one or more filters. See: https://xrtpy.readthedocs.io/en/latest/getting_started.html
     intensity_errors : array-like, optional
         Intensity uncertainties. If None, will use a model-based estimate.
@@ -102,7 +103,7 @@ class XRTDEMIterative:
             self._intensity_errors = np.asarray(intensity_errors, dtype=float)
         else:
             self._intensity_errors = None
-        
+
         # Store temperature grid parameters
         self._dT = float(dT)
         self._min_T = float(min_T)
@@ -185,7 +186,6 @@ class XRTDEMIterative:
                 raise ValueError("solv_factor must be a positive number.")
         except Exception as e:
             raise ValueError(f"Invalid solv_factor: {e}")
-        
 
     #### TEST GIT CI TEST #####
 
@@ -231,7 +231,7 @@ class XRTDEMIterative:
 
         # 6) grid range inside every response
         for r in self.responses:
-            #logT_grid = np√.log10(r.temperature.value)
+            # logT_grid = np√.log10(r.temperature.value)
             logT_grid = np.log10(r.temperature.to_value(u.K))
             if not (self._min_T >= logT_grid.min() and self._max_T <= logT_grid.max()):
                 raise ValueError(
@@ -269,7 +269,11 @@ class XRTDEMIterative:
 
     #######################################################################################################################################
     @property
-    def observed_intensities(self,) -> ( u.Quantity):  # Add method to account for known values not worth observed_intensities
+    def observed_intensities(
+        self,
+    ) -> (
+        u.Quantity
+    ):  # Add method to account for known values not worth observed_intensities
         """
         Observed intensities with physical units.
         Returns
@@ -395,14 +399,14 @@ class XRTDEMIterative:
         (e.g., when using `lmfit.minimize`). Default is 2000.
         """
         return self._max_iterations
-    
+
     def create_logT_grid(self):
         """
         Construct the regular log10 temperature grid for DEM calculations.
-        
+
         This builds a regularly spaced grid in log10(temperature), then converts it
         to linear temperature for use in the DEM integral.
-        
+
         Notes
         -----
         - IDL's `xrt_dem_iterative2.pro` describes this as the "regular logT grid".
@@ -425,11 +429,14 @@ class XRTDEMIterative:
         self.logT = np.linspace(self._min_T, self._max_T, n_bins)
 
         # linear temperature grid in Kelvin
-        self.T = (10.0 ** self.logT) * u.K
+        self.T = (10.0**self.logT) * u.K
 
-        self.dlogT = float(self._dT)  # scalar spacing (dimensionless and natural-log equivalent)
-        self.dlnT = np.log(10.0) * self.dlogT # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
-
+        self.dlogT = float(
+            self._dT
+        )  # scalar spacing (dimensionless and natural-log equivalent)
+        self.dlnT = (
+            np.log(10.0) * self.dlogT
+        )  # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
     def _interpolate_responses_to_grid(self):
         """
@@ -455,12 +462,16 @@ class XRTDEMIterative:
             Final stacked matrix (n_filters x n_temperatures).
         """
         if not hasattr(self, "logT"):
-            raise AttributeError("Temperature grid missing. Call create_logT_grid() first.")
+            raise AttributeError(
+                "Temperature grid missing. Call create_logT_grid() first."
+            )
 
         rows = []
         for T_orig, R_orig in zip(self.response_temperatures, self.response_values):
             logT_orig = np.log10(T_orig.to_value(u.K))
-            response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
+            # response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
+            # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
+            response_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5)
 
             interp_func = interp1d(
                 logT_orig,
@@ -475,10 +486,13 @@ class XRTDEMIterative:
         self.interpolated_responses = rows
         self._response_matrix = np.vstack(rows).astype(float)
 
+        # Store the physical unit for clarity
+        # self._response_unit = u.DN / u.s / u.pix / (u.cm**5)
+        self._response_unit = (u.DN / u.s / u.pix) * u.cm**5
+
         # Quick sanity check
         if self._response_matrix.shape != (len(self.responses), self.logT.size):
             raise RuntimeError("Interpolated response matrix has unexpected shape.")
-
 
     @property
     def response_matrix(self):
@@ -500,8 +514,7 @@ class XRTDEMIterative:
             )
         return self._response_matrix
 
-
-
+    #######################################################################################################################################
     def _estimate_initial_dem(
         self, smooth=False, logscale=False, plot=True
     ):  # mirrors xrt_dem_iter_estim.pro
@@ -964,6 +977,54 @@ class XRTDEMIterative:
             (dem_best_logT / (np.log(10.0) * self.T.to_value(u.K))) * u.cm**-5 / u.K
         )
 
+    def solved(self):
+        """
+        Run the full DEM solver.
+
+        This method orchestrates the entire pipeline:
+        1. Build the temperature grid.
+        2. Interpolate responses onto the grid (builds response matrix).
+        3. Estimate initial DEM guess.
+        4. Run the least-squares solver (LMFIT).
+        5. Optionally perform Monte Carlo runs for uncertainties.
+        6. Store results in object attributes.
+
+        Returns
+        -------
+        dict
+            Dictionary containing primary solver outputs:
+            - "temperature" : log10 temperature grid
+            - "dem"         : best-fit DEM [cm^-5 K^-1]
+            - "dem_err"     : DEM uncertainty (if MC runs > 0)
+            - "ifit"        : fitted intensities [DN/s/pix]
+            - "chi2"        : chi-squared metric
+        """
+        # 1. Build logT grid
+        self.create_logT_grid()
+
+        # 2. Prepare response matrix
+        self._interpolate_responses_to_grid()
+
+        # 3. Estimate initial DEM (placeholder – next step to implement)
+        self._estimate_initial_dem()
+
+        # 4. Run least-squares fit (placeholder)
+        self._fit_dem()
+
+        # 5. Monte Carlo ensemble (optional – placeholder)
+        if self.monte_carlo_runs > 0:
+            self._run_monte_carlo()
+
+        # 6. Bundle results
+        results = {
+            "temperature": self.logT,
+            "dem": self.dem,
+            "dem_err": getattr(self, "dem_uncertainty", None),
+            "ifit": self.fitted_intensities,
+            "chi2": self.chi2,
+        }
+        return results
+
         # if not result.success:
         #     print(" DEM fit did not fully converge:")
         #     print("  >", result.message)
@@ -983,7 +1044,6 @@ class XRTDEMIterative:
 
         return result
 
-
     def summary(self):
         print("\nXRTpy DEM Iterative Setup Summary\n")
         print("-" * 50)
@@ -991,14 +1051,15 @@ class XRTDEMIterative:
         print(f" Obs Intensities:   {self.observed_intensities}")
         print(f" Number of obs:     {len(self._observed_intensities)}")
         print(f" Intensity Errors:  {self.intensity_errors}")
-        print(f" Error model used:  {'User-provided' if self._intensity_errors is not None else f'Auto (obs * {self.relative_error}, min={self.min_error} DN/s)'}")
+        print(
+            f" Error model used:  {'User-provided' if self._intensity_errors is not None else f'Auto (obs * {self.relative_error}, min={self.min_error} DN/s)'}"
+        )
         print(f" Temp Grid:         logT {self.min_T}–{self.max_T}, step {self.dT}")
         print(f" Temp bins:         {len(self.logT)}")
         print(f" Solver factor:     {self.solv_factor:.1e}")
         print(f" Monte Carlo runs:  {self.monte_carlo_runs or 'None'}")
         print(f" Max Iterations:    {self.max_iterations}")
         print("-" * 50)
-
 
     # def summary(self):
     #     print("XRTpy DEM Iterative Setup Summary")
