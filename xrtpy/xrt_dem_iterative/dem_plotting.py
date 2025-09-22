@@ -33,20 +33,29 @@ def plot_dem_results(dem):
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    ax.step(logT, np.log10(best_fit + 1e-40), where="mid",
-            color="blue", linewidth=2, label="Best-fit DEM")
+    ax.step(
+        logT,
+        np.log10(best_fit + 1e-40),
+        where="mid",
+        color="blue",
+        linewidth=2,
+        label="Best-fit DEM",
+    )
 
     if dem_err is not None:
         upper = np.log10(best_fit + dem_err + 1e-40)
         lower = np.log10(np.clip(best_fit - dem_err, 1e-40, None))
-        ax.fill_between(logT, lower, upper, step="mid",
-                        color="blue", alpha=0.2, label="+/-1σ")
+        ax.fill_between(
+            logT, lower, upper, step="mid", color="blue", alpha=0.2, label="+/-1σ"
+        )
 
     ax.set_xlabel("log10 T [K]")
     ax.set_ylabel("log10 DEM [cm$^{-5}$ K$^{-1}$]")
     ax.set_xlim(logT.min(), logT.max())
-    ax.set_ylim(np.floor(np.log10(best_fit.min() + 1e-40)),
-                np.ceil(np.log10(best_fit.max() + 1e-40)))
+    ax.set_ylim(
+        np.floor(np.log10(best_fit.min() + 1e-40)),
+        np.ceil(np.log10(best_fit.max() + 1e-40)),
+    )
     ax.set_title("DEM Solution")
     ax.legend()
     ax.grid(alpha=0.3)
@@ -73,19 +82,28 @@ def plot_dem_uncertainty(dem):
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    ax.step(logT, np.log10(best_fit + 1e-40), where="mid",
-            color="blue", linewidth=2, label="Best-fit DEM")
+    ax.step(
+        logT,
+        np.log10(best_fit + 1e-40),
+        where="mid",
+        color="blue",
+        linewidth=2,
+        label="Best-fit DEM",
+    )
 
     upper = np.log10(best_fit + dem_err + 1e-40)
     lower = np.log10(np.clip(best_fit - dem_err, 1e-40, None))
-    ax.fill_between(logT, lower, upper, step="mid",
-                    color="blue", alpha=0.2, label="+/-1σ")
+    ax.fill_between(
+        logT, lower, upper, step="mid", color="blue", alpha=0.2, label="+/-1σ"
+    )
 
     ax.set_xlabel("log10 T [K]")
     ax.set_ylabel("log10 DEM [cm$^{-5}$ K$^{-1}$]")
     ax.set_xlim(logT.min(), logT.max())
-    ax.set_ylim(np.floor(np.log10(best_fit.min() + 1e-40)),
-                np.ceil(np.log10((best_fit + dem_err).max() + 1e-40)))
+    ax.set_ylim(
+        np.floor(np.log10(best_fit.min() + 1e-40)),
+        np.ceil(np.log10((best_fit + dem_err).max() + 1e-40)),
+    )
     ax.set_title("DEM with Monte Carlo Uncertainty")
     ax.legend()
     ax.grid(alpha=0.3)
@@ -115,18 +133,32 @@ def plot_idl_style(dem):
     if hasattr(dem, "_dem_ensemble"):
         mc_dems = np.array(dem._dem_ensemble)
         for i in range(mc_dems.shape[0]):
-            ax.step(logT, np.log10(mc_dems[i] + 1e-40),
-                    where="mid", linestyle=":", color="black",
-                    alpha=0.3, linewidth=0.6)
+            ax.step(
+                logT,
+                np.log10(mc_dems[i] + 1e-40),
+                where="mid",
+                linestyle=":",
+                color="black",
+                alpha=0.3,
+                linewidth=0.6,
+            )
 
-    ax.step(logT, np.log10(best_fit + 1e-40), where="mid",
-            color="green", linewidth=2, label="Best-fit DEM")
+    ax.step(
+        logT,
+        np.log10(best_fit + 1e-40),
+        where="mid",
+        color="green",
+        linewidth=2,
+        label="Best-fit DEM",
+    )
 
     ax.set_xlabel("log10 T [K]")
     ax.set_ylabel("log10 DEM [cm$^{-5}$ K$^{-1}$]")
     ax.set_xlim(logT.min(), logT.max())
-    ax.set_ylim(np.floor(np.log10(best_fit.min() + 1e-40)),
-                np.ceil(np.log10(best_fit.max() + 1e-40)))
+    ax.set_ylim(
+        np.floor(np.log10(best_fit.min() + 1e-40)),
+        np.ceil(np.log10(best_fit.max() + 1e-40)),
+    )
     ax.set_title("DEM (IDL Style)")
     ax.legend()
     ax.grid(alpha=0.3)
@@ -146,7 +178,9 @@ def plot_fit_residuals(dem):
         dem.solve()
 
     if not hasattr(dem, "fitted_intensities"):
-        raise AttributeError("No fitted intensities found. Run fit_dem() or solve() first.")
+        raise AttributeError(
+            "No fitted intensities found. Run fit_dem() or solve() first."
+        )
 
     obs = dem._observed_intensities
     fit = dem.fitted_intensities
@@ -156,7 +190,7 @@ def plot_fit_residuals(dem):
     indices = np.arange(len(obs))
 
     plt.figure(figsize=(7, 5))
-    plt.errorbar(indices, obs, yerr=sigma, fmt="o",label="Observed", color="black")
+    plt.errorbar(indices, obs, yerr=sigma, fmt="o", label="Observed", color="black")
     plt.plot(indices, fit, "s", label="Fitted", color="red")
     plt.xticks(indices, filters, rotation=45)
     plt.ylabel("Intensity [DN/s/pix]")
@@ -190,7 +224,9 @@ def plot_dem_with_median_bins(dem):
     if not hasattr(dem, "dem"):
         dem.solve()
     if not hasattr(dem, "_dem_ensemble"):
-        raise AttributeError("Monte Carlo ensemble not available. Run with monte_carlo_runs > 0.")
+        raise AttributeError(
+            "Monte Carlo ensemble not available. Run with monte_carlo_runs > 0."
+        )
 
     logT = dem.logT
     mc_dems = np.array(dem._dem_ensemble)
@@ -204,16 +240,40 @@ def plot_dem_with_median_bins(dem):
     fig, ax = plt.subplots(figsize=(9, 6))
 
     for i in range(mc_dems.shape[0]):
-        ax.step(logT, np.log10(mc_dems[i] + 1e-40),
-                where="mid", linestyle=":", color="black",
-                alpha=0.3, linewidth=0.6)
+        ax.step(
+            logT,
+            np.log10(mc_dems[i] + 1e-40),
+            where="mid",
+            linestyle=":",
+            color="black",
+            alpha=0.3,
+            linewidth=0.6,
+        )
 
-    ax.step(logT, np.log10(best_fit + 1e-40), where="mid",
-            color="green", linewidth=2, label="Obs DEM")
-    ax.step(logT, np.log10(med + 1e-40), where="mid",
-            color="blue", linewidth=1.8, label="Median in bins")
-    ax.step(logT, np.log10(closest_dem + 1e-40), where="mid",
-            color="orange", linewidth=1.8, label="Closest DEM to median")
+    ax.step(
+        logT,
+        np.log10(best_fit + 1e-40),
+        where="mid",
+        color="green",
+        linewidth=2,
+        label="Obs DEM",
+    )
+    ax.step(
+        logT,
+        np.log10(med + 1e-40),
+        where="mid",
+        color="blue",
+        linewidth=1.8,
+        label="Median in bins",
+    )
+    ax.step(
+        logT,
+        np.log10(closest_dem + 1e-40),
+        where="mid",
+        color="orange",
+        linewidth=1.8,
+        label="Closest DEM to median",
+    )
 
     ax.set_xlim(dem.min_T, dem.max_T)
     ax.set_ylim(0, 30)
@@ -235,7 +295,9 @@ def plot_iteration_stats(dem):
     Plot x^2 convergence across solver iterations.
     """
     if not hasattr(dem, "_iteration_chi2") or len(dem._iteration_chi2) == 0:
-        raise AttributeError("No iteration stats found. Run fit_dem() or solve() first.")
+        raise AttributeError(
+            "No iteration stats found. Run fit_dem() or solve() first."
+        )
 
     chi2_vals = np.array(dem._iteration_chi2)
 
