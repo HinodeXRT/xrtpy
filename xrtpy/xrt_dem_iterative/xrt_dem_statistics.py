@@ -1,8 +1,11 @@
 __all__ = [
-    "MonteCarlo",
+    "SplineSmoothing",
+    "ErrorPropagation",
 ]
 
 
+class SplineSmoothing:
+    print('Will be updating soon... SplineSmoothing')
 
-class MonteCarlo:
-    print('Will be updating soon.')
+class ErrorPropagation:
+    print('Will be updating soon... SplineSmoothing')
