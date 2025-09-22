@@ -12,6 +12,7 @@ from lmfit import Parameters, minimize
 from scipy.interpolate import interp1d
 
 from xrtpy.util.filters import validate_and_format_filters
+from xrtpy.xrt_dem_iterative import dem_plotting
 
 
 class XRTDEMIterative:
@@ -160,7 +161,7 @@ class XRTDEMIterative:
                     "Please ensure the temperature range fits within all responses.\n"
                     "Hint: Default response range is logT = 5.5 to 8.0. You can view each response's logT range via: [r.temperature for r in responses]"
                 )
-        
+
         # Check consistency between inputs
         if not (
             len(self._observed_intensities)
@@ -186,8 +187,10 @@ class XRTDEMIterative:
                 raise ValueError("solv_factor must be a positive number.")
         except Exception as e:
             raise ValueError(f"Invalid solv_factor: {e}")
-        
-        self._using_estimated_errors = False #track whether default error model has been used
+
+        self._using_estimated_errors = (
+            False  # track whether default error model has been used
+        )
 
     #### TEST GIT CI TEST #####
 
@@ -255,7 +258,6 @@ class XRTDEMIterative:
         # success ⇒ no return value
         return None
 
-    
     def __repr__(self):
         return (
             f"<XRTDEMIterative(filters={self.filter_names}, "
@@ -516,11 +518,10 @@ class XRTDEMIterative:
             )
         return self._response_matrix
 
-
     def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
         """
         Estimate an initial DEM curve from observed intensities and responses.
-        
+
         This follows the algorithm in IDL's `xrt_dem_iterative2.pro`, which uses
         response-peak inversion to generate a crude log10 DEM estimate per channel,
         then interpolates these estimates onto the solver's regular temperature grid.
@@ -555,9 +556,13 @@ class XRTDEMIterative:
         (log10 DEM = 22 everywhere).
         """
         if not hasattr(self, "logT"):
-            raise AttributeError("Temperature grid missing. Call create_logT_grid() first.")
+            raise AttributeError(
+                "Temperature grid missing. Call create_logT_grid() first."
+            )
         if not hasattr(self, "_response_matrix"):
-            raise AttributeError("Response matrix missing. Call _interpolate_responses_to_grid() first.")
+            raise AttributeError(
+                "Response matrix missing. Call _interpolate_responses_to_grid() first."
+            )
 
         # Storage for peak locations and DEM estimates
         t_peaks = []
@@ -565,7 +570,11 @@ class XRTDEMIterative:
 
         # Loop over each filter
         for i, (T_orig, R_orig, I_obs) in enumerate(
-            zip(self.response_temperatures, self.response_values, self._observed_intensities)
+            zip(
+                self.response_temperatures,
+                self.response_values,
+                self._observed_intensities,
+            )
         ):
             logT_orig = np.log10(T_orig.to_value(u.K))
             R_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5)
@@ -584,7 +593,7 @@ class XRTDEMIterative:
                 continue
 
             # 3. Compute denominator integral: sum(T * R * dlnT)
-            T_good = 10.0**logT_orig[good]
+            T_good = 10.0 ** logT_orig[good]
             R_good = R_vals[good]
             dlogT_native = np.diff(logT_orig).mean()
             dlnT_native = np.log(10.0) * dlogT_native
@@ -638,8 +647,7 @@ class XRTDEMIterative:
         self._initial_log_dem = est_log_dem_on_grid
 
         return est_log_dem_on_grid
-    
-    
+
     def _build_lmfit_parameters(self, n_knots: int = 6):
         """
         Build lmfit.Parameters for the DEM spline knots.
@@ -695,14 +703,13 @@ class XRTDEMIterative:
             params.add(
                 name=f"knot_{i}",
                 value=val,
-                min=-10,   # optional bounds: avoid absurdly low
-                max=50,    # optional bounds: avoid absurdly high
+                min=-10,  # optional bounds: avoid absurdly low
+                max=50,  # optional bounds: avoid absurdly high
                 vary=True,
             )
 
         self._init_knot_params = params
         return params
-
 
     def _reconstruct_dem_from_knots(self, params) -> np.ndarray:
         """
@@ -733,7 +740,9 @@ class XRTDEMIterative:
             )
 
         # Extract knot values from parameters (log10(DEM/solv_factor))
-        knot_vals = np.array([params[f"knot_{i}"].value for i in range(len(self._knot_positions))])
+        knot_vals = np.array(
+            [params[f"knot_{i}"].value for i in range(len(self._knot_positions))]
+        )
 
         # Interpolate across solver grid in log space
         interp_func = interp1d(
@@ -746,13 +755,12 @@ class XRTDEMIterative:
         log_dem_scaled = interp_func(self.logT)
 
         # Convert back to DEM [cm^-5 K^-1]
-        dem_grid = self._solv_factor * (10.0 ** log_dem_scaled)
+        dem_grid = self._solv_factor * (10.0**log_dem_scaled)
 
         return dem_grid
 
-    
     # self._iteration_chi2 = []
-    
+
     # def _residuals(self, params) -> np.ndarray:
     #     """
     #     Residuals function for DEM fitting.
@@ -794,7 +802,7 @@ class XRTDEMIterative:
     #     # sigma = self.intensity_errors.to_value(u.DN / u.s)  # ensure numeric
     #     # residuals = (self._observed_intensities - I_calc) / sigma
     #     # Use MC-perturbed intensities if present; otherwise the originals
-        
+
     #     y_obs = getattr(self, "_active_observed_intensities", self._observed_intensities)
     #     sigma = self.intensity_errors.to_value(u.DN / u.s)  # numeric
     #     residuals = (y_obs - I_calc) / sigma
@@ -806,9 +814,8 @@ class XRTDEMIterative:
     #     if not hasattr(self, "_iteration_chi2"):
     #         self._iteration_chi2 = []
     #     self._iteration_chi2.append(chi2_val)
-        
-    #     return residuals
 
+    #     return residuals
     def _residuals(self, params) -> np.ndarray:
         """
         Residuals function for DEM fitting.
@@ -830,7 +837,9 @@ class XRTDEMIterative:
         I_calc = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
 
         # 4. Residuals: normalize by observational errors
-        y_obs = getattr(self, "_active_observed_intensities", self._observed_intensities)
+        y_obs = getattr(
+            self, "_active_observed_intensities", self._observed_intensities
+        )
         sigma = self.intensity_errors.to_value(u.DN / u.s)
         residuals = (y_obs - I_calc) / sigma
 
@@ -842,7 +851,6 @@ class XRTDEMIterative:
 
         return residuals
 
-
     # def fit_dem(self, n_knots: int = 6, method: str = "least_squares", **kwargs):
     #     """
     #     Fit the DEM using lmfit to minimize residuals.
@@ -852,7 +860,7 @@ class XRTDEMIterative:
     #     n_knots : int, optional
     #         Number of spline knots across the logT grid. Default = 6.
     #     method : str, optional
-    #         Minimization method passed to `lmfit.minimize`. 
+    #         Minimization method passed to `lmfit.minimize`.
     #         Common choices: "least_squares", "leastsq", "nelder".
     #         Default = "least_squares".
     #     **kwargs : dict
@@ -881,7 +889,6 @@ class XRTDEMIterative:
     #     responses, and estimates an initial DEM if not already done.
     #     """
     #     from lmfit import minimize
-        
 
     #     # --- Auto-prepare prerequisites ---
     #     if not hasattr(self, "logT") or not hasattr(self, "T"):
@@ -893,8 +900,8 @@ class XRTDEMIterative:
     #     if not hasattr(self, "_initial_log_dem"):
     #         self._estimate_initial_dem()
 
-    #     self._last_n_knots = n_knots #Used for print in the summary function 
-        
+    #     self._last_n_knots = n_knots #Used for print in the summary function
+
     #     # 1. Build initial knot parameters
     #     params = self._build_lmfit_parameters(n_knots=n_knots)
 
@@ -956,7 +963,7 @@ class XRTDEMIterative:
             self._residuals,
             params,
             method=method,
-            iter_cb=_callback,            # <-- track stats
+            iter_cb=_callback,  # <-- track stats
             max_nfev=self.max_iterations,
             **kwargs,
         )
@@ -982,8 +989,9 @@ class XRTDEMIterative:
 
         return result
 
-
-    def fit_with_multiple_methods(self, methods=("leastsq", "least_squares", "nelder"), n_knots: int = 6, **kwargs):
+    def fit_with_multiple_methods(
+        self, methods=("leastsq", "least_squares", "nelder"), n_knots: int = 6, **kwargs
+    ):
         """
         Try multiple lmfit minimization methods and pick the best χ².
 
@@ -1053,356 +1061,102 @@ class XRTDEMIterative:
 
         return best_result
 
+    # def run_monte_carlo(self, n_runs=None, n_knots=6, method="least_squares", random_seed=None):
+    #     if random_seed is not None:
+    #         np.random.seed(random_seed)
+    #     """
+    #     Run Monte Carlo DEM fits to estimate uncertainties and store full ensemble.
 
-    def run_monte_carlo(self, n_runs=None, n_knots=6, method="least_squares", random_seed=None):
-        if random_seed is not None:
-            np.random.seed(random_seed)
-        """
-        Run Monte Carlo DEM fits to estimate uncertainties and store full ensemble.
+    #     Returns
+    #     -------
+    #     dem_ensemble : ndarray
+    #         Shape (n_runs, n_temperatures) array of DEM solutions.
+    #     """
+    #     from lmfit import minimize
 
-        Returns
-        -------
-        dem_ensemble : ndarray
-            Shape (n_runs, n_temperatures) array of DEM solutions.
-        """
+    #     if n_runs is None:
+    #         n_runs = self._monte_carlo_runs
+    #     if n_runs <= 0:
+    #         raise ValueError("Monte Carlo runs disabled (n_runs=0).")
+
+    #     sigma = self.intensity_errors.to_value(u.DN / u.s)
+    #     dem_ensemble = []
+
+    #     self._last_n_knots = n_knots #Used for print in the summary function
+
+    #     for i in range(n_runs):
+    #         noisy_obs = self._observed_intensities + np.random.normal(0, sigma)
+    #         #print(f"Given intensities: {noisy_obs}")
+    #         self._observed_intensities_mc = noisy_obs  # temp override
+
+    #         # params = self._build_lmfit_parameters(n_knots=n_knots)  #Older Version  Sept 18
+    #         # result = minimize(lambda p: self._residuals(p), params, method=method) #Older Version Sept 18
+    #         params = self._build_lmfit_parameters(n_knots=n_knots)
+    #         # Activate noisy intensities for this run
+    #         self._active_observed_intensities = noisy_obs
+    #         try:
+    #             result = minimize(self._residuals, params, method=method)
+    #         finally:
+    #             # Always restore (so the main dataset isn’t polluted)
+    #             if hasattr(self, "_active_observed_intensities"):
+    #                 delattr(self, "_active_observed_intensities")
+
+    #         dem_i = self._reconstruct_dem_from_knots(result.params)
+    #         dem_ensemble.append(dem_i)
+
+    #     dem_ensemble = np.array(dem_ensemble)
+
+    #     # Store ensemble + uncertainty
+    #     self._dem_ensemble = dem_ensemble
+    #     self.dem_uncertainty = np.std(dem_ensemble, axis=0)
+    #     self.dem_median = np.median(dem_ensemble, axis=0)
+
+    #     return dem_ensemble
+
+    def run_monte_carlo(
+        self, n_runs=None, n_knots=6, method="least_squares", random_seed=None
+    ):
         from lmfit import minimize
-        
+        import numpy as np
+        from tqdm import tqdm  # add this at top of file
+
         if n_runs is None:
             n_runs = self._monte_carlo_runs
         if n_runs <= 0:
             raise ValueError("Monte Carlo runs disabled (n_runs=0).")
 
+        if random_seed is not None:
+            np.random.seed(random_seed)
+
         sigma = self.intensity_errors.to_value(u.DN / u.s)
         dem_ensemble = []
 
-        self._last_n_knots = n_knots #Used for print in the summary function 
-        
-        for i in range(n_runs):
-            noisy_obs = self._observed_intensities + np.random.normal(0, sigma)
-            #print(f"Given intensities: {noisy_obs}") 
-            self._observed_intensities_mc = noisy_obs  # temp override
+        self._last_n_knots = n_knots
 
-            # params = self._build_lmfit_parameters(n_knots=n_knots)  #Older Version  Sept 18
-            # result = minimize(lambda p: self._residuals(p), params, method=method) #Older Version Sept 18 
-            params = self._build_lmfit_parameters(n_knots=n_knots)
-            # Activate noisy intensities for this run
+        # --- progress bar
+        for i in tqdm(range(n_runs), desc="Monte Carlo DEM fits", unit="run"):
+            noisy_obs = self._observed_intensities + np.random.normal(0, sigma)
             self._active_observed_intensities = noisy_obs
             try:
+                params = self._build_lmfit_parameters(n_knots=n_knots)
                 result = minimize(self._residuals, params, method=method)
             finally:
-                # Always restore (so the main dataset isn’t polluted)
                 if hasattr(self, "_active_observed_intensities"):
                     delattr(self, "_active_observed_intensities")
-
 
             dem_i = self._reconstruct_dem_from_knots(result.params)
             dem_ensemble.append(dem_i)
 
         dem_ensemble = np.array(dem_ensemble)
-
-        # Store ensemble + uncertainty
         self._dem_ensemble = dem_ensemble
         self.dem_uncertainty = np.std(dem_ensemble, axis=0)
         self.dem_median = np.median(dem_ensemble, axis=0)
 
         return dem_ensemble
 
-
-    ###########################################################################################################################
-    ####################################### Plotting section STARTS ###########################################################
-    ###########################################################################################################################
-
-    ############ Plotting function 1   #########################################################################################
-    def plot_dem_results(self, results):
-        """
-        Quick plotting for users who only have the results dict from solve().
-
-        Parameters
-        ----------
-        results : dict
-            Dictionary returned by self.solve(). Keys:
-            - "temperature" : log10(T) grid
-            - "dem"         : best-fit DEM [cm^-5 K^-1]
-            - "dem_err"     : DEM uncertainty (if Monte Carlo enabled)
-
-        Notes
-        -----
-        - Best-fit DEM is shown as a blue line.
-        - If dem_err exists, a blue shaded band (±1σ) is shown.
-        """
-        import matplotlib.pyplot as plt
-        import numpy as np
-
-        logT = results["temperature"]
-        dem = results["dem"]
-        dem_err = results.get("dem_err", None)
-
-        fig, ax = plt.subplots(figsize=(8,6))
-
-        # Best-fit DEM
-        ax.step(logT, np.log10(dem + 1e-40), where="mid",
-                color="blue", linewidth=2, label="Best-fit DEM")
-
-        # Uncertainty shading
-        if dem_err is not None:
-            upper = np.log10(dem + dem_err + 1e-40)
-            lower = np.log10(np.clip(dem - dem_err, 1e-40, None))
-            ax.fill_between(logT, lower, upper, step="mid",
-                            color="blue", alpha=0.2, label="±1σ")
-
-        ax.set_xlabel("log10 T [K]")
-        ax.set_ylabel("log10 DEM [cm$^{-5}$ K$^{-1}$]")
-        ax.set_xlim(logT.min(), logT.max())
-        ax.set_ylim(np.floor(np.log10(dem.min()+1e-40)),
-                    np.ceil(np.log10(dem.max()+1e-40)))
-        ax.set_title("DEM Solution")
-        ax.legend()
-        ax.grid(alpha=0.3)
-
-        plt.tight_layout()
-        plt.show()
-
-    ############ Plotting function 2  #########################################################################################
-    def plot_dem_uncertainty(self):
-        """
-        Plot DEM with Monte Carlo uncertainty band.
-
-        Requires
-        --------
-        self.dem : ndarray
-            Best-fit DEM curve.
-        self.dem_uncertainty : ndarray
-            Uncertainty from Monte Carlo runs.
-        self.logT : ndarray
-            Temperature grid.
-        """
-        import matplotlib.pyplot as plt
-        import numpy as np
-
-        if not hasattr(self, "dem"):
-            raise AttributeError("No DEM found. Run fit_dem() or solve() first.")
-        if not hasattr(self, "dem_uncertainty"):
-            raise AttributeError("No DEM uncertainty found. Run run_monte_carlo() first.")
-
-        logT = self.logT
-        dem = self.dem
-        dem_err = self.dem_uncertainty
-
-        fig, ax = plt.subplots(figsize=(8,6))
-
-        # Best-fit DEM
-        ax.step(logT, np.log10(dem + 1e-40), where="mid",
-                color="blue", linewidth=2, label="Best-fit DEM")
-
-        # ±1σ shaded region
-        upper = np.log10(dem + dem_err + 1e-40)
-        lower = np.log10(np.clip(dem - dem_err, 1e-40, None))
-        ax.fill_between(logT, lower, upper, step="mid",
-                        color="blue", alpha=0.2, label="±1σ")
-
-        ax.set_xlabel("log10 T [K]")
-        ax.set_ylabel("log10 DEM [cm$^{-5}$ K$^{-1}$]")
-        ax.set_xlim(logT.min(), logT.max())
-        ax.set_ylim(np.floor(np.log10(dem.min()+1e-40)),
-                    np.ceil(np.log10((dem+dem_err).max()+1e-40)))
-        ax.set_title("DEM with Monte Carlo Uncertainty")
-        ax.legend()
-        ax.grid(alpha=0.3)
-
-        plt.tight_layout()
-        plt.show()
-
-    ############ Plotting function 3   #########################################################################################
-    def plot_idl_style(self):
-        """
-        Faithful mirror of IDL's xrt_dem_iterative2.pro plotting style.
-
-        - Black dotted lines → Monte Carlo DEMs (if available)
-        - Green line → Best-fit DEM
-        - No shading, no extras
-
-        Requires
-        --------
-        self.dem : ndarray
-        self.logT : ndarray
-        """
-        import matplotlib.pyplot as plt
-        import numpy as np
-
-        if not hasattr(self, "dem"):
-            raise AttributeError("No DEM found. Run fit_dem() or solve() first.")
-
-        logT = self.logT
-        dem = self.dem
-
-        fig, ax = plt.subplots(figsize=(8,6))
-
-        # Monte Carlo ensemble (if available)
-        if hasattr(self, "_dem_ensemble"):
-            mc_dems = np.array(self._dem_ensemble)
-            for i in range(mc_dems.shape[0]):
-                ax.step(logT, np.log10(mc_dems[i] + 1e-40),
-                        where="mid", linestyle=":", color="black", alpha=0.3, linewidth=0.6)
-
-        # Best-fit DEM
-        ax.step(logT, np.log10(dem + 1e-40), where="mid",
-                color="green", linewidth=2, label="Best-fit DEM")
-
-        ax.set_xlabel("log10 T [K]")
-        ax.set_ylabel("log10 DEM [cm$^{-5}$ K$^{-1}$]")
-        ax.set_xlim(logT.min(), logT.max())
-        ax.set_ylim(np.floor(np.log10(dem.min()+1e-40)),
-                    np.ceil(np.log10(dem.max()+1e-40)))
-        ax.set_title("DEM (IDL Style)")
-        ax.legend()
-        ax.grid(alpha=0.3)
-
-        plt.tight_layout()
-        plt.show()
-
-    
-    ############ Plotting function 4   #########################################################################################
-    def plot_fit_residuals(self):
-        import matplotlib.pyplot as plt
-        """
-        Plot observed vs fitted intensities and residuals.
-        """
-        obs = self._observed_intensities
-        fit = self.fitted_intensities
-        sigma = self.intensity_errors.to_value(u.DN / u.s)
-
-        filters = self.filter_names
-        indices = np.arange(len(obs))
-
-        # Scatter: observed vs fitted
-        plt.figure(figsize=(7,5))
-        plt.errorbar(indices, obs, yerr=sigma, fmt="o", label="Observed", color="black")
-        plt.plot(indices, fit, "s", label="Fitted", color="red")
-        plt.xticks(indices, filters, rotation=45)
-        plt.ylabel("Intensity [DN/s/pix]")
-        plt.title("Observed vs Fitted Intensities")
-        plt.legend()
-        plt.tight_layout()
-        plt.show()
-
-        # Residuals
-        residuals = (obs - fit) / sigma
-        plt.figure(figsize=(7,4))
-        plt.axhline(0, color="gray", linestyle="--")
-        plt.plot(indices, residuals, "o", color="blue")
-        plt.xticks(indices, filters, rotation=45)
-        plt.ylabel("(Obs - Fit) / σ")
-        plt.title("Residuals per Filter")
-        plt.tight_layout()
-        plt.show() 
-        
-        
-    ############ Plotting function 5   #########################################################################################
-    
-    def plot_dem_with_median_bins(self):
-        ####******* IDL MIRROR METHODS *******####
-        """
-        Reproduce IDL-style DEM plot with:
-        - Best-fit DEM (green)
-        - Monte Carlo DEMs as dotted step lines (gray/black)
-        - Median DEM across ensemble (blue)
-        - Closest DEM to the median (orange)
-
-        Requires:
-        self._dem_ensemble from run_monte_carlo()
-        self.dem from fit_dem()
-        """
-        import matplotlib.pyplot as plt
-        if not hasattr(self, "_dem_ensemble"):
-            raise AttributeError("Monte Carlo ensemble not available. Run run_monte_carlo() first.")
-        if not hasattr(self, "dem"):
-            raise AttributeError("Best-fit DEM not available. Run fit_dem() first.")
-
-        logT = self.logT
-        mc_dems = np.array(self._dem_ensemble)  # shape (N_runs, N_T)
-        best_fit = self.dem  # (N_T,)
-
-        # --- Median DEM at each temperature bin
-        med = np.median(mc_dems, axis=0)
-
-        # --- Closest DEM (min L2 distance to median)
-        diffs = np.linalg.norm(mc_dems - med, axis=1)
-        closest_idx = np.argmin(diffs)
-        closest_dem = mc_dems[closest_idx]
-
-        # --- Plot
-        fig, ax = plt.subplots(figsize=(9, 6))
-
-        # MC DEMs: dotted black
-        for i in range(mc_dems.shape[0]):
-            ax.step(logT, np.log10(mc_dems[i] + 1e-40),
-                    where="mid", linestyle=":", color="black", alpha=0.3, linewidth=0.6)
-
-        # Best-fit DEM (green)
-        ax.step(logT, np.log10(best_fit + 1e-40), where="mid",
-                color="green", linewidth=2, label="Obs DEM")
-
-        # Median DEM (blue)
-        ax.step(logT, np.log10(med + 1e-40), where="mid",
-                color="blue", linewidth=1.8, label="Median in bins")
-
-        # Closest-to-median DEM (orange)
-        ax.step(logT, np.log10(closest_dem + 1e-40), where="mid",
-                color="orange", linewidth=1.8, label="Closest DEM to median")
-
-        # Style
-        ax.set_xlim(self.min_T, self.max_T)
-        ax.set_ylim(0, 30)
-        ax.set_xlabel("Log T (K)")
-        #ax.set_ylim(np.floor(np.min(np.log10(mc_dems+1e-40))),np.ceil(np.max(np.log10(mc_dems+1e-40))))
-        ax.set_ylabel("Log DEM [cm$^{-5}$ K$^{-1}$]")
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        ax.set_title("DEM with Monte Carlo Spread, Median, and Closest Fit (IDL Style)")
-
-        plt.tight_layout()
-        plt.show()
-        
-        ############ Plotting function 5   #########################################################################################
-
-    def plot_iteration_stats(self):
-        """
-        Plot χ² convergence across solver iterations.
-
-        Requires
-        --------
-        self._iteration_chi2 : list
-            Logged χ² values from fit_dem().
-        """
-        import matplotlib.pyplot as plt
-        import numpy as np
-
-        if not hasattr(self, "_iteration_chi2") or len(self._iteration_chi2) == 0:
-            raise AttributeError("No iteration stats found. Run fit_dem() or solve() first.")
-
-        chi2_vals = np.array(self._iteration_chi2)
-
-        fig, ax = plt.subplots(figsize=(8, 5))
-        ax.plot(range(len(chi2_vals)), chi2_vals, lw=1.5)
-        ax.set_xlabel("Iteration")
-        ax.set_ylabel("Chi²")
-        ax.set_title("Chi² Convergence")
-        ax.grid(alpha=0.3)
-
-        # Log-scale option if dynamic range is huge
-        if chi2_vals.max() / max(chi2_vals.min(), 1e-10) > 1e4:
-            ax.set_yscale("log")
-
-        plt.tight_layout()
-        plt.show()
-
-    ###########################################################################################################################
-    ####################################### Plotting section ENDS ###########################################################
-    ###########################################################################################################################
-
-
-
-    def solve(self, n_knots: int = 6, method: str = "least_squares", run_mc: bool = True):
+    def solve(
+        self, n_knots: int = 6, method: str = "least_squares", run_mc: bool = True
+    ):
         """
         Run the full DEM solver, IDL-style.
 
@@ -1446,20 +1200,32 @@ class XRTDEMIterative:
 
         # 4. Monte Carlo (optional)
         if run_mc and self.monte_carlo_runs > 0:
-            self.run_monte_carlo(n_runs=self.monte_carlo_runs,
-                                n_knots=n_knots,
-                                method=method)
+            self.run_monte_carlo(
+                n_runs=self.monte_carlo_runs, n_knots=n_knots, method=method
+            )
 
-        # 5. Bundle results
+        # # 5. Bundle results
+        # return {
+        #     "temperature": self.logT,
+        #     "dem": self.dem,
+        #     "dem_err": getattr(self, "dem_uncertainty", None),
+        #     "ifit": self.fitted_intensities,
+        #     "chi2": getattr(self, "chi2", None),
+        #     "redchi2": getattr(self, "redchi2", None),
+        #     "solver": self,
+        # }
+        return self
+
+    def to_dict(self):
+        """Return solver outputs as a dictionary."""
         return {
             "temperature": self.logT,
-            "dem": self.dem,
+            "dem": getattr(self, "dem", None),
             "dem_err": getattr(self, "dem_uncertainty", None),
-            "ifit": self.fitted_intensities,
+            "ifit": getattr(self, "fitted_intensities", None),
             "chi2": getattr(self, "chi2", None),
             "redchi2": getattr(self, "redchi2", None),
         }
-
 
     def summary(self):
         """
@@ -1487,7 +1253,9 @@ class XRTDEMIterative:
             print("   [IDL reference: xrt_dem_iterative2.pro]")
 
         # Temperature grid
-        print(f" Temperature grid:      logT {self.min_T:.2f}–{self.max_T:.2f}, step {self.dT}")
+        print(
+            f" Temperature grid:      logT {self.min_T:.2f}–{self.max_T:.2f}, step {self.dT}"
+        )
         print(f" Temp bins:             {len(self.logT)}")
         print(f" dlogT:                 {self.dlogT:.3f}, dlnT: {self.dlnT:.3f}")
 
@@ -1496,16 +1264,19 @@ class XRTDEMIterative:
         print(f" Monte Carlo runs:      {self.monte_carlo_runs or 'None'}")
         print(f" Max Iterations:        {self.max_iterations}")
         print(f" Knots (n_knots):       {getattr(self, '_last_n_knots', 'default=6')}")
-        
-        if hasattr(self, "chi2"):
-            dof = len(self._observed_intensities) - len(getattr(self, "_init_knot_params", []))
-            print(f"   χ²:                  {self.chi2:.4e} (dof={dof})")
 
+        if hasattr(self, "chi2"):
+            dof = len(self._observed_intensities) - len(
+                getattr(self, "_init_knot_params", [])
+            )
+            print(f"   χ²:                  {self.chi2:.4e} (dof={dof})")
 
         # Responses
         print(f" Response unit:         {self._response_unit}")
         if hasattr(self, "_response_matrix"):
-            print(f" Response matrix:       {self._response_matrix.shape} (filters × bins)")
+            print(
+                f" Response matrix:       {self._response_matrix.shape} (filters × bins)"
+            )
         else:
             print(" Response matrix:       Not yet built")
 
@@ -1531,7 +1302,9 @@ class XRTDEMIterative:
             print("   DEM median (log10 cm^-5 K^-1):")
             print(f"      First 5 bins:     {np.log10(med[:5]+1e-40)}")
             print("   DEM 1σ spread (first bin):")
-            print(f"      {np.log10(spread[0,0]+1e-40):.2f} – {np.log10(spread[1,0]+1e-40):.2f}")
+            print(
+                f"      {np.log10(spread[0,0]+1e-40):.2f} – {np.log10(spread[1,0]+1e-40):.2f}"
+            )
             print("   Reproducibility:     Run with random_seed for identical results")
 
         if hasattr(self, "chi2"):
@@ -1545,12 +1318,28 @@ class XRTDEMIterative:
             print(f"   Final Iter χ²:       {self._iter_stats['chisq'][-1]:.4e}")
 
         # Plotting guidance
-        # print("\n Plotting Options:")
-        # if hasattr(self, "dem"):
-        #     print("   • plot_dem_results(results) → Quick plot from solve() dictionary")
-        #     print("   • plot_dem_uncertainty()   → Best-fit DEM + shaded ±1σ (if MC available)")
-        #     print("   • plot_idl_style()         → IDL-style view (best-fit + MC curves)")
-        #     print("   • plot_dem_with_median_bins() → Median + closest DEM (IDL style extension)")
-        #     print("   • plot_fit_residuals()     → Observed vs fitted intensities")
+        print("\n Plotting Options:")
+        if hasattr(self, "dem"):
+            print("   • plot_dem_results(results) → Quick plot from solve() dictionary")
+            print(
+                "   • plot_dem_uncertainty()   → Best-fit DEM + shaded ±1σ (if MC available)"
+            )
+            print(
+                "   • plot_idl_style()         → IDL-style view (best-fit + MC curves)"
+            )
+            print(
+                "   • plot_dem_with_median_bins() → Median + closest DEM (IDL style extension)"
+            )
+            print("   • plot_fit_residuals()     → Observed vs fitted intensities")
+            print("   • plot_iteration_stats()    ")
 
         print("=" * 65)
+
+
+# Attach plotting functions from plotting.py to the class
+XRTDEMIterative.plot_dem_results = dem_plotting.plot_dem_results
+XRTDEMIterative.plot_dem_uncertainty = dem_plotting.plot_dem_uncertainty
+XRTDEMIterative.plot_idl_style = dem_plotting.plot_idl_style
+XRTDEMIterative.plot_fit_residuals = dem_plotting.plot_fit_residuals
+XRTDEMIterative.plot_dem_with_median_bins = dem_plotting.plot_dem_with_median_bins
+XRTDEMIterative.plot_iteration_stats = dem_plotting.plot_iteration_stats
