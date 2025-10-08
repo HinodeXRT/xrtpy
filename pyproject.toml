@@ -44,6 +44,7 @@ dependencies = [
   "scikit-image>=0.21",
   "scipy>=1.11.1",
   "sunpy[map]>=5.1",
+  "lmfit>=1.2.2",
 ]
 
 optional-dependencies.dev = [
