@@ -80,17 +80,13 @@ _filter_contam_filename = (
 # _ccd_contamination = _ccd_contam_file["p2"]
 
 #_filter_contam_file = scipy.io.readsav(_filter_contam_filename)
-@cached_property
-def _filter_contam_file(self):
-    import scipy.io
-    return scipy.io.readsav(_filter_contam_filename)
 
 
 # Filter contam geny files keys for time and date.
-_filter_contamination_file_time = astropy.time.Time(
-    _filter_contam_file["p1"], format="utime", scale="utc"
-)
-_filter_contamination = _filter_contam_file["p2"]
+# _filter_contamination_file_time = astropy.time.Time(
+#     _filter_contam_file["p1"], format="utime", scale="utc"
+# )
+# _filter_contamination = _filter_contam_file["p2"]
 
 
 class ParsedFilter(NamedTuple):
@@ -183,6 +179,22 @@ class EffectiveAreaFundamental:
 
         self.observation_date = observation_date
         self._channel = Channel(self.name)
+
+    @cached_property
+    def _filter_contam_file(self):
+        import scipy.io
+        return scipy.io.readsav(_filter_contam_filename)
+
+    @cached_property
+    def _filter_contamination_file_time(self):
+        return astropy.time.Time(
+            self._filter_contam_file["p1"], format="utime", scale="utc"
+        )
+
+    @cached_property
+    def _filter_contamination(self):
+        return self._filter_contam_file["p2"]
+
 
     @property
     def name(self) -> str:
@@ -313,7 +325,7 @@ class EffectiveAreaFundamental:
         #     _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
         # )
         interpolater = scipy.interpolate.interp1d(
-            self._ccd_contamination_file_time.utime, self.filter2_name_ccd_contamination, kind="linear"
+            self._ccd_contamination_file_time.utime, self._ccd_contamination, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
@@ -364,7 +376,7 @@ class EffectiveAreaFundamental:
     @property
     def filter_data_dates_to_seconds(self):
         """Returns the contamination file time axis in seconds (utime)."""
-        return _filter_contamination_file_time.utime
+        return self._filter_contamination_file_time.utime
 
     @property
     def filter_observation_date_to_seconds(self):
@@ -379,7 +391,7 @@ class EffectiveAreaFundamental:
             if self._filter1_wheel == 0
             else index_mapping_to_fw2_name.get(self.filter1_name)
         )
-        return _filter_contamination[filter1_index][self._filter1_wheel]
+        return self._filter_contamination[filter1_index][self._filter1_wheel]
 
     @property
     def _filter2_data(self):
@@ -391,7 +403,7 @@ class EffectiveAreaFundamental:
             if self._filter2_wheel == 0
             else index_mapping_to_fw2_name.get(self.filter2_name)
         )
-        return _filter_contamination[filter2_index][self._filter2_wheel]
+        return self._filter_contamination[filter2_index][self._filter2_wheel]
 
     @property
     def contamination_on_filter1(self) -> u.angstrom:
@@ -399,7 +411,7 @@ class EffectiveAreaFundamental:
         Interpolates contamination layer thickness on filter1.
         """
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self._filter1_data, kind="linear"
+            self._filter_contamination_file_time.utime, self._filter1_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
@@ -417,7 +429,7 @@ class EffectiveAreaFundamental:
             return None
 
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self._filter2_data, kind="linear"
+            self._filter_contamination_file_time.utime, self._filter2_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
