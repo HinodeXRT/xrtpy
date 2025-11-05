@@ -60,6 +60,16 @@ invalid_dates = [
 ]
 
 
+def test_ccd_contam_data_loads():
+    eff = EffectiveAreaFundamental(
+        "Al-poly", datetime(year=2013, month=9, day=22, hour=22, minute=1, second=1)
+    )
+    data = eff.ccd_contam_data
+    assert isinstance(data, dict)
+    assert "p1" in data
+    assert "p2" in data
+
+
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_name(channel_name):
     channel = Channel(channel_name)
@@ -78,14 +88,19 @@ def test_EffectiveArea_filter_name(name):
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_contamination_on_CCD(name, date):
     instance = EffectiveAreaFundamental(name, date)
-    assert 0 <= instance.contamination_on_CCD <= 1206
+    assert np.all(
+        (instance.contamination_on_CCD >= 0) & (instance.contamination_on_CCD <= 1206)
+    )
 
 
 @pytest.mark.parametrize("date", valid_dates)
 @pytest.mark.parametrize("name", channel_single_filter_names)
 def test_EffectiveArea_contamination_on_filter1(name, date):
     instance = EffectiveAreaFundamental(name, date)
-    assert 0 <= instance.contamination_on_filter1 <= 2901
+    assert np.all(
+        (instance.contamination_on_filter1 >= 0)
+        & (instance.contamination_on_filter1 <= 2901)
+    )
 
 
 @pytest.mark.parametrize("date", valid_dates)
@@ -94,7 +109,7 @@ def test_EffectiveArea_contamination_on_filter2(name, date):
     instance = EffectiveAreaFundamental(name, date)
     if instance.is_combo:
         result = instance.contamination_on_filter2
-        assert result is None or (0 <= result <= 2901)
+        assert result is None or np.all((result >= 0) & (result <= 2901))
     else:
         assert instance.contamination_on_filter2 is None
 
