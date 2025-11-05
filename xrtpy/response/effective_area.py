@@ -47,45 +47,14 @@ index_mapping_to_multi_filter = {
     "C-poly/Ti-poly": 13,
 }
 
-####
-# from scipy.io import readsav
-# data = readsav(Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.sav")
-# _ccd_contam_filename = (
-#     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.sav"
-# )
-
-# print(data.keys())
 
 _ccd_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.sav"
 )
-# import pdb; pdb.set_trace()
-######
-
-# _ccd_contam_filename = (
-#     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
-# )
 
 _filter_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_filter.geny"
 )
-
-# _ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
-
-# CCD contam geny files keys for time and date.
-# _ccd_contamination_file_time = astropy.time.Time(
-#     _ccd_contam_file["p1"], format="utime", scale="utc"
-# )
-# _ccd_contamination = _ccd_contam_file["p2"]
-
-# _filter_contam_file = scipy.io.readsav(_filter_contam_filename)
-
-
-# Filter contam geny files keys for time and date.
-# _filter_contamination_file_time = astropy.time.Time(
-#     _filter_contam_file["p1"], format="utime", scale="utc"
-# )
-# _filter_contamination = _filter_contam_file["p2"]
 
 
 class ParsedFilter(NamedTuple):
@@ -179,22 +148,6 @@ class EffectiveAreaFundamental:
         self.observation_date = observation_date
         self._channel = Channel(self.name)
 
-    @cached_property
-    def _filter_contam_file(self):
-        import scipy.io
-
-        return scipy.io.readsav(_filter_contam_filename)
-
-    @cached_property
-    def _filter_contamination_file_time(self):
-        return astropy.time.Time(
-            self._filter_contam_file["p1"], format="utime", scale="utc"
-        )
-
-    @cached_property
-    def _filter_contamination(self):
-        return self._filter_contam_file["p2"]
-
     @property
     def name(self) -> str:
         """
@@ -272,9 +225,21 @@ class EffectiveAreaFundamental:
         self._observation_date = observation_date
 
     @cached_property
-    def ccd_contam_data(self):
-        import scipy.io
+    def _filter_contam_file(self):
+        return scipy.io.readsav(_filter_contam_filename)
 
+    @cached_property
+    def _filter_contamination_file_time(self):
+        return astropy.time.Time(
+            self._filter_contam_file["p1"], format="utime", scale="utc"
+        )
+
+    @cached_property
+    def _filter_contamination(self):
+        return self._filter_contam_file["p2"]
+
+    @cached_property
+    def ccd_contam_data(self):
         return scipy.io.readsav(_ccd_contam_filename)
 
     @cached_property
@@ -318,10 +283,6 @@ class EffectiveAreaFundamental:
         ValueError
             If the observation date is outside the range of the available contamination data.
         """
-        # REMOVE
-        # interpolater = scipy.interpolate.interp1d(
-        #     _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
-        # )
         interpolater = scipy.interpolate.interp1d(
             self._ccd_contamination_file_time.utime,
             self._ccd_contamination,
@@ -330,7 +291,7 @@ class EffectiveAreaFundamental:
         return interpolater(self.observation_date.utime)
 
     @staticmethod
-    def _get_filter_wheel_number(filter_name: str) -> int:  # *********
+    def _get_filter_wheel_number(filter_name: str) -> int:
         """Returns 0 if the filter is in FW1, 1 if in FW2. Raises error if unknown."""
         if filter_name in index_mapping_to_fw1_name:
             return 0
@@ -456,7 +417,6 @@ class EffectiveAreaFundamental:
     @cached_property
     def n_DEHP_wavelength(self):
         """(Diethylhexylphthalate) Wavelength given in Angstrom (Å)."""
-
         # Convert wavelength values from nanometers to Angstroms
         wavelength_str = [
             self.n_DEHP_attributes[i][0] for i in range(2, len(self.n_DEHP_attributes))
