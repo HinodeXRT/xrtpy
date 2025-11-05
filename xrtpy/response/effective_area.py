@@ -7,6 +7,7 @@ import math
 from functools import cached_property
 from pathlib import Path
 from typing import NamedTuple
+from functools import cached_property
 
 import astropy.time
 import numpy as np
@@ -47,28 +48,45 @@ index_mapping_to_multi_filter = {
     "C-poly/Ti-poly": 13,
 }
 
+####
+#from scipy.io import readsav
+#data = readsav(Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.sav")
+# _ccd_contam_filename = (
+#     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.sav"
+# )
+
+# print(data.keys())
+
 _ccd_contam_filename = (
-    Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
+    Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.sav"
 )
+#import pdb; pdb.set_trace()
+######
+
+# _ccd_contam_filename = (
+#     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_ccd.geny"
+# )
 
 _filter_contam_filename = (
     Path(__file__).parent.absolute() / "data" / "xrt_contam_on_filter.geny"
 )
 
-_ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
-_filter_contam_file = scipy.io.readsav(_filter_contam_filename)
+#_ccd_contam_file = scipy.io.readsav(_ccd_contam_filename)
 
 # CCD contam geny files keys for time and date.
-_ccd_contamination_file_time = astropy.time.Time(
-    _ccd_contam_file["p1"], format="utime", scale="utc"
-)
-_ccd_contamination = _ccd_contam_file["p2"]
+# _ccd_contamination_file_time = astropy.time.Time(
+#     _ccd_contam_file["p1"], format="utime", scale="utc"
+# )
+# _ccd_contamination = _ccd_contam_file["p2"]
+
+#_filter_contam_file = scipy.io.readsav(_filter_contam_filename)
+
 
 # Filter contam geny files keys for time and date.
-_filter_contamination_file_time = astropy.time.Time(
-    _filter_contam_file["p1"], format="utime", scale="utc"
-)
-_filter_contamination = _filter_contam_file["p2"]
+# _filter_contamination_file_time = astropy.time.Time(
+#     _filter_contam_file["p1"], format="utime", scale="utc"
+# )
+# _filter_contamination = _filter_contam_file["p2"]
 
 
 class ParsedFilter(NamedTuple):
@@ -162,6 +180,22 @@ class EffectiveAreaFundamental:
         self.observation_date = observation_date
         self._channel = Channel(self.name)
 
+    @cached_property
+    def _filter_contam_file(self):
+        import scipy.io
+        return scipy.io.readsav(_filter_contam_filename)
+
+    @cached_property
+    def _filter_contamination_file_time(self):
+        return astropy.time.Time(
+            self._filter_contam_file["p1"], format="utime", scale="utc"
+        )
+
+    @cached_property
+    def _filter_contamination(self):
+        return self._filter_contam_file["p2"]
+
+
     @property
     def name(self) -> str:
         """
@@ -213,9 +247,14 @@ class EffectiveAreaFundamental:
 
         modified_time_path = Path(_ccd_contam_filename).stat().st_mtime
         modified_time = astropy.time.Time(modified_time_path, format="unix")
-        latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
+        #REMOVE
+        # latest_available_ccd_data = _ccd_contamination_file_time[-1].datetime.strftime(
+        #     "%Y/%m/%d"
+        # )
+        latest_available_ccd_data = self._ccd_contamination_file_time[-1].datetime.strftime(
             "%Y/%m/%d"
         )
+
         modified_time_datetime = datetime.datetime.fromtimestamp(
             modified_time_path
         ).strftime("%Y/%m/%d")
@@ -233,6 +272,29 @@ class EffectiveAreaFundamental:
 
         self._observation_date = observation_date
 
+    @cached_property
+    def ccd_contam_data(self):
+        import scipy.io
+        return scipy.io.readsav(_ccd_contam_filename)
+    
+    @cached_property
+    def _ccd_contamination_file_time(self):
+        """
+        CCD contamination time axis from the .sav file.
+        """
+        return astropy.time.Time(
+            self.ccd_contam_data["p1"], format="utime", scale="utc"
+        )
+
+    @cached_property
+    def _ccd_contamination(self):
+        """
+        CCD contamination thickness values from the .sav file.
+        """
+        return self.ccd_contam_data["p2"]
+
+
+    
     @property
     def contamination_on_CCD(self):
         """
@@ -258,8 +320,12 @@ class EffectiveAreaFundamental:
         ValueError
             If the observation date is outside the range of the available contamination data.
         """
+        #REMOVE
+        # interpolater = scipy.interpolate.interp1d(
+        #     _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
+        # )
         interpolater = scipy.interpolate.interp1d(
-            _ccd_contamination_file_time.utime, _ccd_contamination, kind="linear"
+            self._ccd_contamination_file_time.utime, self._ccd_contamination, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
@@ -310,7 +376,7 @@ class EffectiveAreaFundamental:
     @property
     def filter_data_dates_to_seconds(self):
         """Returns the contamination file time axis in seconds (utime)."""
-        return _filter_contamination_file_time.utime
+        return self._filter_contamination_file_time.utime
 
     @property
     def filter_observation_date_to_seconds(self):
@@ -325,7 +391,7 @@ class EffectiveAreaFundamental:
             if self._filter1_wheel == 0
             else index_mapping_to_fw2_name.get(self.filter1_name)
         )
-        return _filter_contamination[filter1_index][self._filter1_wheel]
+        return self._filter_contamination[filter1_index][self._filter1_wheel]
 
     @property
     def _filter2_data(self):
@@ -337,7 +403,7 @@ class EffectiveAreaFundamental:
             if self._filter2_wheel == 0
             else index_mapping_to_fw2_name.get(self.filter2_name)
         )
-        return _filter_contamination[filter2_index][self._filter2_wheel]
+        return self._filter_contamination[filter2_index][self._filter2_wheel]
 
     @property
     def contamination_on_filter1(self) -> u.angstrom:
@@ -345,7 +411,7 @@ class EffectiveAreaFundamental:
         Interpolates contamination layer thickness on filter1.
         """
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self._filter1_data, kind="linear"
+            self._filter_contamination_file_time.utime, self._filter1_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
@@ -363,7 +429,7 @@ class EffectiveAreaFundamental:
             return None
 
         interpolater = scipy.interpolate.interp1d(
-            _filter_contamination_file_time.utime, self._filter2_data, kind="linear"
+            self._filter_contamination_file_time.utime, self._filter2_data, kind="linear"
         )
         return interpolater(self.observation_date.utime)
 
