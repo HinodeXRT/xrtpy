@@ -66,7 +66,8 @@ def test_ccd_contam_data_loads():
     )
     data = eff.ccd_contam_data
     assert isinstance(data, dict)
-    assert "p1" in data and "p2" in data
+    assert "p1" in data
+    assert "p2" in data
 
 
 @pytest.mark.parametrize("channel_name", channel_names)
