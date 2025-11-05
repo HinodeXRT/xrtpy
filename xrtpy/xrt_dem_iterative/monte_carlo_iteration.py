@@ -4,5 +4,4 @@ __all__ = [
 
 
 class MonteCarloIteration:
-    print( 'MonteCarloIteration info coming soon.. ')
-
+    print("MonteCarloIteration info coming soon.. ")
