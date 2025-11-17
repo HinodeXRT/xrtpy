@@ -43,8 +43,6 @@ class XRTDEMIterative:
         Step size in log10 temperature space (default: 0.1).
     min_error : float
         Minimum absolute intensity error (default: 2.0 DN/s/pix).
-    relative_error : float
-        Relative error for model-based uncertainty estimate (default: 0.03).
     monte_carlo_runs : int, optional
         Number of Monte Carlo runs to perform (default: 0, disabled).
         Each run perturbs `observed_intensities` using `intensity_errors`
@@ -61,7 +59,6 @@ class XRTDEMIterative:
         max_T=8.0,
         dT=0.1,
         min_error=2.0,
-        relative_error=0.03,
         monte_carlo_runs=0,
         max_iterations=2000,
         solv_factor=1e21,
@@ -76,7 +73,7 @@ class XRTDEMIterative:
         response temperature ranges for **all** filters provided.
 
         - If `intensity_errors` is not provided, a model-based error estimate is used:
-        max(relative_error * observed_intensity, min_error), as in the IDL original.
+        max(0.03 * observed_intensity, min_error), as in the IDL original.
 
         - Default XRT filter names include:
         {'Al-mesh', 'Al-poly', 'C-poly', 'Ti-poly', 'Be-thin', 'Be-med', 'Al-med', 'Al-thick', 'Be-thick',
@@ -179,7 +176,6 @@ class XRTDEMIterative:
 
         # Store error model parameters
         self._min_error = float(min_error)
-        self._relative_error = float(relative_error)
 
         try:
             self._solv_factor = float(solv_factor)
@@ -284,6 +280,7 @@ class XRTDEMIterative:
         -------
         `~astropy.units.Quantity`
             Intensities in DN/s/pix for each filter channel.
+            Where "pix" means a one-arcsecond, full -resolution XRT pixel.
         """
         return self._observed_intensities * (u.DN / u.s)
 
@@ -339,9 +336,10 @@ class XRTDEMIterative:
     @property
     def relative_error(self):
         """
-        Relative error used to scale intensity if error is not provided.
+        Relative error used to scale intensity if an error is not provided.
+        Default is 0.03 (3%).
         """
-        return self._relative_error
+        return 0.03
 
     @property
     def intensity_errors(self) -> u.Quantity:
@@ -349,7 +347,7 @@ class XRTDEMIterative:
         Returns the intensity uncertainties, either user-provided or model-based.
 
         If not provided, errors are estimated using:
-            max(relative_error * observed_intensity, min_error)
+            max(0.03 * observed_intensity, min_error)
 
         For details, see:
         https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro
@@ -365,15 +363,15 @@ class XRTDEMIterative:
         if self._using_estimated_errors:
             warnings.warn(
                 "No intensity_errors provided. Using default model: "
-                f"max(relative_error * observed_intensity, min_error)\n"
-                f"=> relative_error = {self.relative_error}, min_error = {self.min_error} DN/s\n"
+                f"max(relative-error * observed_intensity, min_error)\n"
+                f"=> relative_error = {self.relative_error} =, min_error = {self.min_error} DN/s\n"
                 "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
                 UserWarning,
             )
         self._using_estimated_errors = True  # suppress future warnings
 
         estimated = np.maximum(
-            self.relative_error * self._observed_intensities,
+            self.relative_error * self._observed_intensities, 
             self.min_error,
         )
         return estimated * (u.DN / u.s)
@@ -430,6 +428,8 @@ class XRTDEMIterative:
         n_bins = int(round((self._max_T - self._min_T) / self._dT)) + 1
 
         # inclusive logT grid (IDL-style regular grid)
+        # Units = 'log K. Runs from Min_T to Max_T with bin-width = DT
+        # SELFNOTEJOY- Do we need to add units - current holds no units- it's wokring correctly - Should this on the Test as well?
         self.logT = np.linspace(self._min_T, self._max_T, n_bins)
 
         # linear temperature grid in Kelvin
@@ -1028,8 +1028,9 @@ class XRTDEMIterative:
             params = self._build_lmfit_parameters(n_knots=n_knots)
             result = minimize(self._residuals, params, method=method, **kwargs)
 
-            # Compute DEM + chi² for this fit
-            dem = self._reconstruct_dem_from_knots(result.params)
+            # Compute DEM + chi square for this fit
+            # SELFNOTEJOY - output currently does not have units. unts=cm^5 * K^-1 Make this a test 
+            dem = self._reconstruct_dem_from_knots(result.params)  #SELFNOTEJOY - here is the stamp to defining the DEM - triple check 
             dem_mid = 0.5 * (dem[:-1] + dem[1:])
             R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
             T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
@@ -1039,7 +1040,7 @@ class XRTDEMIterative:
             residuals = (self._observed_intensities - I_fit) / sigma
             chi2 = np.sum(residuals**2)
 
-            print(f"   χ² = {chi2:.3e}")
+            print(f"x square = {chi2:.3e}")
 
             results[method] = (result, chi2)
 
@@ -1048,7 +1049,7 @@ class XRTDEMIterative:
                 best_result = result
                 best_method = method
 
-        print(f"\n>>> Best method: {best_method} with χ² = {best_chi2:.3e}")
+        print(f"\n>>> Best method: {best_method} with x square = {best_chi2:.3e}")
 
         # Store outputs from the best fit
         best_dem = self._reconstruct_dem_from_knots(best_result.params)
@@ -1252,7 +1253,7 @@ class XRTDEMIterative:
         else:
             print(
                 f" Error model used:      Auto-estimated "
-                f"(obs * {self.relative_error}, min={self.min_error} DN/s)"
+                f"(obs * 0.03, min={self.min_error} DN/s)"
             )
             print("   [IDL reference: xrt_dem_iterative2.pro]")
 
