@@ -475,7 +475,11 @@ class XRTDEMIterative:
             logT_orig = np.log10(T_orig.to_value(u.K))
             # response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
             # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
-            response_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5)
+            #response_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5) Comment on Nov14
+            #response_vals = R_orig.to_value(u.DN / u.s / u.pix / u.cm**5)
+            response_vals = R_orig.value  # already in correct physical units for XRTpy
+
+
 
             interp_func = interp1d(
                 logT_orig,
