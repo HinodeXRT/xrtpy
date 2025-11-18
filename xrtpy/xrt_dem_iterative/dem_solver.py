@@ -10,7 +10,6 @@ import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
 from scipy.interpolate import interp1d
-
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
 
@@ -284,7 +283,14 @@ class XRTDEMIterative:
             ):
                 raise ValueError("`intensity_errors` must be finite and >= 0.")
 
-        # success ⇒ no return value
+        # 8 warning
+        if np.all(self._observed_intensities == 0):
+            warnings.warn(
+                "\n\n All observed intensities are zero. DEM solution will yield zero. "
+                "Object created, but solving will return DEM=0. \n\n"
+            )
+
+        # success -> no return value
         return None
 
     def __repr__(self):
@@ -1232,8 +1238,8 @@ class XRTDEMIterative:
     def run_monte_carlo(
         self, n_runs=None, n_knots=6, method="least_squares", random_seed=None
     ):
-        from lmfit import minimize
         import numpy as np
+        from lmfit import minimize
         from tqdm import tqdm  # add this at top of file
 
         if n_runs is None:
@@ -1304,6 +1310,26 @@ class XRTDEMIterative:
             - "chi2"        : χ²
             - "redchi2"     : reduced χ²
         """
+        # ARLY IDL-STYLE NOSOLVE CHECk
+        # IDL behavior: if all observed intensities are zero (or non-positive),
+        # the DEM is trivially zero. Skip solving and return immediately.
+        if np.all(self._observed_intensities <= 0):
+            warnings.warn(
+                "All observed intensities are zero or non-positive. "
+                "DEM cannot be solved. Returning zero DEM and zero fitted intensities "
+                "(IDL nosolve behavior)."
+            )
+
+            # Ensure grid exists (IDL also returns logT_out even for nosolve)
+            if not hasattr(self, "logT"):
+                self.create_logT_grid()
+
+            self.dem = np.zeros_like(self.logT)
+            self.fitted_intensities = np.zeros_like(self._observed_intensities)
+            self.chi2 = 0.0
+            self.redchi2 = 0.0
+            return self
+
         # 1. Ensure grid & responses
         self.create_logT_grid()
         self._interpolate_responses_to_grid()
