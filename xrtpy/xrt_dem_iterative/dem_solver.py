@@ -306,7 +306,7 @@ class XRTDEMIterative:
     #     """
     #     return self._name
 
-    #######################################################################################################################################
+    ##########################################################
     @property
     def observed_intensities(
         self,
@@ -589,6 +589,26 @@ class XRTDEMIterative:
             )
         return self._response_matrix
 
+    ############################ Everything line of code ABOVE is PREP for the DEM  #############################################
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #################################### structure with all fields the DEM solver expects  ##########################################
+    # 1 Temperature - self.logT , self.T
+    # 2 Response - note - interpolated onto your logT grid. - self.interpolated_responses, self._response_matrix
+    # 3 # of bins  - n_bins
+    # 4 i_obs – self._observed_intensites - measured DN/s/pixel scaled by solv_factor
+    # self.observed_intensities
+    # 5 uncertainty on the intensity - Also scaled by solv_factor.  - self.intensity_errors self.normalization_factor
+    # 6 units?
+
+    ################################################################################################################################
+    ################################################################################################################################
+    ################################################################################################################################
+
+    # ****************************************************************************************************************************
+    ############################ Everything line of code BELOW is FOR the DEM  ##################################################
+
     def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
         """
         Estimate an initial DEM curve from observed intensities and responses.
@@ -836,21 +856,6 @@ class XRTDEMIterative:
         )  ## dem_grid now back in physical units
 
         return dem_grid
-
-    ################################################################################################################################
-    ################################################################################################################################
-    #################################### structure with all fields the DEM solver expects  ##########################################
-    # 1 Temperature - self.logT , self.T
-    # 2 Response - note - interpolated onto your logT grid. - self.interpolated_responses, self._response_matrix
-    # 3 # of bins  - n_bins
-    # 4 i_obs – self._observed_intensites - measured DN/s/pixel scaled by solv_factor
-    # self.observed_intensities
-    # 5 uncertainty on the intensity - Also scaled by solv_factor.  - self.intensity_errors self.normalization_factor
-    # 6 units?
-
-    ################################################################################################################################
-    ################################################################################################################################
-    ################################################################################################################################
 
     # self._iteration_chi2 = []
 
@@ -1310,14 +1315,13 @@ class XRTDEMIterative:
             - "chi2"        : χ²
             - "redchi2"     : reduced χ²
         """
-        # ARLY IDL-STYLE NOSOLVE CHECk
+        # IDL-STYLE NOSOLVE CHECk
         # IDL behavior: if all observed intensities are zero (or non-positive),
         # the DEM is trivially zero. Skip solving and return immediately.
-        if np.all(self._observed_intensities <= 0):
+        if np.all(self._observed_intensities <= 0):  # == 0
             warnings.warn(
-                "All observed intensities are zero or non-positive. "
-                "DEM cannot be solved. Returning zero DEM and zero fitted intensities "
-                "(IDL nosolve behavior)."
+                "\n\n All observed intensities are zero or non-positive. "
+                "DEM cannot be solved. Returning zero DEM and zero fitted intensities. \n\n"
             )
 
             # Ensure grid exists (IDL also returns logT_out even for nosolve)
