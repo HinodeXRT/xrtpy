@@ -54,9 +54,9 @@ class XRTDEMIterative:
         temperature_responses,
         intensity_errors=None,
         minimum_bound_temperature=5.5,
-        maximum_bound_temperature=8.0, 
+        maximum_bound_temperature=8.0,
         logarithmic_temperature_step_size=0.1,
-        monte_carlo_runs=0, #Need to fix this. If set, perform that many Monte Carlo runs. If not set, only do base solution.
+        monte_carlo_runs=0,
         max_iterations=2000,
         normalization_factor=1e21,
     ):
@@ -100,13 +100,26 @@ class XRTDEMIterative:
             self._intensity_errors = None
 
         # Store temperature grid parameters
-        self._logarithmic_temperature_step_size = float(logarithmic_temperature_step_size)
+        self._logarithmic_temperature_step_size = float(
+            logarithmic_temperature_step_size
+        )
         self._minimum_bound_temperature = float(minimum_bound_temperature)
         self._maximum_bound_temperature = float(maximum_bound_temperature)
         if not (self._minimum_bound_temperature < self._maximum_bound_temperature):
-            raise ValueError("minimum_bound_temperature must be < maximum_bound_temperature.")
+            raise ValueError(
+                "minimum_bound_temperature must be < maximum_bound_temperature."
+            )
 
-        n_pts = int(np.floor((self._maximum_bound_temperature - self._minimum_bound_temperature) / logarithmic_temperature_step_size + 1e-9)) + 1
+        n_pts = (
+            int(
+                np.floor(
+                    (self._maximum_bound_temperature - self._minimum_bound_temperature)
+                    / logarithmic_temperature_step_size
+                    + 1e-9
+                )
+            )
+            + 1
+        )
         if n_pts < 4:
             raise ValueError("Temperature grid must have at least 4 points.")
 
@@ -138,7 +151,9 @@ class XRTDEMIterative:
 
         # Check logarithmic_temperature_step_size is positive
         if self._logarithmic_temperature_step_size <= 0:
-            raise ValueError("logarithmic_temperature_step_size must be a positive scalar.")
+            raise ValueError(
+                "logarithmic_temperature_step_size must be a positive scalar."
+            )
 
         # Store temperature response objects
         self.responses = temperature_responses
@@ -149,7 +164,10 @@ class XRTDEMIterative:
         # Validate that the temperature grid falls within the responses
         for r in self.responses:
             logT_grid = np.log10(r.temperature.to_value(u.K))
-            if not (self._minimum_bound_temperature >= logT_grid.min() and self._maximum_bound_temperature <= logT_grid.max()):
+            if not (
+                self._minimum_bound_temperature >= logT_grid.min()
+                and self._maximum_bound_temperature <= logT_grid.max()
+            ):
                 raise ValueError(
                     f"The specified temperature range [{minimum_bound_temperature}, {maximum_bound_temperature}] is outside the bounds of one or more filter response grids.\n"
                     "Please ensure the temperature range fits within all responses.\n"
@@ -169,7 +187,12 @@ class XRTDEMIterative:
                 f"  Filter channels:      {len(self.observed_channel)}\n"
             )
 
-        self.logT = np.arange(self._minimum_bound_temperature, self._maximum_bound_temperature + self._logarithmic_temperature_step_size / 2, self._logarithmic_temperature_step_size)
+        self.logT = np.arange(
+            self._minimum_bound_temperature,
+            self._maximum_bound_temperature
+            + self._logarithmic_temperature_step_size / 2,
+            self._logarithmic_temperature_step_size,
+        )
 
         try:
             self._normalization_factor = float(normalization_factor)
@@ -217,10 +240,23 @@ class XRTDEMIterative:
 
         # 5) temperature grid sanity
         if not (self._minimum_bound_temperature < self._maximum_bound_temperature):
-            raise ValueError("minimum_bound_temperature must be < maximum_bound_temperature.")
+            raise ValueError(
+                "minimum_bound_temperature must be < maximum_bound_temperature."
+            )
         if self._logarithmic_temperature_step_size <= 0:
-            raise ValueError("logarithmic_temperature_step_size must be a positive scalar.")
-        n_pts = int(np.floor((self._maximum_bound_temperature - self._minimum_bound_temperature) / self._logarithmic_temperature_step_size + 1e-9)) + 1
+            raise ValueError(
+                "logarithmic_temperature_step_size must be a positive scalar."
+            )
+        n_pts = (
+            int(
+                np.floor(
+                    (self._maximum_bound_temperature - self._minimum_bound_temperature)
+                    / self._logarithmic_temperature_step_size
+                    + 1e-9
+                )
+            )
+            + 1
+        )
         if n_pts < 4:
             raise ValueError("Temperature grid must have at least 4 points.")
 
@@ -228,7 +264,10 @@ class XRTDEMIterative:
         for r in self.responses:
             # logT_grid = np√.log10(r.temperature.value)
             logT_grid = np.log10(r.temperature.to_value(u.K))
-            if not (self._minimum_bound_temperature >= logT_grid.min() and self._maximum_bound_temperature <= logT_grid.max()):
+            if not (
+                self._minimum_bound_temperature >= logT_grid.min()
+                and self._maximum_bound_temperature <= logT_grid.max()
+            ):
                 raise ValueError(
                     f"The specified temperature range [{self._minimum_bound_temperature}, {self._maximum_bound_temperature}] "
                     "is outside the bounds of one or more filter response grids."
@@ -325,7 +364,7 @@ class XRTDEMIterative:
         """
         Default - Minimum absolute observational intensity error applied to DN/s/pix when intensity error is not provided.
         """
-        return 2 * (u.DN/u.s)
+        return 2 * (u.DN / u.s)
 
     @property
     def relative_error(self):
@@ -364,21 +403,20 @@ class XRTDEMIterative:
             )
         self._using_estimated_errors = True  # suppress future warnings
 
-        #NOTETOJOYWe can remove if no issues later
-        # #No units - added in the return 
+        # NOTETOJOYWe can remove if no issues later
+        # #No units - added in the return
         # estimated = np.maximum(
-        #     self.relative_error * self._observed_intensities , 
+        #     self.relative_error * self._observed_intensities ,
         #     self.min_observational_error.value,
         # )
         # return estimated * (u.DN / u.s)
-        
-        #Fixed in units
+
+        # Fixed in units
         estimated = np.maximum(
-            (self.relative_error * self._observed_intensities)*(u.DN/u.s), 
+            (self.relative_error * self._observed_intensities) * (u.DN / u.s),
             self.min_observational_error,
         )
         return estimated
-        
 
     @property
     def monte_carlo_runs(self) -> int:
@@ -394,7 +432,7 @@ class XRTDEMIterative:
     def normalization_factor(self):
         """
         Scaling factor used during DEM optimization to stabilize the spline fit.
-        Corresponds to `normalization_factor` in IDL (typically 1e21).
+        Corresponds to `normalization_factor` in IDL (default 1e21).
         """
         return self._normalization_factor
 
@@ -405,6 +443,8 @@ class XRTDEMIterative:
         (e.g., when using `lmfit.minimize`). Default is 2000.
         """
         return self._max_iterations
+
+        return None
 
     def create_logT_grid(self):
         """
@@ -428,13 +468,26 @@ class XRTDEMIterative:
             Step size in natural log(T). Useful for IDL-style integrals of the form:
                 F = int. DEM(T) * R(T) * T d(ln T)
         """
-        # number of bins including endpoints
-        n_bins = int(round((self._maximum_bound_temperature - self._minimum_bound_temperature) / self._logarithmic_temperature_step_size)) + 1
+        # number of bins including endpoints - if default values are used - end value is 26
+        self.n_bins = (
+            int(
+                round(
+                    (self._maximum_bound_temperature - self._minimum_bound_temperature)
+                    / self._logarithmic_temperature_step_size
+                )
+            )
+            + 1
+        )
 
+        # This matches the IDL temperature grid exactly. self.logT & self.T.
         # inclusive logT grid (IDL-style regular grid)
         # Units = 'log K. Runs from minimum_bound_temperature to Max_T with bin-width = DT
-        # SELFNOTEJOY- Do we need to add units - current holds no units- it's wokring correctly - Should this on the Test as well?
-        self.logT = np.linspace(self._minimum_bound_temperature, self._maximum_bound_temperature, n_bins)
+        # SELFNOTEJOY- Do we need to add units - current holds no units- it's wokring correctly - Should this on the Test as well?- I don't think it- it's noted in IDL but used with units
+        self.logT = np.linspace(
+            self._minimum_bound_temperature,
+            self._maximum_bound_temperature,
+            self.n_bins,
+        )
 
         # linear temperature grid in Kelvin
         self.T = (10.0**self.logT) * u.K
@@ -442,12 +495,14 @@ class XRTDEMIterative:
         self.dlogT = float(
             self._logarithmic_temperature_step_size
         )  # scalar spacing (dimensionless and natural-log equivalent)
+
         self.dlnT = (
             np.log(10.0) * self.dlogT
         )  # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
     def _interpolate_responses_to_grid(self):
         """
+        IDL method of Interpolate emissivity.
         Interpolate all filter responses onto the common logT grid and build
         the response matrix.
 
@@ -475,15 +530,17 @@ class XRTDEMIterative:
             )
 
         rows = []
-        for T_orig, R_orig in zip(self.response_temperatures, self.response_values):
+        for T_orig, R_orig in zip(
+            self.response_temperatures, self.response_values
+        ):  # Make sure that R_orig.value is indeed in DN/s/pix per cm^5
             logT_orig = np.log10(T_orig.to_value(u.K))
             # response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
             # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
-            #response_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5) Comment on Nov14
-            #response_vals = R_orig.to_value(u.DN / u.s / u.pix / u.cm**5)
-            response_vals = R_orig.value  # already in correct physical units for XRTpy
-
-
+            # response_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5) Comment on Nov14
+            # response_vals = R_orig.to_value(u.DN / u.s / u.pix / u.cm**5)
+            response_vals = (
+                R_orig.value
+            )  # already in correct physical units for XRTpy #NOTEFORJOY- TRIPLE check this
 
             interp_func = interp1d(
                 logT_orig,
@@ -593,7 +650,10 @@ class XRTDEMIterative:
             # 1. Peak location
             max_idx = np.argmax(R_vals)
             peak_val = R_vals[max_idx]
-            t_peak = np.round(logT_orig[max_idx] / self._logarithmic_temperature_step_size) * self._logarithmic_temperature_step_size
+            t_peak = (
+                np.round(logT_orig[max_idx] / self._logarithmic_temperature_step_size)
+                * self._logarithmic_temperature_step_size
+            )
 
             # 2. Good window (where R > cutoff * peak)
             good = np.where(R_vals > peak_val * cutoff)[0]
@@ -689,7 +749,9 @@ class XRTDEMIterative:
         from lmfit import Parameters
 
         # Choose evenly spaced knot positions across logT range
-        knot_positions = np.linspace(self._minimum_bound_temperature, self._maximum_bound_temperature, n_knots)
+        knot_positions = np.linspace(
+            self._minimum_bound_temperature, self._maximum_bound_temperature, n_knots
+        )
         self._knot_positions = knot_positions  # store for later reconstruction
 
         # Interpolate initial DEM estimate at these knot positions
@@ -763,9 +825,26 @@ class XRTDEMIterative:
         log_dem_scaled = interp_func(self.logT)
 
         # Convert back to DEM [cm^-5 K^-1]
-        dem_grid = self._normalization_factor * (10.0**log_dem_scaled)
+        dem_grid = self._normalization_factor * (
+            10.0**log_dem_scaled
+        )  ## dem_grid now back in physical units
 
         return dem_grid
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #################################### structure with all fields the DEM solver expects  ##########################################
+    # 1 Temperature - self.logT , self.T
+    # 2 Response - note - interpolated onto your logT grid. - self.interpolated_responses, self._response_matrix
+    # 3 # of bins  - n_bins
+    # 4 i_obs – self._observed_intensites - measured DN/s/pixel scaled by solv_factor
+    # self.observed_intensities
+    # 5 uncertainty on the intensity - Also scaled by solv_factor.  - self.intensity_errors self.normalization_factor
+    # 6 units?
+
+    ################################################################################################################################
+    ################################################################################################################################
+    ################################################################################################################################
 
     # self._iteration_chi2 = []
 
@@ -844,14 +923,40 @@ class XRTDEMIterative:
         # 3. Modeled intensities
         I_calc = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
 
-        # 4. Residuals: normalize by observational errors
-        y_obs = getattr(
+        # # 4. Residuals: normalize by observational errors
+        # y_obs = getattr(
+        #     self, "_active_observed_intensities", self._observed_intensities
+        # )
+        # sigma = self.intensity_errors.to_value(u.DN / u.s)
+        # residuals = (y_obs - I_calc) / sigma
+
+        # # 5. Track χ² per iteration
+        # chi2_val = np.sum(residuals**2)
+        # if not hasattr(self, "_iteration_chi2"):
+        #     self._iteration_chi2 = []
+        # self._iteration_chi2.append(chi2_val)
+
+        # return residuals
+
+        # 4. Use either base or MC-perturbed observed intensities (physical units)
+        y_obs_phys = getattr(
             self, "_active_observed_intensities", self._observed_intensities
         )
-        sigma = self.intensity_errors.to_value(u.DN / u.s)
-        residuals = (y_obs - I_calc) / sigma
+        sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
 
-        # 5. Track χ² per iteration
+        # 5. Apply normalization_factor in an IDL-like way:
+        #    scale data, model, and errors by the same factor.
+        #    (This keeps residuals numerically identical, but keeps
+        #     internal numbers closer to order unity if desired.)
+        nf = self._normalization_factor
+
+        y_scaled = y_obs_phys / nf
+        I_calc_scaled = I_calc / nf
+        sigma_scaled = sigma_phys / nf
+
+        residuals = (y_scaled - I_calc_scaled) / sigma_scaled
+
+        # 6. Track χ² per iteration (in scaled space — same χ² as unscaled)
         chi2_val = np.sum(residuals**2)
         if not hasattr(self, "_iteration_chi2"):
             self._iteration_chi2 = []
@@ -989,7 +1094,7 @@ class XRTDEMIterative:
         sigma = self.intensity_errors.to_value(u.DN / u.s)
         residuals = (self._observed_intensities - I_fit) / sigma
 
-        # Chi² metrics
+        # Chi^2 metrics
         self.chi2 = np.sum(residuals**2)
         dof = len(self._observed_intensities) - len(result.params)
         self.redchi2 = self.chi2 / max(dof, 1)
@@ -1033,8 +1138,10 @@ class XRTDEMIterative:
             result = minimize(self._residuals, params, method=method, **kwargs)
 
             # Compute DEM + chi square for this fit
-            # SELFNOTEJOY - output currently does not have units. unts=cm^5 * K^-1 Make this a test 
-            dem = self._reconstruct_dem_from_knots(result.params)  #SELFNOTEJOY - here is the stamp to defining the DEM - triple check 
+            # SELFNOTEJOY - output currently does not have units. unts=cm^5 * K^-1 Make this a test
+            dem = self._reconstruct_dem_from_knots(
+                result.params
+            )  # SELFNOTEJOY - here is the stamp to defining the DEM - triple check
             dem_mid = 0.5 * (dem[:-1] + dem[1:])
             R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
             T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
@@ -1352,3 +1459,20 @@ XRTDEMIterative.plot_idl_style = dem_plotting.plot_idl_style
 XRTDEMIterative.plot_fit_residuals = dem_plotting.plot_fit_residuals
 XRTDEMIterative.plot_dem_with_median_bins = dem_plotting.plot_dem_with_median_bins
 XRTDEMIterative.plot_iteration_stats = dem_plotting.plot_iteration_stats
+
+
+# NOTEFROMJOYTOJOY
+# Missin outputs
+# 1
+# I'm missing BASE_OBS- It is a 2D array of intensity values for all DEM runs (base + MC)
+# the set of observed intensities used in each DEM solution, including:
+# Column 0 > the original observed intensities (your real data)
+# Columns 1..MC_ITER > each Monte-Carlo–perturbed intensity vector
+
+# 2
+# MOD_OBS - Model intensities predicted by the DEM for each run.
+
+# 3
+# CHISQ- [1+MC_iter]
+# chi-squre for each DEM solution
+# Computed via mpdemfunct residuals squared and summed
