@@ -589,6 +589,28 @@ class XRTDEMIterative:
             )
         return self._response_matrix
 
+    def _prepare_scaled_observations(self):
+        """
+        Prepare the scaled observed intensities and uncertainties
+        exactly as done in the IDL routine xrt_dem_iterative2.pro.
+
+        IDL equivalent:
+            input1.i_obs = input1.i_obs / solv_factor
+            input1.i_err = input1.i_err / solv_factor
+        """
+        # Extract values as plain floats (DN/s/pix)
+        intensities_scaled_raw = self.observed_intensities.value
+        sigma_intensity_errors_raw = self.intensity_errors.to_value(u.DN / u.s)
+
+        # Apply normalization
+        self.intensities_scaled = intensities_scaled_raw / self.normalization_factor
+        self.sigma_scaled_intensity_errors = (
+            sigma_intensity_errors_raw / self.normalization_factor
+        )
+
+        # Store for solver
+        self._scaled_prepared = True
+
     ############################ Everything line of code ABOVE is PREP for the DEM  #############################################
 
     ################################################################################################################################
