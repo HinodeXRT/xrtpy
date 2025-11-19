@@ -117,3 +117,14 @@ def test_validate_inputs_mismatched_errors():
     dem = XRTDEMIterative(filters, i_obs, resp, intensity_errors=i_err)
     with pytest.raises(ValueError, match="intensity_errors must match"):
         dem.validate_inputs()
+
+
+
+#Test to add later
+#both should be True
+# np.allclose(x.intensities_scaled,
+#             x.observed_intensities.value / x.normalization_factor)
+
+# np.allclose(x.sigma_scaled_intensity_errors,
+#             x.intensity_errors.to_value(u.DN/u.s) / x.normalization_factor)
+
