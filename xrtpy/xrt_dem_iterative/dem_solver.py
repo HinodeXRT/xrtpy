@@ -186,12 +186,13 @@ class XRTDEMIterative:
                 f"  Filter channels:      {len(self.observed_channel)}\n"
             )
 
-        self.logT = np.arange(
-            self._minimum_bound_temperature,
-            self._maximum_bound_temperature
-            + self._logarithmic_temperature_step_size / 2,
-            self._logarithmic_temperature_step_size,
-        )
+        # I am commenting this out because it is redundant since I am defining it below again. I wanna be consistent in using the same logT below.- Remove after testing
+        # self.logT = np.arange(
+        #     self._minimum_bound_temperature,
+        #     self._maximum_bound_temperature
+        #     + self._logarithmic_temperature_step_size / 2,
+        #     self._logarithmic_temperature_step_size,
+        # )
 
         try:
             self._normalization_factor = float(normalization_factor)
@@ -399,7 +400,17 @@ class XRTDEMIterative:
         if self._intensity_errors is not None:
             return self._intensity_errors * (u.DN / u.s)
 
-        if self._using_estimated_errors:
+        # if self._using_estimated_errors:
+        #     warnings.warn(
+        #         "No intensity_errors provided. Using default model: "
+        #         f"max(relative-error * observed_intensity, min_observational_error)\n"
+        #         f"=> relative_error = {self.relative_error} =, min_observational_error = {self.min_observational_error.value} DN/s\n"
+        #         "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
+        #         UserWarning,
+        #     )
+        # self._using_estimated_errors = True  # suppress future warnings
+
+        if not self._using_estimated_errors:
             warnings.warn(
                 "No intensity_errors provided. Using default model: "
                 f"max(relative-error * observed_intensity, min_observational_error)\n"
@@ -407,7 +418,7 @@ class XRTDEMIterative:
                 "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
                 UserWarning,
             )
-        self._using_estimated_errors = True  # suppress future warnings
+        self._using_estimated_errors = True
 
         # NOTETOJOYWe can remove if no issues later
         # #No units - added in the return
@@ -450,8 +461,6 @@ class XRTDEMIterative:
         """
         return self._max_iterations
 
-        return None
-
     def create_logT_grid(self):
         """
         Construct the regular log10 temperature grid for DEM calculations.
@@ -489,6 +498,8 @@ class XRTDEMIterative:
         # inclusive logT grid (IDL-style regular grid)
         # Units = 'log K. Runs from minimum_bound_temperature to Max_T with bin-width = DT
         # SELFNOTEJOY- Do we need to add units - current holds no units- it's wokring correctly - Should this on the Test as well?- I don't think it- it's noted in IDL but used with units
+
+        # np.linspace over np.arange - simple reproduces that reliably:endpoint included, exact number of bins, and no accumulating floating-point drift - Best match to IDL
         self.logT = np.linspace(
             self._minimum_bound_temperature,
             self._maximum_bound_temperature,
@@ -599,8 +610,12 @@ class XRTDEMIterative:
             input1.i_err = input1.i_err / solv_factor
         """
         # Extract values as plain floats (DN/s/pix)
-        intensities_scaled_raw = self.observed_intensities.value
-        sigma_intensity_errors_raw = self.intensity_errors.to_value(u.DN / u.s)
+        intensities_scaled_raw = (
+            self.observed_intensities.value
+        )  # Might just remove this line and up in the normalization
+        sigma_intensity_errors_raw = self.intensity_errors.to_value(
+            u.DN / u.s
+        )  # Might just remove this line and up in the normalization
 
         # Apply normalization
         self.intensities_scaled = intensities_scaled_raw / self.normalization_factor
