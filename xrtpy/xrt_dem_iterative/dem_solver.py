@@ -645,43 +645,183 @@ class XRTDEMIterative:
 
     # ****************************************************************************************************************************
     ############################ Everything line of code BELOW is FOR the DEM  ##################################################
+    # ****************************************************************************************************************************
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #############************************** Start of INITIAL ROUGH DEM ESTIMATE **************************##########################
+    ################## An estimated EM shape based on simple intensity-over-response peaks, smoothed across T. #####################
+
+    # def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
+    #     """
+    #     Estimate an initial DEM curve from observed intensities and responses.
+
+    #     This follows the algorithm in IDL's `xrt_dem_iterative2.pro`, which uses
+    #     response-peak inversion to generate a crude log10 DEM estimate per channel,
+    #     then interpolates these estimates onto the solver's regular temperature grid.
+
+    #     Parameters
+    #     ----------
+    #     cutoff : float, optional
+    #         Fraction of the peak response to use for defining the "good" window
+    #         around each filter's peak. Default is 1/e ≈ 0.3679.
+
+    #     Returns
+    #     -------
+    #     est_log_dem_on_grid : ndarray
+    #         Array of shape (n_temperatures,) giving the initial DEM estimate
+    #         on `self.logT`. Values are log10(DEM) in [cm^-5 K^-1].
+    #         This can be used to seed the solver.
+
+    #     Notes
+    #     -----
+    #     - Units:
+    #         * Observed intensities: [DN s^-1 pix^-1]
+    #         * Response: [DN s^-1 pix^-1 cm^5]
+    #         * DEM(T): [cm^-5 K^-1]
+    #     - For each filter:
+    #         1. Locate the peak of its response.
+    #         2. Define a window where response > cutoff * peak.
+    #         3. Compute the denominator integral: sum( T * R * dlnT ).
+    #         4. Estimate DEM_peak = I_obs / denom.
+    #         5. Store log10(DEM_peak) at the peak logT.
+    #     - Duplicate peak logTs are merged by averaging.
+    #     - If fewer than 2 valid points are found, falls back to a flat guess
+    #     (log10 DEM = 22 everywhere).
+    #     """
+    #     if not hasattr(self, "logT"):
+    #         raise AttributeError(
+    #             "Temperature grid missing. Call create_logT_grid() first."
+    #         )
+    #     if not hasattr(self, "_response_matrix"):
+    #         raise AttributeError(
+    #             "Response matrix missing. Call _interpolate_responses_to_grid() first."
+    #         )
+
+    #     # Storage for peak locations and DEM estimates
+    #     t_peaks = []
+    #     log_dem_estimates = []
+
+    #     # Loop over each filter
+    #     for i, (T_orig, R_orig, I_obs) in enumerate(
+    #         zip(
+    #             self.response_temperatures,
+    #             self.response_values,
+    #             self._observed_intensities,
+    #         )
+    #     ):
+    #         logT_orig = np.log10(T_orig.to_value(u.K))
+    #         R_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5)
+
+    #         if I_obs <= 0 or np.all(R_vals <= 0):
+    #             continue  # skip unusable channel
+
+    #         # 1. Peak location
+    #         max_idx = np.argmax(R_vals)
+    #         peak_val = R_vals[max_idx]
+    #         t_peak = (
+    #             np.round(logT_orig[max_idx] / self._logarithmic_temperature_step_size)
+    #             * self._logarithmic_temperature_step_size
+    #         )
+
+    #         # 2. Good window (where R > cutoff * peak)
+    #         good = np.where(R_vals > peak_val * cutoff)[0]
+    #         if len(good) < 2:
+    #             continue
+
+    #         # 3. Compute denominator integral: sum(T 8*R* dlnT)
+    #         T_good = 10.0 ** logT_orig[good]
+    #         R_good = R_vals[good]
+    #         dlogT_native = np.diff(logT_orig).mean()
+    #         dlnT_native = np.log(10.0) * dlogT_native
+    #         denom = np.sum(T_good * R_good * dlnT_native)
+
+    #         if denom <= 0:
+    #             continue
+
+    #         # 4. DEM estimate at peak
+    #         dem_peak = I_obs / denom  # [cm^-5 K^-1]
+    #         if dem_peak <= 0 or not np.isfinite(dem_peak):
+    #             continue
+
+    #         log_dem_est = np.log10(dem_peak)
+    #         t_peaks.append(t_peak)
+    #         log_dem_estimates.append(log_dem_est)
+
+    #     # 5. Handle duplicates: average log10 DEM at same t_peak
+    #     if len(t_peaks) == 0:
+    #         # Fallback: flat guess (IDL style)
+    #         est_log_dem_on_grid = np.ones_like(self.logT) * 22.0
+    #         self._initial_log_dem = est_log_dem_on_grid
+    #         return est_log_dem_on_grid
+
+    #     uniq_t = {}
+    #     for t, dem_val in zip(t_peaks, log_dem_estimates):
+    #         if t in uniq_t:
+    #             uniq_t[t].append(dem_val)
+    #         else:
+    #             uniq_t[t] = [dem_val]
+    #     t_peaks_uniq = np.array(sorted(uniq_t.keys()))
+    #     log_dem_uniq = np.array([np.mean(uniq_t[t]) for t in t_peaks_uniq])
+
+    #     if len(t_peaks_uniq) < 2:
+    #         # Not enough points > flat guess
+    #         est_log_dem_on_grid = np.ones_like(self.logT) * 22.0
+    #         self._initial_log_dem = est_log_dem_on_grid
+    #         return est_log_dem_on_grid
+
+    #     # 6. Interpolate sparse estimates onto the solver's grid
+    #     interp_func = interp1d(
+    #         t_peaks_uniq,
+    #         log_dem_uniq,
+    #         kind="linear",
+    #         bounds_error=False,
+    #         fill_value="extrapolate",
+    #     )
+
+    #     self._raw_estimated_dem_peaks = (t_peaks_uniq, log_dem_uniq)
+    #     # est_log_dem_on_grid = interp_func(self.logT)
+    #     # # Store for later use
+    #     # self._initial_log_dem = est_log_dem_on_grid
+
+    #     #Use flat dem for inital guess
+    #     est_log_dem_on_grid = np.ones_like(self.logT) * 1.0
+    #     self._initial_log_dem = est_log_dem_on_grid
+
+    #     return est_log_dem_on_grid
 
     def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
         """
-        Estimate an initial DEM curve from observed intensities and responses.
+        Construct an initial DEM guess, mirroring IDL's xrt_dem_iter_estim.
 
-        This follows the algorithm in IDL's `xrt_dem_iterative2.pro`, which uses
-        response-peak inversion to generate a crude log10 DEM estimate per channel,
-        then interpolates these estimates onto the solver's regular temperature grid.
+        This method follows the *structure* of the IDL routine:
+        - Identify channels with non-zero observed intensity.
+        - For each such channel, find the peak of its emissivity/response.
+        - Integrate the response around the peak to estimate a DEM value.
+        - Combine/compact duplicate peak temperatures.
+
+        HOWEVER, to exactly match the behavior of IDL's xrt_dem_iter_estim
+        as used by xrt_dem_iter_nowidget, the final initial guess returned
+        to the solver is a *flat* log10(DEM) curve:
+
+            log10(DEM(T)) = 1.0  for all T on the solver grid.
+
+        The detailed peak-based DEM estimates are kept only for optional
+        diagnostics; they do not affect the initial DEM passed into the
+        spline/least-squares solver (this is exactly what the IDL code does).
 
         Parameters
         ----------
         cutoff : float, optional
-            Fraction of the peak response to use for defining the "good" window
-            around each filter's peak. Default is 1/e ≈ 0.3679.
+            Fraction of the peak response used to define the "good" window
+            around each filter's peak. Default is 1/e (≈ 0.3679), as in IDL.
 
         Returns
         -------
         est_log_dem_on_grid : ndarray
-            Array of shape (n_temperatures,) giving the initial DEM estimate
-            on `self.logT`. Values are log10(DEM) in [cm^-5 K^-1].
-            This can be used to seed the solver.
-
-        Notes
-        -----
-        - Units:
-            * Observed intensities: [DN s^-1 pix^-1]
-            * Response: [DN s^-1 pix^-1 cm^5]
-            * DEM(T): [cm^-5 K^-1]
-        - For each filter:
-            1. Locate the peak of its response.
-            2. Define a window where response > cutoff * peak.
-            3. Compute the denominator integral: sum( T * R * dlnT ).
-            4. Estimate DEM_peak = I_obs / denom.
-            5. Store log10(DEM_peak) at the peak logT.
-        - Duplicate peak logTs are merged by averaging.
-        - If fewer than 2 valid points are found, falls back to a flat guess
-        (log10 DEM = 22 everywhere).
+            Array of shape (n_temperatures,) giving the initial guess for
+            log10(DEM) on `self.logT`. For strict IDL-compatibility, this
+            is identically 1.0 everywhere.
         """
         if not hasattr(self, "logT"):
             raise AttributeError(
@@ -692,48 +832,55 @@ class XRTDEMIterative:
                 "Response matrix missing. Call _interpolate_responses_to_grid() first."
             )
 
-        # Storage for peak locations and DEM estimates
+        # Optional: store the peak-based estimates for diagnostics only.
+        # These are NOT used to set the initial DEM (IDL overwrites them
+        # with a flat DEM before handing off to the solver).
         t_peaks = []
         log_dem_estimates = []
 
-        # Loop over each filter
-        for i, (T_orig, R_orig, I_obs) in enumerate(
-            zip(
-                self.response_temperatures,
-                self.response_values,
-                self._observed_intensities,
-            )
+        # Loop over each filter/channel with non-zero intensity
+        for T_orig, R_orig, I_obs in zip(
+            self.response_temperatures,
+            self.response_values,
+            self._observed_intensities,
         ):
             logT_orig = np.log10(T_orig.to_value(u.K))
+            # Make sure the response is in DN s^-1 pix^-1 per EM (cm^-5)
             R_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5)
 
             if I_obs <= 0 or np.all(R_vals <= 0):
                 continue  # skip unusable channel
 
-            # 1. Peak location
+            # 1. Peak location (logT)
             max_idx = np.argmax(R_vals)
             peak_val = R_vals[max_idx]
-            t_peak = (
-                np.round(logT_orig[max_idx] / self._logarithmic_temperature_step_size)
-                * self._logarithmic_temperature_step_size
-            )
+            t_peak_raw = logT_orig[max_idx]
+
+            # Round to nearest grid step in logT, similar to round_off(..., 0.1)
+            step = self._logarithmic_temperature_step_size
+            t_peak = np.round(t_peak_raw / step) * step
 
             # 2. Good window (where R > cutoff * peak)
             good = np.where(R_vals > peak_val * cutoff)[0]
-            if len(good) < 2:
+            if good.size < 1:
                 continue
 
             # 3. Compute denominator integral: sum(T * R * dlnT)
-            T_good = 10.0 ** logT_orig[good]
+            T_good = 10.0 ** logT_orig[good]  # [K]
             R_good = R_vals[good]
-            dlogT_native = np.diff(logT_orig).mean()
+            # Native spacing in log10(T)
+            if logT_orig.size > 1:
+                dlogT_native = np.mean(np.diff(logT_orig))
+            else:
+                # Degenerate case; fall back to solver grid spacing
+                dlogT_native = step
             dlnT_native = np.log(10.0) * dlogT_native
             denom = np.sum(T_good * R_good * dlnT_native)
 
             if denom <= 0:
                 continue
 
-            # 4. DEM estimate at peak
+            # 4. DEM estimate at the peak (for diagnostics only)
             dem_peak = I_obs / denom  # [cm^-5 K^-1]
             if dem_peak <= 0 or not np.isfinite(dem_peak):
                 continue
@@ -742,42 +889,32 @@ class XRTDEMIterative:
             t_peaks.append(t_peak)
             log_dem_estimates.append(log_dem_est)
 
-        # 5. Handle duplicates: average log10 DEM at same t_peak
-        if len(t_peaks) == 0:
-            # Fallback: flat guess (IDL style)
-            est_log_dem_on_grid = np.ones_like(self.logT) * 22.0
-            self._initial_log_dem = est_log_dem_on_grid
-            return est_log_dem_on_grid
+        # Compact duplicate peak temperatures by averaging (diagnostic only)
+        if t_peaks:
+            uniq = {}
+            for t, val in zip(t_peaks, log_dem_estimates):
+                uniq.setdefault(t, []).append(val)
+            t_peaks_uniq = np.array(sorted(uniq.keys()))
+            log_dem_uniq = np.array([np.mean(uniq[t]) for t in t_peaks_uniq])
+            # Store raw estimated peaks for debugging/inspection if desired
+            self._raw_estimated_dem_peaks = (t_peaks_uniq, log_dem_uniq)
+        else:
+            self._raw_estimated_dem_peaks = (np.array([]), np.array([]))
 
-        uniq_t = {}
-        for t, dem_val in zip(t_peaks, log_dem_estimates):
-            if t in uniq_t:
-                uniq_t[t].append(dem_val)
-            else:
-                uniq_t[t] = [dem_val]
-        t_peaks_uniq = np.array(sorted(uniq_t.keys()))
-        log_dem_uniq = np.array([np.mean(uniq_t[t]) for t in t_peaks_uniq])
+        # IDL BEHAVIOR: override with flat initial DEM
+        # xrt_dem_iter_estim ultimately does:
+        #   dem = 0.0*findgen(nt) + 1.0  ; Use flat dem for initial guess
+        # on a regular logT grid. We mirror that here exactly:
+        est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 1.0
 
-        if len(t_peaks_uniq) < 2:
-            # Not enough points > flat guess
-            est_log_dem_on_grid = np.ones_like(self.logT) * 22.0
-            self._initial_log_dem = est_log_dem_on_grid
-            return est_log_dem_on_grid
-
-        # 6. Interpolate sparse estimates onto the solver's grid
-        interp_func = interp1d(
-            t_peaks_uniq,
-            log_dem_uniq,
-            kind="linear",
-            bounds_error=False,
-            fill_value="extrapolate",
-        )
-        est_log_dem_on_grid = interp_func(self.logT)
-
-        # Store for later use
+        # Store for later use by the solver
         self._initial_log_dem = est_log_dem_on_grid
 
         return est_log_dem_on_grid
+
+    #############************************** End of INITIAL DEM ESTIMATE **************************##################################
+    ################################################################################################################################
+    ################################################################################################################################
 
     def _build_lmfit_parameters(self, n_knots: int = 6):
         """
