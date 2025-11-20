@@ -10,7 +10,6 @@ import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
 from scipy.interpolate import interp1d
-
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
 
@@ -909,16 +908,14 @@ class XRTDEMIterative:
         # xrt_dem_iter_estim ultimately does:
         #   dem = 0.0*findgen(nt) + 1.0  ; Use flat dem for initial guess
         # on a regular logT grid. We mirror that here exactly:
-        
-        #est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 1.0 NOV20
-        
-        
-        #est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 0.0 #NOTEFORJOY
-        #or
+
+        # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 1.0 NOV20
+
+        # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 0.0 #NOTEFORJOY
+        # or
         est_log_dem_on_grid = np.zeros_like(self.logT)
 
-        #Return the intial first guessed DEM
-
+        # Return the intial first guessed DEM
 
         # Store for later use by the solver
         self._initial_log_dem = est_log_dem_on_grid
@@ -959,7 +956,7 @@ class XRTDEMIterative:
         self.weights = np.ones(n_line, dtype=float)
         self.abundances = np.ones(n_line, dtype=float)
 
-        # pm_matrix = R(T) * T * dlnT     (IDL line: emis * 10^t * alog(10^dt)) 
+        # pm_matrix = R(T) * T * dlnT     (IDL line: emis * 10^t * alog(10^dt))
         # units - DN/s/pix/cm^5 * K * dLnT * DEM == DN/s/PIX
         T_linear = self.T.to_value(u.K)
         self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float)
@@ -972,11 +969,11 @@ class XRTDEMIterative:
         interp_init = interp1d(
             self.logT,
             self._initial_log_dem,  # IDL is flat logDEM = 1.0
-            kind="linear",  #IDL uses a cubic spline later NOTEFORJOY NOV24
+            kind="linear",  # IDL uses a cubic spline later NOTEFORJOY NOV24
             bounds_error=False,
             fill_value="extrapolate",
         )
-        
+
         self.spline_log_dem = interp_init(self.spline_logT)
 
     def _build_lmfit_parameters(self):
@@ -994,14 +991,13 @@ class XRTDEMIterative:
             params.add(
                 f"knot_{i}",
                 value=float(self.spline_log_dem[i]),
-                min = -20.0,
-                max = 0.0,
+                min=-20.0,
+                max=0.0,
                 vary=True,
             )
 
         return params
 
-    
     def _reconstruct_dem_from_knots(self, params):
         """
         Construct DEM(T) on self.logT using spline of log10(DEM) at knot positions.
@@ -1020,13 +1016,12 @@ class XRTDEMIterative:
 
         # log_dem = interp_spline(self.logT)  # log10(DEM)
         # dem = 10.0**log_dem  # DEM in linear cm^-5 K^-1
-        
-        #Or used the code above but switch from linear to kind="cubic"
+
+        # Or used the code above but switch from linear to kind="cubic"
         cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
         log_dem = cs(self.logT)
-        dem = 10.0 ** log_dem
+        dem = 10.0**log_dem
         return dem
-
 
     def _residuals(self, params):
         """
@@ -1055,314 +1050,6 @@ class XRTDEMIterative:
         self._iteration_chi2.append(chi2_val)
 
         return residuals
-
-    # def _build_lmfit_parameters(self, n_knots: int = 6):
-    #     """
-    #     Build lmfit.Parameters for the DEM spline knots.
-
-    #     Parameters
-    #     ----------
-    #     n_knots : int, optional
-    #         Number of spline knots across the logT grid. Default = 6.
-
-    #     Returns
-    #     -------
-    #     params : lmfit.Parameters
-    #         Parameters object containing log10(DEM/normalization_factor) values at knot points.
-    #         Each parameter is named "knot_i" where i = 0..n_knots-1.
-
-    #     Notes
-    #     -----
-    #     - IDL's `xrt_dem_iterative2.pro` seeds its fit by taking DEM estimates
-    #     at peak response temperatures and spreading them across the grid.
-    #     - Here, we select evenly spaced knots across the solver's logT range.
-    #     - The stored value at each knot is:
-    #         log10(DEM / normalization_factor)
-    #     where `normalization_factor` is typically 1e17.
-    #     - Bounds can be applied to prevent extreme DEM excursions if desired.
-    #     """
-    #     if not hasattr(self, "_initial_log_dem"):
-    #         raise AttributeError(
-    #             "Initial DEM not available. Run _estimate_initial_dem() first."
-    #         )
-
-    #     # Choose evenly spaced knot positions across logT range
-    #     knot_positions = np.linspace(
-    #         self._minimum_bound_temperature, self._maximum_bound_temperature, n_knots
-    #     )
-    #     self._knot_positions = knot_positions  # store for later reconstruction
-
-    #     # Interpolate initial DEM estimate at these knot positions
-    #     interp_func = interp1d(
-    #         self.logT,
-    #         self._initial_log_dem,
-    #         kind="linear",
-    #         bounds_error=False,
-    #         fill_value="extrapolate",
-    #     )
-    #     init_log_dem_at_knots = interp_func(knot_positions)
-
-    #     # Convert to log10(DEM/normalization_factor)
-    #     init_scaled = init_log_dem_at_knots - np.log10(self._normalization_factor)
-
-    #     # Build lmfit Parameters
-    #     params = Parameters()
-    #     for i, val in enumerate(init_scaled):
-    #         params.add(
-    #             name=f"knot_{i}",
-    #             value=val,
-    #             min=-10,  # optional bounds: avoid absurdly low
-    #             max=50,  # optional bounds: avoid absurdly high
-    #             vary=True,
-    #         )
-
-    #     self._init_knot_params = params
-    #     return params
-
-    # def _reconstruct_dem_from_knots(self, params) -> np.ndarray:
-    #     """
-    #     Reconstruct the DEM curve on the solver's logT grid from spline knot parameters.
-
-    #     Parameters
-    #     ----------
-    #     params : lmfit.Parameters
-    #         Knot parameters where each value is log10(DEM / normalization_factor).
-
-    #     Returns
-    #     -------
-    #     dem_grid : ndarray
-    #         DEM values on `self.logT` grid in linear space [cm^-5 K^-1].
-
-    #     Notes
-    #     -----
-    #     - Knot positions are stored in `self._knot_positions` when
-    #     `_build_lmfit_parameters()` is called.
-    #     - The stored parameter values are log10(DEM/normalization_factor).
-    #     - Conversion back to DEM:
-    #         DEM = normalization_factor * 10^(interp(log10 DEM/normalization_factor))
-    #     - Interpolation is linear in log space, as in IDL's `xrt_dem_iterative2.pro`.
-    #     """
-    #     if not hasattr(self, "_knot_positions"):
-    #         raise AttributeError(
-    #             "Knot positions not found. Run _build_lmfit_parameters() first."
-    #         )
-
-    #     # Extract knot values from parameters (log10(DEM/normalization_factor))
-    #     knot_vals = np.array(
-    #         [params[f"knot_{i}"].value for i in range(len(self._knot_positions))]
-    #     )
-
-    #     # Interpolate across solver grid in log space
-    #     interp_func = interp1d(
-    #         self._knot_positions,
-    #         knot_vals,
-    #         kind="linear",
-    #         bounds_error=False,
-    #         fill_value="extrapolate",
-    #     )
-    #     log_dem_scaled = interp_func(self.logT)
-
-    #     # Convert back to DEM [cm^-5 K^-1]
-    #     dem_grid = self._normalization_factor * (
-    #         10.0**log_dem_scaled
-    #     )  ## dem_grid now back in physical units
-
-    #     return dem_grid
-
-    # # self._iteration_chi2 = []
-
-    # # def _residuals(self, params) -> np.ndarray:
-    # #     """
-    # #     Residuals function for DEM fitting.
-
-    # #     Parameters
-    # #     ----------
-    # #     params : lmfit.Parameters
-    # #         Knot parameters, each storing log10(DEM / normalization_factor).
-
-    # #     Returns
-    # #     -------
-    # #     residuals : ndarray
-    # #         Vector of normalized residuals for each observed channel:
-    # #         (I_obs - I_calc) / sigma
-    # #         Shape = (n_filters,)
-
-    # #     Notes
-    # #     -----
-    # #     - This is the core of the DEM solver. It reconstructs the DEM curve
-    # #     from spline knot parameters, computes modeled intensities by
-    # #     integrating DEM * Response over temperature, and returns the
-    # #     residuals relative to observations.
-    # #     - Integration is done using midpoint trapezoid approximation:
-    # #         I_calc[i] = sum_j DEM_mid[j] * R_mid[i,j] * T_mid[j] * dlnT
-    # #     """
-    # #     # 1. Reconstruct DEM on the grid
-    # #     dem_grid = self._reconstruct_dem_from_knots(params)  # [cm^-5 K^-1]
-
-    # #     # 2. Prepare midpoint arrays
-    # #     dem_mid = 0.5 * (dem_grid[:-1] + dem_grid[1:])
-    # #     R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
-    # #     T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
-
-    # #     # 3. Compute modeled intensities
-    # #     # Shape: (n_filters,)
-    # #     I_calc = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
-
-    # #     # 4. Residuals: normalize by observational errors
-    # #     # sigma = self.intensity_errors.to_value(u.DN / u.s)  # ensure numeric
-    # #     # residuals = (self._observed_intensities - I_calc) / sigma
-    # #     # Use MC-perturbed intensities if present; otherwise the originals
-
-    # #     y_obs = getattr(self, "_active_observed_intensities", self._observed_intensities)
-    # #     sigma = self.intensity_errors.to_value(u.DN / u.s)  # numeric
-    # #     residuals = (y_obs - I_calc) / sigma
-
-    # #     residuals = (y_obs - I_calc) / sigma
-    # #     chi2_val = np.sum(residuals**2)
-
-    # #     # Log χ² per iteration
-    # #     if not hasattr(self, "_iteration_chi2"):
-    # #         self._iteration_chi2 = []
-    # #     self._iteration_chi2.append(chi2_val)
-
-    # #     return residuals
-    # def _residuals(self, params) -> np.ndarray:
-    #     """
-    #     Residuals function for DEM fitting.
-
-    #     Returns
-    #     -------
-    #     residuals : ndarray
-    #         (I_obs - I_calc) / sigma, one per filter.
-    #     """
-    #     # 1. Reconstruct DEM on the grid
-    #     dem_grid = self._reconstruct_dem_from_knots(params)  # [cm^-5 K^-1]
-
-    #     # 2. Midpoint integration setup
-    #     dem_mid = 0.5 * (dem_grid[:-1] + dem_grid[1:])
-    #     R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
-    #     T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
-
-    #     # 3. Modeled intensities
-    #     I_calc = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
-
-    #     # # 4. Residuals: normalize by observational errors
-    #     # y_obs = getattr(
-    #     #     self, "_active_observed_intensities", self._observed_intensities
-    #     # )
-    #     # sigma = self.intensity_errors.to_value(u.DN / u.s)
-    #     # residuals = (y_obs - I_calc) / sigma
-
-    #     # # 5. Track χ² per iteration
-    #     # chi2_val = np.sum(residuals**2)
-    #     # if not hasattr(self, "_iteration_chi2"):
-    #     #     self._iteration_chi2 = []
-    #     # self._iteration_chi2.append(chi2_val)
-
-    #     # return residuals
-
-    #     # 4. Use either base or MC-perturbed observed intensities (physical units)
-    #     y_obs_phys = getattr(
-    #         self, "_active_observed_intensities", self._observed_intensities
-    #     )
-    #     sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
-
-    #     # 5. Apply normalization_factor in an IDL-like way:
-    #     #    scale data, model, and errors by the same factor.
-    #     #    (This keeps residuals numerically identical, but keeps
-    #     #     internal numbers closer to order unity if desired.)
-    #     nf = self._normalization_factor
-
-    #     y_scaled = y_obs_phys / nf
-    #     I_calc_scaled = I_calc / nf
-    #     sigma_scaled = sigma_phys / nf
-
-    #     residuals = (y_scaled - I_calc_scaled) / sigma_scaled
-
-    #     # 6. Track χ² per iteration (in scaled space — same χ² as unscaled)
-    #     chi2_val = np.sum(residuals**2)
-    #     if not hasattr(self, "_iteration_chi2"):
-    #         self._iteration_chi2 = []
-    #     self._iteration_chi2.append(chi2_val)
-
-    #     return residuals
-
-    # # def fit_dem(self, n_knots: int = 6, method: str = "least_squares", **kwargs):
-    # #     """
-    # #     Fit the DEM using lmfit to minimize residuals.
-
-    # #     Parameters
-    # #     ----------
-    # #     n_knots : int, optional
-    # #         Number of spline knots across the logT grid. Default = 6.
-    # #     method : str, optional
-    # #         Minimization method passed to `lmfit.minimize`.
-    # #         Common choices: "least_squares", "leastsq", "nelder".
-    # #         Default = "least_squares".
-    # #     **kwargs : dict
-    # #         Additional keyword arguments forwarded to `lmfit.minimize`.
-
-    # #     Returns
-    # #     -------
-    # #     result : lmfit.MinimizerResult
-    # #         The lmfit result object containing fit information.
-
-    # #     Side Effects
-    # #     ------------
-    # #     On successful fit, stores:
-    # #     - self.dem : ndarray
-    # #         Best-fit DEM(T) on self.logT [cm^-5 K^-1].
-    # #     - self.fitted_intensities : ndarray
-    # #         Modeled intensities [DN/s/pix] for each filter.
-    # #     - self.chi2 : float
-    # #         Chi-squared (sum of squared residuals).
-    # #     - self.redchi2 : float
-    # #         Reduced chi-squared, normalized by (Nobs - Nparams).
-
-    # #     Notes
-    # #     -----
-    # #     This method automatically builds the logT grid, interpolates
-    # #     responses, and estimates an initial DEM if not already done.
-    # #     """
-
-    # #     # --- Auto-prepare prerequisites ---
-    # #     if not hasattr(self, "logT") or not hasattr(self, "T"):
-    # #         self.create_logT_grid()
-
-    # #     if not hasattr(self, "_response_matrix"):
-    # #         self._interpolate_responses_to_grid()
-
-    # #     if not hasattr(self, "_initial_log_dem"):
-    # #         self._estimate_initial_dem()
-
-    # #     self._last_n_knots = n_knots #Used for print in the summary function
-
-    # #     # 1. Build initial knot parameters
-    # #     params = self._build_lmfit_parameters(n_knots=n_knots)
-
-    # #     # 2. Run minimization
-    # #     result = minimize(self._residuals, params, method=method, **kwargs)
-
-    # #     # 3. On success, reconstruct DEM and fitted intensities
-    # #     best_dem = self._reconstruct_dem_from_knots(result.params)
-    # #     self.dem = best_dem  # [cm^-5 K^-1]
-
-    # #     # Compute fitted intensities using midpoint integration
-    # #     dem_mid = 0.5 * (best_dem[:-1] + best_dem[1:])
-    # #     R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
-    # #     T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
-    # #     I_fit = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
-
-    # #     self.fitted_intensities = I_fit  # [DN/s/pix]
-    # #     sigma = self.intensity_errors.to_value(u.DN / u.s)
-    # #     residuals = (self._observed_intensities - I_fit) / sigma
-
-    # #     # Chi-squared metrics
-    # #     self.chi2 = np.sum(residuals**2)
-    # #     dof = len(self._observed_intensities) - len(result.params)
-    # #     self.redchi2 = self.chi2 / max(dof, 1)
-
-    # #     return result
 
     def _solve_single_dem(self, observed_intensities_vals: np.ndarray):
         """
@@ -1421,6 +1108,13 @@ class XRTDEMIterative:
         chisq = float(np.sum(resid**2))
 
         return dem_phys, modeled_intensities_phys, chisq, result
+
+    # -------------------------------------------------------------------------------------------------------------------------------
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #############************************** Start of DEM SOLVER  **************************##########################
+    ################## #####################
 
     def solve(self):
         """
@@ -1503,12 +1197,128 @@ class XRTDEMIterative:
         # Finished
         return self.dem
 
+    # #NOTEFORJOY NOV 19
+    # def solve(
+    #     self, n_knots: int = 6, method: str = "least_squares", run_mc: bool = True
+    # ):
+    #     """
+    #     Run the full DEM solver, IDL-style.
+
+    #     This orchestrates:
+    #     1. Build temperature grid.
+    #     2. Interpolate responses (response matrix).
+    #     3. Estimate initial DEM.
+    #     4. Fit DEM with lmfit.
+    #     5. Optionally run Monte Carlo ensemble.
+
+    #     Parameters
+    #     ----------
+    #     n_knots : int, optional
+    #         Number of spline knots across logT. Default = 6.
+    #     method : str, optional
+    #         Minimization method for `lmfit.minimize`. Default = "least_squares".
+    #     run_mc : bool, optional
+    #         Whether to run Monte Carlo simulations (using self.monte_carlo_runs).
+    #         Default = True.
+
+    #     Returns
+    #     -------
+    #     results : dict
+    #         Dictionary of solver outputs:
+    #         - "temperature" : log10(T) grid
+    #         - "dem"         : best-fit DEM [cm^-5 K^-1]
+    #         - "dem_err"     : DEM uncertainty (if MC runs > 0)
+    #         - "ifit"        : fitted intensities [DN/s/pix]
+    #         - "chi2"        : χ²
+    #         - "redchi2"     : reduced χ²
+    #     """
+    #     # IDL-STYLE NOSOLVE CHECk
+    #     # IDL behavior: if all observed intensities are zero (or non-positive),
+    #     # the DEM is trivially zero. Skip solving and return immediately.
+    #     if np.all(self._observed_intensities <= 0):  # == 0
+    #         warnings.warn(
+    #             "\n\n All observed intensities are zero or non-positive. "
+    #             "DEM cannot be solved. Returning zero DEM and zero fitted intensities. \n\n"
+    #         )
+
+    #         # Ensure grid exists (IDL also returns logT_out even for nosolve)
+    #         if not hasattr(self, "logT"):
+    #             self.create_logT_grid()
+
+    #         self.dem = np.zeros_like(self.logT)
+    #         self.fitted_intensities = np.zeros_like(self._observed_intensities)
+    #         self.chi2 = 0.0
+    #         self.redchi2 = 0.0
+    #         return self
+
+    #     # 1. Ensure grid & responses
+    #     self.create_logT_grid()
+    #     self._interpolate_responses_to_grid()
+
+    #     # 2. Estimate initial DEM
+    #     self._estimate_initial_dem()
+
+    #     # 3. Fit DEM
+    #     result = self.fit_dem(n_knots=n_knots, method=method)
+    #     result = self.fit_dem()
+
+    #     # 4. Monte Carlo (optional)
+    #     if run_mc and self.monte_carlo_runs > 0:
+    #         self.run_monte_carlo(
+    #             n_runs=self.monte_carlo_runs, n_knots=n_knots, method=method
+    #         )
+
+    #     # # 5. Bundle results
+    #     # return {
+    #     #     "temperature": self.logT,
+    #     #     "dem": self.dem,
+    #     #     "dem_err": getattr(self, "dem_uncertainty", None),
+    #     #     "ifit": self.fitted_intensities,
+    #     #     "chi2": getattr(self, "chi2", None),
+    #     #     "redchi2": getattr(self, "redchi2", None),
+    #     #     "solver": self,
+    #     # }
+    #     return self
+
+    # def to_dict(self):
+    #     """Return solver outputs as a dictionary."""
+    #     return {
+    #         "temperature": self.logT,
+    #         "dem": getattr(self, "dem", None),
+    #         "dem_err": getattr(self, "dem_uncertainty", None),
+    #         "ifit": getattr(self, "fitted_intensities", None),
+    #         "chi2": getattr(self, "chi2", None),
+    #         "redchi2": getattr(self, "redchi2", None),
+    #     }
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #############************************** END of  DEM SOLVER **************************##########################
+    ################################################################################################################################
+    ################################################################################################################################
+
+    # -------------------------------------------------------------------------------------------------------------------------------
+
     ################################################################################################################################
     ################################################################################################################################
     #############************************** END of  **************************##########################
-    #################################################################################################################################
+    ################################################################################################################################
+    ################################################################################################################################
 
-    # ----------------------------------------------------------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------------------------------------------------------
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #############************************** Start of  error bars / Monte Carlo  **************************##########################
+    ################## #####################
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #############************************** END of  **************************##########################
+    ################################################################################################################################
+    ################################################################################################################################
+
+    # -------------------------------------------------------------------------------------------------------------------------------
 
     def fit_dem(self, n_knots: int = 6, method: str = "least_squares", **kwargs):
         """
@@ -1682,99 +1492,12 @@ class XRTDEMIterative:
 
         return dem_ensemble
 
-    # #NOTEFORJOY NOV 19
-    # def solve(
-    #     self, n_knots: int = 6, method: str = "least_squares", run_mc: bool = True
-    # ):
-    #     """
-    #     Run the full DEM solver, IDL-style.
+    # -------------------------------------------------------------------------------------------------------------------------------
 
-    #     This orchestrates:
-    #     1. Build temperature grid.
-    #     2. Interpolate responses (response matrix).
-    #     3. Estimate initial DEM.
-    #     4. Fit DEM with lmfit.
-    #     5. Optionally run Monte Carlo ensemble.
-
-    #     Parameters
-    #     ----------
-    #     n_knots : int, optional
-    #         Number of spline knots across logT. Default = 6.
-    #     method : str, optional
-    #         Minimization method for `lmfit.minimize`. Default = "least_squares".
-    #     run_mc : bool, optional
-    #         Whether to run Monte Carlo simulations (using self.monte_carlo_runs).
-    #         Default = True.
-
-    #     Returns
-    #     -------
-    #     results : dict
-    #         Dictionary of solver outputs:
-    #         - "temperature" : log10(T) grid
-    #         - "dem"         : best-fit DEM [cm^-5 K^-1]
-    #         - "dem_err"     : DEM uncertainty (if MC runs > 0)
-    #         - "ifit"        : fitted intensities [DN/s/pix]
-    #         - "chi2"        : χ²
-    #         - "redchi2"     : reduced χ²
-    #     """
-    #     # IDL-STYLE NOSOLVE CHECk
-    #     # IDL behavior: if all observed intensities are zero (or non-positive),
-    #     # the DEM is trivially zero. Skip solving and return immediately.
-    #     if np.all(self._observed_intensities <= 0):  # == 0
-    #         warnings.warn(
-    #             "\n\n All observed intensities are zero or non-positive. "
-    #             "DEM cannot be solved. Returning zero DEM and zero fitted intensities. \n\n"
-    #         )
-
-    #         # Ensure grid exists (IDL also returns logT_out even for nosolve)
-    #         if not hasattr(self, "logT"):
-    #             self.create_logT_grid()
-
-    #         self.dem = np.zeros_like(self.logT)
-    #         self.fitted_intensities = np.zeros_like(self._observed_intensities)
-    #         self.chi2 = 0.0
-    #         self.redchi2 = 0.0
-    #         return self
-
-    #     # 1. Ensure grid & responses
-    #     self.create_logT_grid()
-    #     self._interpolate_responses_to_grid()
-
-    #     # 2. Estimate initial DEM
-    #     self._estimate_initial_dem()
-
-    #     # 3. Fit DEM
-    #     result = self.fit_dem(n_knots=n_knots, method=method)
-    #     result = self.fit_dem()
-
-    #     # 4. Monte Carlo (optional)
-    #     if run_mc and self.monte_carlo_runs > 0:
-    #         self.run_monte_carlo(
-    #             n_runs=self.monte_carlo_runs, n_knots=n_knots, method=method
-    #         )
-
-    #     # # 5. Bundle results
-    #     # return {
-    #     #     "temperature": self.logT,
-    #     #     "dem": self.dem,
-    #     #     "dem_err": getattr(self, "dem_uncertainty", None),
-    #     #     "ifit": self.fitted_intensities,
-    #     #     "chi2": getattr(self, "chi2", None),
-    #     #     "redchi2": getattr(self, "redchi2", None),
-    #     #     "solver": self,
-    #     # }
-    #     return self
-
-    # def to_dict(self):
-    #     """Return solver outputs as a dictionary."""
-    #     return {
-    #         "temperature": self.logT,
-    #         "dem": getattr(self, "dem", None),
-    #         "dem_err": getattr(self, "dem_uncertainty", None),
-    #         "ifit": getattr(self, "fitted_intensities", None),
-    #         "chi2": getattr(self, "chi2", None),
-    #         "redchi2": getattr(self, "redchi2", None),
-    #     }
+    ################################################################################################################################
+    ################################################################################################################################
+    #############************************** Start of  error bars / Monte Carlo  **************************##########################
+    ################## #####################
 
     def summary(self):
         """
@@ -1883,6 +1606,14 @@ class XRTDEMIterative:
             print("   • plot_iteration_stats()    ")
 
         print("=" * 65)
+
+    ################################################################################################################################
+    ################################################################################################################################
+    #############************************** END of  **************************##########################
+    ################################################################################################################################
+    ################################################################################################################################
+
+    # -------------------------------------------------------------------------------------------------------------------------------
 
 
 # Attach plotting functions from plotting.py to the class
