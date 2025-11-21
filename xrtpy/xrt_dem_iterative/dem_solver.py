@@ -649,148 +649,8 @@ class XRTDEMIterative:
 
     # -------------------------------------------------------------------------------------------------------------------------------
 
-    ################################################################################################################################
-    ################################################################################################################################
     #############************************** Start of INITIAL ROUGH DEM ESTIMATE **************************##########################
     ################## An estimated EM shape based on simple intensity-over-response peaks, smoothed across T. #####################
-
-    # def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
-    #     """
-    #     Estimate an initial DEM curve from observed intensities and responses.
-
-    #     This follows the algorithm in IDL's `xrt_dem_iterative2.pro`, which uses
-    #     response-peak inversion to generate a crude log10 DEM estimate per channel,
-    #     then interpolates these estimates onto the solver's regular temperature grid.
-
-    #     Parameters
-    #     ----------
-    #     cutoff : float, optional
-    #         Fraction of the peak response to use for defining the "good" window
-    #         around each filter's peak. Default is 1/e ≈ 0.3679.
-
-    #     Returns
-    #     -------
-    #     est_log_dem_on_grid : ndarray
-    #         Array of shape (n_temperatures,) giving the initial DEM estimate
-    #         on `self.logT`. Values are log10(DEM) in [cm^-5 K^-1].
-    #         This can be used to seed the solver.
-
-    #     Notes
-    #     -----
-    #     - Units:
-    #         * Observed intensities: [DN s^-1 pix^-1]
-    #         * Response: [DN s^-1 pix^-1 cm^5]
-    #         * DEM(T): [cm^-5 K^-1]
-    #     - For each filter:
-    #         1. Locate the peak of its response.
-    #         2. Define a window where response > cutoff * peak.
-    #         3. Compute the denominator integral: sum( T * R * dlnT ).
-    #         4. Estimate DEM_peak = I_obs / denom.
-    #         5. Store log10(DEM_peak) at the peak logT.
-    #     - Duplicate peak logTs are merged by averaging.
-    #     - If fewer than 2 valid points are found, falls back to a flat guess
-    #     (log10 DEM = 22 everywhere).
-    #     """
-    #     if not hasattr(self, "logT"):
-    #         raise AttributeError(
-    #             "Temperature grid missing. Call create_logT_grid() first."
-    #         )
-    #     if not hasattr(self, "_response_matrix"):
-    #         raise AttributeError(
-    #             "Response matrix missing. Call _interpolate_responses_to_grid() first."
-    #         )
-
-    #     # Storage for peak locations and DEM estimates
-    #     t_peaks = []
-    #     log_dem_estimates = []
-
-    #     # Loop over each filter
-    #     for i, (T_orig, R_orig, I_obs) in enumerate(
-    #         zip(
-    #             self.response_temperatures,
-    #             self.response_values,
-    #             self._observed_intensities,
-    #         )
-    #     ):
-    #         logT_orig = np.log10(T_orig.to_value(u.K))
-    #         R_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5)
-
-    #         if I_obs <= 0 or np.all(R_vals <= 0):
-    #             continue  # skip unusable channel
-
-    #         # 1. Peak location
-    #         max_idx = np.argmax(R_vals)
-    #         peak_val = R_vals[max_idx]
-    #         t_peak = (
-    #             np.round(logT_orig[max_idx] / self._logarithmic_temperature_step_size)
-    #             * self._logarithmic_temperature_step_size
-    #         )
-
-    #         # 2. Good window (where R > cutoff * peak)
-    #         good = np.where(R_vals > peak_val * cutoff)[0]
-    #         if len(good) < 2:
-    #             continue
-
-    #         # 3. Compute denominator integral: sum(T 8*R* dlnT)
-    #         T_good = 10.0 ** logT_orig[good]
-    #         R_good = R_vals[good]
-    #         dlogT_native = np.diff(logT_orig).mean()
-    #         dlnT_native = np.log(10.0) * dlogT_native
-    #         denom = np.sum(T_good * R_good * dlnT_native)
-
-    #         if denom <= 0:
-    #             continue
-
-    #         # 4. DEM estimate at peak
-    #         dem_peak = I_obs / denom  # [cm^-5 K^-1]
-    #         if dem_peak <= 0 or not np.isfinite(dem_peak):
-    #             continue
-
-    #         log_dem_est = np.log10(dem_peak)
-    #         t_peaks.append(t_peak)
-    #         log_dem_estimates.append(log_dem_est)
-
-    #     # 5. Handle duplicates: average log10 DEM at same t_peak
-    #     if len(t_peaks) == 0:
-    #         # Fallback: flat guess (IDL style)
-    #         est_log_dem_on_grid = np.ones_like(self.logT) * 22.0
-    #         self._initial_log_dem = est_log_dem_on_grid
-    #         return est_log_dem_on_grid
-
-    #     uniq_t = {}
-    #     for t, dem_val in zip(t_peaks, log_dem_estimates):
-    #         if t in uniq_t:
-    #             uniq_t[t].append(dem_val)
-    #         else:
-    #             uniq_t[t] = [dem_val]
-    #     t_peaks_uniq = np.array(sorted(uniq_t.keys()))
-    #     log_dem_uniq = np.array([np.mean(uniq_t[t]) for t in t_peaks_uniq])
-
-    #     if len(t_peaks_uniq) < 2:
-    #         # Not enough points > flat guess
-    #         est_log_dem_on_grid = np.ones_like(self.logT) * 22.0
-    #         self._initial_log_dem = est_log_dem_on_grid
-    #         return est_log_dem_on_grid
-
-    #     # 6. Interpolate sparse estimates onto the solver's grid
-    #     interp_func = interp1d(
-    #         t_peaks_uniq,
-    #         log_dem_uniq,
-    #         kind="linear",
-    #         bounds_error=False,
-    #         fill_value="extrapolate",
-    #     )
-
-    #     self._raw_estimated_dem_peaks = (t_peaks_uniq, log_dem_uniq)
-    #     # est_log_dem_on_grid = interp_func(self.logT)
-    #     # # Store for later use
-    #     # self._initial_log_dem = est_log_dem_on_grid
-
-    #     #Use flat dem for inital guess
-    #     est_log_dem_on_grid = np.ones_like(self.logT) * 1.0
-    #     self._initial_log_dem = est_log_dem_on_grid
-
-    #     return est_log_dem_on_grid
 
     def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
         """
@@ -923,15 +783,10 @@ class XRTDEMIterative:
         return est_log_dem_on_grid
 
     #############************************** End of INITIAL DEM ESTIMATE **************************##################################
-    ################################################################################################################################
-    ################################################################################################################################
 
     # -------------------------------------------------------------------------------------------------------------------------------
 
-    ################################################################################################################################
-    ################################################################################################################################
     #############************************** Start of  **************************##########################
-    ################## #####################
 
     def _prepare_spline_system(self):
         """
@@ -1110,17 +965,10 @@ class XRTDEMIterative:
         return dem_phys, modeled_intensities_phys, chisq, result
 
     ################################################################################################################################
-    ################################################################################################################################
-    #############**************************  **************************##########################
-    ################################################################################################################################
-    ################################################################################################################################
 
     # -------------------------------------------------------------------------------------------------------------------------------
 
-    ################################################################################################################################
-    ################################################################################################################################
     #############************************** Start of  error bars / Monte Carlo  **************************##########################
-    ################## #####################
 
     def _run_monte_carlo(self, result_params):
         """
@@ -1202,10 +1050,7 @@ class XRTDEMIterative:
 
     # -------------------------------------------------------------------------------------------------------------------------------
 
-    ################################################################################################################################
-    ################################################################################################################################
     #############************************** Start of DEM SOLVER  **************************##########################
-    ################## #####################
 
     def solve(self):
         """
@@ -1321,246 +1166,12 @@ XRTDEMIterative.plot_dem_with_mc_vertical_bars = (
 XRTDEMIterative.plot_dem_mc_vertical_bars = dem_plotting.plot_dem_mc_vertical_bars
 
 
-# def solve(self):
-#     """
-#     High-level DEM solver.
-
-#     Mirrors IDL's xrt_dem_iterative2:
-#     - validates inputs
-#     - prepares temperature grid & responses
-#     - solves for base DEM
-#     - optionally runs Monte Carlo iterations
-
-#     After this call, the following attributes are set:
-
-#     self.logT        : log10(T) grid (same as self.logT from create_logT_grid)
-#     self.dem         : base DEM(T) [cm^-5 K^-1]
-#     self.chisq       : χ² for base solution
-#     self.modeled_intensities : modeled DN/s/pix for base solution
-
-#     If monte_carlo_runs > 0:
-
-#     self.dem_mc      : array shape (n_runs+1, n_T). 0 = base, 1..N = MC.
-#     self.chisq_mc    : array shape (n_runs+1,).
-#     self.obs_mc      : array shape (n_runs+1, n_channels) of observed intensities.
-#     self.mod_mc      : array shape (n_runs+1, n_channels) of modeled intensities.
-#     """
-#     # 0) Basic validation & preparation
-#     self.validate_inputs()
-
-#     # Temperature grid and responses
-#     self.create_logT_grid()
-#     self._interpolate_responses_to_grid()
-
-#     # We don't scale intensities here; scaling will be done per run
-#     base_obs_phys = self._observed_intensities.astype(float)  # DN/s (no units)
-
-#     # 1) Base DEM solution
-#     dem_base, mod_base, chisq_base, base_result = self._solve_single_dem(
-#         observed_intensities_vals=base_obs_phys
-#     )
-
-#     # Store base solution
-#     self.logT_solution = self.logT.copy()
-#     self.dem = dem_base  # [cm^-5 K^-1]
-#     self.chisq = chisq_base
-#     self.modeled_intensities = mod_base  # DN/s/pix
-
-#     # For convenience: store base as the first "MC" entry
-#     n_T = self.logT.size
-#     n_ch = base_obs_phys.size
-#     n_runs = self.monte_carlo_runs
-
-#     self.dem_mc = np.zeros((n_runs + 1, n_T), dtype=float)
-#     self.chisq_mc = np.zeros((n_runs + 1,), dtype=float)
-#     self.obs_mc = np.zeros((n_runs + 1, n_ch), dtype=float)
-#     self.mod_mc = np.zeros((n_runs + 1, n_ch), dtype=float)
-
-#     self.dem_mc[0, :] = dem_base
-#     self.chisq_mc[0] = chisq_base
-#     self.obs_mc[0, :] = base_obs_phys
-#     self.mod_mc[0, :] = mod_base
-
-#     # 2) Monte Carlo runs (if requested)
-#     if n_runs > 0:
-#         rng = np.random.default_rng()
-#         sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
-
-#         for ii in range(1, n_runs + 1):
-#             # Perturb observed intensities (IDL: i_obs + randomn * i_err, clipped at 0)
-#             noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
-#             obs_pert = base_obs_phys + noise
-#             obs_pert = np.maximum(obs_pert, 0.0)
-
-#             dem_i, mod_i, chisq_i, _ = self._solve_single_dem(obs_pert)
-
-#             self.dem_mc[ii, :] = dem_i
-#             self.chisq_mc[ii] = chisq_i
-#             self.obs_mc[ii, :] = obs_pert
-#             self.mod_mc[ii, :] = mod_i
-
-#     # Finished
-#     return self.dem
-
-# #NOTEFORJOY NOV 19
-# def solve(
-#     self, n_knots: int = 6, method: str = "least_squares", run_mc: bool = True
-# ):
-#     """
-#     Run the full DEM solver, IDL-style.
-
-#     This orchestrates:
-#     1. Build temperature grid.
-#     2. Interpolate responses (response matrix).
-#     3. Estimate initial DEM.
-#     4. Fit DEM with lmfit.
-#     5. Optionally run Monte Carlo ensemble.
-
-#     Parameters
-#     ----------
-#     n_knots : int, optional
-#         Number of spline knots across logT. Default = 6.
-#     method : str, optional
-#         Minimization method for `lmfit.minimize`. Default = "least_squares".
-#     run_mc : bool, optional
-#         Whether to run Monte Carlo simulations (using self.monte_carlo_runs).
-#         Default = True.
-
-#     Returns
-#     -------
-#     results : dict
-#         Dictionary of solver outputs:
-#         - "temperature" : log10(T) grid
-#         - "dem"         : best-fit DEM [cm^-5 K^-1]
-#         - "dem_err"     : DEM uncertainty (if MC runs > 0)
-#         - "ifit"        : fitted intensities [DN/s/pix]
-#         - "chi2"        : χ²
-#         - "redchi2"     : reduced χ²
-#     """
-#     # IDL-STYLE NOSOLVE CHECk
-#     # IDL behavior: if all observed intensities are zero (or non-positive),
-#     # the DEM is trivially zero. Skip solving and return immediately.
-#     if np.all(self._observed_intensities <= 0):  # == 0
-#         warnings.warn(
-#             "\n\n All observed intensities are zero or non-positive. "
-#             "DEM cannot be solved. Returning zero DEM and zero fitted intensities. \n\n"
-#         )
-
-#         # Ensure grid exists (IDL also returns logT_out even for nosolve)
-#         if not hasattr(self, "logT"):
-#             self.create_logT_grid()
-
-#         self.dem = np.zeros_like(self.logT)
-#         self.fitted_intensities = np.zeros_like(self._observed_intensities)
-#         self.chi2 = 0.0
-#         self.redchi2 = 0.0
-#         return self
-
-#     # 1. Ensure grid & responses
-#     self.create_logT_grid()
-#     self._interpolate_responses_to_grid()
-
-#     # 2. Estimate initial DEM
-#     self._estimate_initial_dem()
-
-#     # 3. Fit DEM
-#     result = self.fit_dem(n_knots=n_knots, method=method)
-#     result = self.fit_dem()
-
-#     # 4. Monte Carlo (optional)
-#     if run_mc and self.monte_carlo_runs > 0:
-#         self.run_monte_carlo(
-#             n_runs=self.monte_carlo_runs, n_knots=n_knots, method=method
-#         )
-
-#     # # 5. Bundle results
-#     # return {
-#     #     "temperature": self.logT,
-#     #     "dem": self.dem,
-#     #     "dem_err": getattr(self, "dem_uncertainty", None),
-#     #     "ifit": self.fitted_intensities,
-#     #     "chi2": getattr(self, "chi2", None),
-#     #     "redchi2": getattr(self, "redchi2", None),
-#     #     "solver": self,
-#     # }
-#     return self
-
-# def to_dict(self):
-#     """Return solver outputs as a dictionary."""
-#     return {
-#         "temperature": self.logT,
-#         "dem": getattr(self, "dem", None),
-#         "dem_err": getattr(self, "dem_uncertainty", None),
-#         "ifit": getattr(self, "fitted_intensities", None),
-#         "chi2": getattr(self, "chi2", None),
-#         "redchi2": getattr(self, "redchi2", None),
-#     }
-
 ################################################################################################################################
 ################################################################################################################################
 #############************************** END of  DEM SOLVER **************************##########################
 ################################################################################################################################
 ################################################################################################################################
 
-
-# def fit_dem(self, n_knots: int = 6, method: str = "least_squares", **kwargs):
-#     """
-#     Fit the DEM using lmfit to minimize residuals.
-#     Tracks chi² per iteration (like IDL's XRT_ITER_DEMSTAT).
-#     """
-
-#     # --- Auto-prepare prerequisites ---
-#     if not hasattr(self, "logT") or not hasattr(self, "T"):
-#         self.create_logT_grid()
-#     if not hasattr(self, "_response_matrix"):
-#         self._interpolate_responses_to_grid()
-#     if not hasattr(self, "_initial_log_dem"):
-#         self._estimate_initial_dem()
-
-#     self._last_n_knots = n_knots  # for summary()
-
-#     # Storage for iteration statistics
-#     self._iter_stats = {"chisq": [], "iteration": []}
-
-#     def _callback(params, iter, resid, *args, **kwargs):
-#         # Compute chi² at this iteration
-#         chi2 = np.sum(resid**2)
-#         self._iter_stats["chisq"].append(chi2)
-#         self._iter_stats["iteration"].append(iter)
-
-#     # 1. Build initial knot parameters
-#     params = self._build_lmfit_parameters(n_knots=n_knots)
-
-#     # 2. Run minimization
-#     result = minimize(
-#         self._residuals,
-#         params,
-#         method=method,
-#         iter_cb=_callback,  # <-- track stats
-#         max_nfev=self.max_iterations,
-#         **kwargs,
-#     )
-
-#     # 3. On success, reconstruct DEM + fitted intensities
-#     best_dem = self._reconstruct_dem_from_knots(result.params)
-#     self.dem = best_dem
-
-#     dem_mid = 0.5 * (best_dem[:-1] + best_dem[1:])
-#     R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
-#     T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
-#     I_fit = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
-
-#     self.fitted_intensities = I_fit
-#     sigma = self.intensity_errors.to_value(u.DN / u.s)
-#     residuals = (self._observed_intensities - I_fit) / sigma
-
-#     # Chi^2 metrics
-#     self.chi2 = np.sum(residuals**2)
-#     dof = len(self._observed_intensities) - len(result.params)
-#     self.redchi2 = self.chi2 / max(dof, 1)
-#     self.dof = dof  # save for summary
-
-#     return result
 
 # def fit_with_multiple_methods(
 #     self, methods=("leastsq", "least_squares", "nelder"), n_knots: int = 6, **kwargs
@@ -1789,28 +1400,3 @@ XRTDEMIterative.plot_dem_mc_vertical_bars = dem_plotting.plot_dem_mc_vertical_ba
 #         print("   • plot_iteration_stats()    ")
 
 #     print("=" * 65)
-
-################################################################################################################################
-################################################################################################################################
-#############************************** END of  **************************##########################
-################################################################################################################################
-################################################################################################################################
-
-# -------------------------------------------------------------------------------------------------------------------------------
-
-
-# NOTEFROMJOYTOJOY
-# Missin outputs
-# 1
-# I'm missing BASE_OBS- It is a 2D array of intensity values for all DEM runs (base + MC)
-# the set of observed intensities used in each DEM solution, including:
-# Column 0 > the original observed intensities (your real data)
-# Columns 1..MC_ITER > each Monte-Carlo–perturbed intensity vector
-
-# 2
-# MOD_OBS - Model intensities predicted by the DEM for each run.
-
-# 3
-# CHISQ- [1+MC_iter]
-# chi-squre for each DEM solution
-# Computed via mpdemfunct residuals squared and summed
