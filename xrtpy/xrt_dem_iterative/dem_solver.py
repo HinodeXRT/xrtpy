@@ -814,6 +814,17 @@ class XRTDEMIterative:
         # pm_matrix = R(T) * T * dlnT     (IDL line: emis * 10^t * alog(10^dt))
         # units - DN/s/pix/cm^5 * K * dLnT * DEM == DN/s/PIX
         T_linear = self.T.to_value(u.K)
+
+        # self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float) NOV21
+
+        # NOV21
+        # Was missing  - normalization_factor - i think #NOTETOJOYNOV21
+        # emissivity_matrix is shape (n_filters, n_T)
+        pm_phys = self._response_matrix * T_linear * self.dlnT  # physical units
+
+        # SCALE to match scaled DEM and scaled intensities
+        # self.pm_matrix = pm_phys / self.normalization_factor#THE FIX
+
         self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float)
 
         # Knot positions are evenly spaced in logT (IDL spl_t)
@@ -824,7 +835,7 @@ class XRTDEMIterative:
         interp_init = interp1d(
             self.logT,
             self._initial_log_dem,  # IDL is flat logDEM = 1.0
-            kind="linear",  # IDL uses a cubic spline later NOTEFORJOY NOV24
+            kind="linear",  # IDL uses a cubic spline later NOTEFORJOY NOV20
             bounds_error=False,
             fill_value="extrapolate",
         )
@@ -898,7 +909,7 @@ class XRTDEMIterative:
         # 4. Residuals = (i_mod - y_obs) * weights / sigma
         residuals = (i_mod - y_scaled) * self.weights / sigma_scaled
 
-        # Store χ² if desired
+        # chi^2 history, mostly for debugging
         chi2_val = np.sum(residuals**2)
         if not hasattr(self, "_iteration_chi2"):
             self._iteration_chi2 = []
@@ -906,59 +917,97 @@ class XRTDEMIterative:
 
         return residuals
 
+    # def _solve_single_dem(self, observed_intensities_vals: np.ndarray):
+    #     """
+    #     Solve the DEM once for a given set of observed intensities (base or MC-perturbed).
+
+    #     Parameters
+    #     ----------
+    #     observed_intensities_vals : ndarray
+    #         1D array of observed intensities in DN/s/pix (no units attached).
+
+    #     Returns
+    #     -------
+    #     dem_phys : ndarray
+    #         DEM(T) in physical units [cm^-5 K^-1] on self.logT.
+    #     modeled_intensities_phys : ndarray
+    #         Modeled intensities in DN/s/pix for each channel.
+    #     chisq : float
+    #         Sum of squared residuals for this run.
+    #     fit_result : lmfit.MinimizerResult
+    #         Full lmfit result object (for diagnostics).
+    #     """
+    #     # 1. Set scaled observations for this run (IDL: i_obs = i_obs/solv_factor)
+    #     nf = self._normalization_factor
+    #     self.intensities_scaled = observed_intensities_vals / nf
+    #     # Errors are the same for all runs; scale once
+    #     sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
+    #     self.sigma_scaled_intensity_errors = sigma_phys / nf
+
+    #     # 2. If all intensities are zero → nosolve, DEM = 0
+    #     if np.all(self.intensities_scaled == 0.0):
+    #         dem_scaled = np.zeros_like(self.logT, dtype=float)
+    #         dem_phys = dem_scaled * nf
+    #         modeled_intensities_phys = np.zeros_like(observed_intensities_vals)
+    #         chisq = 0.0
+    #         fit_result = None
+    #         return dem_phys, modeled_intensities_phys, chisq, fit_result
+
+    #     # 3. Initial DEM & spline system (IDL: xrt_dem_iter_estim + mp_prep)
+    #     self._estimate_initial_dem()
+    #     self._prepare_spline_system()
+    #     params = self._build_lmfit_parameters()
+
+    #     # 4. Run the least-squares solver (IDL: xrt_dem_iter_solver + mpfit)
+    #     result = minimize(self._residuals, params, max_nfev=self._max_iterations)
+
+    #     # 5. Reconstruct DEM in *scaled* units, then convert to physical
+    #     dem_scaled = self._reconstruct_dem_from_knots(result.params)  # cm^-5 K^-1 / nf
+    #     dem_phys = dem_scaled * nf  # undo normalization, like IDL
+
+    #     # 6. Modeled intensities (IDL: i_mod = dem ## pm * abunds)
+    #     i_mod_scaled = (self.pm_matrix @ dem_scaled) * self.abundances
+    #     modeled_intensities_phys = i_mod_scaled * nf  # back to DN/s/pix
+
+    #     # 7. χ² from residuals
+    #     resid = self._residuals(result.params)
+    #     chisq = float(np.sum(resid**2))
+
+    #     return dem_phys, modeled_intensities_phys, chisq, result
+
     def _solve_single_dem(self, observed_intensities_vals: np.ndarray):
-        """
-        Solve the DEM once for a given set of observed intensities (base or MC-perturbed).
-
-        Parameters
-        ----------
-        observed_intensities_vals : ndarray
-            1D array of observed intensities in DN/s/pix (no units attached).
-
-        Returns
-        -------
-        dem_phys : ndarray
-            DEM(T) in physical units [cm^-5 K^-1] on self.logT.
-        modeled_intensities_phys : ndarray
-            Modeled intensities in DN/s/pix for each channel.
-        chisq : float
-            Sum of squared residuals for this run.
-        fit_result : lmfit.MinimizerResult
-            Full lmfit result object (for diagnostics).
-        """
-        # 1. Set scaled observations for this run (IDL: i_obs = i_obs/solv_factor)
         nf = self._normalization_factor
+
+        # 1. scaled obs/errors
         self.intensities_scaled = observed_intensities_vals / nf
-        # Errors are the same for all runs; scale once
         sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
         self.sigma_scaled_intensity_errors = sigma_phys / nf
 
-        # 2. If all intensities are zero → nosolve, DEM = 0
+        # 2. trivial nosolve case
         if np.all(self.intensities_scaled == 0.0):
-            dem_scaled = np.zeros_like(self.logT, dtype=float)
-            dem_phys = dem_scaled * nf
+            dem_model = np.zeros_like(self.logT)
+            dem_phys = dem_model * nf
             modeled_intensities_phys = np.zeros_like(observed_intensities_vals)
-            chisq = 0.0
-            fit_result = None
-            return dem_phys, modeled_intensities_phys, chisq, fit_result
+            return dem_phys, modeled_intensities_phys, 0.0, None
 
-        # 3. Initial DEM & spline system (IDL: xrt_dem_iter_estim + mp_prep)
-        self._estimate_initial_dem()
+        # 3. initial guess (log10 DEM_model on grid)
+        init_log_dem = self._estimate_initial_dem()  # flat ~ 1.0 in IDL
+        self._initial_log_dem = init_log_dem
+
+        # 4. spline system using that initial guess
         self._prepare_spline_system()
-        params = self._build_lmfit_parameters()
+        params0 = self._build_lmfit_parameters()  # values = initial_log_dem at knots
 
-        # 4. Run the least-squares solver (IDL: xrt_dem_iter_solver + mpfit)
-        result = minimize(self._residuals, params, max_nfev=self._max_iterations)
+        # 5. run minimizer
+        result = minimize(self._residuals, params0, max_nfev=self._max_iterations)
 
-        # 5. Reconstruct DEM in *scaled* units, then convert to physical
-        dem_scaled = self._reconstruct_dem_from_knots(result.params)  # cm^-5 K^-1 / nf
-        dem_phys = dem_scaled * nf  # undo normalization, like IDL
+        # THIS is the critical part – use *result.params*, not params0 <<<
+        dem_model = self._reconstruct_dem_from_knots(result.params)  # DEM_model(T)
+        dem_phys = dem_model * nf
 
-        # 6. Modeled intensities (IDL: i_mod = dem ## pm * abunds)
-        i_mod_scaled = (self.pm_matrix @ dem_scaled) * self.abundances
-        modeled_intensities_phys = i_mod_scaled * nf  # back to DN/s/pix
+        i_mod_scaled = (self.pm_matrix @ dem_model) * self.abundances
+        modeled_intensities_phys = i_mod_scaled * nf
 
-        # 7. χ² from residuals
         resid = self._residuals(result.params)
         chisq = float(np.sum(resid**2))
 
@@ -1052,57 +1101,223 @@ class XRTDEMIterative:
 
     #############************************** Start of DEM SOLVER  **************************##########################
 
+    # def solve(self):
+    #     """
+    #     High-level DEM solver.
+
+    #     Pythonic analogue of IDL's xrt_dem_iterative2.pro:
+
+    #     1. Validate inputs.
+    #     2. Build the logarithmic temperature grid and interpolate responses.
+    #     3. Solve ONE base DEM using the original (unperturbed) intensities.
+    #     4. If Monte Carlo is requested (monte_carlo_runs > 0), perform N
+    #     perturbed solves by adding Gaussian noise to the base intensities.
+    #     5. Store all outputs on the instance for later analysis/plotting.
+
+    #     After calling solve(), the following attributes are defined:
+
+    #     Base solution
+    #     -------------
+    #     logT : ndarray, shape (n_T,)
+    #         Temperature grid (log10 K) on which the DEM is defined.
+    #     dem : ndarray, shape (n_T,)
+    #         Best-fit DEM(T) in linear units [cm^-5 K^-1].
+    #         This is already scaled back by `normalization_factor`.
+    #     chisq : float
+    #         Chi-square of the base fit (sum of squared residuals).
+    #     modeled_intensities : ndarray, shape (n_channels,)
+    #         Best-fit modeled intensities in physical units [DN s^-1 pix^-1].
+    #     _base_fit_result : lmfit.Result
+    #         The lmfit result object for the base fit (for debugging/inspection).
+
+    #     Monte Carlo products
+    #     --------------------
+    #     mc_dem : ndarray, shape (N+1, n_T)
+    #         DEM curves for base (row 0) and each Monte Carlo run (rows 1..N).
+    #         All in physical units [cm^-5 K^-1].
+    #     mc_chisq : ndarray, shape (N+1,)
+    #         Chi-square values for base (index 0) and each MC run.
+    #     mc_base_obs : ndarray, shape (N+1, n_channels)
+    #         Observed intensities for base + each MC run [DN s^-1 pix^-1].
+    #         Row 0 is the original observation; rows 1..N are perturbed.
+    #     mc_mod_obs : ndarray, shape (N+1, n_channels)
+    #         Modeled intensities corresponding to each DEM realization,
+    #         in physical units [DN s^-1 pix^-1].
+
+    #     Notes
+    #     -----
+    #     * Column/row 0 always holds the BASE (unperturbed) solution.
+    #     Rows 1..N hold the Monte Carlo solutions.
+    #     * Monte Carlo perturbations follow the IDL scheme:
+    #     I_obs' = I_obs + N(0, sigma), with sigma from `intensity_errors`,
+    #     and clipped at 0 (no negative intensities).
+    #     """
+
+    #     # ------------------------------------------------------------------
+    #     # 0) Validate inputs (IDL: argument checking at top of xrt_dem_iterative2)
+    #     # ------------------------------------------------------------------
+    #     self.validate_inputs()
+
+    #     # ------------------------------------------------------------------
+    #     # 1) Build temperature grid and response matrix (IDL: regular logT grid + interpol)
+    #     # ------------------------------------------------------------------
+    #     self.create_logT_grid()
+    #     self._interpolate_responses_to_grid()
+
+    #     # Base observed intensities in physical units [DN/s/pix]
+    #     base_obs_phys = self._observed_intensities.astype(float)
+
+    #     # ------------------------------------------------------------------
+    #     # 2) Solve base DEM (no perturbations)
+    #     #    This is the analogue of the "base" call to xrt_dem_iter_nowidget.
+    #     # ------------------------------------------------------------------
+    #     dem_base, mod_base, chisq_base, base_result = self._solve_single_dem(
+    #         observed_intensities_vals=base_obs_phys
+    #     )
+
+    #     #first dem testing
+    #     self.first = dem_base
+
+    #     # Store base solution on the instance
+    #     # logT is already stored by create_logT_grid(), but keep alias if desired.
+    #     self.logT_solution = self.logT.copy()
+    #     self.dem = dem_base                      # DEM(T) in [cm^-5 K^-1]
+    #     self.chisq = chisq_base                  # sum of squared residuals
+    #     self.modeled_intensities = mod_base      # [DN/s/pix]
+    #     self._base_fit_result = base_result      # lmfit.Result for debugging
+
+    #     # ------------------------------------------------------------------
+    #     # 3) Allocate Monte Carlo arrays
+    #     #    IDL: base_obs, dem_out, chisq, mod_obs grow in the 2nd dimension.
+    #     #    Here we store as (N+1, ...) with row 0 = base solution.
+    #     # ------------------------------------------------------------------
+    #     n_T = self.logT.size
+    #     n_ch = base_obs_phys.size
+    #     N = self.monte_carlo_runs
+
+    #     self.mc_dem = np.zeros((N + 1, n_T), dtype=float)
+    #     self.mc_chisq = np.zeros((N + 1,), dtype=float)
+    #     self.mc_base_obs = np.zeros((N + 1, n_ch), dtype=float)
+    #     self.mc_mod_obs = np.zeros((N + 1, n_ch), dtype=float)
+
+    #     # Row 0 = base solution (unperturbed)
+    #     self.mc_dem[0, :] = dem_base
+    #     self.mc_chisq[0] = chisq_base
+    #     self.mc_base_obs[0, :] = base_obs_phys
+    #     self.mc_mod_obs[0, :] = mod_base
+
+    #     # ------------------------------------------------------------------
+    #     # 4) Monte Carlo loop (IDL: Section 3.6)
+    #     # ------------------------------------------------------------------
+    #     if N > 0:
+    #         # Use default_rng() seeded from system entropy (IDL: seed = systime(1))
+    #         rng = np.random.default_rng()
+
+    #         # Base intensity errors in physical units [DN/s/pix]
+    #         sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
+
+    #         for ii in range(1, N + 1):
+    #             # Optional lightweight progress indicator (~20 updates max)
+    #             if ii % max(1, N // 20) == 0:
+    #                 print(f"  - Monte Carlo run {ii}/{N}")
+
+    #             # --- 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0 ---
+    #             noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
+    #             obs_pert = base_obs_phys + noise
+    #             obs_pert = np.maximum(obs_pert, 0.0)  # IDL: > 0.0 to avoid negatives
+
+    #             # --- 4b) Solve DEM for this perturbed realization ---
+    #             dem_i, mod_i, chisq_i, _ = self._solve_single_dem(
+    #                 observed_intensities_vals=obs_pert
+    #             )
+
+    #             # --- 4c) Store Monte Carlo results ---
+    #             self.mc_dem[ii, :] = dem_i
+    #             self.mc_chisq[ii] = chisq_i
+    #             self.mc_base_obs[ii, :] = obs_pert
+    #             self.mc_mod_obs[ii, :] = mod_i
+
+    #     # ------------------------------------------------------------------
+    #     # 5) Return DEM for convenience (common pattern in Python APIs)
+    #     # ------------------------------------------------------------------
+    #     return self.dem
+
     def solve(self):
         """
         High-level DEM solver.
 
-        Replicates IDL’s xrt_dem_iterative2.pro behavior:
-        1. Validate inputs
-        2. Prepare logT grid and interpolate responses
-        3. Solve ONE base DEM using original intensities
-        4. If Monte Carlo requested, perform N perturbed solves
-        5. Store all arrays cleanly for plotting and analysis
+        Python analogue of IDL's xrt_dem_iterative2.pro:
 
-        After calling solve(), the following attributes exist:
+        1. Validate inputs.
+        2. Build the logT grid and interpolate temperature responses.
+        3. Solve ONE base DEM using the original (unperturbed) intensities.
+        4. If Monte Carlo is requested (monte_carlo_runs > 0), perform N
+        perturbed solves by adding Gaussian noise to the base intensities.
+        5. Store all outputs on the instance for later analysis/plotting.
 
-        Base solution:
-            - self.logT        (temperature grid)
-            - self.dem         (DEM(T) in cm^-5 K^-1)
-            - self.chisq       (chi-square of base fit)
-            - self.modeled_intensities
+        After calling solve(), the following attributes are defined:
 
-        Monte Carlo products (N = monte_carlo_runs, N>=0):
-            - self.mc_dem        shape = (N+1, n_T)
-            - self.mc_chisq      shape = (N+1,)
-            - self.mc_base_obs   shape = (N+1, n_filters)
-            - self.mc_mod_obs    shape = (N+1, n_filters)
+        Base solution
+        -------------
+        logT : ndarray (n_T,)
+            log10 temperature grid [K].
+        dem : ndarray (n_T,)
+            Best-fit DEM(T) in physical units [cm^-5 K^-1].
+        chisq : float
+            Chi-square of the base fit (sum of squared residuals).
+        modeled_intensities : ndarray (n_channels,)
+            Best-fit modeled intensities in [DN s^-1 pix^-1].
+        _base_fit_result : lmfit.MinimizerResult
+            Full lmfit result object for diagnostics.
 
-        Column 0 always holds the BASE solution (unperturbed).
-        Columns 1..N hold Monte Carlo solutions.
+        Monte Carlo products
+        --------------------
+        mc_dem : ndarray (N+1, n_T)
+            DEM curves for base (row 0) and each Monte Carlo run (rows 1..N),
+            in physical units [cm^-5 K^-1].
+        mc_chisq : ndarray (N+1,)
+            Chi-square values for base (index 0) and each MC run.
+        mc_base_obs : ndarray (N+1, n_channels)
+            Observed intensities [DN s^-1 pix^-1] for base + each MC run.
+            Row 0 = original observation; rows 1..N = perturbed.
+        mc_mod_obs : ndarray (N+1, n_channels)
+            Modeled intensities [DN s^-1 pix^-1] corresponding to mc_dem.
         """
 
-        # 0) Validate inputs -------------------------------------------------------
+        # --------------------------------------------------------------
+        # 0) Validate inputs (IDL: argument checks near top)
+        # --------------------------------------------------------------
         self.validate_inputs()
 
-        # 1) Build temperature grid and response matrix --------------------------
+        # --------------------------------------------------------------
+        # 1) Build logT grid and response matrix
+        #    (IDL: regular logT grid + interpolated emissivities)
+        # --------------------------------------------------------------
         self.create_logT_grid()
         self._interpolate_responses_to_grid()
 
-        # Base observed intensities (physical DN/s/pix)
-        base_obs_phys = self._observed_intensities.astype(float)
+        # Base observed intensities in physical units [DN/s/pix]
+        base_obs_phys = np.asarray(self._observed_intensities, dtype=float)
 
-        # 2) Solve base DEM -------------------------------------------------------
+        # --------------------------------------------------------------
+        # 2) Solve BASE DEM (unperturbed intensities)
+        #    Corresponds to the first call to xrt_dem_iter_nowidget in IDL.
+        # --------------------------------------------------------------
         dem_base, mod_base, chisq_base, base_result = self._solve_single_dem(
             observed_intensities_vals=base_obs_phys
         )
 
         # Store base solution
-        self.logT_solution = self.logT.copy()
-        self.dem = dem_base
-        self.chisq = chisq_base
-        self.modeled_intensities = mod_base
+        self.logT_solution = self.logT.copy()  # alias
+        self.dem = dem_base  # [cm^-5 K^-1]
+        self.chisq = chisq_base  # chi-square
+        self.modeled_intensities = mod_base  # [DN/s/pix]
+        self._base_fit_result = base_result
 
-        # 3) Allocate Monte Carlo arrays ------------------------------------------
+        # --------------------------------------------------------------
+        # 3) Allocate Monte Carlo arrays
+        #    (IDL: base_obs, dem_out, chisq, mod_obs)
+        # --------------------------------------------------------------
         n_T = self.logT.size
         n_ch = base_obs_phys.size
         N = self.monte_carlo_runs
@@ -1112,38 +1327,112 @@ class XRTDEMIterative:
         self.mc_base_obs = np.zeros((N + 1, n_ch), dtype=float)
         self.mc_mod_obs = np.zeros((N + 1, n_ch), dtype=float)
 
-        # Column 0 = base solution
+        # Row 0 = base solution (unperturbed)
         self.mc_dem[0, :] = dem_base
         self.mc_chisq[0] = chisq_base
         self.mc_base_obs[0, :] = base_obs_phys
         self.mc_mod_obs[0, :] = mod_base
 
-        # 4) Monte Carlo Loop -----------------------------------------------------
+        # --------------------------------------------------------------
+        # 4) Monte Carlo loop (IDL: Section 3.6)
+        # --------------------------------------------------------------
         if N > 0:
-            rng = np.random.default_rng()
+            rng = np.random.default_rng()  # like IDL's systime(1) seeding
+
+            # Intensity errors in physical units [DN/s/pix]
             sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
 
             for ii in range(1, N + 1):
+                # Lightweight progress indicator
+                if ii % max(1, N // 20) == 0:
+                    print(f"  - Monte Carlo run {ii}/{N}")
 
-                if ii % max(1, N // 20) == 0:  # print 5% updates
-                    print(f"  - MC run {ii}/{N}")
-
-                # Perturb intensities (IDL: i_obs + randn * i_err)
+                # ---- 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0
                 noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
                 obs_pert = base_obs_phys + noise
-                obs_pert = np.maximum(obs_pert, 0.0)  # IDL clips at zero
+                obs_pert = np.maximum(obs_pert, 0.0)  # IDL: >0 to avoid negatives
 
-                # Solve DEM for perturbed intensities
-                dem_i, mod_i, chisq_i, _ = self._solve_single_dem(obs_pert)
+                # ---- 4b) Solve DEM for this perturbed realization
+                dem_i, mod_i, chisq_i, _ = self._solve_single_dem(
+                    observed_intensities_vals=obs_pert
+                )
 
-                # Store results
+                # ---- 4c) Store Monte Carlo results
                 self.mc_dem[ii, :] = dem_i
                 self.mc_chisq[ii] = chisq_i
                 self.mc_base_obs[ii, :] = obs_pert
                 self.mc_mod_obs[ii, :] = mod_i
 
-        # 5) Return DEM for convenience ------------------------------------------
+        # --------------------------------------------------------------
+        # 5) Return DEM for convenience
+        # --------------------------------------------------------------
         return self.dem
+
+    def plot_dem_with_monte_carlo(
+        self,
+        mc_color="black",
+        base_color="red",
+        alpha_mc=0.15,
+        lw_mc=1.2,
+        lw_base=2.0,
+        figsize=(10, 6),
+        show_envelope=True,
+    ):
+        """
+        Plot DEM with Monte Carlo ensemble using step curves.
+        """
+
+        import matplotlib.pyplot as plt
+
+        logT = self.logT
+        mc_dem = self.mc_dem  # shape (N+1, n_T)
+        base_dem = self.dem  # shape (n_T,)
+        N = mc_dem.shape[0] - 1  # number of MC runs
+
+        plt.figure(figsize=figsize)
+
+        # --- MC DEM curves (black) ---
+        for i in range(1, N + 1):
+            plt.step(
+                logT,
+                np.log10(mc_dem[i, :]),
+                where="mid",
+                color=mc_color,
+                alpha=alpha_mc,
+                linewidth=lw_mc,
+            )
+
+        # --- Optional uncertainty envelope (16–84 percentile) ---
+        if show_envelope and N > 1:
+            dem_low = np.percentile(mc_dem[1:, :], 16, axis=0)
+            dem_high = np.percentile(mc_dem[1:, :], 84, axis=0)
+
+            plt.fill_between(
+                logT,
+                np.log10(dem_low),
+                np.log10(dem_high),
+                step="mid",
+                color="black",
+                alpha=0.2,
+                label="68% interval",
+            )
+
+        # --- Base DEM (red) ---
+        plt.step(
+            logT,
+            np.log10(base_dem),
+            where="mid",
+            color=base_color,
+            linewidth=lw_base,
+            label="Base DEM",
+        )
+
+        plt.xlabel("log₁₀(T) [K]")
+        plt.ylabel("log₁₀(DEM)")
+        plt.title(f"DEM Monte Carlo ({N} realizations)")
+        plt.grid(True)
+        plt.legend()
+        plt.show()
 
 
 # Attach plotting functions from plotting.py to the class
@@ -1172,121 +1461,6 @@ XRTDEMIterative.plot_dem_mc_vertical_bars = dem_plotting.plot_dem_mc_vertical_ba
 ################################################################################################################################
 ################################################################################################################################
 
-
-# def fit_with_multiple_methods(
-#     self, methods=("leastsq", "least_squares", "nelder"), n_knots: int = 6, **kwargs
-# ):
-#     """
-#     Try multiple lmfit minimization methods and pick the best χ².
-
-#     Parameters
-#     ----------
-#     methods : tuple of str, optional
-#         Minimization methods to test. Default = ("leastsq", "least_squares", "nelder").
-#     n_knots : int, optional
-#         Number of spline knots for DEM fit. Default = 6.
-#     **kwargs : dict
-#         Extra arguments passed to `lmfit.minimize`.
-
-#     Returns
-#     -------
-#     best_result : lmfit.MinimizerResult
-#         Result from the method with lowest chi².
-#     """
-
-#     if not hasattr(self, "_initial_log_dem"):
-#         self._estimate_initial_dem()
-
-#     results = {}
-#     best_chi2 = np.inf
-#     best_result = None
-#     best_method = None
-
-#     for method in methods:
-#         print(f"\n>>> Trying method: {method}")
-#         params = self._build_lmfit_parameters(n_knots=n_knots)
-#         result = minimize(self._residuals, params, method=method, **kwargs)
-
-#         # Compute DEM + chi square for this fit
-#         # SELFNOTEJOY - output currently does not have units. unts=cm^5 * K^-1 Make this a test
-#         dem = self._reconstruct_dem_from_knots(
-#             result.params
-#         )  # SELFNOTEJOY - here is the stamp to defining the DEM - triple check
-#         dem_mid = 0.5 * (dem[:-1] + dem[1:])
-#         R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
-#         T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
-#         I_fit = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
-
-#         sigma = self.intensity_errors.to_value(u.DN / u.s)
-#         residuals = (self._observed_intensities - I_fit) / sigma
-#         chi2 = np.sum(residuals**2)
-
-#         print(f"x square = {chi2:.3e}")
-
-#         results[method] = (result, chi2)
-
-#         if chi2 < best_chi2:
-#             best_chi2 = chi2
-#             best_result = result
-#             best_method = method
-
-#     print(f"\n>>> Best method: {best_method} with x square = {best_chi2:.3e}")
-
-#     # Store outputs from the best fit
-#     best_dem = self._reconstruct_dem_from_knots(best_result.params)
-#     self.dem = best_dem
-#     dem_mid = 0.5 * (best_dem[:-1] + best_dem[1:])
-#     R_mid = 0.5 * (self._response_matrix[:, :-1] + self._response_matrix[:, 1:])
-#     T_mid = 0.5 * (self.T[:-1] + self.T[1:]).to_value(u.K)
-#     self.fitted_intensities = np.sum(R_mid * dem_mid * T_mid * self.dlnT, axis=1)
-#     sigma = self.intensity_errors.to_value(u.DN / u.s)
-#     residuals = (self._observed_intensities - self.fitted_intensities) / sigma
-#     self.chi2 = np.sum(residuals**2)
-#     dof = len(self._observed_intensities) - len(best_result.params)
-#     self.redchi2 = self.chi2 / max(dof, 1)
-
-#     return best_result
-
-# def run_monte_carlo(
-#     self, n_runs=None, n_knots=6, method="least_squares", random_seed=None
-# ):
-#     from tqdm import tqdm  # add this at top of file
-
-#     if n_runs is None:
-#         n_runs = self._monte_carlo_runs
-#     if n_runs <= 0:
-#         raise ValueError("Monte Carlo runs disabled (n_runs=0).")
-
-#     if random_seed is not None:
-#         np.random.seed(random_seed)
-
-#     sigma = self.intensity_errors.to_value(u.DN / u.s)
-#     dem_ensemble = []
-
-#     self._last_n_knots = n_knots
-
-#     # --- progress bar
-#     for i in tqdm(range(n_runs), desc="Monte Carlo DEM fits", unit="run"):
-#         noisy_obs = self._observed_intensities + np.random.normal(0, sigma)
-#         self._active_observed_intensities = noisy_obs
-#         try:
-#             params = self._build_lmfit_parameters(n_knots=n_knots)
-#             result = minimize(self._residuals, params, method=method)
-#         finally:
-#             if hasattr(self, "_active_observed_intensities"):
-#                 delattr(self, "_active_observed_intensities")
-
-#         dem_i = self._reconstruct_dem_from_knots(result.params)
-#         dem_ensemble.append(dem_i)
-
-#     dem_ensemble = np.array(dem_ensemble)
-#     self._dem_ensemble = dem_ensemble
-#     self.dem_uncertainty = np.std(dem_ensemble, axis=0)
-#     self.dem_median = np.median(dem_ensemble, axis=0)
-
-#     return dem_ensemble
-
-# # -------------------------------------------------------------------------------------------------------------------------------
 
 # ################################################################################################################################
 # ################################################################################################################################
