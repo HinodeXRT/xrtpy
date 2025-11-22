@@ -628,26 +628,8 @@ class XRTDEMIterative:
 
     ############################ Everything line of code ABOVE is PREP for the DEM  #############################################
 
-    ################################################################################################################################
-    ################################################################################################################################
-    #################################### structure with all fields the DEM solver expects  ##########################################
-    # 1 Temperature - self.logT , self.T
-    # 2 Response - note - interpolated onto your logT grid. - self.interpolated_responses, self._response_matrix
-    # 3 # of bins  - n_bins
-    # 4 i_obs – self._observed_intensites - measured DN/s/pixel scaled by solv_factor
-    # self.observed_intensities
-    # 5 uncertainty on the intensity - Also scaled by solv_factor.  - self.intensity_errors self.normalization_factor
-    # 6 units?
-
-    ################################################################################################################################
-    ################################################################################################################################
-    ################################################################################################################################
-
     # ****************************************************************************************************************************
     ############################ Everything line of code BELOW is FOR the DEM  ##################################################
-    # ****************************************************************************************************************************
-
-    # -------------------------------------------------------------------------------------------------------------------------------
 
     #############************************** Start of INITIAL ROUGH DEM ESTIMATE **************************##########################
     ################## An estimated EM shape based on simple intensity-over-response peaks, smoothed across T. #####################
@@ -917,64 +899,6 @@ class XRTDEMIterative:
 
         return residuals
 
-    # def _solve_single_dem(self, observed_intensities_vals: np.ndarray):
-    #     """
-    #     Solve the DEM once for a given set of observed intensities (base or MC-perturbed).
-
-    #     Parameters
-    #     ----------
-    #     observed_intensities_vals : ndarray
-    #         1D array of observed intensities in DN/s/pix (no units attached).
-
-    #     Returns
-    #     -------
-    #     dem_phys : ndarray
-    #         DEM(T) in physical units [cm^-5 K^-1] on self.logT.
-    #     modeled_intensities_phys : ndarray
-    #         Modeled intensities in DN/s/pix for each channel.
-    #     chisq : float
-    #         Sum of squared residuals for this run.
-    #     fit_result : lmfit.MinimizerResult
-    #         Full lmfit result object (for diagnostics).
-    #     """
-    #     # 1. Set scaled observations for this run (IDL: i_obs = i_obs/solv_factor)
-    #     nf = self._normalization_factor
-    #     self.intensities_scaled = observed_intensities_vals / nf
-    #     # Errors are the same for all runs; scale once
-    #     sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
-    #     self.sigma_scaled_intensity_errors = sigma_phys / nf
-
-    #     # 2. If all intensities are zero → nosolve, DEM = 0
-    #     if np.all(self.intensities_scaled == 0.0):
-    #         dem_scaled = np.zeros_like(self.logT, dtype=float)
-    #         dem_phys = dem_scaled * nf
-    #         modeled_intensities_phys = np.zeros_like(observed_intensities_vals)
-    #         chisq = 0.0
-    #         fit_result = None
-    #         return dem_phys, modeled_intensities_phys, chisq, fit_result
-
-    #     # 3. Initial DEM & spline system (IDL: xrt_dem_iter_estim + mp_prep)
-    #     self._estimate_initial_dem()
-    #     self._prepare_spline_system()
-    #     params = self._build_lmfit_parameters()
-
-    #     # 4. Run the least-squares solver (IDL: xrt_dem_iter_solver + mpfit)
-    #     result = minimize(self._residuals, params, max_nfev=self._max_iterations)
-
-    #     # 5. Reconstruct DEM in *scaled* units, then convert to physical
-    #     dem_scaled = self._reconstruct_dem_from_knots(result.params)  # cm^-5 K^-1 / nf
-    #     dem_phys = dem_scaled * nf  # undo normalization, like IDL
-
-    #     # 6. Modeled intensities (IDL: i_mod = dem ## pm * abunds)
-    #     i_mod_scaled = (self.pm_matrix @ dem_scaled) * self.abundances
-    #     modeled_intensities_phys = i_mod_scaled * nf  # back to DN/s/pix
-
-    #     # 7. χ² from residuals
-    #     resid = self._residuals(result.params)
-    #     chisq = float(np.sum(resid**2))
-
-    #     return dem_phys, modeled_intensities_phys, chisq, result
-
     def _solve_single_dem(self, observed_intensities_vals: np.ndarray):
         nf = self._normalization_factor
 
@@ -1101,147 +1025,6 @@ class XRTDEMIterative:
 
     #############************************** Start of DEM SOLVER  **************************##########################
 
-    # def solve(self):
-    #     """
-    #     High-level DEM solver.
-
-    #     Pythonic analogue of IDL's xrt_dem_iterative2.pro:
-
-    #     1. Validate inputs.
-    #     2. Build the logarithmic temperature grid and interpolate responses.
-    #     3. Solve ONE base DEM using the original (unperturbed) intensities.
-    #     4. If Monte Carlo is requested (monte_carlo_runs > 0), perform N
-    #     perturbed solves by adding Gaussian noise to the base intensities.
-    #     5. Store all outputs on the instance for later analysis/plotting.
-
-    #     After calling solve(), the following attributes are defined:
-
-    #     Base solution
-    #     -------------
-    #     logT : ndarray, shape (n_T,)
-    #         Temperature grid (log10 K) on which the DEM is defined.
-    #     dem : ndarray, shape (n_T,)
-    #         Best-fit DEM(T) in linear units [cm^-5 K^-1].
-    #         This is already scaled back by `normalization_factor`.
-    #     chisq : float
-    #         Chi-square of the base fit (sum of squared residuals).
-    #     modeled_intensities : ndarray, shape (n_channels,)
-    #         Best-fit modeled intensities in physical units [DN s^-1 pix^-1].
-    #     _base_fit_result : lmfit.Result
-    #         The lmfit result object for the base fit (for debugging/inspection).
-
-    #     Monte Carlo products
-    #     --------------------
-    #     mc_dem : ndarray, shape (N+1, n_T)
-    #         DEM curves for base (row 0) and each Monte Carlo run (rows 1..N).
-    #         All in physical units [cm^-5 K^-1].
-    #     mc_chisq : ndarray, shape (N+1,)
-    #         Chi-square values for base (index 0) and each MC run.
-    #     mc_base_obs : ndarray, shape (N+1, n_channels)
-    #         Observed intensities for base + each MC run [DN s^-1 pix^-1].
-    #         Row 0 is the original observation; rows 1..N are perturbed.
-    #     mc_mod_obs : ndarray, shape (N+1, n_channels)
-    #         Modeled intensities corresponding to each DEM realization,
-    #         in physical units [DN s^-1 pix^-1].
-
-    #     Notes
-    #     -----
-    #     * Column/row 0 always holds the BASE (unperturbed) solution.
-    #     Rows 1..N hold the Monte Carlo solutions.
-    #     * Monte Carlo perturbations follow the IDL scheme:
-    #     I_obs' = I_obs + N(0, sigma), with sigma from `intensity_errors`,
-    #     and clipped at 0 (no negative intensities).
-    #     """
-
-    #     # ------------------------------------------------------------------
-    #     # 0) Validate inputs (IDL: argument checking at top of xrt_dem_iterative2)
-    #     # ------------------------------------------------------------------
-    #     self.validate_inputs()
-
-    #     # ------------------------------------------------------------------
-    #     # 1) Build temperature grid and response matrix (IDL: regular logT grid + interpol)
-    #     # ------------------------------------------------------------------
-    #     self.create_logT_grid()
-    #     self._interpolate_responses_to_grid()
-
-    #     # Base observed intensities in physical units [DN/s/pix]
-    #     base_obs_phys = self._observed_intensities.astype(float)
-
-    #     # ------------------------------------------------------------------
-    #     # 2) Solve base DEM (no perturbations)
-    #     #    This is the analogue of the "base" call to xrt_dem_iter_nowidget.
-    #     # ------------------------------------------------------------------
-    #     dem_base, mod_base, chisq_base, base_result = self._solve_single_dem(
-    #         observed_intensities_vals=base_obs_phys
-    #     )
-
-    #     #first dem testing
-    #     self.first = dem_base
-
-    #     # Store base solution on the instance
-    #     # logT is already stored by create_logT_grid(), but keep alias if desired.
-    #     self.logT_solution = self.logT.copy()
-    #     self.dem = dem_base                      # DEM(T) in [cm^-5 K^-1]
-    #     self.chisq = chisq_base                  # sum of squared residuals
-    #     self.modeled_intensities = mod_base      # [DN/s/pix]
-    #     self._base_fit_result = base_result      # lmfit.Result for debugging
-
-    #     # ------------------------------------------------------------------
-    #     # 3) Allocate Monte Carlo arrays
-    #     #    IDL: base_obs, dem_out, chisq, mod_obs grow in the 2nd dimension.
-    #     #    Here we store as (N+1, ...) with row 0 = base solution.
-    #     # ------------------------------------------------------------------
-    #     n_T = self.logT.size
-    #     n_ch = base_obs_phys.size
-    #     N = self.monte_carlo_runs
-
-    #     self.mc_dem = np.zeros((N + 1, n_T), dtype=float)
-    #     self.mc_chisq = np.zeros((N + 1,), dtype=float)
-    #     self.mc_base_obs = np.zeros((N + 1, n_ch), dtype=float)
-    #     self.mc_mod_obs = np.zeros((N + 1, n_ch), dtype=float)
-
-    #     # Row 0 = base solution (unperturbed)
-    #     self.mc_dem[0, :] = dem_base
-    #     self.mc_chisq[0] = chisq_base
-    #     self.mc_base_obs[0, :] = base_obs_phys
-    #     self.mc_mod_obs[0, :] = mod_base
-
-    #     # ------------------------------------------------------------------
-    #     # 4) Monte Carlo loop (IDL: Section 3.6)
-    #     # ------------------------------------------------------------------
-    #     if N > 0:
-    #         # Use default_rng() seeded from system entropy (IDL: seed = systime(1))
-    #         rng = np.random.default_rng()
-
-    #         # Base intensity errors in physical units [DN/s/pix]
-    #         sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
-
-    #         for ii in range(1, N + 1):
-    #             # Optional lightweight progress indicator (~20 updates max)
-    #             if ii % max(1, N // 20) == 0:
-    #                 print(f"  - Monte Carlo run {ii}/{N}")
-
-    #             # --- 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0 ---
-    #             noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
-    #             obs_pert = base_obs_phys + noise
-    #             obs_pert = np.maximum(obs_pert, 0.0)  # IDL: > 0.0 to avoid negatives
-
-    #             # --- 4b) Solve DEM for this perturbed realization ---
-    #             dem_i, mod_i, chisq_i, _ = self._solve_single_dem(
-    #                 observed_intensities_vals=obs_pert
-    #             )
-
-    #             # --- 4c) Store Monte Carlo results ---
-    #             self.mc_dem[ii, :] = dem_i
-    #             self.mc_chisq[ii] = chisq_i
-    #             self.mc_base_obs[ii, :] = obs_pert
-    #             self.mc_mod_obs[ii, :] = mod_i
-
-    #     # ------------------------------------------------------------------
-    #     # 5) Return DEM for convenience (common pattern in Python APIs)
-    #     # ------------------------------------------------------------------
-    #     return self.dem
-
     def solve(self):
         """
         High-level DEM solver.
@@ -1284,25 +1067,20 @@ class XRTDEMIterative:
             Modeled intensities [DN s^-1 pix^-1] corresponding to mc_dem.
         """
 
-        # --------------------------------------------------------------
-        # 0) Validate inputs (IDL: argument checks near top)
-        # --------------------------------------------------------------
+        # Validate inputs (IDL: argument checks near top)
+
         self.validate_inputs()
 
-        # --------------------------------------------------------------
-        # 1) Build logT grid and response matrix
-        #    (IDL: regular logT grid + interpolated emissivities)
-        # --------------------------------------------------------------
+        # 1) Build logT grid and response matrix - IDL: regular logT grid + interpolated emissivities
+
         self.create_logT_grid()
         self._interpolate_responses_to_grid()
 
         # Base observed intensities in physical units [DN/s/pix]
         base_obs_phys = np.asarray(self._observed_intensities, dtype=float)
 
-        # --------------------------------------------------------------
-        # 2) Solve BASE DEM (unperturbed intensities)
-        #    Corresponds to the first call to xrt_dem_iter_nowidget in IDL.
-        # --------------------------------------------------------------
+        # 2) Solve BASE DEM (unperturbed intensities) Corresponds to the first call to xrt_dem_iter_nowidget in IDL.
+
         dem_base, mod_base, chisq_base, base_result = self._solve_single_dem(
             observed_intensities_vals=base_obs_phys
         )
@@ -1314,10 +1092,8 @@ class XRTDEMIterative:
         self.modeled_intensities = mod_base  # [DN/s/pix]
         self._base_fit_result = base_result
 
-        # --------------------------------------------------------------
-        # 3) Allocate Monte Carlo arrays
-        #    (IDL: base_obs, dem_out, chisq, mod_obs)
-        # --------------------------------------------------------------
+        # 3) Allocate Monte Carlo arrays (IDL: base_obs, dem_out, chisq, mod_obs)
+
         n_T = self.logT.size
         n_ch = base_obs_phys.size
         N = self.monte_carlo_runs
@@ -1333,9 +1109,8 @@ class XRTDEMIterative:
         self.mc_base_obs[0, :] = base_obs_phys
         self.mc_mod_obs[0, :] = mod_base
 
-        # --------------------------------------------------------------
-        # 4) Monte Carlo loop (IDL: Section 3.6)
-        # --------------------------------------------------------------
+        # 4) Monte Carlo loop
+
         if N > 0:
             rng = np.random.default_rng()  # like IDL's systime(1) seeding
 
@@ -1427,150 +1202,130 @@ class XRTDEMIterative:
             label="Base DEM",
         )
 
-        plt.xlabel("log₁₀(T) [K]")
-        plt.ylabel("log₁₀(DEM)")
+        plt.xlabel("log10(T) [K]")
+        plt.ylabel("log10(DEM)")
         plt.title(f"DEM Monte Carlo ({N} realizations)")
         plt.grid(True)
         plt.legend()
         plt.show()
 
+    def summary(self):
+        """
+        Print a complete diagnostic summary of the DEM solver state,
+        including input parameters, solver configuration, response matrix,
+        base DEM fit, Monte Carlo ensemble, and available plotting helpers.
 
-# Attach plotting functions from plotting.py to the class
-XRTDEMIterative.plot_dem_results = dem_plotting.plot_dem_results
-# XRTDEMIterative.plot_dem_uncertainty = dem_plotting.plot_dem_uncertainty
-XRTDEMIterative.plot_idl_style = dem_plotting.plot_idl_style
-XRTDEMIterative.plot_fit_residuals = dem_plotting.plot_fit_residuals
-XRTDEMIterative.plot_dem_with_median_bins = dem_plotting.plot_dem_with_median_bins
-XRTDEMIterative.plot_iteration_stats = dem_plotting.plot_iteration_stats
+        Designed to mimic the detailed transparent reporting style
+        of IDL’s xrt_dem_iterative2.pro, but more informative.
+        """
+        import numpy as np
+
+        print("\n" + "=" * 70)
+        print("XRTpy DEM Iterative — Solver Summary")
+        print("=" * 70)
+
+        # -----------------------------------------------------
+        print("\nINPUTS")
+        print("-" * 70)
+        print(f" Filters:                 {self.filter_names}")
+        print(
+            f" Observed Intensities:    {np.array(self._observed_intensities)} DN/s/pix"
+        )
+        print(f" Number of channels:      {len(self._observed_intensities)}")
+
+        # Error model
+        if self._intensity_errors is not None:
+            print(f" Intensity Errors:        User-provided ({self._intensity_errors})")
+        else:
+            print(f" Intensity Errors:        Auto-estimated (0.03*I, min=2 DN/s)")
+        print(
+            f" Error values:            {self.intensity_errors.to_value('DN/s')} DN/s"
+        )
+
+        # -----------------------------------------------------
+        print("\nTEMPERATURE GRID")
+        print("-" * 70)
+        if hasattr(self, "logT"):
+            print(f" logT range:              {self.logT[0]:.2f} – {self.logT[-1]:.2f}")
+            print(f" Number of bins:          {len(self.logT)}")
+            print(f" ΔlogT:                   {self.dlogT:.3f}")
+            print(f" ΔlnT:                    {self.dlnT:.3f}")
+        else:
+            print(" Grid has not been constructed yet (call solve()).")
+
+        # -----------------------------------------------------
+        print("\nRESPONSE MATRIX")
+        print("-" * 70)
+        if hasattr(self, "_response_matrix"):
+            print(
+                f" Response matrix shape:   {self._response_matrix.shape} (filters × T bins)"
+            )
+            print(f" Response unit:           {self._response_unit}")
+        else:
+            print(" Response matrix not constructed yet.")
+
+        # -----------------------------------------------------
+        print("\nSOLVER CONFIGURATION")
+        print("-" * 70)
+        print(f" Normalization factor:    {self.normalization_factor:.2e}")
+        print(f" Max iterations:          {self.max_iterations}")
+        print(f" Monte Carlo runs:        {self.monte_carlo_runs}")
+        if hasattr(self, "n_spl"):
+            print(f" Spline knots:            {self.n_spl}")
+        else:
+            print(" Spline knots:            (not prepared yet)")
+
+        # -----------------------------------------------------
+        print("\nINITIAL DEM GUESS")
+        print("-" * 70)
+        if hasattr(self, "_initial_log_dem"):
+            print(" Initial DEM (log10):     flat initial estimate")
+            print(f" First 5 values:          {self._initial_log_dem[:5]}")
+        else:
+            print(" Initial DEM has not been estimated yet.")
+
+        # -----------------------------------------------------
+
+        print("\nBASE DEM SOLUTION")
+        print("-" * 70)
+        if hasattr(self, "dem"):
+            print(f" DEM shape:               {self.dem.shape}")
+            print(f" First 5 DEM bins:        {self.dem[:5]}")
+            print(f" log10(DEM) first 5:      {np.log10(self.dem[:5] + 1e-99)}")
+            print(f" Chi-square:              {self.chisq:.4e}")
+            print(f" Modeled intensities:     {self.modeled_intensities}")
+        else:
+            print(" No DEM solution computed yet (call solve()).")
+
+        # -----------------------------------------------------
+
+        print("\nMONTE CARLO ENSEMBLE")
+        print("-" * 70)
+        if hasattr(self, "mc_dem"):
+            N = self.mc_dem.shape[0] - 1
+            print(f" MC realizations:         {N}")
+            if N > 0:
+                median = np.median(self.mc_dem[1:], axis=0)
+                p16, p84 = np.percentile(self.mc_dem[1:], [16, 84], axis=0)
+
+                print(f" MC DEM preview:")
+                print(f"   Median (first 5):      {median[:5]}")
+                print(
+                    f"   1σ bounds (log10):     "
+                    f"{np.log10(p16[0] + 1e-99):.2f} – {np.log10(p84[0] + 1e-99):.2f}"
+                )
+            else:
+                print(" MC array allocated but N=0 (no Monte Carlo).")
+        else:
+            print(" No Monte Carlo results available.")
+
+        # -----------------------------------------------------
+        print("\nPLOTTING OPTIONS")
+        print("-" * 70)
+        print(" • plot_dem()     Base DEM only")
+        print(" • plot_dem_mc()  Best-fit + MC curves")
+        print("\n" + "=" * 70 + "\n")
+
+
 XRTDEMIterative.plot_dem = dem_plotting.plot_dem
-XRTDEMIterative.plot_dem_uncertainty = dem_plotting.plot_dem_uncertainty
-XRTDEMIterative.plot_mc_fan = dem_plotting.plot_mc_fan
-XRTDEMIterative.plot_mc_hist_at_temperature = dem_plotting.plot_mc_hist_at_temperature
-XRTDEMIterative.plot_mc_chisq = dem_plotting.plot_mc_chisq
-XRTDEMIterative.plot_modeled_vs_observed = dem_plotting.plot_modeled_vs_observed
-
-XRTDEMIterative.plot_dem_with_mc_vertical_bars = (
-    dem_plotting.plot_dem_with_mc_vertical_bars
-)
-XRTDEMIterative.plot_dem_mc_vertical_bars = dem_plotting.plot_dem_mc_vertical_bars
-
-
-################################################################################################################################
-################################################################################################################################
-#############************************** END of  DEM SOLVER **************************##########################
-################################################################################################################################
-################################################################################################################################
-
-
-# ################################################################################################################################
-# ################################################################################################################################
-# #############************************** Start of  error Summary **************************##########################
-# ################## #####################
-
-# def summary(self):
-#     """
-#     Print a comprehensive summary of the DEM solver setup,
-#     including inputs, solver configuration, fit results,
-#     Monte Carlo ensemble status, and available plotting helpers.
-#     """
-#     print("\nXRTpy DEM Iterative Setup Summary\n")
-#     print("=" * 65)
-
-#     # Filters & Observations
-#     print(f" Filters:               {self.filter_names}")
-#     print(f" Observed Intensities:  {self.observed_intensities}")
-#     print(f" Number of channels:    {len(self._observed_intensities)}")
-
-#     # Errors
-#     print(f" Intensity Errors:      {self.intensity_errors}")
-#     if self._intensity_errors is not None:
-#         print(" Error model used:      User-provided")
-#     else:
-#         print(
-#             f" Error model used:      Auto-estimated "
-#             f"(obs * 0.03, min={self.min_observational_error.value} DN/s)"
-#         )
-#         print("   [IDL reference: xrt_dem_iterative2.pro]")
-
-#     # Temperature grid
-#     print(
-#         f" Temperature grid:      logT {self.minimum_bound_temperature:.2f}–{self.maximum_bound_temperature:.2f}, step {self.logarithmic_temperature_step_size}"
-#     )
-#     print(f" Temp bins:             {len(self.logT)}")
-#     print(f" dlogT:                 {self.dlogT:.3f}, dlnT: {self.dlnT:.3f}")
-
-#     # Solver setup
-#     print(f" Solver factor:         {self.normalization_factor:.1e}")
-#     print(f" Monte Carlo runs:      {self.monte_carlo_runs or 'None'}")
-#     print(f" Max Iterations:        {self.max_iterations}")
-#     print(f" Knots (n_knots):       {getattr(self, '_last_n_knots', 'default=6')}")
-
-#     if hasattr(self, "chi2"):
-#         dof = len(self._observed_intensities) - len(
-#             getattr(self, "_init_knot_params", [])
-#         )
-#         print(f"   χ²:                  {self.chi2:.4e} (dof={dof})")
-
-#     # Responses
-#     print(f" Response unit:         {self._response_unit}")
-#     if hasattr(self, "_response_matrix"):
-#         print(
-#             f" Response matrix:       {self._response_matrix.shape} (filters × bins)"
-#         )
-#     else:
-#         print(" Response matrix:       Not yet built")
-
-#     # Fit results
-#     if hasattr(self, "dem"):
-#         print("\n Fit Results:")
-#         print(f"   DEM bins:            {self.dem.shape}")
-#         if hasattr(self, "chi2"):
-#             print(f"   Chi²:                {self.chi2:.4e}")
-#         if hasattr(self, "redchi2"):
-#             print(f"   Reduced Chi²:        {self.redchi2:.4e}")
-#         if hasattr(self, "fitted_intensities"):
-#             print(f"   Fitted Intensities:  {self.fitted_intensities}")
-
-#     # Monte Carlo results
-#     if hasattr(self, "_dem_ensemble"):
-#         print("\n Monte Carlo Ensemble:")
-#         n_mc = len(self._dem_ensemble)
-#         print(f"   Runs stored:         {n_mc}")
-#         dem_stack = np.array(self._dem_ensemble)
-#         med = np.median(dem_stack, axis=0)
-#         spread = np.percentile(dem_stack, [16, 84], axis=0)
-#         print("   DEM median (log10 cm^-5 K^-1):")
-#         print(f"      First 5 bins:     {np.log10(med[:5]+1e-40)}")
-#         print("   DEM 1σ spread (first bin):")
-#         print(
-#             f"      {np.log10(spread[0,0]+1e-40):.2f} – {np.log10(spread[1,0]+1e-40):.2f}"
-#         )
-#         print("   Reproducibility:     Run with random_seed for identical results")
-
-#     if hasattr(self, "chi2"):
-#         print(f"   Chi²:                {self.chi2:.4e}")
-#     if hasattr(self, "redchi2"):
-#         print(f"   Reduced Chi²:        {self.redchi2:.4e}")
-#     if hasattr(self, "dof"):
-#         print(f"   Degrees of Freedom:  {self.dof}")
-#     if hasattr(self, "_iter_stats") and len(self._iter_stats["chisq"]) > 0:
-#         print(f"   Iterations tracked:  {len(self._iter_stats['chisq'])}")
-#         print(f"   Final Iter χ²:       {self._iter_stats['chisq'][-1]:.4e}")
-
-#     # Plotting guidance
-#     print("\n Plotting Options:")
-#     if hasattr(self, "dem"):
-#         print("   • plot_dem_results(results) → Quick plot from solve() dictionary")
-#         print(
-#             "   • plot_dem_uncertainty()   → Best-fit DEM + shaded ±1σ (if MC available)"
-#         )
-#         print(
-#             "   • plot_idl_style()         → IDL-style view (best-fit + MC curves)"
-#         )
-#         print(
-#             "   • plot_dem_with_median_bins() → Median + closest DEM (IDL style extension)"
-#         )
-#         print("   • plot_fit_residuals()     → Observed vs fitted intensities")
-#         print("   • plot_iteration_stats()    ")
-
-#     print("=" * 65)
+XRTDEMIterative.plot_dem_mc = dem_plotting.plot_dem_mc
