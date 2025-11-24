@@ -767,15 +767,6 @@ class XRTDEMIterative:
         # units - DN/s/pix/cm^5 * K * dLnT * DEM == DN/s/PIX
         T_linear = self.T.to_value(u.K)
 
-        # REMOVEJOY
-        # # self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float) NOV21
-        # # NOV21
-        # # Was missing  - normalization_factor - i think #NOTETOJOYNOV21
-        # # emissivity_matrix is shape (n_filters, n_T)
-        # pm_phys = self._response_matrix * T_linear * self.dlnT  # physical units
-        # # SCALE to match scaled DEM and scaled intensities
-        # # self.pm_matrix = pm_phys / self.normalization_factor#THE FIX
-
         self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float)
 
         # Knot positions are evenly spaced in logT (IDL spl_t)
@@ -899,8 +890,6 @@ class XRTDEMIterative:
 
     # -------------------------------------------------------------------------------------------------------------------------------
 
-    #############************************** Start of  error bars / Monte Carlo  **************************##########################
-
     def _run_monte_carlo(self):
         """
         Replicates IDL's Monte Carlo loop.
@@ -978,7 +967,7 @@ class XRTDEMIterative:
         self.mc_mod_obs = mc_mod
         self.mc_chisq = mc_chi
 
-    #############************************** Start of DEM SOLVER  **************************##########################
+    # -------------------------------------------------------------------------------------------------------------------------------
 
     def solve(self):
         """
@@ -1077,81 +1066,81 @@ class XRTDEMIterative:
                 if ii % max(1, N // 20) == 0:
                     print(f"  - Monte Carlo run {ii}/{N}")
 
-                # ---- 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0
+                # 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0
                 noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
                 obs_pert = base_obs_phys + noise
                 obs_pert = np.maximum(obs_pert, 0.0)  # IDL: >0 to avoid negatives
 
-                # ---- 4b) Solve DEM for this perturbed realization
+                # 4b) Solve DEM for this perturbed realization
                 dem_i, mod_i, chisq_i, _ = self._solve_single_dem(
                     observed_intensities_vals=obs_pert
                 )
 
-                # ---- 4c) Store Monte Carlo results
+                # 4c) Store Monte Carlo results
                 self.mc_dem[ii, :] = dem_i
                 self.mc_chisq[ii] = chisq_i
                 self.mc_base_obs[ii, :] = obs_pert
                 self.mc_mod_obs[ii, :] = mod_i
 
-        # --------------------------------------------------------------
         # 5) Return DEM for convenience
-        # --------------------------------------------------------------
         return self.dem
 
     def summary(self):
         """
-        Print a complete diagnostic summary of the DEM solver state,
-        including input parameters, solver configuration, response matrix,
-        base DEM fit, Monte Carlo ensemble, and available plotting helpers.
+        Print a detailed, diagnostic summary of the DEM solver state.
 
-        Designed to mimic the detailed transparent reporting style
-        of IDL’s xrt_dem_iterative2.pro, but more informative.
+        This provides:
+            • Input observation details
+            • Temperature grid configuration
+            • Response matrix status
+            • Spline system configuration
+            • Base DEM fit results
+            • Monte Carlo statistics (if available)
+            • Available plotting helpers
         """
-        import numpy as np
 
         print("\n" + "=" * 70)
         print("XRTpy DEM Iterative — Solver Summary")
         print("=" * 70)
 
         # -----------------------------------------------------
-        print("\nINPUTS")
-        print("-" * 70)
-        print(f" Filters:                 {self.filter_names}")
+        print("\nINPUT DATA")
+        print("-" * 76)
+        print(f" Filters: {self.filter_names}")
         print(
-            f" Observed Intensities:    {np.array(self._observed_intensities)} DN/s/pix"
+            f" Observed Intensities: {np.array(self._observed_intensities)}  DN/s/pix"
         )
-        print(f" Number of channels:      {len(self._observed_intensities)}")
+        print(f" Number of channels: {len(self._observed_intensities)}")
 
         # Error model
         if self._intensity_errors is not None:
-            print(f" Intensity Errors:        User-provided ({self._intensity_errors})")
+            print(" Intensity Errors: User-provided")
         else:
-            print(" Intensity Errors:        Auto-estimated (0.03*I, min=2 DN/s)")
-        print(
-            f" Error values:            {self.intensity_errors.to_value('DN/s')} DN/s"
-        )
+            print(" Intensity Errors: Auto-estimated (3% of I, min=2 DN/s)")
+
+        print(f" Error values (DN/s): {self.intensity_errors.to_value('DN/s')}\n")
 
         # -----------------------------------------------------
         print("\nTEMPERATURE GRID")
         print("-" * 70)
         if hasattr(self, "logT"):
-            print(f" logT range:              {self.logT[0]:.2f} – {self.logT[-1]:.2f}")
-            print(f" Number of bins:          {len(self.logT)}")
-            print(f" ΔlogT:                   {self.dlogT:.3f}")
-            print(f" ΔlnT:                    {self.dlnT:.3f}")
+            print(
+                f" logT range:               {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}"
+            )
+            print(f" Number of temperature bins:  {len(self.logT)}")
+            print(f" logT (grid spacing):      {self.dlogT:.3f}")
+            print(f" lnT (natural log spacing): {self.dlnT:.3f}")
         else:
-            print(" Grid has not been constructed yet (call solve()).")
+            print(" Grid has not been constructed (call solve()).")
 
         # -----------------------------------------------------
         print("\nRESPONSE MATRIX")
         print("-" * 70)
         if hasattr(self, "_response_matrix"):
-            print(
-                f" Response matrix shape:   {self._response_matrix.shape} (filters × T bins)"
-            )
-            print(f" Response unit:           {self._response_unit}")
+            print(f" Matrix shape: {self._response_matrix.shape}  (filters x T bins)")
+            print(f" Response units: {self._response_unit}")
         else:
-            print(" Response matrix not constructed yet.")
+            print(" Response matrix not constructed.")
 
         # -----------------------------------------------------
         print("\nSOLVER CONFIGURATION")
@@ -1160,18 +1149,18 @@ class XRTDEMIterative:
         print(f" Max iterations:          {self.max_iterations}")
         print(f" Monte Carlo runs:        {self.monte_carlo_runs}")
         if hasattr(self, "n_spl"):
-            print(f" Spline knots:            {self.n_spl}")
+            print(f" Number of spline knots:   {self.n_spl}")
+            print(f" Knot positions (logT):    {getattr(self, 'spline_logT', 'N/A')}")
         else:
-            print(" Spline knots:            (not prepared yet)")
-
+            print(" Spline system not prepared yet.")
         # -----------------------------------------------------
         print("\nINITIAL DEM GUESS")
         print("-" * 70)
         if hasattr(self, "_initial_log_dem"):
-            print(" Initial DEM (log10):     flat initial estimate")
-            print(f" First 5 values:          {self._initial_log_dem[:5]}")
+            print(" Initial DEM assumption:   flat log10(DEM) (IDL-style)")
+            print(f" First 5 bins (log10):     {self._initial_log_dem[:5]}")
         else:
-            print(" Initial DEM has not been estimated yet.")
+            print(" Initial DEM has not been estimated.")
 
         # -----------------------------------------------------
 
@@ -1196,11 +1185,10 @@ class XRTDEMIterative:
             if N > 0:
                 median = np.median(self.mc_dem[1:], axis=0)
                 p16, p84 = np.percentile(self.mc_dem[1:], [16, 84], axis=0)
-
-                print(" MC DEM preview:")
+                print(" MC DEM statistics (first T-bin):")
                 print(f"   Median (first 5):      {median[:5]}")
                 print(
-                    f"   1σ bounds (log10):     "
+                    f"   1x bounds (log10):     "
                     f"{np.log10(p16[0] + 1e-99):.2f} – {np.log10(p84[0] + 1e-99):.2f}"
                 )
             else:
@@ -1209,11 +1197,11 @@ class XRTDEMIterative:
             print(" No Monte Carlo results available.")
 
         # -----------------------------------------------------
-        print("\nPLOTTING OPTIONS")
-        print("-" * 70)
-        print(" • plot_dem()     Base DEM only")
-        print(" • plot_dem_mc()  Best-fit + MC curves")
-        print("\n" + "=" * 70 + "\n")
+        print("\nPLOTTING HELPERS")
+        print("-" * 76)
+        print(" • plot_dem()         – Base DEM only")
+        print(" • plot_dem_mc()      – Base DEM + MC ensemble")
+        print("\n" + "=" * 76 + "\n")
 
 
 XRTDEMIterative.plot_dem = dem_plotting.plot_dem
