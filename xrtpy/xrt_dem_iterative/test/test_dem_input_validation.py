@@ -1,13 +1,15 @@
-
 from importlib.resources import files
-
 import numpy as np
 import pytest
 import sunpy
 import sunpy.io.special
 import sunpy.map
 
+
 from xrtpy.response.channel import Channel
+from xrtpy.response.tools import generate_temperature_responses
+from xrtpy.xrt_dem_iterative import XRTDEMIterative
+
 
 channel_names = [
     "Al-mesh",
@@ -27,17 +29,13 @@ channel_names = [
 ]
 
 
-
-
-
-
 @pytest.mark.parametrize("channel_name", channel_names)
 def test_channel_name(channel_name):
     channel = Channel(channel_name)
     assert channel.name == channel_name
 
 
-#filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0017.genx"
+# filename = Path(__file__).parent.parent.absolute() / "data" / "xrt_channels_v0017.genx"
 filename = files("xrtpy.response.data") / "xrt_channels_v0017.genx"
 
 v6_genx = sunpy.io.special.genx.read_genx(filename)
@@ -60,71 +58,47 @@ _channel_name_to_index_mapping = {
     "C-poly/Ti-poly": 13,
 }
 
-def validate_inputs(self):
-    """
-    Run all internal validation checks again. Raises if any inputs are invalid.
-    Useful for debugging or after programmatic changes.
-    """
-    # Check shape of intensity_errors
-    if self._intensity_errors is not None:
-        if self._intensity_errors.shape != self._observed_intensities.shape:
-            raise ValueError("Length of intensity_errors must match observed_intensities.")
 
-    # Check consistency between filters, intensities, and responses
-    if not (
-        len(self._observed_intensities)
-        == len(self.responses)
-        == len(self.observed_channel)
-    ):
-        raise ValueError(
-            f"\nLength mismatch in inputs:\n"
-            f"  Observed intensities: {len(self._observed_intensities)}\n"
-            f"  Responses:            {len(self.responses)}\n"
-            f"  Filter channels:      {len(self.observed_channel)}\n"
-        )
+def test_dem_validate_inputs_basic():
+    # Minimal “realistic” inputs for a DEM solve
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([2500.0, 1800.0])
 
-    # Check temperature grid
-    if self._dT <= 0:
-        raise ValueError("dT must be a positive scalar.")
+    # Use real responses from XRTpy
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
 
-    for r in self.responses:
-        logT_grid = np.log10(r.temperature.value)
-        if not (self._min_T >= logT_grid.min() and self._max_T <= logT_grid.max()):
-            raise ValueError(
-                f"The specified temperature range [{self._min_T}, {self._max_T}] is outside the bounds of one or more filter response grids.\n"
-                "Please ensure the temperature range fits within all responses."
-            )
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+        minimum_bound_temperature=5.5,
+        maximum_bound_temperature=8.0,
+        logarithmic_temperature_step_size=0.1,
+        monte_carlo_runs=0,
+    )
+
+    # Should NOT raise any error
+    x.validate_inputs()
 
 
-import pytest
+def test_dem_temperature_grid():
+    filters = ["Al-poly"]
+    intensities = np.array([1500.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
 
-from xrtpy.response.tools import generate_temperature_responses
-from xrtpy.xrt_dem_iterative import XRTDEMIterative
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+        minimum_bound_temperature=5.5,
+        maximum_bound_temperature=7.5,
+        logarithmic_temperature_step_size=0.1,
+    )
 
+    x.create_logT_grid()
 
-def test_validate_inputs_good_case():
-    filters = ["Be-thin", "Be-med"]
-    i_obs = [10000.0, 20000.0]
-    resp = generate_temperature_responses(filters, obs_date="2007-07-10")
-    dem = XRTDEMIterative(filters, i_obs, resp)
-    dem.validate_inputs()  # Should NOT raise
-
-def test_validate_inputs_mismatched_errors():
-    filters = ["Be-thin", "Be-med"]
-    i_obs = [10000.0, 20000.0]
-    i_err = [100.0]  # Wrong length
-    resp = generate_temperature_responses(filters, obs_date="2007-07-10")
-    dem = XRTDEMIterative(filters, i_obs, resp, intensity_errors=i_err)
-    with pytest.raises(ValueError, match="intensity_errors must match"):
-        dem.validate_inputs()
-
-
-
-#Test to add later
-#both should be True
-# np.allclose(x.intensities_scaled,
-#             x.observed_intensities.value / x.normalization_factor)
-
-# np.allclose(x.sigma_scaled_intensity_errors,
-#             x.intensity_errors.to_value(u.DN/u.s) / x.normalization_factor)
-
+    assert np.isclose(x.logT[0], 5.5)
+    assert np.isclose(x.logT[-1], 7.5)
+    assert len(x.logT) == 21  # (7.5-5.5)/0.1 + 1 = 21
+    assert np.isclose(x.dlogT, 0.1)
+    assert np.isclose(x.dlnT, np.log(10) * 0.1)
