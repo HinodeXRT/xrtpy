@@ -10,6 +10,7 @@ import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
 from scipy.interpolate import interp1d
+
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
 
@@ -124,11 +125,11 @@ class XRTDEMIterative:
 
         # Validate Monte Carlo setting
         if isinstance(monte_carlo_runs, bool):
-            raise ValueError(
+            raise TypeError(
                 "monte_carlo_runs must be a non-negative whole number, not a boolean."
             )
         elif (
-            isinstance(monte_carlo_runs, (int, np.integer))
+            isinstance(monte_carlo_runs, int | np.integer)
             or isinstance(monte_carlo_runs, float)
             and monte_carlo_runs.is_integer()
         ):
@@ -143,7 +144,7 @@ class XRTDEMIterative:
             raise ValueError("monte_carlo_runs must be ≥ 0.")
 
         # Validate max_iterations
-        if not isinstance(max_iterations, (int, np.integer)) or max_iterations <= 0:
+        if not isinstance(max_iterations, int | np.integer) or max_iterations <= 0:
             raise ValueError("max_iterations must be a positive integer.")
 
         self._max_iterations = int(max_iterations)
@@ -186,26 +187,20 @@ class XRTDEMIterative:
                 f"  Filter channels:      {len(self.observed_channel)}\n"
             )
 
-        # I am commenting this out because it is redundant since I am defining it below again. I wanna be consistent in using the same logT below.- Remove after testing
-        # self.logT = np.arange(
-        #     self._minimum_bound_temperature,
-        #     self._maximum_bound_temperature
-        #     + self._logarithmic_temperature_step_size / 2,
-        #     self._logarithmic_temperature_step_size,
-        # )
-
         try:
-            self._normalization_factor = float(normalization_factor)
-            if self._normalization_factor <= 0:
-                raise ValueError("normalization_factor must be a positive number.")
-        except Exception as e:
-            raise ValueError(f"Invalid normalization_factor: {e}")
+            value = float(normalization_factor)
+        except (TypeError, ValueError) as err:
+            raise ValueError(f"Invalid normalization_factor: {err}") from err
+
+        if value <= 0:
+            raise ValueError("normalization_factor must be a positive number.")
+
+        self._normalization_factor = value
+        # self._normalization_factor = value
 
         self._using_estimated_errors = (
             False  # track whether default error model has been used
         )
-
-    #### TEST GIT CI TEST #####
 
     def validate_inputs(self) -> None:
         """
@@ -288,7 +283,8 @@ class XRTDEMIterative:
         if np.all(self._observed_intensities == 0):
             warnings.warn(
                 "\n\n All observed intensities are zero. DEM solution will yield zero. "
-                "Object created, but solving will return DEM=0. \n\n"
+                "Object created, but solving will return DEM=0. \n\n",
+                stacklevel=2,
             )
 
         # success -> no return value
@@ -400,33 +396,16 @@ class XRTDEMIterative:
         if self._intensity_errors is not None:
             return self._intensity_errors * (u.DN / u.s)
 
-        # if self._using_estimated_errors:
-        #     warnings.warn(
-        #         "No intensity_errors provided. Using default model: "
-        #         f"max(relative-error * observed_intensity, min_observational_error)\n"
-        #         f"=> relative_error = {self.relative_error} =, min_observational_error = {self.min_observational_error.value} DN/s\n"
-        #         "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
-        #         UserWarning,
-        #     )
-        # self._using_estimated_errors = True  # suppress future warnings
-
         if not self._using_estimated_errors:
             warnings.warn(
-                "No intensity_errors provided. Using default model: "
-                f"max(relative-error * observed_intensity, min_observational_error)\n"
+                "\n\nNo intensity_errors provided. Using default model: "
+                "max(relative-error * observed_intensity, min_observational_error)\n",
                 f"=> relative_error = {self.relative_error} =, min_observational_error = {self.min_observational_error.value} DN/s\n"
-                "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro",
+                "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n",
                 UserWarning,
             )
-        self._using_estimated_errors = True
 
-        # NOTETOJOYWe can remove if no issues later
-        # #No units - added in the return
-        # estimated = np.maximum(
-        #     self.relative_error * self._observed_intensities ,
-        #     self.min_observational_error.value,
-        # )
-        # return estimated * (u.DN / u.s)
+        self._using_estimated_errors = True
 
         # Fixed in units
         estimated = np.maximum(
@@ -551,10 +530,7 @@ class XRTDEMIterative:
             self.response_temperatures, self.response_values, strict=False
         ):  # Make sure that R_orig.value is indeed in DN/s/pix per cm^5
             logT_orig = np.log10(T_orig.to_value(u.K))
-            # response_vals = R_orig.to_value((u.cm**5 * u.DN) / (u.pix * u.s))
-            # response_vals = R_orig.to_value(u.DN / u.s / u.pix / (u.cm**5))
-            # response_vals = R_orig.to_value((u.DN / u.s / u.pix) * u.cm**5) Comment on Nov14
-            # response_vals = R_orig.to_value(u.DN / u.s / u.pix / u.cm**5)
+
             response_vals = (
                 R_orig.value
             )  # already in correct physical units for XRTpy #NOTEFORJOY- TRIPLE check this
@@ -747,14 +723,10 @@ class XRTDEMIterative:
             self._raw_estimated_dem_peaks = (np.array([]), np.array([]))
 
         # IDL BEHAVIOR: override with flat initial DEM
-        # xrt_dem_iter_estim ultimately does:
-        #   dem = 0.0*findgen(nt) + 1.0  ; Use flat dem for initial guess
-        # on a regular logT grid. We mirror that here exactly:
+        # xrt_dem_iter_estim ultimately does: dem = 0.0*findgen(nt) + 1.0  ; Use flat dem for initial guess on a regular logT grid. We mirror that here exactly:
 
         # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 1.0 NOV20
-
         # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 0.0 #NOTEFORJOY
-        # or
         est_log_dem_on_grid = np.zeros_like(self.logT)
 
         # Return the intial first guessed DEM
@@ -767,8 +739,6 @@ class XRTDEMIterative:
     #############************************** End of INITIAL DEM ESTIMATE **************************##################################
 
     # -------------------------------------------------------------------------------------------------------------------------------
-
-    #############************************** Start of  **************************##########################
 
     def _prepare_spline_system(self):
         """
@@ -797,15 +767,14 @@ class XRTDEMIterative:
         # units - DN/s/pix/cm^5 * K * dLnT * DEM == DN/s/PIX
         T_linear = self.T.to_value(u.K)
 
-        # self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float) NOV21
-
-        # NOV21
-        # Was missing  - normalization_factor - i think #NOTETOJOYNOV21
-        # emissivity_matrix is shape (n_filters, n_T)
-        pm_phys = self._response_matrix * T_linear * self.dlnT  # physical units
-
-        # SCALE to match scaled DEM and scaled intensities
-        # self.pm_matrix = pm_phys / self.normalization_factor#THE FIX
+        # REMOVEJOY
+        # # self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float) NOV21
+        # # NOV21
+        # # Was missing  - normalization_factor - i think #NOTETOJOYNOV21
+        # # emissivity_matrix is shape (n_filters, n_T)
+        # pm_phys = self._response_matrix * T_linear * self.dlnT  # physical units
+        # # SCALE to match scaled DEM and scaled intensities
+        # # self.pm_matrix = pm_phys / self.normalization_factor#THE FIX
 
         self.pm_matrix = (self._response_matrix * T_linear * self.dlnT).astype(float)
 
@@ -853,17 +822,6 @@ class XRTDEMIterative:
         from scipy.interpolate import CubicSpline
 
         knot_vals = np.array([params[f"knot_{i}"].value for i in range(self.n_spl)])
-
-        # interp_spline = interp1d(
-        #     self.spline_logT,
-        #     knot_vals,
-        #     kind="linear", #IDL uses cubic spline interpolation NOTEFORJOY NOV20
-        #     bounds_error=False,
-        #     fill_value="extrapolate",
-        # )
-
-        # log_dem = interp_spline(self.logT)  # log10(DEM)
-        # dem = 10.0**log_dem  # DEM in linear cm^-5 K^-1
 
         # Or used the code above but switch from linear to kind="cubic"
         cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
@@ -923,7 +881,9 @@ class XRTDEMIterative:
         params0 = self._build_lmfit_parameters()  # values = initial_log_dem at knots
 
         # 5. run minimizer
-        result = minimize(self._residuals, params0, max_nfev=self._max_iterations)
+        result = minimize(
+            self._residuals, params0, max_nfev=self._max_iterations
+        )  # method='leastsq'
 
         # THIS is the critical part – use *result.params*, not params0 <<<
         dem_model = self._reconstruct_dem_from_knots(result.params)  # DEM_model(T)
@@ -937,13 +897,11 @@ class XRTDEMIterative:
 
         return dem_phys, modeled_intensities_phys, chisq, result
 
-    ################################################################################################################################
-
     # -------------------------------------------------------------------------------------------------------------------------------
 
     #############************************** Start of  error bars / Monte Carlo  **************************##########################
 
-    def _run_monte_carlo(self, result_params):
+    def _run_monte_carlo(self):
         """
         Replicates IDL's Monte Carlo loop.
         Produces:
@@ -963,7 +921,7 @@ class XRTDEMIterative:
         mc_mod = np.zeros((n_obs, N + 1))
         mc_chi = np.zeros(N + 1)
 
-        # --- Base run first (IDL puts real data in column 0) ---
+        # Base run first (IDL puts real data in column 0)
         dem = self.dem  # already scaled back by normalization
         mc_dem[:, 0] = dem
         mc_base[:, 0] = self._observed_intensities  # unscaled
@@ -974,7 +932,6 @@ class XRTDEMIterative:
         rng = np.random.default_rng()  # like systime(1)
 
         for ii in range(1, N + 1):
-
             # Step 1: Perturbed intensities (scaled)
             perturbed = (
                 self.intensities_scaled
@@ -1020,8 +977,6 @@ class XRTDEMIterative:
         self.mc_base_obs = mc_base
         self.mc_mod_obs = mc_mod
         self.mc_chisq = mc_chi
-
-    # -------------------------------------------------------------------------------------------------------------------------------
 
     #############************************** Start of DEM SOLVER  **************************##########################
 
@@ -1143,72 +1098,6 @@ class XRTDEMIterative:
         # --------------------------------------------------------------
         return self.dem
 
-    def plot_dem_with_monte_carlo(
-        self,
-        mc_color="black",
-        base_color="red",
-        alpha_mc=0.15,
-        lw_mc=1.2,
-        lw_base=2.0,
-        figsize=(10, 6),
-        show_envelope=True,
-    ):
-        """
-        Plot DEM with Monte Carlo ensemble using step curves.
-        """
-
-        import matplotlib.pyplot as plt
-
-        logT = self.logT
-        mc_dem = self.mc_dem  # shape (N+1, n_T)
-        base_dem = self.dem  # shape (n_T,)
-        N = mc_dem.shape[0] - 1  # number of MC runs
-
-        plt.figure(figsize=figsize)
-
-        # --- MC DEM curves (black) ---
-        for i in range(1, N + 1):
-            plt.step(
-                logT,
-                np.log10(mc_dem[i, :]),
-                where="mid",
-                color=mc_color,
-                alpha=alpha_mc,
-                linewidth=lw_mc,
-            )
-
-        # --- Optional uncertainty envelope (16–84 percentile) ---
-        if show_envelope and N > 1:
-            dem_low = np.percentile(mc_dem[1:, :], 16, axis=0)
-            dem_high = np.percentile(mc_dem[1:, :], 84, axis=0)
-
-            plt.fill_between(
-                logT,
-                np.log10(dem_low),
-                np.log10(dem_high),
-                step="mid",
-                color="black",
-                alpha=0.2,
-                label="68% interval",
-            )
-
-        # --- Base DEM (red) ---
-        plt.step(
-            logT,
-            np.log10(base_dem),
-            where="mid",
-            color=base_color,
-            linewidth=lw_base,
-            label="Base DEM",
-        )
-
-        plt.xlabel("log10(T) [K]")
-        plt.ylabel("log10(DEM)")
-        plt.title(f"DEM Monte Carlo ({N} realizations)")
-        plt.grid(True)
-        plt.legend()
-        plt.show()
-
     def summary(self):
         """
         Print a complete diagnostic summary of the DEM solver state,
@@ -1237,7 +1126,7 @@ class XRTDEMIterative:
         if self._intensity_errors is not None:
             print(f" Intensity Errors:        User-provided ({self._intensity_errors})")
         else:
-            print(f" Intensity Errors:        Auto-estimated (0.03*I, min=2 DN/s)")
+            print(" Intensity Errors:        Auto-estimated (0.03*I, min=2 DN/s)")
         print(
             f" Error values:            {self.intensity_errors.to_value('DN/s')} DN/s"
         )
@@ -1308,7 +1197,7 @@ class XRTDEMIterative:
                 median = np.median(self.mc_dem[1:], axis=0)
                 p16, p84 = np.percentile(self.mc_dem[1:], [16, 84], axis=0)
 
-                print(f" MC DEM preview:")
+                print(" MC DEM preview:")
                 print(f"   Median (first 5):      {median[:5]}")
                 print(
                     f"   1σ bounds (log10):     "
