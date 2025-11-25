@@ -9,6 +9,7 @@ import sunpy.map
 from xrtpy.response.channel import Channel
 from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
+from lmfit import Parameters
 
 channel_names = [
     "Al-mesh",
@@ -35,11 +36,8 @@ def test_channel_name(channel_name):
 
 
 def test_dem_validate_inputs_basic():
-    # Minimal “realistic” inputs for a DEM solve
     filters = ["Al-poly", "Ti-poly"]
     intensities = np.array([2500.0, 1800.0])
-
-    # Use real responses from XRTpy
     responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
 
     x = XRTDEMIterative(
@@ -90,7 +88,7 @@ def test_validate_inputs_good_case():
 def test_validate_inputs_mismatched_errors():
     filters = ["Be-thin", "Be-med"]
     i_obs = [10000.0, 20000.0]
-    i_err = [100.0]  # Wrong length
+    i_err = [100.0]  # Wrong length - should be two error/ uncertainties
     resp = generate_temperature_responses(filters, "2007-07-10")
     dem = XRTDEMIterative(filters, i_obs, resp, intensity_errors=i_err)
     with pytest.raises(ValueError, match="intensity_errors must match"):
@@ -98,12 +96,11 @@ def test_validate_inputs_mismatched_errors():
 
 
 def test_create_logT_grid():
-    # Simple single-channel setup
+
     filters = ["Al-poly"]
     intensities = np.array([1500.0])
-    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+    responses = generate_temperature_responses(filters, "2018-10-27T00:00:00")
 
-    # Construct DEM object
     x = XRTDEMIterative(
         observed_channel=filters,
         observed_intensities=intensities,
@@ -113,35 +110,32 @@ def test_create_logT_grid():
         logarithmic_temperature_step_size=0.1,
     )
 
-    # Create grid
     x.create_logT_grid()
 
-    # 1 — Correct start and end
+    #1 — Correct start and end
     assert x.logT[0] == pytest.approx(5.5)
     assert x.logT[-1] == pytest.approx(7.5)
 
-    # 2 — Correct number of bins: (7.5 - 5.5)/0.1 + 1 = 21
+    #2 — Correct number of bins: (7.5 - 5.5)/0.1 + 1 = 21
     assert len(x.logT) == 21
     assert x.n_bins == 21
 
-    # 3 — Correct spacing (uniform)
+    #3 — Correct spacing (uniform)
     diffs = np.diff(x.logT)
     assert np.allclose(diffs, 0.1, atol=1e-12)
 
-    # 4 — dlogT and dlnT correct
+    #4 — dlogT and dlnT correct
     assert x.dlogT == pytest.approx(0.1)
     assert x.dlnT == pytest.approx(np.log(10) * 0.1)
 
-    # 5 — T = 10**logT
+    #5 — T = 10**logT
     assert np.allclose(x.T.to_value(u.K), 10**x.logT)
 
-    # 6 — logT strictly increasing
+    #6 — logT strictly increasing
     assert np.all(np.diff(x.logT) > 0)
 
 
 def test_estimate_initial_dem():
-
-    # Step 1: Simple DEM case
     filters = ["Al-poly", "Ti-poly"]
     intensities = np.array([1500.0, 2300.0])
     responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
@@ -152,10 +146,9 @@ def test_estimate_initial_dem():
         temperature_responses=responses,
         minimum_bound_temperature=5.5,
         maximum_bound_temperature=7.5,
-        logarithmic_temperature_step_size=0.1,
     )
 
-    # Step 2: Create temperature grid & response matrix
+    #Step 2: Create temperature grid & response matrix
     x.create_logT_grid()
     x._interpolate_responses_to_grid()
 
@@ -165,43 +158,44 @@ def test_estimate_initial_dem():
     # TEST 1: Correct length
     assert len(est) == len(x.logT)
 
-    # TEST 2: All values should be exactly 0.0 ( Python implementation overrides with flat logDEM = 0)
+    #TEST 2: All values should be exactly 0.0 ( Python implementation overrides with flat logDEM = 0)
     assert np.allclose(est, 0.0)
 
-    # TEST 3: Internal storage _initial_log_dem should match
+    #TEST 3: Internal storage _initial_log_dem should match
     assert np.allclose(x._initial_log_dem, est)
 
-    # TEST 4: Returned DEM should be finite
+    #TEST 4: Returned DEM should be finite
     assert np.all(np.isfinite(est))
 
 
-
 def test_prepare_spline_system():
-    # Setup: 3 channels → n_spl = 2
-    
+    """
+    1. _prepare_spline_system runs without errors
+    2. n_spl computed correctly
+    3. spline_logT shape and monotonicity
+    4. spline_log_dem has correct values
+    5. pm_matrix has correct shape
+    6. weights and abundances are all ones
+    """
     filters = ["Al-poly", "Ti-poly", "Be-thin"]
     intensities = np.array([1000.0, 2000.0, 1500.0])
-    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+    responses = generate_temperature_responses(filters, "2012-10-27T12:30:00")
 
     x = XRTDEMIterative(
         observed_channel=filters,
         observed_intensities=intensities,
         temperature_responses=responses,
-        minimum_bound_temperature=5.5,
-        maximum_bound_temperature=8.0,
-        logarithmic_temperature_step_size=0.1,
     )
 
-    # Need logT, response matrix, initial DEM
+    # logT, response matrix, initial DEM
     x.create_logT_grid()
     x._interpolate_responses_to_grid()
-    x._estimate_initial_dem()   # sets _initial_log_dem
+    x._estimate_initial_dem()  # sets _initial_log_dem
 
     # Prepare spline system
     x._prepare_spline_system()
 
-
-    # TEST 1 — n_spl formula: n_channels=3 → n_spl=2
+    # TEST 1 — n_spl formula: n_channels=3 > n_spl=2
     assert x.n_spl == 2
 
     # TEST 2 — spline_logT: correct shape and increasing
@@ -221,6 +215,71 @@ def test_prepare_spline_system():
     # TEST 5 — weights and abundances
     assert np.all(x.weights == 1.0)
     assert np.all(x.abundances == 1.0)
+
+
+def test_residuals_simple_case():
+    """
+    Create a fully synthetic DEM / response case so the forward model has a predictable value.
+    This isolates and tests the math inside `_residuals`.
+    """
+    filters = ["Dummy"]
+    intensities = np.array([10.0])  # I_obs
+    responses = generate_temperature_responses(["Al-poly"], "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+        minimum_bound_temperature=5.5,
+        maximum_bound_temperature=6.5,
+        logarithmic_temperature_step_size=0.1,
+    )
+
+    # STEP 2 — Temperature grid
+    x.create_logT_grid()
+    N = len(x.logT)
+
+    # Synthetic pm_matrix = constant 2 everywhere
+    x.pm_matrix = np.ones((1, N)) * 2.0
+
+
+    # STEP 3 — Construct synthetic spline state
+    x.spline_logT = np.array([x.logT[0], x.logT[-1]])
+    x.spline_log_dem = np.array([0.0, 0.0])  # log10(DEM)=0 → DEM=1
+    x.n_spl = 2
+
+    params = Parameters()
+    params.add("knot_0", value=0.0, min=-20, max=0)
+    params.add("knot_1", value=0.0, min=-20, max=0)
+
+
+    # STEP 4 synthetic errors
+    x.intensities_scaled = np.array([10.0])
+    x.sigma_scaled_intensity_errors = np.array([1.0])
+
+
+    #MISSING IN ORIGINAL TEST: Need abundances and weights (normally set in _prepare_spline_system)
+    x.abundances = np.ones(1)
+    x.weights = np.ones(1)
+
+    # STEP 5 — Compute residuals
+    residuals = x._residuals(params)
+
+    # Expected residual:
+    #   DEM(T)=1 > pm(T)=2 > I_model = 2*N
+    #   residual = (2N - I_obs) / sigma
+    expected_I_model = 2.0 * N
+    expected_residual = expected_I_model - 10.0  # sigma = 1
+
+    assert residuals.shape == (1,)
+    assert np.isfinite(residuals[0])
+    assert np.isclose(residuals[0], expected_residual)
+
+
+
+
+# ----------------------------------- TEST Against IDL ------------------------------------------
+
 
 # def test_interpolate_responses_to_grid():
 #     # -------------------------------
