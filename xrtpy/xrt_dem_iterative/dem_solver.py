@@ -327,6 +327,7 @@ class XRTDEMIterative:
     ):  # Add method to account for known values not worth observed_intensities
         """
         Observed intensities with physical units.
+        
         Returns
         -------
         `~astropy.units.Quantity`
@@ -395,18 +396,21 @@ class XRTDEMIterative:
     @property
     def intensity_errors(self) -> u.Quantity:
         """
-        Returns the intensity uncertainties, either user-provided or model-based.
+        Return the intensity uncertainty values.
+        
+        If the user supplied intensity_errors, those values are returned.
+        Otherwise a default model is used:
 
-        If not provided, errors are estimated using:
-            max(0.03 * observed_intensity, 2 DN/s/pix)
+            sigma = max(0.03 * intensity, 2 DN/s/pix)
+
+        This behavior mirrors the default uncertainty logic of the IDL routine
+        xrt_dem_iterative2.pro.
+        
+        `~astropy.units.Quantity`
+        Intensity errors in DN/s for each filter.
 
         For details, see:
         https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro
-
-        Returns
-        -------
-        `~astropy.units.Quantity`
-            Intensity errors in DN/s for each filter.
         """
         if self._intensity_errors is not None:
             return self._intensity_errors * (u.DN / u.s)
