@@ -398,13 +398,17 @@ class XRTDEMIterative:
 
         if not self._using_estimated_errors:
             warnings.warn(
-                "\n\nNo intensity_errors provided. Using default model: "
-                "max(relative-error * observed_intensity, min_observational_error)\n",
-                f"=> relative_error = {self.relative_error} =, min_observational_error = {self.min_observational_error.value} DN/s\n"
-                "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n",
-                UserWarning,
+                (
+                    "\n\nNo intensity_errors provided. Using default model: "
+                    "max(relative-error * observed_intensity, min_observational_error)\n"
+                    f"=> relative_error = {self.relative_error}, "
+                    f"min_observational_error = {self.min_observational_error.value} DN/s\n"
+                    "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n"
+                ),
+                category=UserWarning,
+                stacklevel=2,
             )
-
+            
         self._using_estimated_errors = True
 
         # Fixed in units
@@ -1099,13 +1103,13 @@ class XRTDEMIterative:
             • Available plotting helpers
         """
 
-        print("\n" + "=" * 70)
-        print("XRTpy DEM Iterative — Solver Summary")
-        print("=" * 70)
+        print("\n" + "=" * 76)
+        print("          XRTpy DEM Iterative — Solver Summary")
+        print("=" * 76)
 
         # -----------------------------------------------------
         print("\nINPUT DATA")
-        print("-" * 76)
+        print("-" * 70)
         print(f" Filters: {self.filter_names}")
         print(
             f" Observed Intensities: {np.array(self._observed_intensities)}  DN/s/pix"
@@ -1124,11 +1128,9 @@ class XRTDEMIterative:
         print("\nTEMPERATURE GRID")
         print("-" * 70)
         if hasattr(self, "logT"):
-            print(
-                f" logT range:               {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}"
-            )
-            print(f" Number of temperature bins:  {len(self.logT)}")
-            print(f" logT (grid spacing):      {self.dlogT:.3f}")
+            print( f" logT range: {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}")
+            print(f" Number of temperature bins: {len(self.logT)}")
+            print(f" logT (grid spacing): {self.dlogT:.3f}")
             print(f" lnT (natural log spacing): {self.dlnT:.3f}")
         else:
             print(" Grid has not been constructed (call solve()).")
@@ -1137,7 +1139,7 @@ class XRTDEMIterative:
         print("\nRESPONSE MATRIX")
         print("-" * 70)
         if hasattr(self, "_response_matrix"):
-            print(f" Matrix shape: {self._response_matrix.shape}  (filters x T bins)")
+            print(f" Matrix shape:    {self._response_matrix.shape}  (filters x T bins)")
             print(f" Response units: {self._response_unit}")
         else:
             print(" Response matrix not constructed.")
@@ -1145,9 +1147,9 @@ class XRTDEMIterative:
         # -----------------------------------------------------
         print("\nSOLVER CONFIGURATION")
         print("-" * 70)
-        print(f" Normalization factor:    {self.normalization_factor:.2e}")
-        print(f" Max iterations:          {self.max_iterations}")
-        print(f" Monte Carlo runs:        {self.monte_carlo_runs}")
+        print(f" Normalization factor:     {self.normalization_factor:.2e}")
+        print(f" Max iterations:           {self.max_iterations}")
+        print(f" Monte Carlo runs:         {self.monte_carlo_runs}")
         if hasattr(self, "n_spl"):
             print(f" Number of spline knots:   {self.n_spl}")
             print(f" Knot positions (logT):    {getattr(self, 'spline_logT', 'N/A')}")
