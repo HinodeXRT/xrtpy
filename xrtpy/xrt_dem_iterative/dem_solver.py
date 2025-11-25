@@ -17,34 +17,49 @@ from xrtpy.xrt_dem_iterative import dem_plotting
 
 class XRTDEMIterative:
     """
-    Estimate the differential emission measure (DEM) from Hinode/XRT data
-    using the iterative spline-based method.
+    Differential Emission Measure (DEM) solver for Hinode/XRT observations.
+
+    This class implements a Python version of the IDL routine
+    `xrt_dem_iterative2.pro`, using spline-parameterized DEM curves and
+    iterative least-squares fitting. It supports Monte Carlo error analysis
+    and closely mirrors the logic of the original IDL algorithm.
 
     Parameters
     ----------
-    observed_channel : str or list of str (required)
-        Filter names used in the observation (e.g., 'Al-mesh', 'Be-thin').
-        Must match the provided temperature responses.
-    observed_intensities : array-like (required)
-        Observed intensities for each channel.
-        Units = DN/s/pix.
-    temperature_responses : list (required)
-        List of `TemperatureResponseFundamental` objects matching the filters.
-        Units = DN s^-1 pix^-1 EM^-1.
-        Can be generated using `xrtpy.response.tools.generate_temperature_responses`
-        for one or more filters. See: https://xrtpy.readthedocs.io/en/latest/getting_started.html
+    observed_channel : str or list of str, required
+        Names of the filters used in the observation (for example,
+        "Al-mesh", "Be-thin"). Must correspond one-to-one with the
+        temperature_responses argument.
+    observed_intensities : array-like, required
+        Observed intensities for each filter channel. Units are DN/s/pix.
+    temperature_responses : list, required
+        List of TemperatureResponseFundamental objects matching the filters.
+        Units are DN s^-1 pix^-1 cm^5. These can be created using
+        xrtpy.response.tools.generate_temperature_responses().
     intensity_errors : array-like, optional
-        Intensity uncertainties. If None, will use a model-based estimate.
-    minimum_bound_temperature : float
-        Minimum log10 temperature (default: 5.5).
-    maximum_bound_temperature: float
-        Maximum log10 temperature (default: 8.0).
-    logarithmic_temperature_step_size : float
-        Step size in log10 temperature space (default: 0.1).
+        Uncertainties in the observed intensities. If None, a default model
+        is used: max(0.03 * intensity, 2 DN/s/pix).
+    minimum_bound_temperature : float,  optional
+        Minimum value of the log10(T) grid. Default is 5.5.
+    maximum_bound_temperature : float,  optional
+        Maximum value of the log10(T) grid. Default is 8.0.
+    logarithmic_temperature_step_size : float, optional
+        Step size for the log10(T) grid. Default is 0.1.
     monte_carlo_runs : int, optional
-        Number of Monte Carlo runs to perform (default: 0, disabled).
-        Each run perturbs `observed_intensities` using `intensity_errors`
-        as Gaussian sigma and re-solves the DEM.
+        Number of Monte Carlo repetitions to perform. Default is 0 (disabled).
+    max_iterations : int, optional
+        Maximum number of function evaluations for lmfit. Default is 2000.
+    normalization_factor : float, optional
+        Internal scaling factor used during optimization. Default is 1e21.
+
+    Notes
+    -----
+    - All lists (observed_channel, observed_intensities,
+    temperature_responses) must be the same length.
+    - The log10(T) range must lie inside the native temperature grid
+    provided by all filter responses.
+    - If intensity_errors is not provided, a default model is used to
+    estimate uncertainties.
     """
 
     def __init__(
