@@ -60,6 +60,9 @@ class XRTDEMIterative:
     provided by all filter responses.
     - If intensity_errors is not provided, a default model is used to
     estimate uncertainties.
+    
+    SELFNOTEJOY
+        Add web-link to IDL script. 
     """
 
     def __init__(
@@ -521,6 +524,22 @@ class XRTDEMIterative:
 
     def _interpolate_responses_to_grid(self):
         """
+        Interpolate all filter responses onto the solver's regular log10(T) grid.
+        
+        This constructs the response matrix used in the DEM forward model.
+        Each filter's native temperature response (R(T)) is interpolated to the
+        grid defined by self.logT. Extrapolated values outside the native
+        response range are set to zero.
+        
+        Equivalent to the "Res_Mat" construction in the IDL routine xrt_dem_iterative2.pro.
+
+        Notes
+        -----
+        - Response units (from XRTpy) are DN s^-1 pix^-1 cm^5.
+        - Output matrix has shape (n_filters, n_temperatures).
+        - Rows correspond to filters; columns correspond to temperature bins.
+
+        -------
         IDL method of Interpolate emissivity.
         Interpolate all filter responses onto the common logT grid and build
         the response matrix.
@@ -528,20 +547,11 @@ class XRTDEMIterative:
         Equivalent to constructing `Res_Mat` in IDL's `xrt_dem_iterative2.pro`
         and in the DEM_Solver PDF documentation.
 
-        Notes
-        -----
-        - Each filter's response is interpolated to `self.logT` (regular log10 grid).
-        - Extrapolation beyond the native response grid is set to 0.0.
-        - Units: DN s^-1 pix^-1 cm^5 (per emission measure).
-        - Shape of `_response_matrix`: (n_filters, n_temperatures)
-        Rows = filters, Columns = temperature bins.
-
         Attributes Created
         ------------------
         interpolated_responses : list of ndarray
-            Interpolated response arrays for each filter.
         _response_matrix : ndarray
-            Final stacked matrix (n_filters x n_temperatures).
+            Stacked filter responses on the uniform logT grid.
         """
         if not hasattr(self, "logT"):
             raise AttributeError(
@@ -635,36 +645,32 @@ class XRTDEMIterative:
 
     def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
         """
-        Construct an initial DEM guess, mirroring IDL's xrt_dem_iter_estim.
+        Compute an initial DEM estimate closely following the structure of the IDL routine xrt_dem_iter_estim.
 
-        This method follows the *structure* of the IDL routine:
-        - Identify channels with non-zero observed intensity.
-        - For each such channel, find the peak of its emissivity/response.
-        - Integrate the response around the peak to estimate a DEM value.
-        - Combine/compact duplicate peak temperatures.
+        The IDL code performs a rough DEM estimate by evaluating intensities
+        relative to response peaks, but xrt_dem_iterative2 ultimately replaces
+        that estimate with a flat log10(DEM) curve before calling the solver.
 
-        HOWEVER, to exactly match the behavior of IDL's xrt_dem_iter_estim
-        as used by xrt_dem_iter_nowidget, the final initial guess returned
-        to the solver is a *flat* log10(DEM) curve:
+        This method repeats the peak-finding logic for diagnostic purposes, but
+        the final DEM passed into the solver is always:
 
-            log10(DEM(T)) = 1.0  for all T on the solver grid.
+            log10(DEM(T)) = 0.0  for all temperature bins
 
-        The detailed peak-based DEM estimates are kept only for optional
-        diagnostics; they do not affect the initial DEM passed into the
-        spline/least-squares solver (this is exactly what the IDL code does).
+        which corresponds to DEM(T) = 1 in arbitrary units. This reproduces the
+        IDL initial condition exactly.
 
         Parameters
         ----------
         cutoff : float, optional
-            Fraction of the peak response used to define the "good" window
-            around each filter's peak. Default is 1/e (≈ 0.3679), as in IDL.
+            Fraction of the peak response used to define the usable window
+            around a channel's emissivity peak. Default is 1/e (approximately
+            0.3679).
 
         Returns
         -------
-        est_log_dem_on_grid : ndarray
-            Array of shape (n_temperatures,) giving the initial guess for
-            log10(DEM) on `self.logT`. For strict IDL-compatibility, this
-            is identically 1.0 everywhere.
+        ndarray
+            Initial log10(DEM) estimate on self.logT. This is always a flat
+            array of zeros (IDL-equivalent behavior).
         """
         if not hasattr(self, "logT"):
             raise AttributeError(
