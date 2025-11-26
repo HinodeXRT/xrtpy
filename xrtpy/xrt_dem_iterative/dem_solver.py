@@ -60,9 +60,9 @@ class XRTDEMIterative:
     provided by all filter responses.
     - If intensity_errors is not provided, a default model is used to
     estimate uncertainties.
-    
+
     SELFNOTEJOY
-        Add web-link to IDL script. 
+        Add web-link to IDL script.
     """
 
     def __init__(
@@ -330,7 +330,7 @@ class XRTDEMIterative:
     ):  # Add method to account for known values not worth observed_intensities
         """
         Observed intensities with physical units.
-        
+
         Returns
         -------
         `~astropy.units.Quantity`
@@ -400,7 +400,7 @@ class XRTDEMIterative:
     def intensity_errors(self) -> u.Quantity:
         """
         Return the intensity uncertainty values.
-        
+
         If the user supplied intensity_errors, those values are returned.
         Otherwise a default model is used:
 
@@ -408,7 +408,7 @@ class XRTDEMIterative:
 
         This behavior mirrors the default uncertainty logic of the IDL routine
         xrt_dem_iterative2.pro.
-        
+
         `~astropy.units.Quantity`
         Intensity errors in DN/s for each filter.
 
@@ -430,7 +430,7 @@ class XRTDEMIterative:
                 category=UserWarning,
                 stacklevel=2,
             )
-            
+
         self._using_estimated_errors = True
 
         # Fixed in units
@@ -525,12 +525,12 @@ class XRTDEMIterative:
     def _interpolate_responses_to_grid(self):
         """
         Interpolate all filter responses onto the solver's regular log10(T) grid.
-        
+
         This constructs the response matrix used in the DEM forward model.
         Each filter's native temperature response (R(T)) is interpolated to the
         grid defined by self.logT. Extrapolated values outside the native
         response range are set to zero.
-        
+
         Equivalent to the "Res_Mat" construction in the IDL routine xrt_dem_iterative2.pro.
 
         Notes
@@ -564,9 +564,7 @@ class XRTDEMIterative:
         ):  # Make sure that R_orig.value is indeed in DN/s/pix per cm^5
             logT_orig = np.log10(T_orig.to_value(u.K))
 
-            response_vals = (
-                R_orig.value
-            )  # already in correct physical units for XRTpy #NOTEFORJOY- TRIPLE check this
+            response_vals = R_orig.value  # already in correct physical units for XRTpy #NOTEFORJOY- TRIPLE check this
 
             interp_func = interp1d(
                 logT_orig,
@@ -771,14 +769,23 @@ class XRTDEMIterative:
 
     def _prepare_spline_system(self):
         """
-        Pythonic, IDL version of mp_prep.
-        Prepares:s
-            - self.n_spl           (number of spline knots)
-            - self.spline_logT     (knot positions)
-            - self.spline_log_dem  (initial spline logDEM values)
-            - self.pm_matrix       (R(T) * T * dlnT)
-            - self.weights         (all ones)
-            - self.abundances      (all ones)
+        Prepare the spline-based DEM parameterization.
+
+        This mirrors the IDL routine mp_prep and sets up all arrays needed by
+        the least-squares solver, including:
+
+        - self.n_spl          : number of spline knots
+        - self.spline_logT    : knot positions (evenly spaced in log10(T))
+        - self.spline_log_dem : initial values of log10(DEM) at each knot
+        - self.pm_matrix      : response matrix multiplied by T * d(ln T)
+        - self.weights        : all ones (IDL uses a channel weighting mask)
+        - self.abundances     : all ones
+
+        pm_matrix corresponds to:
+            pm[i, j] = R_i(T_j) * T_j * d(ln T)
+
+        which appears in the forward model:
+            I_model_i = sum_j DEM(T_j) * pm[i, j]
         """
 
         # Number of channels
@@ -838,6 +845,7 @@ class XRTDEMIterative:
     def _reconstruct_dem_from_knots(self, params):
         """
         Construct DEM(T) on self.logT using spline of log10(DEM) at knot positions.
+        Uses a natural cubic spline interpolation in log10(DEM) space.
         """
         from scipy.interpolate import CubicSpline
 
@@ -851,9 +859,18 @@ class XRTDEMIterative:
 
     def _residuals(self, params):
         """
-        IDL equivalent of mpdemfunct.
-        Computes residuals:
-            ((DEM ## pm) - i_obs_scaled) / i_err_scaled
+        Compute residuals for use by the least-squares optimizer.
+
+        Residuals are computed as:
+            residual_i = (I_model_i - I_observed_i) / sigma_i
+
+        where:
+            I_model = (pm_matrix @ DEM) * abundances
+
+        Returns
+        -------
+        ndarray
+            Residuals for each filter channel.
         """
 
         # 1. DEM(T)
@@ -878,6 +895,11 @@ class XRTDEMIterative:
         return residuals
 
     def _solve_single_dem(self, observed_intensities_vals: np.ndarray):
+        """
+        This method solves the DEM for one set of intensities only, without
+        Monte Carlo perturbation.
+        """
+
         nf = self._normalization_factor
 
         # 1. scaled obs/errors
@@ -927,6 +949,8 @@ class XRTDEMIterative:
             - self.mc_base_obs      shape (n_obs, N+1)
             - self.mc_mod_obs       shape (n_obs, N+1)
             - self.mc_chisq         shape (N+1,)
+
+        Note that N+1 rows means: row 0 = base case, rows 1..N = MC.
         """
 
         n_obs = len(self._observed_intensities)
@@ -1119,13 +1143,13 @@ class XRTDEMIterative:
         Print a detailed, diagnostic summary of the DEM solver state.
 
         This provides:
-            • Input observation details
-            • Temperature grid configuration
-            • Response matrix status
-            • Spline system configuration
-            • Base DEM fit results
-            • Monte Carlo statistics (if available)
-            • Available plotting helpers
+            - Input observation details
+            - Temperature grid configuration
+            - Response matrix status
+            - Spline system configuration
+            - Base DEM fit results
+            - Monte Carlo statistics (if available)
+            - Available plotting helpers
         """
 
         print("\n" + "=" * 76)
@@ -1153,7 +1177,7 @@ class XRTDEMIterative:
         print("\nTEMPERATURE GRID")
         print("-" * 70)
         if hasattr(self, "logT"):
-            print( f" logT range: {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}")
+            print(f" logT range: {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}")
             print(f" Number of temperature bins: {len(self.logT)}")
             print(f" logT (grid spacing): {self.dlogT:.3f}")
             print(f" lnT (natural log spacing): {self.dlnT:.3f}")
@@ -1164,7 +1188,9 @@ class XRTDEMIterative:
         print("\nRESPONSE MATRIX")
         print("-" * 70)
         if hasattr(self, "_response_matrix"):
-            print(f" Matrix shape:    {self._response_matrix.shape}  (filters x T bins)")
+            print(
+                f" Matrix shape:    {self._response_matrix.shape}  (filters x T bins)"
+            )
             print(f" Response units: {self._response_unit}")
         else:
             print(" Response matrix not constructed.")
