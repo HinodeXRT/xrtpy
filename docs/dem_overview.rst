@@ -1,7 +1,7 @@
 .. _xrtpy-dem-overview:
 
 ===================================
-DEM
+Differential Emission Measure (DEM)
 ===================================
 
 .. contents::
@@ -10,24 +10,38 @@ DEM
 
 Introduction
 ------------
-The **Differential Emission Measure (DEM)** describes how much plasma is present 
-in the solar corona as a function of temperature.  
-It is a key diagnostic for understanding coronal heating, solar flares, and 
-general plasma properties.
 
-Hinode/XRT is particularly well suited for DEM analysis because of its multiple 
-broadband filters, which are sensitive to different temperature ranges.
+The differential emission measure (DEM) describes how much plasma is present
+in the solar corona as a function of temperature. It is a key diagnostic for
+understanding coronal heating, solar flares, and the thermal structure of
+active regions.
 
-Why DEM?
---------
-- Converts observed X-ray intensities into a thermal distribution of plasma.
-- Allows comparison across instruments (e.g., Hinode/XRT, SDO/AIA, Hinode/EIS).
-- Provides a physical link between observations and coronal heating models.
+Hinode/XRT is well suited for DEM analysis because it observes the corona
+through multiple broadband filters, each sensitive to different temperature
+ranges. By combining these channels, we can infer a temperature distribution
+DEM(T) that explains the observed X-ray intensities.
+
+
+.. Why DEM?
+.. --------
+.. - Converts observed X-ray intensities into a thermal distribution of plasma.
+.. - Allows comparison across instruments (e.g., Hinode/XRT, SDO/AIA, Hinode/EIS).
+.. - Provides a physical link between observations and coronal heating models.
 
 DEM in XRTpy
 ------------
-XRTpy provides a Python implementation of the iterative spline-fitting method 
-(originally available in IDL as ``xrt_dem_iterative2.pro``).  
+XRTpy provides a Python implementation of the iterative spline fitting method
+originally available in IDL as `xrt_dem_iterative2.pro <http://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`_.
+The core solver is implemented in :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
+
+
+Conceptually, the solver:
+    1. Builds a regular grid in log10(T) between user-specified bounds.
+    2. Interpolates the filter temperature responses onto that grid.
+    3. Represents log10(DEM) as a spline in log10(T).
+    4. Uses least-squares fitting (via ``lmfit``) to adjust the spline values so that the modeled filter intensities match the observed intensities.
+    5. Optionally performs Monte Carlo runs by perturbing the observed intensities with their errors and re-solving the DEM many times to estimate uncertainties.
+
 
 The DEM workflow requires three main inputs, each with specific type, shape, and units:
 
