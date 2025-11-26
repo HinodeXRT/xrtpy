@@ -2,8 +2,6 @@ __all__ = [
     "XRTDEMIterative",
 ]
 
-# import pdb; pdb.set_trace()
-
 import warnings
 
 import astropy.units as u
@@ -323,11 +321,7 @@ class XRTDEMIterative:
 
     ##########################################################
     @property
-    def observed_intensities(
-        self,
-    ) -> (
-        u.Quantity
-    ):  # Add method to account for known values not worth observed_intensities
+    def observed_intensities(self,) -> u.Quantity:  # Add method to account for known values not worth observed_intensities
         """
         Observed intensities with physical units.
 
@@ -633,13 +627,9 @@ class XRTDEMIterative:
         # Store for solver
         self._scaled_prepared = True
 
-    ############################ Everything line of code ABOVE is PREP for the DEM  #############################################
-
-    # ****************************************************************************************************************************
-    ############################ Everything line of code BELOW is FOR the DEM  ##################################################
-
-    #############************************** Start of INITIAL ROUGH DEM ESTIMATE **************************##########################
-    ################## An estimated EM shape based on simple intensity-over-response peaks, smoothed across T. #####################
+    # ======================================================================
+    # DEM INITIALIZATION AND SOLVER METHODS
+    # ======================================================================
 
     def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
         """
