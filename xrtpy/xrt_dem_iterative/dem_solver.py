@@ -319,9 +319,12 @@ class XRTDEMIterative:
     #     """
     #     return self._name
 
-    ##########################################################
     @property
-    def observed_intensities(self,) -> u.Quantity:  # Add method to account for known values not worth observed_intensities
+    def observed_intensities(
+        self,
+    ) -> (
+        u.Quantity
+    ):  # Add method to account for known values not worth observed_intensities
         """
         Observed intensities with physical units.
 
@@ -753,10 +756,6 @@ class XRTDEMIterative:
 
         return est_log_dem_on_grid
 
-    #############************************** End of INITIAL DEM ESTIMATE **************************##################################
-
-    # -------------------------------------------------------------------------------------------------------------------------------
-
     def _prepare_spline_system(self):
         """
         Prepare the spline-based DEM parameterization.
@@ -929,8 +928,6 @@ class XRTDEMIterative:
 
         return dem_phys, modeled_intensities_phys, chisq, result
 
-    # -------------------------------------------------------------------------------------------------------------------------------
-
     def _run_monte_carlo(self):
         """
         Replicates IDL's Monte Carlo loop.
@@ -1010,8 +1007,6 @@ class XRTDEMIterative:
         self.mc_mod_obs = mc_mod
         self.mc_chisq = mc_chi
 
-    # -------------------------------------------------------------------------------------------------------------------------------
-
     def solve(self):
         """
         High-level DEM solver.
@@ -1055,11 +1050,9 @@ class XRTDEMIterative:
         """
 
         # Validate inputs (IDL: argument checks near top)
-
         self.validate_inputs()
 
         # 1) Build logT grid and response matrix - IDL: regular logT grid + interpolated emissivities
-
         self.create_logT_grid()
         self._interpolate_responses_to_grid()
 
@@ -1097,7 +1090,6 @@ class XRTDEMIterative:
         self.mc_mod_obs[0, :] = mod_base
 
         # 4) Monte Carlo loop
-
         if N > 0:
             rng = np.random.default_rng()  # like IDL's systime(1) seeding
 
@@ -1125,7 +1117,6 @@ class XRTDEMIterative:
                 self.mc_base_obs[ii, :] = obs_pert
                 self.mc_mod_obs[ii, :] = mod_i
 
-        # 5) Return DEM for convenience
         return self.dem
 
     def summary(self):
@@ -1146,7 +1137,6 @@ class XRTDEMIterative:
         print("          XRTpy DEM Iterative — Solver Summary")
         print("=" * 76)
 
-        # -----------------------------------------------------
         print("\nINPUT DATA")
         print("-" * 70)
         print(f" Filters: {self.filter_names}")
@@ -1163,7 +1153,6 @@ class XRTDEMIterative:
 
         print(f" Error values (DN/s): {self.intensity_errors.to_value('DN/s')}\n")
 
-        # -----------------------------------------------------
         print("\nTEMPERATURE GRID")
         print("-" * 70)
         if hasattr(self, "logT"):
@@ -1174,7 +1163,6 @@ class XRTDEMIterative:
         else:
             print(" Grid has not been constructed (call solve()).")
 
-        # -----------------------------------------------------
         print("\nRESPONSE MATRIX")
         print("-" * 70)
         if hasattr(self, "_response_matrix"):
@@ -1185,7 +1173,6 @@ class XRTDEMIterative:
         else:
             print(" Response matrix not constructed.")
 
-        # -----------------------------------------------------
         print("\nSOLVER CONFIGURATION")
         print("-" * 70)
         print(f" Normalization factor:     {self.normalization_factor:.2e}")
@@ -1196,7 +1183,7 @@ class XRTDEMIterative:
             print(f" Knot positions (logT):    {getattr(self, 'spline_logT', 'N/A')}")
         else:
             print(" Spline system not prepared yet.")
-        # -----------------------------------------------------
+
         print("\nINITIAL DEM GUESS")
         print("-" * 70)
         if hasattr(self, "_initial_log_dem"):
@@ -1204,8 +1191,6 @@ class XRTDEMIterative:
             print(f" First 5 bins (log10):     {self._initial_log_dem[:5]}")
         else:
             print(" Initial DEM has not been estimated.")
-
-        # -----------------------------------------------------
 
         print("\nBASE DEM SOLUTION")
         print("-" * 70)
@@ -1217,8 +1202,6 @@ class XRTDEMIterative:
             print(f" Modeled intensities:     {self.modeled_intensities}")
         else:
             print(" No DEM solution computed yet (call solve()).")
-
-        # -----------------------------------------------------
 
         print("\nMONTE CARLO ENSEMBLE")
         print("-" * 70)
@@ -1239,7 +1222,6 @@ class XRTDEMIterative:
         else:
             print(" No Monte Carlo results available.")
 
-        # -----------------------------------------------------
         print("\nPLOTTING HELPERS")
         print("-" * 76)
         print(" • plot_dem()         – Base DEM only")
