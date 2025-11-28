@@ -22,12 +22,6 @@ ranges. By combining these channels, we can infer a temperature distribution
 DEM(T) that explains the observed X-ray intensities.
 
 
-.. Why DEM?
-.. --------
-.. - Converts observed X-ray intensities into a thermal distribution of plasma.
-.. - Allows comparison across instruments (e.g., Hinode/XRT, SDO/AIA, Hinode/EIS).
-.. - Provides a physical link between observations and coronal heating models.
-
 DEM in XRTpy
 ------------
 XRTpy provides a Python implementation of the iterative spline fitting method
@@ -43,54 +37,73 @@ Conceptually, the solver:
     5. Optionally performs Monte Carlo runs by perturbing the observed intensities with their errors and re-solving the DEM many times to estimate uncertainties.
 
 
-The DEM workflow requires three main inputs, each with specific type, shape, and units:
+Required inputs
+---------------
+The DEM workflow requires three main input pieces:
 
-1. **Observed channels (filters)**  
-    - Type: ``str`` or ``list`` of ``str``  
-    - Description: Names of the filters used in the observation (e.g., ``"Al-mesh"``, ``"Be-thin"``).  
+1. Observed channels (filters)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Type: ``str`` or ``list`` of ``str``
+* Description: Names of the filters used in the observation, for example ``"Al-mesh"`` or ``"Be-thin"``.
+* These must correspond to filters understood by XRTpy and must match the provided temperature responses one-to-one.
 
-2. **Observed intensities**  
-    - Type: array-like  
-    - Units: DN/s (normalized per pixel)  
-    - Description: Measured intensities corresponding to each filter.  
+2. Observed intensities
+~~~~~~~~~~~~~~~~~~~~~~~
+* Type: array-like
+* Units: DN/s (normalized per pixel)
+* Description: Measured intensities in each filter channel.
+* Length must match the number of filters.
 
-3. **Temperature response functions**  
-    - Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
-    - Units: DN s\ :sup:`-1` pix\ :sup:`-1` EM\ :sup:`-1`  
-    - Description: Instrument temperature responses matching the filters.  
-        These can be generated with ``xrtpy.response.tools.generate_temperature_responses``
-        See :doc:`getting_started` for details.
+
+3. Temperature response functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
+* Units: DN s\ :sup:`-1` pix\ :sup:`-1` cm\ :sup:`5`
+* Description: Instrument response as a function of temperature for each filter, matching the order of the filters.
+* Can be generated using :func:`xrtpy.response.tools.generate_temperature_responses`.
+
+
 
 Example
 -------
 A simple example with two filters:
 
+
 .. code-block:: python
-
+    
     from xrtpy.response.tools import generate_temperature_responses
-    from xrtpy.xrt_dem_iterative import XRTDEMIterative
 
-    # Define filters and observed intensities
-    filters = ["Al-poly","C-poly/Ti-poly"]
-    intensities = [250.0, 180.0]  # DN/s
-
-    # Generate responses
+    filters = ["Al-poly", "Ti-poly"]
     responses = generate_temperature_responses(
-        filters, 
-        observation_date="2007-07-10", 
+        filters,
+        "2012-10-27T00:00:00",
         abundance_model="hybrid"
         )
 
-    # Solve XRT DEM
+
+Overview of the XRTDEMIterative API
+-----------------------------------
+The main entry point is :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
+
+Constructor
+~~~~~~~~~~~
+.. code-block:: python
+
+    from xrtpy.xrt_dem_iterative import XRTDEMIterative
+
     dem_solver = XRTDEMIterative(
         observed_channel=filters,
         observed_intensities=intensities,
         temperature_responses=responses,
+        intensity_errors=None,
+        minimum_bound_temperature=5.5,
+        maximum_bound_temperature=8.0,
+        logarithmic_temperature_step_size=0.1,
+        monte_carlo_runs=0,
+        max_iterations=2000,
+        normalization_factor=1e21,
     )
 
-    dem_result = dem_solver.solve()
-
-    dem_result.plot()
 
 
 Comparison with IDL
@@ -179,8 +192,34 @@ References
 - Golub, L., et al. (2004), *Solar Physics*, 243, 63. :cite:p:`golub:2004`
 - Weber, M. A., et al. (2004), *ApJ*, 605, 528. :cite:p:`weber:2004`.
 
+
 .. Next Steps
 .. ----------
-.. - See :ref:`API Reference <xrtpy.xrt_dem_iterative>` for details on 
-..     ``XRTDEMIterative``. Coming soon. 
 .. - Explore example notebooks in the `examples/` directory. Coming soon. 
+
+.. .. code-block:: python
+
+..     from xrtpy.response.tools import generate_temperature_responses
+..     from xrtpy.xrt_dem_iterative import XRTDEMIterative
+
+..     # Define filters and observed intensities
+..     filters = ["Al-poly","C-poly/Ti-poly"]
+..     intensities = [250.0, 180.0]  # DN/s
+
+..     # Generate responses
+..     responses = generate_temperature_responses(
+..         filters, 
+..         observation_date="2007-07-10", 
+..         abundance_model="hybrid"
+..         )
+
+..     # Solve XRT DEM
+..     dem_solver = XRTDEMIterative(
+..         observed_channel=filters,
+..         observed_intensities=intensities,
+..         temperature_responses=responses,
+..     )
+
+..     dem_result = dem_solver.solve()
+
+..     dem_result.plot()
