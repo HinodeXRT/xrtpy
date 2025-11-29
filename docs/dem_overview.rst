@@ -25,9 +25,8 @@ DEM(T) that explains the observed X-ray intensities.
 DEM in XRTpy
 ------------
 XRTpy provides a Python implementation of the iterative spline fitting method
-originally available in IDL as `xrt_dem_iterative2.pro <http://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`_.
+originally available in IDL as `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__.
 The core solver is implemented in :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
-
 
 Conceptually, the solver:
     1. Builds a regular grid in log10(T) between user-specified bounds.
@@ -36,6 +35,8 @@ Conceptually, the solver:
     4. Uses least-squares fitting (via ``lmfit``) to adjust the spline values so that the modeled filter intensities match the observed intensities.
     5. Optionally performs Monte Carlo runs by perturbing the observed intensities with their errors and re-solving the DEM many times to estimate uncertainties.
 
+This approach mirrors the structure and behavior of the IDL routine while providing
+a modern, fully open-source implementation in Python.
 
 Required inputs
 ---------------
@@ -45,7 +46,7 @@ The DEM workflow requires three main input pieces:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Type: ``str`` or ``list`` of ``str``
 * Description: Names of the filters used in the observation, for example ``"Al-mesh"`` or ``"Be-thin"``.
-* These must correspond to filters understood by XRTpy and must match the provided temperature responses one-to-one.
+* These must correspond to valid XRT filters and must match the provided temperature responses one-to-one.
 
 2. Observed intensities
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,7 +71,7 @@ A simple example with two filters:
 
 
 .. code-block:: python
-    
+
     from xrtpy.response.tools import generate_temperature_responses
 
     filters = ["Al-poly", "Ti-poly"]
@@ -94,13 +95,8 @@ Constructor
         observed_channel=filters,
         observed_intensities=intensities,
         temperature_responses=responses,
-        intensity_errors=None,
-        minimum_bound_temperature=5.5,
-        maximum_bound_temperature=8.0,
-        logarithmic_temperature_step_size=0.1,
         monte_carlo_runs=0,
         max_iterations=2000,
-        normalization_factor=1e21,
     )
 
     # Solve for the DEM
@@ -118,15 +114,16 @@ for each realization.
 
 .. code-block:: python
 
-    N_mc = 50  # number of Monte Carlo runs
+    N_mc = 100  # number of Monte Carlo runs
 
     dem_solver = XRTDEMIterative(
         observed_channel=filters,
         observed_intensities=intensities,
         temperature_responses=responses,
         monte_carlo_runs=N_mc,
+        max_iterations=2000,
     )
-    
+
     dem_solver.solve()
 
     # Monte Carlo DEM Plot
@@ -139,7 +136,10 @@ for custom analysis.
 Comparison with IDL
 -------------------
 The Python solver is designed to closely follow the logic of the
-SolarSoft/IDL routine `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`_:
+SolarSoft/IDL routine `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__:
+
+
+
 
 * Uses a regular log10(T) grid.
 * Represents log10(DEM) at a set of spline knots.
@@ -244,8 +244,8 @@ These values match current defaults but are written out here for clarity.
     The values shown above correspond to existing defaults in the solver, 
     but they are written out here to illustrate what can be tuned.  
     You can adjust these to best suit your analysis needs.  
-    This mirrors the flexibility of the IDL routine 
-    ``xrt_dem_iterative2.pro``.
+    This mirrors the flexibility of the IDL routine  ``xrt_dem_iterative2.pro``.
+
 
 .. Acknowledgement
 .. ---------------
@@ -257,5 +257,5 @@ These values match current defaults but are written out here for clarity.
 
 References
 ----------
-- Golub, L., et al. (2004), *Solar Physics*, 243, 63. :cite:`golub:2004`
-- Weber, M. A., et al. (2004), *ApJ*, 605, 528. :cite:p:`weber:2004`.
+- Golub, L., et al. (2004), Solar Physics, 243, 63. :cite:p:`golub:2004`
+- Weber, M. A., et al. (2004), Astrophysical Journal, 605, 528. :cite:p:`weber:2004`
