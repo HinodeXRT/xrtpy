@@ -26,7 +26,7 @@ DEM in XRTpy
 ------------
 XRTpy provides a Python implementation of the iterative spline fitting method
 originally available in IDL as `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__.
-The core solver is implemented in :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
+The core solver is implemented in :class:`xrtpy.xrt_dem_iterative.dem_solver.XRTDEMIterative`.
 
 Conceptually, the solver:
     1. Builds a regular grid in log10(T) between user-specified bounds.
@@ -65,6 +65,7 @@ The DEM workflow requires three main input pieces:
 
 
 
+
 Example
 -------
 A simple example with two filters:
@@ -83,7 +84,9 @@ A simple example with two filters:
 
 Overview of the XRTDEMIterative API
 -----------------------------------
-The main entry point is :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
+The main entry point is :class:`xrtpy.xrt_dem_iterative.dem_solver.XRTDEMIterative`.
+
+
 
 Constructor
 ~~~~~~~~~~~
