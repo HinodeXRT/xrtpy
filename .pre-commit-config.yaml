@@ -23,7 +23,7 @@ repos:
   - id: check-yaml
 
 - repo: https://github.com/python-jsonschema/check-jsonschema
-  rev: 0.34.1
+  rev: 0.36.0
   hooks:
   - id: check-github-workflows
 
@@ -67,7 +67,7 @@ repos:
     exclude: .*\.fits
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.3
+  rev: v0.14.10
   hooks:
   - id: ruff
     name: ruff
@@ -90,6 +90,6 @@ repos:
     additional_dependencies: ['validate-pyproject-schema-store[all]']
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: v2.11.0
+  rev: v2.11.1
   hooks:
   - id: pyproject-fmt
