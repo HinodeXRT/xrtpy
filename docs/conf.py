@@ -70,7 +70,7 @@ linkcheck_anchors_ignore = []
 ogp_image = "https://raw.githubusercontent.com/HinodeXRT/xrtpy/main/docs/_static/images/xrtpy_logo.png"
 ogp_use_first_image = True
 ogp_description_length = 160
-ogp_custom_meta_tags = ('<meta property="og:ignore_canonical" content="true" />',)
+#ogp_custom_meta_tags = ('<meta property="og:ignore_canonical" content="true" />',)
 
 # Suppress warnings about overriding directives as we overload some of the
 # doctest extensions.
@@ -230,6 +230,7 @@ html_sidebars = {
     "feedback_communication*": [],
     "contributing*": [],
     "code_of_conduct*": [],
+    "dem_overview*": [],
 }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
