@@ -78,7 +78,7 @@ def test_dem_temperature_grid():
 
 def test_validate_inputs_good_case():
     filters = ["Be-thin", "Be-med"]
-    i_obs = [10000.0, 20000.0]
+    i_obs = [100.0, 200.0]
     resp = generate_temperature_responses(filters, "2007-07-10")
     dem = XRTDEMIterative(filters, i_obs, resp)
     dem.validate_inputs()  # Should NOT raise
@@ -86,7 +86,7 @@ def test_validate_inputs_good_case():
 
 def test_validate_inputs_mismatched_errors():
     filters = ["Be-thin", "Be-med"]
-    i_obs = [10000.0, 20000.0]
+    i_obs = [100.0, 200.0]
     i_err = [100.0]  # Wrong length - should be two error/ uncertainties
     resp = generate_temperature_responses(filters, "2007-07-10")
     dem = XRTDEMIterative(filters, i_obs, resp, intensity_errors=i_err)
@@ -97,7 +97,7 @@ def test_validate_inputs_mismatched_errors():
 def test_create_logT_grid():
 
     filters = ["Al-poly"]
-    intensities = np.array([1500.0])
+    intensities = np.array([150.0])
     responses = generate_temperature_responses(filters, "2018-10-27T00:00:00")
 
     x = XRTDEMIterative(
@@ -136,7 +136,7 @@ def test_create_logT_grid():
 
 def test_estimate_initial_dem():
     filters = ["Al-poly", "Ti-poly"]
-    intensities = np.array([1500.0, 2300.0])
+    intensities = np.array([150.0, 230.0])
     responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
 
     x = XRTDEMIterative(
@@ -537,17 +537,21 @@ def test_compare_with_idl_dem():
 
     TEST_DIR = Path(__file__).parent
     data_path = (
-        TEST_DIR / "IDL_DEM_testing_sav_files" / "xrt_IDL_DEM_2012_10_27_MC100.sav"
+        TEST_DIR / "IDL_DEM_testing_sav_files" / "obs_20090730_DEM_MC100_IDL_2026.sav"# "xrt_IDL_DEM_2012_10_27_MC100.sav"
     )
     data = readsav(data_path)
     logT_idl = data["logt"]
 
-    # XRTpy
-    filters = ["Ti-poly", "Be-thin", "Al-poly", "C-poly"]
-    intensities = np.array([311680.2, 135815.0, 2351258.9, 2352987.7])
-    date = "2012-10-27T16:27:46"
+    # XRTpy - 2012-10-27 Data Set
+    # filters = ["Ti-poly", "Be-thin", "Al-poly", "C-poly"]
+    # intensities = np.array([311680.2, 135815.0, 2351258.9, 2352987.7])
+    # date = "2012-10-27T16:27:46"
 
-    responses = generate_temperature_responses(filters, date)
+    filters = ["Al-mesh", "Ti-poly", "Al-poly", "Be-thin"]
+    intensities = [178.482 ,44.919,132.193,3.149]  # DN/s
+    observation_date="2009-07-30T00:38"
+
+    responses = generate_temperature_responses(filters, observation_date)
 
     x = XRTDEMIterative(
         observed_channel=filters,
