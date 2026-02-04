@@ -303,6 +303,27 @@ class XRTDEMIterative:
                 stacklevel=2,
             )
 
+        # warn if any value is >= 2500
+        if np.any(self._observed_intensities >= 2500):
+            bad = self._observed_intensities >= 2500
+            bad_channels = [ch for ch, m in zip(self.observed_channel, bad, strict=False) if m]
+            bad_values = self._observed_intensities[bad]
+
+            warnings.warn(
+                (
+                    "\n\nOne or more observed intensities are >= 2500 DN/s/pix.\n"
+                    "Hinode/XRT CCD response becomes non-linear as values approach the "
+                    "practical upper linear limit (~3000 DN, 12-bit ADU), which may affect DEM results.\n"
+                    'See XRT Blue Book, Section 2.4.5 "Charge Spreading":\n'
+                    "https://xrt.cfa.harvard.edu/resources/documents/XRT_BlueBook/SolarB_bluebook.XRT.pdf\n\n"
+                    f"Affected filters: {bad_channels}\n"
+                    f"Affected intensities (DN/s/pix): {bad_values}\n"
+                ),
+
+                category=UserWarning,
+                stacklevel=2,
+            )
+            
         # success -> no return value
         return None
 
