@@ -295,7 +295,6 @@ class XRTDEMIterative:
             ):
                 raise ValueError("`intensity_errors` must be finite and >= 0.")
 
-        # 8 warning
         if np.all(self._observed_intensities == 0):
             warnings.warn(
                 "\n\n All observed intensities are zero. DEM solution will yield zero. "
@@ -303,6 +302,25 @@ class XRTDEMIterative:
                 stacklevel=2,
             )
 
+        if np.any(self._observed_intensities < 0):
+            bad = self._observed_intensities < 0
+            bad_channels = [
+                ch for ch, m in zip(self.observed_channel, bad, strict=False) if m
+            ]
+            bad_values = self._observed_intensities[bad]
+
+            warnings.warn(
+                (
+                    "\n\nOne or more observed intensities are negative.\n"
+                    "XRT intensity values are expected to be non-negative. "
+                    "The solver will continue.\n\n"
+                    f"Affected filters: {bad_channels}\n"
+                    f"Affected intensities (DN/s/pix): {bad_values}\n"
+                ),
+                category=UserWarning,
+                stacklevel=2,
+            )
+            
         # warn if any value is >= 2500
         if np.any(self._observed_intensities >= 2500):
             bad = self._observed_intensities >= 2500
