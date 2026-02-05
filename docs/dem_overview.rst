@@ -154,16 +154,12 @@ Comparison with IDL
 The Python solver is designed to closely follow the logic of the
 SolarSoft/IDL routine `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__:
 
-
-
-
 * Uses a regular log10(T) grid.
 * Represents log10(DEM) at a set of spline knots.
-* Uses a least-squares algorithm to minimize chi-square.
+* Uses a least-squares algorithm to minimize chi-square statistic.
 * Supports Monte Carlo noise realizations for uncertainty estimation.
 
-
-Small numerical differences can arise due to:
+Small numerical differences between the Python and IDL implementations can arise due to:
 
 * Different interpolation choices (for example, cubic splines from SciPy).
 * Differences in optimization libraries (lmfit versus IDL MPFIT).
@@ -171,7 +167,6 @@ Small numerical differences can arise due to:
 
 Within these limits, the Python implementation is intended to produce
 results that are consistent with the IDL tool.
-
 
 
 Mathematical background
