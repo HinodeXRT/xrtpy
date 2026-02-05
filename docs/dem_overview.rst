@@ -171,47 +171,54 @@ results that are consistent with the IDL tool.
 
 Mathematical background
 -----------------------
-The DEM inversion problem is ill posed. For each filter channel i,
-the observed intensity :math:`I_i` is related to the DEM through:
+This section provides a short description of the equations solved by the
+XRTpy DEM solver. It is intended for orientation rather than as a full
+mathematical derivation.
+
+The DEM inversion problem is mathematically ill posed, meaning that multiple
+thermal distributions can reproduce the same set of observations. For each
+filter channel :math:`i`, the observed intensity :math:`I_i` is related to the
+DEM by
 
 .. math::
 
-    I_i = \int DEM(T) \, R_i(T) \, dT
+    I_i = \int DEM(T)\, R_i(T)\, dT
 
-where :math:`R_i(T)` is the temperature response function for the filter,
-and :math:`DEM(T)` is the unknown thermal distribution.
+where :math:`R_i(T)` is the temperature response function of the filter and
+:math:`DEM(T)` describes the amount of emitting plasma as a function of
+temperature.
 
-Since the number of temperature bins typically exceeds the number of
-observed channels, the inversion does not have a unique solution. The
-XRTpy solver uses a forward-fitting approach:
+Because the number of temperature bins typically exceeds the number of observed
+channels, the inversion does not have a unique solution. XRTpy therefore uses a
+forward-fitting approach. The DEM is represented as a smooth function in
+:math:`\log_{10}(T)` using a small number of spline knots. Model intensities are
+computed on a discrete temperature grid as
 
-1. Assume a parametric form for log10(DEM(T)) using spline knots.
-2. Compute model intensities:
+.. math::
 
-    .. math::
+    I_i^{model} = \sum_j DEM(T_j)\, R_i(T_j)\, T_j\, \Delta(\ln T)
 
-        I_i^{model} = \sum_j DEM(T_j)\, R_i(T_j)\, T_j\, \Delta(\ln T)
+The spline values are adjusted to minimize the chi-square statistic
 
-3. Adjust the spline values to minimize:
+.. math::
 
-    .. math::
+    \chi^2 = \sum_i \left[
+        \frac{I_i^{model} - I_i^{obs}}{\sigma_i}
+    \right]^2
 
-        \chi^2 = \sum_i \left[
-            \frac{I_i^{model} - I_i^{obs}}{\sigma_i}
-        \right]^2
+where :math:`\sigma_i` are the observational uncertainties. Smoothness of the
+solution is enforced implicitly through the spline representation and the
+limited number of knots.
 
-Here :math:`\sigma_i` are the observational uncertainties. Smoothness and
-the low number of spline knots help regularize the solution.
-
-
-Monte Carlo iterations perturb the observed intensities:
+When Monte Carlo error estimation is enabled, the observed intensities are
+perturbed according to their uncertainties,
 
 .. math::
 
     I_i^{(k)} = I_i^{obs} + \mathcal{N}(0, \sigma_i)
 
-and re-fit the DEM for each realization k. The spread in the resulting DEM
-curves provides an estimate of the uncertainty in DEM(T).
+and the DEM is re-fit for each realization. The spread of the resulting DEM
+curves provides an estimate of the uncertainty in :math:`DEM(T)`.
 
 
 Extended example with options
