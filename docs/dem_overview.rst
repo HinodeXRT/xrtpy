@@ -11,6 +11,8 @@ Differential Emission Measure (DEM)
 Introduction
 ------------
 
+This page describes the XRTpy iterative DEM solver and the inputs and outputs needed to run it.
+
 The differential emission measure (DEM) describes how much plasma is present
 in the solar corona as a function of temperature. It is a key diagnostic for
 understanding coronal heating, solar flares, and the thermal structure of
@@ -18,9 +20,12 @@ active regions.
 
 Hinode/XRT is well suited for DEM analysis because it observes the corona
 through multiple broadband filters, each sensitive to different temperature
-ranges. By combining these channels, we can infer a temperature distribution
-DEM(T) that explains the observed X-ray intensities.
+ranges. By combining these channels, we can infer a DEM(T) that reproduces 
+the observed filter intensities when combined with the instrument temperature 
+response functions.
 
+The solver is iterative in the sense that it repeatedly adjusts a parameterized
+DEM to minimize the difference between observed and modeled intensities.
 
 DEM in XRTpy
 ------------
@@ -48,7 +53,28 @@ The DEM workflow requires three main input pieces:
 * Description: Names of the filters used in the observation, for example ``"Al-mesh"`` or ``"Be-thin"``.
 * These must correspond to valid XRT filters and must match the provided temperature responses one-to-one.
 
-2. Observed intensities
+2. Temperature response functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
+* Units: DN s\ :sup:`-1` pix\ :sup:`-1` cm\ :sup:`5`
+* Description: Instrument response as a function of temperature for each filter, matching the order of the filters.
+* Can be generated using :func:`xrtpy.response.tools.generate_temperature_responses`.
+
+Example
+^^^^^^^
+
+.. code-block:: python
+
+    from xrtpy.response.tools import generate_temperature_responses
+
+    filters = ["Al-poly", "C-poly", "Ti-poly"]
+    responses = generate_temperature_responses(
+        filters,
+        "2012-07-10T12:03:20",
+        )
+
+
+3. Observed intensities
 ~~~~~~~~~~~~~~~~~~~~~~~
 * Type: array-like
 * Units: DN/s (normalized per pixel)
@@ -56,30 +82,9 @@ The DEM workflow requires three main input pieces:
 * Length must match the number of filters.
 
 
-3. Temperature response functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
-* Units: DN s\ :sup:`-1` pix\ :sup:`-1` cm\ :sup:`5`
-* Description: Instrument response as a function of temperature for each filter, matching the order of the filters.
-* Can be generated using :func:`xrtpy.response.tools.generate_temperature_responses`.
 
 
 
-
-Example
--------
-A simple example with two filters:
-
-
-.. code-block:: python
-
-    from xrtpy.response.tools import generate_temperature_responses
-
-    filters = ["Al-poly", "Ti-poly"]
-    responses = generate_temperature_responses(
-        filters,
-        "2012-10-27T00:00:00",
-        )
 
 
 Overview of the XRTDEMIterative API
@@ -98,8 +103,6 @@ Constructor
         observed_channel=filters,
         observed_intensities=intensities,
         temperature_responses=responses,
-        monte_carlo_runs=0,
-        max_iterations=2000,
     )
 
     # Solve for the DEM
@@ -217,8 +220,9 @@ These values match current defaults but are written out here for clarity.
     from xrtpy.xrt_dem_iterative import XRTDEMIterative
 
     filters = ["Al-poly", "Ti-poly", "Be-thin", "C-poly"]
-    intensities = [2500.0, 1800.0, 900.0, 450.0]  # DN/s
-    observation_date="2012-10-27T00:00:00"
+    #Random intensities
+    intensities = [520.0, 104.0, 901.0, 458.0]  # DN/s 
+    observation_date="2012-10-27T10:00:03"
 
     responses = generate_temperature_responses(
         filters,
