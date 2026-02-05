@@ -24,7 +24,7 @@ ranges. By combining these channels, we can infer a DEM(T) that reproduces
 the observed filter intensities when combined with the instrument temperature 
 response functions.
 
-The solver is iterative in the sense that it repeatedly adjusts a parameterized
+The solver is iterative in that it repeatedly adjusts a parameterized
 DEM to minimize the difference between observed and modeled intensities.
 
 DEM in XRTpy
@@ -55,9 +55,10 @@ The DEM workflow requires three main input pieces:
 2. Temperature response functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The DEM class needs the Temperature-Response data and information for each filter. We've created a tool that 
-generate the temperature responses and temperatures for a given list of xrt filters at a given date. 
-Check out xrtpy.response.tools for more details abot this funcrtion.
+The DEM class requires temperature response functions for each filter, which
+describe the instrument sensitivity as a function of temperature. These
+responses can be generated for a chosen observation date using utilities
+provided in ``xrtpy.response.tools``.
 
 * Units: DN s\ :sup:`-1` pix\ :sup:`-1` cm\ :sup:`5`
 * Description: Instrument response as a function of temperature for each filter, matching the order of the filters.
@@ -126,7 +127,7 @@ Solving a DEM
 Enabling Monte Carlo error estimates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To estimate uncertainties, you can enable Monte Carlo iterations. The solver
-will perturb the observed intensities by their errors and re-solving the DEM
+will perturb the observed intensities by their errors and re-solve the DEM
 for each realization.
 
 .. code-block:: python
@@ -156,7 +157,7 @@ SolarSoft/IDL routine `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ss
 
 * Uses a regular log10(T) grid.
 * Represents log10(DEM) at a set of spline knots.
-* Uses a least-squares algorithm to minimize chi-square statistic.
+* Uses a least-squares algorithm to minimize the chi-square statistic.
 * Supports Monte Carlo noise realizations for uncertainty estimation.
 
 Small numerical differences between the Python and IDL implementations can arise due to:
@@ -223,8 +224,8 @@ curves provides an estimate of the uncertainty in :math:`DEM(T)`.
 
 Extended example with options
 -----------------------------
-Below is an extended example showing more constructor options explicitly.
-These values match current defaults but are written out here for clarity.
+Below is an extended example showing additional constructor options.
+The values shown match the current defaults and are written out for clarity.
 
 .. code-block:: python
 
@@ -232,9 +233,9 @@ These values match current defaults but are written out here for clarity.
     from xrtpy.xrt_dem_iterative import XRTDEMIterative
 
     filters = ["Al-poly", "Ti-poly", "Be-thin", "C-poly"]
-    #Random intensities
-    intensities = [520.0, 104.0, 901.0, 458.0]  # DN/s 
-    observation_date="2012-10-27T10:00:03"
+    #Example intensities
+    intensities = [520.0, 104.0, 901.0, 458.0]  # DN/s/pix
+    observation_date = "2012-10-27T10:00:03"
 
     responses = generate_temperature_responses(
         filters,
@@ -247,24 +248,23 @@ These values match current defaults but are written out here for clarity.
         temperature_responses=responses,       # Instrument responses
 
         # Optional configuration:
-        intensity_errors=None,                 # Obs. uncertainties - default: auto-estimated (3%)
+        intensity_errors=None,                 # Observed uncertainties - default: auto-estimated (3%)
         minimum_bound_temperature=5.5,         # Minimum log T (default: 5.5)
         maximum_bound_temperature=8.0,         # Maximum log T (default: 8.0)
         logarithmic_temperature_step_size=0.1, # Bin width in log T (default: 0.1)
-        monte_carlo_runs=100,                  # # of Monte Carlo runs (default: none)
+        monte_carlo_runs=100,                  # Number of Monte Carlo runs (default: none)
         max_iterations=2000,                   # Solver max iterations (default: 2000)
-        normalization_factor=1e21,             # Normalization saling factor (default: 1e21)
+        normalization_factor=1e21,             # Normalization scaling factor (default: 1e21)
     )
 
     dem_solver.solve()
     dem_solver.plot_dem_mc()
 
 .. note::
-    The values shown above correspond to existing defaults in the solver, 
-    but they are written out here to illustrate what can be tuned.  
-    You can adjust these to best suit your analysis needs.  
-    This mirrors the flexibility of the IDL routine  ``xrt_dem_iterative2.pro``.
-
+    The values shown above correspond to the solver defaults and are written
+    out here to illustrate which parameters can be tuned. You can adjust these
+    to suit your specific analysis needs. This mirrors the flexibility of the
+    IDL routine ``xrt_dem_iterative2.pro``.
 
 .. Acknowledgement
 .. ---------------
@@ -274,7 +274,18 @@ These values match current defaults but are written out here for clarity.
 .. capabilities from legacy IDL routines into modern, open-source Python 
 .. tools for the solar physics community.*
 
+
 References
 ----------
+The following references provide background on the Hinode/XRT instrument and
+its use in coronal diagnostics:
+
 - Golub, L., et al. (2004), Solar Physics, 243, 63. :cite:p:`golub:2004`
 - Weber, M. A., et al. (2004), Astrophysical Journal, 605, 528. :cite:p:`weber:2004`
+
+Notes and warnings
+------------------
+The solver performs basic validation of user inputs and may emit warnings in
+cases where observed intensities are non-physical (e.g., negative values) or
+approach known instrument limits. These warnings do not stop execution but are
+intended to help users assess the reliability of the results.
