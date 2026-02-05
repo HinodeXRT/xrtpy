@@ -55,14 +55,14 @@ The DEM workflow requires three main input pieces:
 2. Temperature response functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The DEM class needs the Temperature-Response for each filter. We've created a tool that 
-generate the temperature responses for a given list of xrt filters at a given date. 
+The DEM class needs the Temperature-Response data and information for each filter. We've created a tool that 
+generate the temperature responses and temperatures for a given list of xrt filters at a given date. 
 Check out xrtpy.response.tools for more details abot this funcrtion.
 
-* Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
 * Units: DN s\ :sup:`-1` pix\ :sup:`-1` cm\ :sup:`5`
 * Description: Instrument response as a function of temperature for each filter, matching the order of the filters.
 * Can be generated using :func:`xrtpy.response.tools.generate_temperature_responses`.
+
 
 
 Example
@@ -87,19 +87,14 @@ Example
 * Length must match the number of filters.
 
 
-
-
-
-
-
 Overview of the XRTDEMIterative API
 -----------------------------------
 The main entry point is :class:`xrtpy.xrt_dem_iterative.dem_solver.XRTDEMIterative`.
 
 
 
-Constructor
-~~~~~~~~~~~
+Solving a DEM
+~~~~~~~~~~~~~
 .. code-block:: python
 
     from xrtpy.xrt_dem_iterative import XRTDEMIterative
@@ -111,16 +106,27 @@ Constructor
     )
 
     # Solve for the DEM
-    dem = dem_solver.solve()  # returns the DEM array, also stored in dem_solver.dem
+    dem_solver.solve()  # returns the DEM array, also stored in dem_solver.dem
 
     # Plot the DEM
     dem_solver.plot_dem()
 
+    # Access DEM results
+    dem = dem_solver.dem
+    logT = dem_solver.logT
+
+    # DEM solution
+    print(dem_solver.dem)
+
+    # Temperature grid
+    print(dem_solver.logT)
+
+
 
 Enabling Monte Carlo error estimates
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To estimate uncertainties, you can enable Monte Carlo iterations. The solver
-will perturb the observed intensities by their errors and re-solve the DEM
+will perturb the observed intensities by their errors and re-solving the DEM
 for each realization.
 
 .. code-block:: python
@@ -132,7 +138,6 @@ for each realization.
         observed_intensities=intensities,
         temperature_responses=responses,
         monte_carlo_runs=N_mc,
-        max_iterations=2000,
     )
 
     dem_solver.solve()
