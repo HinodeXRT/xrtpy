@@ -37,11 +37,11 @@ Conceptually, the solver:
     1. Builds a regular grid in log10(T) between user-specified bounds.
     2. Interpolates the filter temperature responses onto that grid.
     3. Represents log10(DEM) as a spline in log10(T).
-    4. Uses least-squares fitting (via ``lmfit``) to adjust the spline values so that the modeled filter intensities match the observed intensities.
+    4. Uses least-squares fitting (via ``lmfit``) to adjust the spline values so that the modeled filter intensities best match the observed intensities.
     5. Optionally performs Monte Carlo runs by perturbing the observed intensities with their errors and re-solving the DEM many times to estimate uncertainties.
 
-This approach mirrors the structure and behavior of the IDL routine while providing
-a modern, fully open-source implementation in Python.
+This approach mirrors the structure and behavior of the IDL routine while providing a modern, 
+fully open-source implementation in Python that integrates naturally with the scientific Python ecosystem.
 
 Required inputs
 ---------------
@@ -49,16 +49,21 @@ The DEM workflow requires three main input pieces:
 
 1. Observed channels (filters)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Type: ``str`` or ``list`` of ``str``
+* Type: ``list`` of ``str``
 * Description: Names of the filters used in the observation, for example ``"Al-mesh"`` or ``"Be-thin"``.
-* These must correspond to valid XRT filters and must match the provided temperature responses one-to-one.
 
 2. Temperature response functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The DEM class needs the Temperature-Response for each filter. We've created a tool that 
+generate the temperature responses for a given list of xrt filters at a given date. 
+Check out xrtpy.response.tools for more details abot this funcrtion.
+
 * Type: ``list`` of :class:`xrtpy.response.TemperatureResponseFundamental`
 * Units: DN s\ :sup:`-1` pix\ :sup:`-1` cm\ :sup:`5`
 * Description: Instrument response as a function of temperature for each filter, matching the order of the filters.
 * Can be generated using :func:`xrtpy.response.tools.generate_temperature_responses`.
+
 
 Example
 ^^^^^^^
