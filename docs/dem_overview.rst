@@ -31,7 +31,7 @@ DEM in XRTpy
 ------------
 XRTpy provides a Python implementation of the iterative spline fitting method
 originally available in IDL as `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__.
-The core solver is implemented in :class:`xrtpy.xrt_dem_iterative.dem_solver.XRTDEMIterative`.
+The core solver is implemented in :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
 
 Conceptually, the solver:
     1. Builds a regular grid in log10(T) between user-specified bounds.
@@ -90,7 +90,31 @@ Example
 
 Overview of the XRTDEMIterative API
 -----------------------------------
-The main entry point is :class:`xrtpy.xrt_dem_iterative.dem_solver.XRTDEMIterative`.
+The main entry point is :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
+    """
+    Construct the regular log10 temperature grid used for DEM calculations.
+
+    This builds a uniformly spaced grid in :math:`\\log_{10}(T)` between
+    ``minimum_bound_temperature`` and ``maximum_bound_temperature``, using
+    ``logarithmic_temperature_step_size``. The linear temperature grid is then
+    computed as :math:`T = 10^{\\log_{10}(T)}` in Kelvin.
+
+    Notes
+    -----
+    This mirrors the "regular logT grid" used by the IDL routine
+    ``xrt_dem_iterative2.pro``.
+
+    Attributes created
+    ------------------
+    logT : `~numpy.ndarray`
+        The regular :math:`\\log_{10}(T)` grid (dimensionless).
+    T : `~astropy.units.Quantity`
+        The linear temperature grid in Kelvin.
+    dlogT : float
+        Step size in :math:`\\log_{10}(T)`.
+    dlnT : float
+        Step size in :math:`\\ln(T)`, computed as ``np.log(10) * dlogT``.
+    """
 
 
 
