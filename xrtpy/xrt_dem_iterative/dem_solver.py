@@ -504,25 +504,28 @@ class XRTDEMIterative:
 
     def create_logT_grid(self):
         """
-        Construct the regular log10 temperature grid for DEM calculations.
+        Construct the regular log10 temperature grid used for DEM calculations.
 
-        This builds a regularly spaced grid in log10(temperature), then converts it
-        to linear temperature for use in the DEM integral.
+        This builds a uniformly spaced grid in :math:`\\log_{10}(T)` between
+        ``minimum_bound_temperature`` and ``maximum_bound_temperature``, using
+        ``logarithmic_temperature_step_size``. The linear temperature grid is then
+        computed as :math:`T = 10^{\\log_{10}(T)}` in Kelvin.
 
         Notes
         -----
-        - IDL's `xrt_dem_iterative2.pro` describes this as the "regular logT grid".
-        - Two forms of the temperature grid are stored:
-            * self.logT : log10(T) values (dimensionless)
-            * self.T    : linear temperatures (Kelvin, astropy.units.Quantity)
-        - The grid is inclusive of both `minimum_bound_temperature` and `maximum_bound_temperature`, with step size `logarithmic_temperature_step_size`.
+        This mirrors the "regular logT grid" used by the IDL routine
+        ``xrt_dem_iterative2.pro``.
 
-        Additional attributes created:
-        - self.dlogT : float
-            Step size in log10(T) (dimensionless).
-        - self.dlnT : float
-            Step size in natural log(T). Useful for IDL-style integrals of the form:
-                F = int. DEM(T) * R(T) * T d(ln T)
+        Attributes created
+        ------------------
+        logT : `~numpy.ndarray`
+            The regular :math:`\\log_{10}(T)` grid (dimensionless).
+        T : `~astropy.units.Quantity`
+            The linear temperature grid in Kelvin.
+        dlogT : float
+            Step size in :math:`\\log_{10}(T)`.
+        dlnT : float
+            Step size in :math:`\\ln(T)`, computed as ``np.log(10) * dlogT``.
         """
         # number of bins including endpoints - if default values are used - end value is 26
         self.n_bins = (
