@@ -498,7 +498,7 @@ class XRTDEMIterative:
     def max_iterations(self):
         """
         Maximum number of iterations allowed in the least-squares DEM solver
-        (e.g., when using `lmfit.minimize`). Default is 2000.
+        (e.g., when using `lmfit.minimize <https://lmfit.github.io/lmfit-py/>`__). Default is 2000.
         """
         return self._max_iterations
 
@@ -570,7 +570,7 @@ class XRTDEMIterative:
         grid defined by self.logT. Extrapolated values outside the native
         response range are set to zero.
 
-        Equivalent to the "Res_Mat" construction in the IDL routine xrt_dem_iterative2.pro.
+        Equivalent to the ``Res_Mat`` construction in the IDL routine xrt_dem_iterative2.pro.
 
         Notes
         -----
@@ -583,7 +583,7 @@ class XRTDEMIterative:
         Interpolate all filter responses onto the common logT grid and build
         the response matrix.
 
-        Equivalent to constructing `Res_Mat` in IDL's `xrt_dem_iterative2.pro`
+        Equivalent to constructing ``Res_Mat`` in IDL's `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__
         and in the DEM_Solver PDF documentation.
 
         Attributes Created
