@@ -91,30 +91,32 @@ Example
 Overview of the XRTDEMIterative API
 -----------------------------------
 The main entry point is :class:`xrtpy.xrt_dem_iterative.XRTDEMIterative`.
-    """
-    Construct the regular log10 temperature grid used for DEM calculations.
 
-    This builds a uniformly spaced grid in :math:`\\log_{10}(T)` between
-    ``minimum_bound_temperature`` and ``maximum_bound_temperature``, using
-    ``logarithmic_temperature_step_size``. The linear temperature grid is then
-    computed as :math:`T = 10^{\\log_{10}(T)}` in Kelvin.
+LogT grid construction
+~~~~~~~~~~~~~~~~~~~~~~
+The solver constructs a uniformly spaced grid in :math:`\log_{10}(T)` between
+``minimum_bound_temperature`` and ``maximum_bound_temperature`` using
+``logarithmic_temperature_step_size``. The linear temperature grid is then computed as
+:math:`T = 10^{\log_{10}(T)}` (Kelvin).
 
-    Notes
-    -----
-    This mirrors the "regular logT grid" used by the IDL routine
-    ``xrt_dem_iterative2.pro``.
+.. rubric:: Notes
 
-    Attributes created
-    ------------------
-    logT : `~numpy.ndarray`
-        The regular :math:`\\log_{10}(T)` grid (dimensionless).
-    T : `~astropy.units.Quantity`
-        The linear temperature grid in Kelvin.
-    dlogT : float
-        Step size in :math:`\\log_{10}(T)`.
-    dlnT : float
-        Step size in :math:`\\ln(T)`, computed as ``np.log(10) * dlogT``.
-    """
+This mirrors the "regular logT grid" used by the IDL routine ``xrt_dem_iterative2.pro``.
+
+.. rubric:: Attributes created
+
+logT : `~numpy.ndarray`
+    The regular :math:`\log_{10}(T)` grid (dimensionless).
+
+T : `~astropy.units.Quantity`
+    The linear temperature grid in Kelvin.
+
+dlogT : float
+    Step size in :math:`\log_{10}(T)`.
+
+dlnT : float
+    Step size in :math:`\ln(T)`, computed as ``np.log(10) * dlogT``.
+
 
 
 
