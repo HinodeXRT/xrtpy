@@ -6,13 +6,11 @@ from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
-
 from scipy.io import readsav
 
-#from xrtpy.response.tools import generate_temperature_responses
+# from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.response.tools.multi_filter_response import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
-
 
 
 def case_dir(case_name: str) -> Path:
@@ -59,7 +57,9 @@ def read_mc_intensities_csv(csv_path: str | Path) -> MonteCarloInputs:
         # try case-insensitive match
         matches = [c for c in df.columns if c.strip().lower() == "run"]
         if not matches:
-            raise ValueError(f"CSV missing a 'run' column. Found columns: {list(df.columns)}")
+            raise ValueError(
+                f"CSV missing a 'run' column. Found columns: {list(df.columns)}"
+            )
         df = df.rename(columns={matches[0]: "run"})
 
     # normalize run
@@ -86,7 +86,7 @@ def read_mc_intensities_csv(csv_path: str | Path) -> MonteCarloInputs:
     for c in filters:
         df[c] = pd.to_numeric(df[c], errors="raise").astype(float)
 
-    mc_intensities = df[filters].to_numpy(dtype=float) #(n_runs, n_filters)
+    mc_intensities = df[filters].to_numpy(dtype=float)  # (n_runs, n_filters)
 
     # No NaNs - but shoudn't have any
     if not np.isfinite(mc_intensities).all():
@@ -96,14 +96,13 @@ def read_mc_intensities_csv(csv_path: str | Path) -> MonteCarloInputs:
     return MonteCarloInputs(df=df, filters=filters, mc_intensities=mc_intensities)
 
 
-
 @dataclass(frozen=True)
 class DemBatchResult:
     filters: list[str]
-    logT: np.ndarray# (nT,)
-    dem_runs: np.ndarray# (n_runs, nT)
-    modeled_runs: np.ndarray # (n_runs, n_filters)
-    chisq_runs: np.ndarray# (n_runs,)
+    logT: np.ndarray  # (nT,)
+    dem_runs: np.ndarray  # (n_runs, nT)
+    modeled_runs: np.ndarray  # (n_runs, n_filters)
+    chisq_runs: np.ndarray  # (n_runs,)
 
 
 def run_dem_for_mc_csv(
@@ -172,9 +171,11 @@ def run_dem_for_mc_csv(
 
 @dataclass(frozen=True)
 class IDLDemResult:
-    logT: np.ndarray# (nT,)
-    dem_runs: np.ndarray# (n_runs, nT)   (runs exclude base or include base depending on file)
-    dem_base: np.ndarray # (nT,)
+    logT: np.ndarray  # (nT,)
+    dem_runs: (
+        np.ndarray
+    )  # (n_runs, nT)   (runs exclude base or include base depending on file)
+    dem_base: np.ndarray  # (nT,)
     n_runs: int
 
 
@@ -224,12 +225,19 @@ def load_idl_dem_sav(sav_path: str | Path) -> IDLDemResult:
         - dem_base (nT,)
         - dem_runs (n_runs, nT)  (MC only, base removed)
     """
-    
+
     data = readsav(str(sav_path), python_dict=True)
 
     # Be flexible about key names
     # Your newer IDL saver used logT_out/dem_out; older might be logt/dem_mc/dem
-    logT_key_candidates = ["logT_out", "logt_out", "logt", "logT", "logT_mc", "logT_idl"]
+    logT_key_candidates = [
+        "logT_out",
+        "logt_out",
+        "logt",
+        "logT",
+        "logT_mc",
+        "logT_idl",
+    ]
     dem_key_candidates = ["dem_out", "dem_mc", "dem", "dem0"]
 
     logT = None

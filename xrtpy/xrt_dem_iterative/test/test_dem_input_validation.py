@@ -95,8 +95,8 @@ def test_validate_inputs_rejects_mismatched_intensity_errors():
 
 def test_create_logT_grid():
 
-    filters = ["Al-poly/Ti-poly","C-poly","Be-thin"]
-    intensities = np.array([150.0,670.0,392.0])
+    filters = ["Al-poly/Ti-poly", "C-poly", "Be-thin"]
+    intensities = np.array([150.0, 670.0, 392.0])
     responses = generate_temperature_responses(filters, "2018-10-27T00:00:00")
 
     x = XRTDEMIterative(
@@ -134,7 +134,7 @@ def test_create_logT_grid():
 
 
 def test_estimate_initial_dem_returns_flat_log_dem_zero():
-    filters = ["Al-poly", "Ti-poly","Al-thick"]
+    filters = ["Al-poly", "Ti-poly", "Al-thick"]
     intensities = np.array([150.2, 230.0, 1321.1])
     responses = generate_temperature_responses(filters, "2012-10-27T23:02:00")
 
@@ -183,11 +183,9 @@ def test_prepare_spline_system_initializes_all_solver_state():
         temperature_responses=responses,
     )
 
-
     x.create_logT_grid()
     x._interpolate_responses_to_grid()
     x._estimate_initial_dem()  # sets _initial_log_dem
-
 
     x._prepare_spline_system()
 
@@ -267,7 +265,7 @@ def test_solve_single_dem_returns_zeros_when_all_intensities_zero():
     """
     # filterwarnings = ignore:No intensity_errors provided
 
-    filters = ["Al-poly", "Ti-poly","Al-mesh"]
+    filters = ["Al-poly", "Ti-poly", "Al-mesh"]
     intensities = np.array([0.0, 0.0, 0])  # all zero → triggers nosolve
     responses = generate_temperature_responses(filters, "2022-11-27T00:00:00")
 
@@ -300,6 +298,7 @@ def test_solve_single_dem_returns_zeros_when_all_intensities_zero():
     assert dem.shape == x.logT.shape
     assert modeled.shape == intensities.shape
 
+
 def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
     """
     Monte Carlo DEM runs should produce DEMs that differ from the base DEM
@@ -313,7 +312,9 @@ def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
     """
     filters = ["Al-poly", "Ti-poly", "Be-thin"]
     intensities = np.array([2300.0, 1500.0, 800.0], dtype=float)
-    intensity_errors = 0.2 * intensities  # explicit sigma -> avoids warning and ensures perturbations
+    intensity_errors = (
+        0.2 * intensities
+    )  # explicit sigma -> avoids warning and ensures perturbations
     responses = generate_temperature_responses(filters, "2012-10-27T08:23:54")
     n_runs = 5
 
@@ -347,6 +348,7 @@ def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
     assert np.all(np.isfinite(x.mc_dem)) and np.all(x.mc_dem >= 0.0)
     assert np.all(np.isfinite(x.mc_mod_obs))
     assert np.all(np.isfinite(x.mc_chisq))
+
 
 def test_reconstruct_dem_from_knots_matches_endpoints_and_is_finite():
     filters = ["Al-poly"]
@@ -447,6 +449,7 @@ def test_solve_end_to_end_produces_finite_dem_and_mc_outputs():
     ]
     assert any(different_mod)
 
+
 def test_warns_when_intensity_exceeds_physical_xrt_limit():
     filters = ["Al-poly", "Ti-poly"]
     intensities = np.array([4200.0, 1800.0], dtype=float)
@@ -456,6 +459,7 @@ def test_warns_when_intensity_exceeds_physical_xrt_limit():
 
     with pytest.warns(UserWarning, match=r"observed intensit"):
         x.validate_inputs()
+
 
 def test_warns_when_intensity_is_negative():
     filters = ["Al-poly", "Ti-poly"]
