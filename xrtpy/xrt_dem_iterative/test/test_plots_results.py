@@ -12,9 +12,17 @@ from utils_case_io import (
 
 #NOTE-User will need Python 3.11 to run
 
-CASE_DIR = case_dir("case_20080104_110426")
-csv_path = CASE_DIR / "mc_intensities_20080104_110426_IDL.csv"
-idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_20080104_110426_MCITER100.sav")
+# CASE_DIR = case_dir("case_20210720_1604")
+# csv_path = CASE_DIR / "mc_intensities_20210720_1604_IDL.csv"
+# idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_20210720_1604_MCITER100.sav")
+# observation_date = "2021-07-20T16:04"
+
+CASE_DIR = case_dir("case_20260107_124503")
+csv_path = CASE_DIR / "mc_intensities_20260107_124503_IDL.csv"
+idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_20260107_124503_MCITER100.sav")
+observation_date = "2026-01-07T12:45:03"
+
+
 mc = read_mc_intensities_csv(csv_path)
 
 
@@ -22,12 +30,12 @@ print(mc.filters)
 print(mc.mc_intensities.shape)  # (N, n_filters)
 print(mc.df.head())
 
-observation_date = "2008-01-04T11:04:26"
+
 
 out = run_dem_for_mc_csv(
     csv_path=csv_path,
     observation_date=observation_date,
-    intensity_errors=[ 8.9914,6.6961,2.3677, 3.9784,0.4987]#None,  # keep None to match IDL default behavior
+    intensity_errors=None,  # keep None to match IDL default behavior
 )
 
 #import pdb; pdb.set_trace()
@@ -193,7 +201,7 @@ ymax += pad
 # -------------------------
 # SECTION 1: Save overlay PNGs
 # -------------------------
-plots_dir = CASE_DIR / "plots_overlay_first10"
+plots_dir = CASE_DIR / "plots_overlay"
 plots_dir.mkdir(parents=True, exist_ok=True)
 
 for k, run in enumerate(runs_to_plot):
@@ -315,7 +323,7 @@ delta_band = None          # e.g. 0.10 for ±0.10 dex band, or None to disable
 # -------------------------
 # SECTION 1: Save professional PNGs (2 panels)
 # -------------------------
-plots_dir = CASE_DIR / "plots_overlay_professional"
+plots_dir = CASE_DIR / "plots_overlay_w_diff"
 plots_dir.mkdir(parents=True, exist_ok=True)
 
 for k, run in enumerate(runs_to_plot):
@@ -439,33 +447,44 @@ print(f"Saved {len(runs_to_plot)} professional plots to: {plots_dir}")
 # plt.close(fig)
 
 # print(f"Movie saved to: {movie_path}")
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.collections import LineCollection
+
+def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
+    return np.log10(np.maximum(dem, floor))
 
 # -------------------------
-# Bottom-panel "major" logT points
+# Inputs assumed to exist:
+#   logT (nT,)
+#   log_idl_10 (n_runs, nT)
+#   log_py_10  (n_runs, nT)
+#   runs_to_plot (list of run numbers, 1-based)
+#   ymin, ymax
+#   plots_dir (Path)
 # -------------------------
-major_logT = np.arange(5.0, 8.0 + 1e-9, 0.5)  # 5.0, 5.5, ... 8.0
 
-# For each major temp, pick the nearest index in the logT grid
+# Major points: only keep ones inside the grid
+major_logT = np.arange(5.0, 8.0 + 1e-9, 0.5)
+major_logT = major_logT[(major_logT >= logT.min() - 1e-9) & (major_logT <= logT.max() + 1e-9)]
+
 major_idx = np.array([int(np.argmin(np.abs(logT - t))) for t in major_logT])
-major_x = logT[major_idx]  # actual grid values used (closest to requested)
+major_x = logT[major_idx]
 
-# Compute delta(logDEM) for all frames/runs we are animating
-# shape: (n_frames, 26)
-delta_all = log_py_10 - log_idl_10
+# Delta across frames
+delta_all = log_py_10 - log_idl_10                  # (n_frames, nT)
+sigma_delta = np.std(delta_all, axis=0)             # (nT,)
+sigma_major = sigma_delta[major_idx]                # (n_major,)
 
-# Error bars: 1-sigma across frames at each temperature bin (professional context)
-# shape: (26,)
-sigma_delta = np.std(delta_all, axis=0)
-
-# Only at the major points:
-sigma_major = sigma_delta[major_idx]
+# Stable y-range for bottom panel
+dmin = float(np.min(delta_all[:, major_idx]))
+dmax = float(np.max(delta_all[:, major_idx]))
+pad = 0.15 * (dmax - dmin) if dmax > dmin else 0.5
+ax_bot_ylim = (dmin - pad, dmax + pad)
 
 # -------------------------
-# Figure with two subplots
+# Figure + axes
 # -------------------------
 fig = plt.figure(figsize=(9, 7))
 gs = fig.add_gridspec(nrows=2, ncols=1, height_ratios=[3, 1], hspace=0.12)
@@ -483,62 +502,80 @@ ax_top.set_ylabel("log10(DEM)")
 ax_top.grid(True, alpha=0.3)
 ax_top.legend(loc="best")
 
-# Bottom: delta points with error bars (we'll update their y-values each frame)
-# We create an "errorbar container" once and then update the data each frame.
-eb = ax_bot.errorbar(
-    major_x,
-    np.zeros_like(major_x),
-    yerr=sigma_major,
-    fmt="o",
-    capsize=3,
-    elinewidth=1,
-    color='Black'
-)
-
+# Bottom baseline
 ax_bot.axhline(0.0, linewidth=1, alpha=0.8)
 ax_bot.set_xlabel("log T (K)")
 ax_bot.set_ylabel("Δ log10(DEM)\n(XRTpy - IDL)")
 ax_bot.grid(True, alpha=0.3)
+ax_bot.set_ylim(*ax_bot_ylim)
 
-# Set a reasonable fixed y-range for delta based on overall spread
-# (prevents the bottom axis from jumping around frame-to-frame)
-dmin = float(np.min(delta_all[:, major_idx]))
-dmax = float(np.max(delta_all[:, major_idx]))
-pad = 0.15 * (dmax - dmin) if dmax > dmin else 0.5
-ax_bot.set_ylim(dmin - pad, dmax + pad)
-
-# Prevent top subplot from repeating x tick labels
 plt.setp(ax_top.get_xticklabels(), visible=False)
 
-def update(frame: int):
-    run = runs_to_plot[frame]  # run number (1-based in your setup)
+# -------------------------
+# Build animated "errorbar" artists manually
+# -------------------------
+# Markers
+(points_line,) = ax_bot.plot(major_x, np.zeros_like(major_x), "o", markersize=5, color="black")
 
-    # Top panel
+# Vertical error segments (LineCollection)
+def make_vsegments(y_major):
+    # segments shape: (n_major, 2, 2) => [ [ [x,ylo],[x,yhi] ], ...]
+    ylo = y_major - sigma_major
+    yhi = y_major + sigma_major
+    segs = np.zeros((len(major_x), 2, 2), dtype=float)
+    segs[:, 0, 0] = major_x
+    segs[:, 1, 0] = major_x
+    segs[:, 0, 1] = ylo
+    segs[:, 1, 1] = yhi
+    return segs
+
+# Caps (small horizontal lines at top/bottom)
+cap_halfwidth = 0.03  # in logT units (adjust if you want)
+def make_capsegs(y_major):
+    ylo = y_major - sigma_major
+    yhi = y_major + sigma_major
+
+    segs = []
+    for x, yl, yh in zip(major_x, ylo, yhi):
+        segs.append([[x - cap_halfwidth, yl], [x + cap_halfwidth, yl]])
+        segs.append([[x - cap_halfwidth, yh], [x + cap_halfwidth, yh]])
+    return np.array(segs, dtype=float)
+
+vlines = LineCollection(make_vsegments(np.zeros_like(major_x)), colors="black", linewidths=1.0)
+caps   = LineCollection(make_capsegs(np.zeros_like(major_x)), colors="black", linewidths=1.0)
+ax_bot.add_collection(vlines)
+ax_bot.add_collection(caps)
+
+# -------------------------
+# Update function
+# -------------------------
+def update(frame: int):
+    run = runs_to_plot[frame]  # 1-based run label
+
+    # Top
     ax_top.set_title(f"DEM Overlay (Run {run})")
     line_idl.set_data(logT, log_idl_10[frame])
     line_py.set_data(logT,  log_py_10[frame])
 
-    # Bottom panel: delta at major temp points
+    # Bottom
     y_major = delta_all[frame, major_idx]
+    points_line.set_data(major_x, y_major)
 
-    # Update errorbar artist:
-    # eb.lines[0] is the marker/line for the data points
-    eb.lines[0].set_data(major_x, y_major)
+    vlines.set_segments(make_vsegments(y_major))
+    caps.set_segments(make_capsegs(y_major))
 
-    # Return artists for blitting (we'll keep blit=False for robustness)
-    return (line_idl, line_py, eb.lines[0])
+    return (line_idl, line_py, points_line, vlines, caps)
 
 ani = animation.FuncAnimation(
     fig,
     update,
     frames=len(runs_to_plot),
-    blit=False,
+    blit=False,  # keep robust
 )
 
-movie_path = plots_dir / "dem_overlay_first10_science.mp4"
-
+movie_path = plots_dir / "dem_overlay_with_diff.mp4"
 writer = animation.FFMpegWriter(
-    fps=7.5,  # <-- make faster/slower here
+    fps=7.5,          # increase -> faster
     metadata={"artist": "xrtpy"},
     bitrate=1800,
 )
@@ -546,7 +583,114 @@ writer = animation.FFMpegWriter(
 ani.save(movie_path, writer=writer, dpi=200)
 plt.close(fig)
 
-print(f"Science-style movie saved to: {movie_path}")
+print(f"Movie saved to: {movie_path}")
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import matplotlib.animation as animation
+
+# # -------------------------
+# # Bottom-panel "major" logT points
+# # -------------------------
+# major_logT = np.arange(5.0, 8.0 + 1e-9, 0.5)  # 5.0, 5.5, ... 8.0
+
+# # For each major temp, pick the nearest index in the logT grid
+# major_idx = np.array([int(np.argmin(np.abs(logT - t))) for t in major_logT])
+# major_x = logT[major_idx]  # actual grid values used (closest to requested)
+
+# # Compute delta(logDEM) for all frames/runs we are animating
+# # shape: (n_frames, 26)
+# delta_all = log_py_10 - log_idl_10
+
+# # Error bars: 1-sigma across frames at each temperature bin (professional context)
+# # shape: (26,)
+# sigma_delta = np.std(delta_all, axis=0)
+
+# # Only at the major points:
+# sigma_major = sigma_delta[major_idx]
+
+# # -------------------------
+# # Figure with two subplots
+# # -------------------------
+# fig = plt.figure(figsize=(9, 7))
+# gs = fig.add_gridspec(nrows=2, ncols=1, height_ratios=[3, 1], hspace=0.12)
+
+# ax_top = fig.add_subplot(gs[0, 0])
+# ax_bot = fig.add_subplot(gs[1, 0], sharex=ax_top)
+
+# # Top lines
+# (line_idl,) = ax_top.plot([], [], linewidth=2, label="IDL")
+# (line_py,)  = ax_top.plot([], [], linewidth=2, linestyle="--", label="XRTpy")
+
+# ax_top.set_xlim(float(logT.min()), float(logT.max()))
+# ax_top.set_ylim(ymin, ymax)
+# ax_top.set_ylabel("log10(DEM)")
+# ax_top.grid(True, alpha=0.3)
+# ax_top.legend(loc="best")
+
+# # Bottom: delta points with error bars (we'll update their y-values each frame)
+# # We create an "errorbar container" once and then update the data each frame.
+# eb = ax_bot.errorbar(
+#     major_x,
+#     np.zeros_like(major_x),
+#     yerr=sigma_major,
+#     fmt="o",
+#     capsize=3,
+#     elinewidth=1,
+#     color='Black'
+# )
+
+# ax_bot.axhline(0.0, linewidth=1, alpha=0.8)
+# ax_bot.set_xlabel("log T (K)")
+# ax_bot.set_ylabel("Δ log10(DEM)\n(XRTpy - IDL)")
+# ax_bot.grid(True, alpha=0.3)
+
+# # Set a reasonable fixed y-range for delta based on overall spread
+# # (prevents the bottom axis from jumping around frame-to-frame)
+# dmin = float(np.min(delta_all[:, major_idx]))
+# dmax = float(np.max(delta_all[:, major_idx]))
+# pad = 0.15 * (dmax - dmin) if dmax > dmin else 0.5
+# ax_bot.set_ylim(dmin - pad, dmax + pad)
+
+# # Prevent top subplot from repeating x tick labels
+# plt.setp(ax_top.get_xticklabels(), visible=False)
+
+# def update(frame: int):
+#     run = runs_to_plot[frame]  # run number (1-based in your setup)
+
+#     # Top panel
+#     ax_top.set_title(f"DEM Overlay (Run {run})")
+#     line_idl.set_data(logT, log_idl_10[frame])
+#     line_py.set_data(logT,  log_py_10[frame])
+
+#     # Bottom panel: delta at major temp points
+#     y_major = delta_all[frame, major_idx]
+
+#     # Update errorbar artist:
+#     # eb.lines[0] is the marker/line for the data points
+#     eb.lines[0].set_data(major_x, y_major)
+
+#     # Return artists for blitting (we'll keep blit=False for robustness)
+#     return (line_idl, line_py, eb.lines[0])
+
+# ani = animation.FuncAnimation(
+#     fig,
+#     update,
+#     frames=len(runs_to_plot),
+#     blit=False,
+# )
+
+# movie_path = plots_dir / "dem_overlay_with_diff.mp4"
+
+# writer = animation.FFMpegWriter(
+#     fps=7.5,  # <-- make faster/slower here
+#     metadata={"artist": "xrtpy"},
+#     bitrate=1800,
+# )
+
+# ani.save(movie_path, writer=writer, dpi=200)
+# plt.close(fig)
+
+# print(f"Science-style movie saved to: {movie_path}")
 ######
 
 # Single plot: overlay ALL XRTpy DEM runs on one figure (log10 DEM vs logT)
@@ -736,99 +880,3 @@ fig.savefig(out_png, dpi=300)
 plt.close(fig)
 
 print(f"Saved: {out_png}")
-######
-# def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
-#     dem = np.asarray(dem, dtype=float)
-#     return np.log10(np.maximum(dem, floor))
-
-# def _run_metrics(log_idl: np.ndarray, log_py: np.ndarray, dem_floor: float = 1e-20):
-#     """
-#     Returns (mean_abs_diff, max_abs_diff, n_used_bins) using a mask that ignores bins
-#     where both DEMs are ~zero (physically irrelevant tails).
-#     """
-#     # mask in linear space
-#     idl_lin = 10 ** log_idl
-#     py_lin = 10 ** log_py
-#     mask = (idl_lin > dem_floor) | (py_lin > dem_floor)
-
-#     if not np.any(mask):
-#         # nothing to compare (both essentially zero everywhere)
-#         return 0.0, 0.0, 0
-
-#     diff = log_py[mask] - log_idl[mask]
-#     mean_abs = float(np.mean(np.abs(diff)))
-#     max_abs = float(np.max(np.abs(diff)))
-#     return mean_abs, max_abs, int(mask.sum())
-
-# # ----------------------------
-# # 101 DEM comparisons
-# # ----------------------------
-
-# # 1) IDL log-space arrays
-# log_idl_base = _log10_dem(idl.dem_base)          # (26,)
-# log_idl_mc   = _log10_dem(idl.dem_runs)          # (100, 26)
-
-# # 2) Python: base DEM + MC DEMs
-# # You already computed MC DEMs in `out.dem_runs` (100, 26).
-# # Now compute base DEM ONCE using the base intensities you used in IDL.
-
-# base_intensities = np.array([197.823884, 172.347778, 43.104172, 86.083239, 5.400697], dtype=float)
-# filters = ["Be-med", "Al-mesh", "Ti-poly", "Al-poly", "Be-thin"]
-# observation_date = "2008-01-04T11:04:26"
-
-# responses = generate_temperature_responses(filters, observation_date)
-# base_solver = XRTDEMIterative(
-#     observed_channel=filters,
-#     observed_intensities=base_intensities,
-#     temperature_responses=responses,
-#     monte_carlo_runs=0,  # explicit base only
-# )
-# base_solver.solve()
-# py_dem_base = np.asarray(base_solver.dem, dtype=float)        # (26,)
-# log_py_base = _log10_dem(py_dem_base)
-
-# log_py_mc = _log10_dem(out.dem_runs)                          # (100, 26)
-
-# # 3) Sanity checks (shapes + grid)
-# assert idl.logT.shape == base_solver.logT.shape == out.logT.shape
-# assert np.allclose(idl.logT, out.logT, atol=1e-10)
-# assert log_idl_mc.shape == log_py_mc.shape == (100, len(idl.logT))
-
-# # 4) Metrics for base + 100 runs
-# dem_floor = 1e-20
-# mean_tol = 0.35   # dex (start here, tighten later)
-# max_tol  = 0.90   # dex
-
-# results = []
-
-# # Run 0: base
-# m, M, nmask = _run_metrics(log_idl_base, log_py_base, dem_floor=dem_floor)
-# results.append(("base", m, M, nmask))
-
-# # Runs 1..100: MC
-# for i in range(100):
-#     m, M, nmask = _run_metrics(log_idl_mc[i], log_py_mc[i], dem_floor=dem_floor)
-#     results.append((f"mc_{i+1:03d}", m, M, nmask))
-
-# # 5) Summarize
-# means = np.array([r[1] for r in results], dtype=float)
-# maxes = np.array([r[2] for r in results], dtype=float)
-
-# print("\nPer-run DEM comparison (IDL vs XRTpy)")
-# print(f"  runs compared: {len(results)} (base + 100 MC)")
-# print(f"  dem_floor: {dem_floor:g}")
-# print(f"  mean|Δlog10DEM|: median={np.median(means):.3f}  max={means.max():.3f}")
-# print(f"  max |Δlog10DEM|: median={np.median(maxes):.3f}  max={maxes.max():.3f}")
-
-# # 6) Fail logic (strict all-pass; you can relax later)
-# failed = [(name, m, M, nmask) for (name, m, M, nmask) in results if (m > mean_tol) or (M > max_tol)]
-# if failed:
-#     print("\nWorst offenders (up to 10):")
-#     failed_sorted = sorted(failed, key=lambda x: (x[1], x[2]), reverse=True)[:10]
-#     for name, m, M, nmask in failed_sorted:
-#         print(f"  {name}: mean={m:.3f} dex, max={M:.3f} dex, bins_used={nmask}")
-
-#     raise AssertionError(
-#         f"{len(failed)}/{len(results)} runs exceeded tolerances "
-#         f"(mean_tol={mean_tol}, max_tol={max_tol})."
-#     )

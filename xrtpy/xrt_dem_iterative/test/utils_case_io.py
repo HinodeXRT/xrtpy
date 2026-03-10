@@ -128,6 +128,24 @@ def run_dem_for_mc_csv(
     # Generate temperature responses once
     responses = generate_temperature_responses(filters, observation_date)
 
+
+
+    # ---- Ensure intensity_errors length matches number of filters ----
+    n_filters = len(filters)
+
+    if intensity_errors is not None:
+        # allow scalar -> broadcast
+        if np.isscalar(intensity_errors):
+            intensity_errors = np.full(n_filters, float(intensity_errors), dtype=float)
+        else:
+            intensity_errors = np.asarray(intensity_errors, dtype=float)
+            if intensity_errors.shape[0] != n_filters:
+                raise ValueError(
+                    f"intensity_errors length ({intensity_errors.shape[0]}) must match "
+                    f"number of filters ({n_filters}). Filters={filters}"
+                )
+                
+            
     # Create a solver "template" once (we'll reuse and only replace intensities)
     solver = XRTDEMIterative(
         observed_channel=filters,
