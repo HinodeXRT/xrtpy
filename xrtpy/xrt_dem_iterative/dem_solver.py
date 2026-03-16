@@ -789,7 +789,13 @@ class XRTDEMIterative:
 
         # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 1.0 NOV20
         # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 0.0 #NOTEFORJOY
-        est_log_dem_on_grid = np.zeros_like(self.logT)
+        
+        ###
+        est_log_dem_on_grid = np.zeros_like(self.logT) ####### JOY HERE!!!!!!!!
+        #March 12, 2026 
+        #est_log_dem_on_grid = np.ones_like(self.logT)
+        #####
+        
 
         # Return the intial first guessed DEM
 
@@ -862,6 +868,7 @@ class XRTDEMIterative:
 
         params = Parameters()
 
+        #March 12, 2026 
         for i in range(self.n_spl):
             params.add(
                 f"knot_{i}",
@@ -870,6 +877,14 @@ class XRTDEMIterative:
                 max=0.0,
                 vary=True,
             )
+        # for i in range(self.n_spl):
+        #     params.add(
+        #         f"knot_{i}",
+        #         value=float(self.spline_log_dem[i]),
+        #         min=-20.0,
+        #         vary=True,
+        #     )
+        ##### JOY HERE!!!!!!!!!
 
         return params
 

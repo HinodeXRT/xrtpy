@@ -17,6 +17,11 @@ csv_path = CASE_DIR / "mc_intensities_20080104_110426_IDL.csv"
 idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_20080104_110426_MCITER100.sav")
 mc = read_mc_intensities_csv(csv_path)
 
+# CASE_DIR = case_dir("case_20080104_110426")
+# csv_path = CASE_DIR / "mc_intensities_20080104_110426_IDL.csv"
+# idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_20260107_124503_MCITER100.sav")
+# mc = read_mc_intensities_csv(csv_path)
+
 
 print(mc.filters)
 print(mc.mc_intensities.shape)  # (N, n_filters)
