@@ -791,7 +791,8 @@ class XRTDEMIterative:
         # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 0.0 #NOTEFORJOY
         
         ###
-        est_log_dem_on_grid = np.zeros_like(self.logT) ####### JOY HERE!!!!!!!!
+        #est_log_dem_on_grid = np.zeros_like(self.logT) ####### JOY HERE!!!!!!!! March2026
+        est_log_dem_on_grid = np.ones_like(self.logT)
         #March 12, 2026 
         #est_log_dem_on_grid = np.ones_like(self.logT)
         #####
@@ -868,22 +869,23 @@ class XRTDEMIterative:
 
         params = Parameters()
 
-        #March 12, 2026 
-        for i in range(self.n_spl):
-            params.add(
-                f"knot_{i}",
-                value=float(self.spline_log_dem[i]),
-                min=-20.0,
-                max=0.0,
-                vary=True,
-            )
+        #March 16, 2026 
         # for i in range(self.n_spl):
         #     params.add(
         #         f"knot_{i}",
         #         value=float(self.spline_log_dem[i]),
         #         min=-20.0,
+        #         max=0.0,
         #         vary=True,
         #     )
+        for i in range(self.n_spl):
+            params.add(
+                f"knot_{i}",
+                value=float(self.spline_log_dem[i]),
+                min=-20.0,
+                vary=True,
+            )
+
         ##### JOY HERE!!!!!!!!!
 
         return params
@@ -900,6 +902,7 @@ class XRTDEMIterative:
         # Or used the code above but switch from linear to kind="cubic"
         cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
         log_dem = cs(self.logT)
+        log_dem = np.clip(log_dem, -300.0, 300.0) #JOY-MARCH 2026!!!!!!!
         dem = 10.0**log_dem
         return dem
 
@@ -985,84 +988,85 @@ class XRTDEMIterative:
 
         return dem_phys, modeled_intensities_phys, chisq, result
 
-    def _run_monte_carlo(self):
-        """
-        Replicates IDL's Monte Carlo loop.
-        Produces:
-            - self.mc_dem           shape (n_T, N+1)
-            - self.mc_base_obs      shape (n_obs, N+1)
-            - self.mc_mod_obs       shape (n_obs, N+1)
-            - self.mc_chisq         shape (N+1,)
+    # _run_monte_carlo never reference after all
+    # def _run_monte_carlo(self):
+    #     """
+    #     Replicates IDL's Monte Carlo loop.
+    #     Produces:
+    #         - self.mc_dem           shape (n_T, N+1)
+    #         - self.mc_base_obs      shape (n_obs, N+1)
+    #         - self.mc_mod_obs       shape (n_obs, N+1)
+    #         - self.mc_chisq         shape (N+1,)
 
-        Note that N+1 rows means: row 0 = base case, rows 1..N = MC.
-        """
+    #     Note that N+1 rows means: row 0 = base case, rows 1..N = MC.
+    #     """
 
-        n_obs = len(self._observed_intensities)
-        nT = len(self.logT)
-        N = self._monte_carlo_runs
+    #     n_obs = len(self._observed_intensities)
+    #     nT = len(self.logT)
+    #     N = self._monte_carlo_runs
 
-        # Prepare arrays
-        mc_dem = np.zeros((nT, N + 1))
-        mc_base = np.zeros((n_obs, N + 1))
-        mc_mod = np.zeros((n_obs, N + 1))
-        mc_chi = np.zeros(N + 1)
+    #     # Prepare arrays
+    #     mc_dem = np.zeros((nT, N + 1))
+    #     mc_base = np.zeros((n_obs, N + 1))
+    #     mc_mod = np.zeros((n_obs, N + 1))
+    #     mc_chi = np.zeros(N + 1)
 
-        # Base run first (IDL puts real data in column 0)
-        dem = self.dem  # already scaled back by normalization
-        mc_dem[:, 0] = dem
-        mc_base[:, 0] = self._observed_intensities  # unscaled
-        mc_mod[:, 0] = self.modeled_intensities  # unscaled
-        mc_chi[0] = self.current_chi2
+    #     # Base run first (IDL puts real data in column 0)
+    #     dem = self.dem  # already scaled back by normalization
+    #     mc_dem[:, 0] = dem
+    #     mc_base[:, 0] = self._observed_intensities  # unscaled
+    #     mc_mod[:, 0] = self.modeled_intensities  # unscaled
+    #     mc_chi[0] = self.current_chi2
 
-        # --- Run the MC loops ---
-        rng = np.random.default_rng()  # like systime(1)
+    #     # --- Run the MC loops ---
+    #     rng = np.random.default_rng()  # like systime(1)
 
-        for ii in range(1, N + 1):
-            # Step 1: Perturbed intensities (scaled)
-            perturbed = (
-                self.intensities_scaled
-                + rng.normal(size=n_obs) * self.sigma_scaled_intensity_errors
-            )
-            perturbed = np.clip(perturbed, 0, None)
+    #     for ii in range(1, N + 1):
+    #         # Step 1: Perturbed intensities (scaled)
+    #         perturbed = (
+    #             self.intensities_scaled
+    #             + rng.normal(size=n_obs) * self.sigma_scaled_intensity_errors
+    #         )
+    #         perturbed = np.clip(perturbed, 0, None)
 
-            # Store unscaled in mc_base
-            mc_base[:, ii] = perturbed * self.normalization_factor
+    #         # Store unscaled in mc_base
+    #         mc_base[:, ii] = perturbed * self.normalization_factor
 
-            # If all zero → nosolve=True
-            if np.all(perturbed == 0):
-                mc_dem[:, ii] = 0.0
-                mc_mod[:, ii] = 0.0
-                mc_chi[ii] = 0.0
-                continue
+    #         # If all zero → nosolve=True
+    #         if np.all(perturbed == 0):
+    #             mc_dem[:, ii] = 0.0
+    #             mc_mod[:, ii] = 0.0
+    #             mc_chi[ii] = 0.0
+    #             continue
 
-            # Step 2: assign perturbed intensities
-            self.intensities_scaled = perturbed
+    #         # Step 2: assign perturbed intensities
+    #         self.intensities_scaled = perturbed
 
-            # Step 3: Rebuild spline system
-            self._prepare_spline_system()
+    #         # Step 3: Rebuild spline system
+    #         self._prepare_spline_system()
 
-            # Step 4: Solve via lmfit
-            params = self._build_lmfit_parameters()
-            out = minimize(self._residuals, params, max_nfev=self.max_iterations)
+    #         # Step 4: Solve via lmfit
+    #         params = self._build_lmfit_parameters()
+    #         out = minimize(self._residuals, params, max_nfev=self.max_iterations)
 
-            # Step 5: Reconstruct DEM
-            dem = self._reconstruct_dem_from_knots(out.params)
-            dem_scaled = dem * self.normalization_factor  # unscale
-            mc_dem[:, ii] = dem_scaled
+    #         # Step 5: Reconstruct DEM
+    #         dem = self._reconstruct_dem_from_knots(out.params)
+    #         dem_scaled = dem * self.normalization_factor  # unscale
+    #         mc_dem[:, ii] = dem_scaled
 
-            # Step 6: Compute modeled intensities
-            modeled = (self.pm_matrix @ dem) * self.abundances
-            mc_mod[:, ii] = modeled * self.normalization_factor
+    #         # Step 6: Compute modeled intensities
+    #         modeled = (self.pm_matrix @ dem) * self.abundances
+    #         mc_mod[:, ii] = modeled * self.normalization_factor
 
-            # Step 7: Compute chi-square
-            resid = self._residuals(out.params)
-            mc_chi[ii] = np.sum(resid**2)
+    #         # Step 7: Compute chi-square
+    #         resid = self._residuals(out.params)
+    #         mc_chi[ii] = np.sum(resid**2)
 
-        # store results
-        self.mc_dem = mc_dem
-        self.mc_base_obs = mc_base
-        self.mc_mod_obs = mc_mod
-        self.mc_chisq = mc_chi
+    #     # store results
+    #     self.mc_dem = mc_dem
+    #     self.mc_base_obs = mc_base
+    #     self.mc_mod_obs = mc_mod
+    #     self.mc_chisq = mc_chi
 
     def solve(self):
         """
