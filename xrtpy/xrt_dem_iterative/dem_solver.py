@@ -649,31 +649,32 @@ class XRTDEMIterative:
             )
         return self._response_matrix
 
-    def _prepare_scaled_observations(self):
-        """
-        Prepare the scaled observed intensities and uncertainties
-        exactly as done in the IDL routine xrt_dem_iterative2.pro.
+    # Might just be dead-code  - JOY HERE !!! MARCH 2026
+    # def _prepare_scaled_observations(self):
+    #     """
+    #     Prepare the scaled observed intensities and uncertainties
+    #     exactly as done in the IDL routine xrt_dem_iterative2.pro.
 
-        IDL equivalent:
-            input1.i_obs = input1.i_obs / solv_factor
-            input1.i_err = input1.i_err / solv_factor
-        """
-        # Extract values as plain floats (DN/s/pix)
-        intensities_scaled_raw = (
-            self.observed_intensities.value
-        )  # Might just remove this line and up in the normalization
-        sigma_intensity_errors_raw = self.intensity_errors.to_value(
-            u.DN / u.s
-        )  # Might just remove this line and up in the normalization
+    #     IDL equivalent:
+    #         input1.i_obs = input1.i_obs / solv_factor
+    #         input1.i_err = input1.i_err / solv_factor
+    #     """
+    #     # Extract values as plain floats (DN/s/pix)
+    #     intensities_scaled_raw = (
+    #         self.observed_intensities.value
+    #     )  # Might just remove this line and up in the normalization
+    #     sigma_intensity_errors_raw = self.intensity_errors.to_value(
+    #         u.DN / u.s
+    #     )  # Might just remove this line and up in the normalization
 
-        # Apply normalization
-        self.intensities_scaled = intensities_scaled_raw / self.normalization_factor
-        self.sigma_scaled_intensity_errors = (
-            sigma_intensity_errors_raw / self.normalization_factor
-        )
+    #     # Apply normalization
+    #     self.intensities_scaled = intensities_scaled_raw / self.normalization_factor
+    #     self.sigma_scaled_intensity_errors = (
+    #         sigma_intensity_errors_raw / self.normalization_factor
+    #     )
 
-        # Store for solver
-        self._scaled_prepared = True
+    #     # Store for solver
+    #     self._scaled_prepared = True
 
     # ======================================================================
     # DEM INITIALIZATION AND SOLVER METHODS
@@ -836,9 +837,9 @@ class XRTDEMIterative:
 
         # Weights and abundances (IDL sets all =1)
         # Later, should I a use_line mask (IDL ignores lines with i_obs=0), but you can add that when you need it.
-        #JOY HERE!!!!! MARCH 17, 2026
-        #self.weights = np.ones(n_line, dtype=float)
-        #self.abundances = np.ones(n_line, dtype=float)
+        # JOY HERE!!!!! MARCH 17, 2026
+        # self.weights = np.ones(n_line, dtype=float)
+        # self.abundances = np.ones(n_line, dtype=float)
         self.weights = np.where(self._observed_intensities != 0.0, 1.0, 0.0)
         self.abundances = np.ones(n_line, dtype=float)
 
