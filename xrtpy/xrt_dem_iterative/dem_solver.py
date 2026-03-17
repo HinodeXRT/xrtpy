@@ -320,11 +320,13 @@ class XRTDEMIterative:
                 category=UserWarning,
                 stacklevel=2,
             )
-            
+
         # warn if any value is >= 2500
         if np.any(self._observed_intensities >= 2500):
             bad = self._observed_intensities >= 2500
-            bad_channels = [ch for ch, m in zip(self.observed_channel, bad, strict=False) if m]
+            bad_channels = [
+                ch for ch, m in zip(self.observed_channel, bad, strict=False) if m
+            ]
             bad_values = self._observed_intensities[bad]
 
             warnings.warn(
@@ -337,11 +339,10 @@ class XRTDEMIterative:
                     f"Affected filters: {bad_channels}\n"
                     f"Affected intensities (DN/s/pix): {bad_values}\n"
                 ),
-
                 category=UserWarning,
                 stacklevel=2,
             )
-            
+
         # success -> no return value
         return None
 
@@ -603,7 +604,9 @@ class XRTDEMIterative:
         ):  # Make sure that R_orig.value is indeed in DN/s/pix per cm^5
             logT_orig = np.log10(T_orig.to_value(u.K))
 
-            response_vals = R_orig.value  # already in correct physical units for XRTpy #NOTEFORJOY- TRIPLE check this
+            response_vals = (
+                R_orig.value
+            )  # already in correct physical units for XRTpy #NOTEFORJOY- TRIPLE check this
 
             interp_func = interp1d(
                 logT_orig,
@@ -789,14 +792,13 @@ class XRTDEMIterative:
 
         # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 1.0 NOV20
         # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 0.0 #NOTEFORJOY
-        
+
         ###
-        #est_log_dem_on_grid = np.zeros_like(self.logT) ####### JOY HERE!!!!!!!! March2026
+        # est_log_dem_on_grid = np.zeros_like(self.logT) ####### JOY HERE!!!!!!!! March2026
         est_log_dem_on_grid = np.ones_like(self.logT)
-        #March 12, 2026 
-        #est_log_dem_on_grid = np.ones_like(self.logT)
+        # March 12, 2026
+        # est_log_dem_on_grid = np.ones_like(self.logT)
         #####
-        
 
         # Return the intial first guessed DEM
 
@@ -834,7 +836,10 @@ class XRTDEMIterative:
 
         # Weights and abundances (IDL sets all =1)
         # Later, should I a use_line mask (IDL ignores lines with i_obs=0), but you can add that when you need it.
-        self.weights = np.ones(n_line, dtype=float)
+        #JOY HERE!!!!! MARCH 17, 2026
+        #self.weights = np.ones(n_line, dtype=float)
+        #self.abundances = np.ones(n_line, dtype=float)
+        self.weights = np.where(self._observed_intensities != 0.0, 1.0, 0.0)
         self.abundances = np.ones(n_line, dtype=float)
 
         # pm_matrix = R(T) * T * dlnT     (IDL line: emis * 10^t * alog(10^dt))
@@ -869,7 +874,7 @@ class XRTDEMIterative:
 
         params = Parameters()
 
-        #March 16, 2026 
+        # March 16, 2026
         # for i in range(self.n_spl):
         #     params.add(
         #         f"knot_{i}",
@@ -902,7 +907,7 @@ class XRTDEMIterative:
         # Or used the code above but switch from linear to kind="cubic"
         cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
         log_dem = cs(self.logT)
-        log_dem = np.clip(log_dem, -300.0, 300.0) #JOY-MARCH 2026!!!!!!!
+        log_dem = np.clip(log_dem, -300.0, 300.0)  # JOY-MARCH 2026!!!!!!!
         dem = 10.0**log_dem
         return dem
 
