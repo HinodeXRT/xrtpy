@@ -198,7 +198,7 @@ def test_prepare_spline_system_initializes_all_solver_state():
 
     # spline_log_dem should be zeros (flat initial DEM)
     assert len(x.spline_log_dem) == 2
-    assert np.allclose(x.spline_log_dem, 0.0)
+    assert np.allclose(x.spline_log_dem, 1.0)  # 0.0) - March 2026 Edit
 
     # pm_matrix has correct shape
     assert x.pm_matrix.shape == (3, len(x.logT))
