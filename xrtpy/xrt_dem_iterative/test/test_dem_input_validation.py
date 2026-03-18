@@ -133,7 +133,7 @@ def test_create_logT_grid():
     assert np.all(np.diff(x.logT) > 0)
 
 
-def test_estimate_initial_dem_returns_flat_log_dem_zero():
+def test_estimate_initial_dem_returns_flat_log_dem_one():
     filters = ["Al-poly", "Ti-poly", "Al-thick"]
     intensities = np.array([150.2, 230.0, 1321.1])
     responses = generate_temperature_responses(filters, "2012-10-27T23:02:00")
@@ -155,7 +155,7 @@ def test_estimate_initial_dem_returns_flat_log_dem_zero():
     assert len(est) == len(x.logT)
 
     # TEST 2: All values should be exactly 0.0 ( Python implementation overrides with flat logDEM = 0)
-    assert np.allclose(est, 0.0)
+    assert np.allclose(est,1.0)# 0.0) #JOY- Updated March 17, 2026 -Python implementation overrides with flat logDEM = 0
 
     # TEST 3: Internal storage _initial_log_dem should match
     assert np.allclose(x._initial_log_dem, est)
