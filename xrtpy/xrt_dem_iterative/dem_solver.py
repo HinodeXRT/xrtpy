@@ -8,7 +8,6 @@ import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
 from scipy.interpolate import interp1d
-
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
 
@@ -212,7 +211,6 @@ class XRTDEMIterative:
             raise ValueError("normalization_factor must be a positive number.")
 
         self._normalization_factor = value
-        # self._normalization_factor = value
 
         self._using_estimated_errors = (
             False  # track whether default error model has been used
@@ -975,6 +973,9 @@ class XRTDEMIterative:
 
         # 4. spline system using that initial guess
         self._prepare_spline_system()
+        self.weights = np.where(
+            observed_intensities_vals != 0.0, 1.0, 0.0
+        )  # JOY- March 17, 2026 !!!!!
         params0 = self._build_lmfit_parameters()  # values = initial_log_dem at knots
 
         # 5. run minimizer
