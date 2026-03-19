@@ -82,14 +82,14 @@ def test_validate_inputs_accepts_defaults():
     dem.validate_inputs()  # Should NOT raise
 
 
-def test_validate_inputs_rejects_mismatched_intensity_errors():
+def test_validate_inputs_rejects_mismatched_intensity_uncertainties():
     filters = ["Be-thin", "Be-med"]
     i_obs = [100.0, 200.0]
-    i_err = [20.0]  # Wrong length - should be two error/ uncertainties
+    i_err = [20.0]  # Wrong length - should be two uncertainties
     resp = generate_temperature_responses(filters, "2007-07-10")
-    dem = XRTDEMIterative(filters, i_obs, resp, intensity_errors=i_err)
+    dem = XRTDEMIterative(filters, i_obs, resp, intensity_uncertainties=i_err)
 
-    with pytest.raises(ValueError, match="intensity_errors must match"):
+    with pytest.raises(ValueError, match="intensity_uncertainties must match"):
         dem.validate_inputs()
 
 
@@ -155,7 +155,9 @@ def test_estimate_initial_dem_returns_flat_log_dem_one():
     assert len(est) == len(x.logT)
 
     # TEST 2: All values should be exactly 0.0 ( Python implementation overrides with flat logDEM = 0)
-    assert np.allclose(est,1.0)# 0.0) #JOY- Updated March 17, 2026 -Python implementation overrides with flat logDEM = 0
+    assert np.allclose(
+        est, 1.0
+    )  # 0.0) #JOY- Updated March 17, 2026 -Python implementation overrides with flat logDEM = 0
 
     # TEST 3: Internal storage _initial_log_dem should match
     assert np.allclose(x._initial_log_dem, est)
@@ -166,7 +168,7 @@ def test_estimate_initial_dem_returns_flat_log_dem_one():
 
 def test_prepare_spline_system_initializes_all_solver_state():
     """
-    1. _prepare_spline_system runs without errors
+    1. _prepare_spline_system runs without uncertainties
     2. n_spl computed correctly
     3. spline_logT shape and monotonicity
     4. spline_log_dem has correct values
@@ -243,7 +245,7 @@ def test_residuals_matches_hand_computed_forward_model():
     params.add("knot_1", value=0.0, min=-20, max=0)
 
     x.intensities_scaled = np.array([10.0])
-    x.sigma_scaled_intensity_errors = np.array([1.0])
+    x.sigma_scaled_intensity_uncertainties = np.array([1.0])
     x.abundances = np.ones(1)
     x.weights = np.ones(1)
 
@@ -261,9 +263,9 @@ def test_solve_single_dem_returns_zeros_when_all_intensities_zero():
         - modeled intensities = all zeros
         - chi sqr = 0
         - result = None
-    This run will output a warning - expected due to no intensity_errors provided.
+    This run will output a warning - expected due to no intensity_uncertainties provided.
     """
-    # filterwarnings = ignore:No intensity_errors provided
+    # filterwarnings = ignore:No intensity_uncertainties provided
 
     filters = ["Al-poly", "Ti-poly", "Al-mesh"]
     intensities = np.array([0.0, 0.0, 0])  # all zero → triggers nosolve
@@ -312,7 +314,7 @@ def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
     """
     filters = ["Al-poly", "Ti-poly", "Be-thin"]
     intensities = np.array([2300.0, 1500.0, 800.0], dtype=float)
-    intensity_errors = (
+    intensity_uncertainties = (
         0.2 * intensities
     )  # explicit sigma -> avoids warning and ensures perturbations
     responses = generate_temperature_responses(filters, "2012-10-27T08:23:54")
@@ -326,7 +328,7 @@ def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
         observed_channel=filters,
         observed_intensities=intensities,
         temperature_responses=responses,
-        intensity_errors=intensity_errors,
+        intensity_uncertainties=intensity_uncertainties,
         minimum_bound_temperature=5.5,
         maximum_bound_temperature=7.5,
         logarithmic_temperature_step_size=0.5,
@@ -381,7 +383,7 @@ def test_solve_end_to_end_produces_finite_dem_and_mc_outputs():
     """
     Full DEM solving pipeline using real XRT filter responses.
     Verifies:
-        -solve() runs without errors
+        -solve() runs without uncertainties
         -base DEM exists, finite, and positive
         -modeled intensities computed
         -chi-square finite

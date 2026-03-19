@@ -18,7 +18,7 @@ class XRTDEMIterative:
 
     This class implements a Python version of the IDL routine
     `xrt_dem_iterative2.pro`, using spline-parameterized DEM curves and
-    iterative least-squares fitting. It supports Monte Carlo error analysis
+    iterative least-squares fitting. It supports Monte Carlo uncertainty analysis
     and closely mirrors the logic of the original IDL algorithm.
 
     Parameters
@@ -33,7 +33,7 @@ class XRTDEMIterative:
         List of TemperatureResponseFundamental objects matching the filters.
         Units are DN s^-1 pix^-1 cm^5. These can be created using
         xrtpy.response.tools.generate_temperature_responses().
-    intensity_errors : array-like, optional
+    intensity_uncertainties : array-like, optional
         Uncertainties in the observed intensities. If None, a default model
         is used: max(0.03 * intensity, 2 DN/s/pix).
     minimum_bound_temperature : float,  optional
@@ -55,7 +55,7 @@ class XRTDEMIterative:
     temperature_responses) must be the same length.
     - The log10(T) range must lie inside the native temperature grid
     provided by all filter responses.
-    - If intensity_errors is not provided, a default model is used to
+    - If intensity_uncertainties is not provided, a default model is used to
     estimate uncertainties.
 
     SELFNOTEJOY
@@ -67,7 +67,7 @@ class XRTDEMIterative:
         observed_channel,
         observed_intensities,
         temperature_responses,
-        intensity_errors=None,
+        intensity_uncertainties=None,
         minimum_bound_temperature=5.5,
         maximum_bound_temperature=8.0,
         logarithmic_temperature_step_size=0.1,
@@ -84,7 +84,7 @@ class XRTDEMIterative:
         - The temperature grid range (`minimum_bound_temperature`, `maximum_bound_temperature`) must lie entirely within the
         response temperature ranges for **all** filters provided.
 
-        - If `intensity_errors` is not provided, a model-based error estimate is used:
+        - If `intensity_uncertainties` is not provided, a model-based uncertainty estimate is used:
         max(0.03 * observed_intensity, 2 (DN/s/pix)), as in the IDL original.
 
         - Default XRT filter names include:
@@ -99,7 +99,7 @@ class XRTDEMIterative:
             raise ValueError("`observed_channel` is required and cannot be empty.")
         self.observed_channel = validate_and_format_filters(observed_channel)
 
-        # Store intensity and error arrays
+        # Store intensity and uncertainty arrays
         if observed_intensities is None or len(observed_intensities) == 0:
             raise ValueError("`observed_intensities` is required and cannot be empty.")
         self._observed_intensities = np.asarray(observed_intensities, dtype=float)
@@ -107,12 +107,14 @@ class XRTDEMIterative:
         if not np.all(np.isfinite(self._observed_intensities)):
             raise ValueError("`observed_intensities` must be finite numbers.")
 
-        # Errors
+        # uncertainties
         # NEW (defer to validate_inputs)
-        if intensity_errors is not None:
-            self._intensity_errors = np.asarray(intensity_errors, dtype=float)
+        if intensity_uncertainties is not None:
+            self._intensity_uncertainties = np.asarray(
+                intensity_uncertainties, dtype=float
+            )
         else:
-            self._intensity_errors = None
+            self._intensity_uncertainties = None
 
         # Store temperature grid parameters
         self._logarithmic_temperature_step_size = float(
@@ -212,8 +214,8 @@ class XRTDEMIterative:
 
         self._normalization_factor = value
 
-        self._using_estimated_errors = (
-            False  # track whether default error model has been used
+        self._using_estimated_uncertainty = (
+            False  # track whether default uncertainty model has been used
         )
 
     def validate_inputs(self) -> None:
@@ -282,16 +284,16 @@ class XRTDEMIterative:
                     "is outside the bounds of one or more filter response grids."
                 )
 
-        # 7) intensity_errors length & finiteness (only if provided)
-        if self._intensity_errors is not None:
-            if self._intensity_errors.shape != self._observed_intensities.shape:
+        # 7) intensity_uncertainties length & finiteness (only if provided)
+        if self._intensity_uncertainties is not None:
+            if self._intensity_uncertainties.shape != self._observed_intensities.shape:
                 raise ValueError(
-                    "Length of intensity_errors must match observed_intensities."
+                    "Length of intensity_uncertainties must match observed_intensities."
                 )
-            if not np.all(np.isfinite(self._intensity_errors)) or np.any(
-                self._intensity_errors < 0
+            if not np.all(np.isfinite(self._intensity_uncertainties)) or np.any(
+                self._intensity_uncertainties < 0
             ):
-                raise ValueError("`intensity_errors` must be finite and >= 0.")
+                raise ValueError("`intensity_uncertainties` must be finite and >= 0.")
 
         if np.all(self._observed_intensities == 0):
             warnings.warn(
@@ -318,14 +320,13 @@ class XRTDEMIterative:
                 category=UserWarning,
                 stacklevel=2,
             )
-            
 
         # warn if any value is >= 2500
         if np.any(self._observed_intensities >= 2500):
             bad = self._observed_intensities >= 2500
             bad_channels = [
                 ch for ch, m in zip(self.observed_channel, bad, strict=False) if m
-                ]
+            ]
             bad_values = self._observed_intensities[bad]
 
             warnings.warn(
@@ -346,28 +347,6 @@ class XRTDEMIterative:
                 category=UserWarning,
                 stacklevel=2,
             )
-            
-        # # warn if any value is >= 2500
-        # if np.any(self._observed_intensities >= 2500):
-        #     bad = self._observed_intensities >= 2500
-        #     bad_channels = [
-        #         ch for ch, m in zip(self.observed_channel, bad, strict=False) if m
-        #     ]
-        #     bad_values = self._observed_intensities[bad]
-
-        #     warnings.warn(
-        #         (
-        #             "\n\nOne or more observed intensities are >= 2500 DN/s/pix.\n"
-        #             "Hinode/XRT CCD response becomes non-linear as values approach the "
-        #             "practical upper linear limit (~3000 DN, 12-bit ADU), which may affect DEM results.\n"
-        #             'See XRT Blue Book, Section 2.4.5 "Charge Spreading":\n'
-        #             "https://xrt.cfa.harvard.edu/resources/documents/XRT_BlueBook/SolarB_bluebook.XRT.pdf\n\n"
-        #             f"Affected filters: {bad_channels}\n"
-        #             f"Affected intensities (DN/s/pix): {bad_values}\n"
-        #         ),
-        #         category=UserWarning,
-        #         stacklevel=2,
-        #     )
 
         # success -> no return value
         return None
@@ -445,26 +424,26 @@ class XRTDEMIterative:
         return self._logarithmic_temperature_step_size
 
     @property
-    def min_observational_error(self):
+    def min_observational_uncertainty(self):
         """
-        Default - Minimum absolute observational intensity error applied to DN/s/pix when intensity error is not provided.
+        Default - Minimum absolute observational intensity uncertainty applied to DN/s/pix when intensity uncertainty is not provided.
         """
         return 2 * (u.DN / u.s)
 
     @property
-    def relative_error(self):
+    def relative_uncertainty(self):
         """
-        Relative error used to scale intensity if an error is not provided.
+        Relative uncertainty used to scale intensity if an uncertainty is not provided.
         Default is 0.03 (3%).
         """
         return 0.03
 
     @property
-    def intensity_errors(self) -> u.Quantity:
+    def intensity_uncertainties(self) -> u.Quantity:
         """
         Return the intensity uncertainty values.
 
-        If the user supplied intensity_errors, those values are returned.
+        If the user supplied intensity_uncertainties, those values are returned.
         Otherwise a default model is used:
 
             sigma = max(0.03 * intensity, 2 DN/s/pix)
@@ -473,33 +452,33 @@ class XRTDEMIterative:
         xrt_dem_iterative2.pro.
 
         `~astropy.units.Quantity`
-        Intensity errors in DN/s for each filter.
+        Intensity uncertainties in DN/s for each filter.
 
         For details, see:
         https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro
         """
-        if self._intensity_errors is not None:
-            return self._intensity_errors * (u.DN / u.s)
+        if self._intensity_uncertainties is not None:
+            return self._intensity_uncertainties * (u.DN / u.s)
 
-        if not self._using_estimated_errors:
+        if not self._using_estimated_uncertainty:
             warnings.warn(
                 (
-                    "\n\nNo intensity_errors provided. Using default model: "
-                    "max(relative-error * observed_intensity, min_observational_error)\n"
-                    f"=> relative_error = {self.relative_error}, "
-                    f"min_observational_error = {self.min_observational_error.value} DN/s\n"
+                    "\n\nNo intensity_uncertainties provided. Using default model: "
+                    "max(relative-uncertainty * observed_intensity, min_observational_uncertainty)\n"
+                    f"=> relative_uncertainty = {self.relative_uncertainty}, "
+                    f"min_observational_uncertainty = {self.min_observational_uncertainty.value} DN/s\n"
                     "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n"
                 ),
                 category=UserWarning,
                 stacklevel=2,
             )
 
-        self._using_estimated_errors = True
+        self._using_estimated_uncertainty = True
 
         # Fixed in units
         estimated = np.maximum(
-            (self.relative_error * self._observed_intensities) * (u.DN / u.s),
-            self.min_observational_error,
+            (self.relative_uncertainty * self._observed_intensities) * (u.DN / u.s),
+            self.min_observational_uncertainty,
         )
         return estimated
 
@@ -689,14 +668,14 @@ class XRTDEMIterative:
     #     intensities_scaled_raw = (
     #         self.observed_intensities.value
     #     )  # Might just remove this line and up in the normalization
-    #     sigma_intensity_errors_raw = self.intensity_errors.to_value(
+    #     sigma_intensity_uncertainties_raw = self.intensity_uncertainties.to_value(
     #         u.DN / u.s
     #     )  # Might just remove this line and up in the normalization
 
     #     # Apply normalization
     #     self.intensities_scaled = intensities_scaled_raw / self.normalization_factor
-    #     self.sigma_scaled_intensity_errors = (
-    #         sigma_intensity_errors_raw / self.normalization_factor
+    #     self.sigma_scaled_intensity_uncertainties = (
+    #         sigma_intensity_uncertainties_raw / self.normalization_factor
     #     )
 
     #     # Store for solver
@@ -962,7 +941,7 @@ class XRTDEMIterative:
 
         # 3. Observed (scaled)
         y_scaled = self.intensities_scaled  # i_obs / solv_factor
-        sigma_scaled = self.sigma_scaled_intensity_errors
+        sigma_scaled = self.sigma_scaled_intensity_uncertainties
 
         # 4. Residuals = (i_mod - y_obs) * weights / sigma
         residuals = (i_mod - y_scaled) * self.weights / sigma_scaled
@@ -983,10 +962,10 @@ class XRTDEMIterative:
 
         nf = self._normalization_factor
 
-        # 1. scaled obs/errors
+        # 1. scaled obs/uncertainties
         self.intensities_scaled = observed_intensities_vals / nf
-        sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
-        self.sigma_scaled_intensity_errors = sigma_phys / nf
+        sigma_phys = self.intensity_uncertainties.to_value(u.DN / u.s)
+        self.sigma_scaled_intensity_uncertainties = sigma_phys / nf
 
         # 2. trivial nosolve case
         if np.all(self.intensities_scaled == 0.0):
@@ -1060,7 +1039,7 @@ class XRTDEMIterative:
     #         # Step 1: Perturbed intensities (scaled)
     #         perturbed = (
     #             self.intensities_scaled
-    #             + rng.normal(size=n_obs) * self.sigma_scaled_intensity_errors
+    #             + rng.normal(size=n_obs) * self.sigma_scaled_intensity_uncertainties
     #         )
     #         perturbed = np.clip(perturbed, 0, None)
 
@@ -1189,13 +1168,22 @@ class XRTDEMIterative:
         if N > 0:
             rng = np.random.default_rng()  # like IDL's systime(1) seeding
 
-            # Intensity errors in physical units [DN/s/pix]
-            sigma_phys = self.intensity_errors.to_value(u.DN / u.s)
+            # Intensity uncertainties in physical units [DN/s/pix]
+            sigma_phys = self.intensity_uncertainties.to_value(u.DN / u.s)
 
+            # Method 1
+            # for ii in range(1, N + 1):
+            #     # Lightweight progress indicator
+            #     #if ii % max(1, N // 20) == 0:
+            #     print(f"  - Monte Carlo run {ii}/{N}")
+
+            # Method 2 - but this one might be better overall
             for ii in range(1, N + 1):
-                # Lightweight progress indicator
-                if ii % max(1, N // 20) == 0:
-                    print(f"  - Monte Carlo run {ii}/{N}")
+
+                # Method 3 - I like this one!
+                # from tqdm import tqdm
+                # for ii in tqdm(range(1, N + 1), desc="  Monte Carlo", unit="run", colour="#005A9C"):
+                print(f"  - Monte Carlo run {ii}/{N}", end="\r", flush=True)
 
                 # 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0
                 noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
@@ -1213,7 +1201,187 @@ class XRTDEMIterative:
                 self.mc_base_obs[ii, :] = obs_pert
                 self.mc_mod_obs[ii, :] = mod_i
 
+            print(f"  - Monte Carlo complete ({N} runs)     ")  # final line after loop
         return self.dem
+
+    # def summary(self):
+    #     """
+    #     Print a detailed, diagnostic summary of the DEM solver state.
+
+    #     This provides:
+    #         - Input observation details with observed vs modeled comparison
+    #         - Temperature grid configuration
+    #         - Response matrix status
+    #         - Spline system configuration
+    #         - Base DEM fit results including peak temperature
+    #         - Monte Carlo statistics (if available)
+    #         - Available plotting helpers
+    #     """
+
+    #     print("\n" + "=" * 76)
+    #     print("          XRTpy DEM Iterative — Solver Summary")
+    #     print("=" * 76)
+
+    #     # ------------------------------------------------------------------ #
+    #     # INPUT DATA
+    #     # ------------------------------------------------------------------ #
+    #     print("\nINPUT DATA")
+    #     print("-" * 70)
+    #     print(f" Filters:          {self.filter_names}")
+    #     print(f" Number of channels: {len(self._observed_intensities)}")
+    #     print(f" Intensity uncertainties: {'User-provided' if self._intensity_uncertainties is not None else 'Auto-estimated (3% of I, min=2 DN/s)'}")
+
+    #     # ------------------------------------------------------------------ #
+    #     # OBSERVED vs MODELED TABLE
+    #     # ------------------------------------------------------------------ #
+    #     if hasattr(self, "modeled_intensities"):
+    #         print("\nOBSERVED vs MODELED INTENSITIES")
+    #         print("-" * 70)
+    #         uncertainties = self.intensity_uncertainties.to_value(u.DN / u.s)
+    #         header = f"  {'Filter':<22} {'Observed':>12} {'Modeled':>12} {'Residual':>12} {'% Diff':>9} {'Sigma':>10}"
+    #         print(header)
+    #         print("  " + "-" * 68)
+    #         for i, fname in enumerate(self.filter_names):
+    #             obs   = self._observed_intensities[i]
+    #             mod   = self.modeled_intensities[i]
+    #             resid = mod - obs
+    #             pct   = 100.0 * resid / obs if obs != 0 else float("nan")
+    #             sig   = uncertainties[i]
+    #             print(f"  {fname:<22} {obs:>12.4f} {mod:>12.4f} {resid:>12.4f} {pct:>8.2f}% {sig:>10.4f}")
+    #         print(f"\n  Units: DN/s/pix  |  Residual = Modeled − Observed")
+    #     else:
+    #         print("\n  Observed intensities:")
+    #         for i, fname in enumerate(self.filter_names):
+    #             print(f"  {fname:<22} {self._observed_intensities[i]:>12.4f}  DN/s/pix")
+
+    #     # ------------------------------------------------------------------ #
+    #     # TEMPERATURE GRID
+    #     # ------------------------------------------------------------------ #
+    #     print("\nTEMPERATURE GRID")
+    #     print("-" * 70)
+    #     if hasattr(self, "logT"):
+    #         print(f" logT range:              {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}  [log10 K]")
+    #         print(f" Number of bins:          {len(self.logT)}")
+    #         print(f" Grid spacing (dlogT):    {self.dlogT:.3f}")
+    #         print(f" Natural log spacing:     {self.dlnT:.4f}")
+    #     else:
+    #         print(" Grid has not been constructed (call solve()).")
+
+    #     # ------------------------------------------------------------------ #
+    #     # RESPONSE MATRIX
+    #     # ------------------------------------------------------------------ #
+    #     print("\nRESPONSE MATRIX")
+    #     print("-" * 70)
+    #     if hasattr(self, "_response_matrix"):
+    #         print(f" Shape:          {self._response_matrix.shape}  (n_filters x n_T_bins)")
+    #         print(f" Units:          {self._response_unit}")
+    #         print(f" Non-zero entries per filter:")
+    #         for i, fname in enumerate(self.filter_names):
+    #             n_nonzero = np.count_nonzero(self._response_matrix[i])
+    #             peak_logT = self.logT[np.argmax(self._response_matrix[i])]
+    #             print(f"   {fname:<22}  non-zero bins: {n_nonzero:>3d}   peak at logT = {peak_logT:.2f}")
+    #     else:
+    #         print(" Response matrix not constructed.")
+
+    #     # ------------------------------------------------------------------ #
+    #     # SOLVER CONFIGURATION
+    #     # ------------------------------------------------------------------ #
+    #     print("\nSOLVER CONFIGURATION")
+    #     print("-" * 70)
+    #     print(f" Normalization factor:     {self.normalization_factor:.2e}")
+    #     print(f" Max iterations:           {self.max_iterations}")
+    #     print(f" Monte Carlo runs:         {self.monte_carlo_runs}")
+    #     if hasattr(self, "n_spl"):
+    #         print(f" Number of spline knots:   {self.n_spl}")
+    #         print(f" Knot positions (logT):    {np.round(self.spline_logT, 3)}")
+    #     else:
+    #         print(" Spline system not prepared yet.")
+
+    #     # ------------------------------------------------------------------ #
+    #     # INITIAL DEM GUESS
+    #     # ------------------------------------------------------------------ #
+    #     print("\nINITIAL DEM GUESS")
+    #     print("-" * 70)
+    #     if hasattr(self, "_initial_log_dem"):
+    #         print(" Assumption: flat log10(DEM) = 0  (IDL-style, DEM=1 everywhere)")
+    #     else:
+    #         print(" Initial DEM has not been estimated.")
+
+    #     # ------------------------------------------------------------------ #
+    #     # BASE DEM SOLUTION
+    #     # ------------------------------------------------------------------ #
+    #     print("\nBASE DEM SOLUTION")
+    #     print("-" * 70)
+    #     if hasattr(self, "dem"):
+    #         log_dem = np.log10(np.clip(self.dem, 1e-99, None))
+    #         peak_idx = np.argmax(self.dem)
+    #         peak_logT = self.logT[peak_idx]
+    #         peak_dem  = self.dem[peak_idx]
+
+    #         n_dof = max(1, len(self._observed_intensities) - self.n_spl) if hasattr(self, "n_spl") else len(self._observed_intensities)
+    #         reduced_chi2 = self.chisq / n_dof
+
+    #         print(f" DEM shape:               {self.dem.shape}")
+    #         print(f" Peak DEM:                {peak_dem:.4e}  at logT = {peak_logT:.2f}  [cm⁻⁵ K⁻¹]")
+    #         print(f" log10(DEM) range:        {log_dem.min():.2f}  to  {log_dem.max():.2f}")
+    #         print(f" Chi-square:              {self.chisq:.4e}")
+    #         print(f" Reduced chi-square:      {reduced_chi2:.4e}  (chi2 / {n_dof} dof)")
+    #     else:
+    #         print(" No DEM solution computed yet (call solve()).")
+
+    #     # ------------------------------------------------------------------ #
+    #     # MONTE CARLO ENSEMBLE
+    #     # ------------------------------------------------------------------ #
+    #     print("\nMONTE CARLO ENSEMBLE")
+    #     print("-" * 70)
+    #     if hasattr(self, "mc_dem"):
+    #         N = self.mc_dem.shape[0] - 1
+    #         print(f" MC realizations:         {N}")
+    #         if N > 0:
+    #             mc_only = self.mc_dem[1:]                               # (N, nT)
+    #             log_mc  = np.log10(np.clip(mc_only, 1e-99, None))
+
+    #             median_dem = np.median(mc_only, axis=0)
+    #             p16, p84   = np.percentile(mc_only, [16, 84], axis=0)
+    #             log_p16    = np.log10(np.clip(p16, 1e-99, None))
+    #             log_p84    = np.log10(np.clip(p84, 1e-99, None))
+
+    #             # Peak T across MC runs
+    #             peak_logT_mc = self.logT[np.argmax(median_dem)]
+
+    #             # Chi-square stats across MC runs
+    #             mc_chi = self.mc_chisq[1:]
+    #             n_dof  = max(1, len(self._observed_intensities) - self.n_spl) if hasattr(self, "n_spl") else len(self._observed_intensities)
+
+    #             print(f" Median peak DEM logT:    {peak_logT_mc:.2f}  [log10 K]")
+    #             print(f"\n log10(DEM) 1σ envelope across all T bins:")
+    #             print(f"   {'logT':>6}  {'log10(p16)':>12}  {'log10(median)':>14}  {'log10(p84)':>12}  {'±width':>8}")
+    #             print("   " + "-" * 58)
+    #             for j in range(len(self.logT)):
+    #                 lmed = np.log10(max(median_dem[j], 1e-99))
+    #                 lp16 = log_p16[j]
+    #                 lp84 = log_p84[j]
+    #                 width = (lp84 - lp16) / 2.0
+    #                 print(f"   {self.logT[j]:>6.2f}  {lp16:>12.3f}  {lmed:>14.3f}  {lp84:>12.3f}  {width:>8.3f}")
+
+    #             print(f"\n MC chi-square stats (runs 1..{N}):")
+    #             print(f"   Min:     {mc_chi.min():.4e}")
+    #             print(f"   Median:  {np.median(mc_chi):.4e}")
+    #             print(f"   Max:     {mc_chi.max():.4e}")
+    #             print(f"   Reduced (÷{n_dof} dof) — median: {np.median(mc_chi)/n_dof:.4e}")
+    #         else:
+    #             print(" MC array allocated but N=0 (no Monte Carlo runs performed).")
+    #     else:
+    #         print(" No Monte Carlo results available.")
+
+    #     # ------------------------------------------------------------------ #
+    #     # PLOTTING HELPERS
+    #     # ------------------------------------------------------------------ #
+    #     print("\nPLOTTING HELPERS")
+    #     print("-" * 76)
+    #     print(" • solver.plot_dem()     – Base DEM only")
+    #     print(" • solver.plot_dem_mc()  – Base DEM + MC ensemble")
+    #     print("\n" + "=" * 76 + "\n")
 
     def summary(self):
         """
@@ -1241,13 +1409,15 @@ class XRTDEMIterative:
         )
         print(f" Number of channels: {len(self._observed_intensities)}")
 
-        # Error model
-        if self._intensity_errors is not None:
-            print(" Intensity Errors: User-provided")
+        # uncertainty model
+        if self._intensity_uncertainties is not None:
+            print(" Intensity uncertainties: User-provided")
         else:
-            print(" Intensity Errors: Auto-estimated (3% of I, min=2 DN/s)")
+            print(" Intensity uncertainties: Auto-estimated (3% of I, min=2 DN/s)")
 
-        print(f" Error values (DN/s): {self.intensity_errors.to_value('DN/s')}\n")
+        print(
+            f" Uncertainty values (DN/s): {self.intensity_uncertainties.to_value('DN/s')}\n"
+        )
 
         print("\nTEMPERATURE GRID")
         print("-" * 70)

@@ -109,7 +109,7 @@ def run_dem_for_mc_csv(
     csv_path: str | Path,
     observation_date: str,
     *,
-    intensity_errors: np.ndarray | None = None,
+    intensity_uncertainties: np.ndarray | None = None,
     minimum_bound_temperature: float = 5.5,
     maximum_bound_temperature: float = 8.0,
     logarithmic_temperature_step_size: float = 0.1,
@@ -128,30 +128,29 @@ def run_dem_for_mc_csv(
     # Generate temperature responses once
     responses = generate_temperature_responses(filters, observation_date)
 
-
-
-    # ---- Ensure intensity_errors length matches number of filters ----
+    # ---- Ensure intensity_uncertainties length matches number of filters ----
     n_filters = len(filters)
 
-    if intensity_errors is not None:
+    if intensity_uncertainties is not None:
         # allow scalar -> broadcast
-        if np.isscalar(intensity_errors):
-            intensity_errors = np.full(n_filters, float(intensity_errors), dtype=float)
+        if np.isscalar(intensity_uncertainties):
+            intensity_uncertainties = np.full(
+                n_filters, float(intensity_uncertainties), dtype=float
+            )
         else:
-            intensity_errors = np.asarray(intensity_errors, dtype=float)
-            if intensity_errors.shape[0] != n_filters:
+            intensity_uncertainties = np.asarray(intensity_uncertainties, dtype=float)
+            if intensity_uncertainties.shape[0] != n_filters:
                 raise ValueError(
-                    f"intensity_errors length ({intensity_errors.shape[0]}) must match "
+                    f"intensity_uncertainties length ({intensity_uncertainties.shape[0]}) must match "
                     f"number of filters ({n_filters}). Filters={filters}"
                 )
-                
-            
+
     # Create a solver "template" once (we'll reuse and only replace intensities)
     solver = XRTDEMIterative(
         observed_channel=filters,
         observed_intensities=mc_intensities[0],
         temperature_responses=responses,
-        intensity_errors=intensity_errors,  # optional; can be None - Make sure current xrtpy-dem has it set- NOTEFORJOY
+        intensity_uncertainties=intensity_uncertainties,  # optional; can be None - Make sure current xrtpy-dem has it set- NOTEFORJOY
         monte_carlo_runs=0,
         minimum_bound_temperature=minimum_bound_temperature,
         maximum_bound_temperature=maximum_bound_temperature,
