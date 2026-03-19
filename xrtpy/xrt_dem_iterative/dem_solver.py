@@ -1055,185 +1055,6 @@ class XRTDEMIterative:
             print(f"  - Monte Carlo complete ({N} runs)     ")  # final line after loop
         return self.dem
 
-    # def summary(self):
-    #     """
-    #     Print a detailed, diagnostic summary of the DEM solver state.
-
-    #     This provides:
-    #         - Input observation details with observed vs modeled comparison
-    #         - Temperature grid configuration
-    #         - Response matrix status
-    #         - Spline system configuration
-    #         - Base DEM fit results including peak temperature
-    #         - Monte Carlo statistics (if available)
-    #         - Available plotting helpers
-    #     """
-
-    #     print("\n" + "=" * 76)
-    #     print("          XRTpy DEM Iterative — Solver Summary")
-    #     print("=" * 76)
-
-    #     # ------------------------------------------------------------------ #
-    #     # INPUT DATA
-    #     # ------------------------------------------------------------------ #
-    #     print("\nINPUT DATA")
-    #     print("-" * 70)
-    #     print(f" Filters:          {self.filter_names}")
-    #     print(f" Number of channels: {len(self._observed_intensities)}")
-    #     print(f" Intensity uncertainties: {'User-provided' if self._intensity_uncertainties is not None else 'Auto-estimated (3% of I, min=2 DN/s)'}")
-
-    #     # ------------------------------------------------------------------ #
-    #     # OBSERVED vs MODELED TABLE
-    #     # ------------------------------------------------------------------ #
-    #     if hasattr(self, "modeled_intensities"):
-    #         print("\nOBSERVED vs MODELED INTENSITIES")
-    #         print("-" * 70)
-    #         uncertainties = self.intensity_uncertainties.to_value(u.DN / u.s)
-    #         header = f"  {'Filter':<22} {'Observed':>12} {'Modeled':>12} {'Residual':>12} {'% Diff':>9} {'Sigma':>10}"
-    #         print(header)
-    #         print("  " + "-" * 68)
-    #         for i, fname in enumerate(self.filter_names):
-    #             obs   = self._observed_intensities[i]
-    #             mod   = self.modeled_intensities[i]
-    #             resid = mod - obs
-    #             pct   = 100.0 * resid / obs if obs != 0 else float("nan")
-    #             sig   = uncertainties[i]
-    #             print(f"  {fname:<22} {obs:>12.4f} {mod:>12.4f} {resid:>12.4f} {pct:>8.2f}% {sig:>10.4f}")
-    #         print(f"\n  Units: DN/s/pix  |  Residual = Modeled − Observed")
-    #     else:
-    #         print("\n  Observed intensities:")
-    #         for i, fname in enumerate(self.filter_names):
-    #             print(f"  {fname:<22} {self._observed_intensities[i]:>12.4f}  DN/s/pix")
-
-    #     # ------------------------------------------------------------------ #
-    #     # TEMPERATURE GRID
-    #     # ------------------------------------------------------------------ #
-    #     print("\nTEMPERATURE GRID")
-    #     print("-" * 70)
-    #     if hasattr(self, "logT"):
-    #         print(f" logT range:              {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}  [log10 K]")
-    #         print(f" Number of bins:          {len(self.logT)}")
-    #         print(f" Grid spacing (dlogT):    {self.dlogT:.3f}")
-    #         print(f" Natural log spacing:     {self.dlnT:.4f}")
-    #     else:
-    #         print(" Grid has not been constructed (call solve()).")
-
-    #     # ------------------------------------------------------------------ #
-    #     # RESPONSE MATRIX
-    #     # ------------------------------------------------------------------ #
-    #     print("\nRESPONSE MATRIX")
-    #     print("-" * 70)
-    #     if hasattr(self, "_response_matrix"):
-    #         print(f" Shape:          {self._response_matrix.shape}  (n_filters x n_T_bins)")
-    #         print(f" Units:          {self._response_unit}")
-    #         print(f" Non-zero entries per filter:")
-    #         for i, fname in enumerate(self.filter_names):
-    #             n_nonzero = np.count_nonzero(self._response_matrix[i])
-    #             peak_logT = self.logT[np.argmax(self._response_matrix[i])]
-    #             print(f"   {fname:<22}  non-zero bins: {n_nonzero:>3d}   peak at logT = {peak_logT:.2f}")
-    #     else:
-    #         print(" Response matrix not constructed.")
-
-    #     # ------------------------------------------------------------------ #
-    #     # SOLVER CONFIGURATION
-    #     # ------------------------------------------------------------------ #
-    #     print("\nSOLVER CONFIGURATION")
-    #     print("-" * 70)
-    #     print(f" Normalization factor:     {self.normalization_factor:.2e}")
-    #     print(f" Max iterations:           {self.max_iterations}")
-    #     print(f" Monte Carlo runs:         {self.monte_carlo_runs}")
-    #     if hasattr(self, "n_spl"):
-    #         print(f" Number of spline knots:   {self.n_spl}")
-    #         print(f" Knot positions (logT):    {np.round(self.spline_logT, 3)}")
-    #     else:
-    #         print(" Spline system not prepared yet.")
-
-    #     # ------------------------------------------------------------------ #
-    #     # INITIAL DEM GUESS
-    #     # ------------------------------------------------------------------ #
-    #     print("\nINITIAL DEM GUESS")
-    #     print("-" * 70)
-    #     if hasattr(self, "_initial_log_dem"):
-    #         print(" Assumption: flat log10(DEM) = 0  (IDL-style, DEM=1 everywhere)")
-    #     else:
-    #         print(" Initial DEM has not been estimated.")
-
-    #     # ------------------------------------------------------------------ #
-    #     # BASE DEM SOLUTION
-    #     # ------------------------------------------------------------------ #
-    #     print("\nBASE DEM SOLUTION")
-    #     print("-" * 70)
-    #     if hasattr(self, "dem"):
-    #         log_dem = np.log10(np.clip(self.dem, 1e-99, None))
-    #         peak_idx = np.argmax(self.dem)
-    #         peak_logT = self.logT[peak_idx]
-    #         peak_dem  = self.dem[peak_idx]
-
-    #         n_dof = max(1, len(self._observed_intensities) - self.n_spl) if hasattr(self, "n_spl") else len(self._observed_intensities)
-    #         reduced_chi2 = self.chisq / n_dof
-
-    #         print(f" DEM shape:               {self.dem.shape}")
-    #         print(f" Peak DEM:                {peak_dem:.4e}  at logT = {peak_logT:.2f}  [cm⁻⁵ K⁻¹]")
-    #         print(f" log10(DEM) range:        {log_dem.min():.2f}  to  {log_dem.max():.2f}")
-    #         print(f" Chi-square:              {self.chisq:.4e}")
-    #         print(f" Reduced chi-square:      {reduced_chi2:.4e}  (chi2 / {n_dof} dof)")
-    #     else:
-    #         print(" No DEM solution computed yet (call solve()).")
-
-    #     # ------------------------------------------------------------------ #
-    #     # MONTE CARLO ENSEMBLE
-    #     # ------------------------------------------------------------------ #
-    #     print("\nMONTE CARLO ENSEMBLE")
-    #     print("-" * 70)
-    #     if hasattr(self, "mc_dem"):
-    #         N = self.mc_dem.shape[0] - 1
-    #         print(f" MC realizations:         {N}")
-    #         if N > 0:
-    #             mc_only = self.mc_dem[1:]                               # (N, nT)
-    #             log_mc  = np.log10(np.clip(mc_only, 1e-99, None))
-
-    #             median_dem = np.median(mc_only, axis=0)
-    #             p16, p84   = np.percentile(mc_only, [16, 84], axis=0)
-    #             log_p16    = np.log10(np.clip(p16, 1e-99, None))
-    #             log_p84    = np.log10(np.clip(p84, 1e-99, None))
-
-    #             # Peak T across MC runs
-    #             peak_logT_mc = self.logT[np.argmax(median_dem)]
-
-    #             # Chi-square stats across MC runs
-    #             mc_chi = self.mc_chisq[1:]
-    #             n_dof  = max(1, len(self._observed_intensities) - self.n_spl) if hasattr(self, "n_spl") else len(self._observed_intensities)
-
-    #             print(f" Median peak DEM logT:    {peak_logT_mc:.2f}  [log10 K]")
-    #             print(f"\n log10(DEM) 1σ envelope across all T bins:")
-    #             print(f"   {'logT':>6}  {'log10(p16)':>12}  {'log10(median)':>14}  {'log10(p84)':>12}  {'±width':>8}")
-    #             print("   " + "-" * 58)
-    #             for j in range(len(self.logT)):
-    #                 lmed = np.log10(max(median_dem[j], 1e-99))
-    #                 lp16 = log_p16[j]
-    #                 lp84 = log_p84[j]
-    #                 width = (lp84 - lp16) / 2.0
-    #                 print(f"   {self.logT[j]:>6.2f}  {lp16:>12.3f}  {lmed:>14.3f}  {lp84:>12.3f}  {width:>8.3f}")
-
-    #             print(f"\n MC chi-square stats (runs 1..{N}):")
-    #             print(f"   Min:     {mc_chi.min():.4e}")
-    #             print(f"   Median:  {np.median(mc_chi):.4e}")
-    #             print(f"   Max:     {mc_chi.max():.4e}")
-    #             print(f"   Reduced (÷{n_dof} dof) — median: {np.median(mc_chi)/n_dof:.4e}")
-    #         else:
-    #             print(" MC array allocated but N=0 (no Monte Carlo runs performed).")
-    #     else:
-    #         print(" No Monte Carlo results available.")
-
-    #     # ------------------------------------------------------------------ #
-    #     # PLOTTING HELPERS
-    #     # ------------------------------------------------------------------ #
-    #     print("\nPLOTTING HELPERS")
-    #     print("-" * 76)
-    #     print(" • solver.plot_dem()     – Base DEM only")
-    #     print(" • solver.plot_dem_mc()  – Base DEM + MC ensemble")
-    #     print("\n" + "=" * 76 + "\n")
-
     def summary(self):
         """
         Print a detailed, diagnostic summary of the DEM solver state.
@@ -1255,28 +1076,29 @@ class XRTDEMIterative:
         print("\nINPUT DATA")
         print("-" * 70)
         print(f" Filters: {self.filter_names}")
-        print(
-            f" Observed Intensities: {np.array(self._observed_intensities)}  DN/s/pix"
-        )
         print(f" Number of channels: {len(self._observed_intensities)}")
-
-        # uncertainty model
         if self._intensity_uncertainties is not None:
-            print(" Intensity uncertainties: User-provided")
+            arr_str = np.array2string(
+                np.array(self._observed_intensities),
+                precision=3,
+                suppress_small=True,
+                separator=", ",
+            )
+            msg = f"User-provided (DN/s):\n  {arr_str}"
         else:
-            print(" Intensity uncertainties: Auto-estimated (3% of I, min=2 DN/s)")
+            msg = "Auto-estimated (3% of I, min=2 DN/s)"
 
-        print(
-            f" Uncertainty values (DN/s): {self.intensity_uncertainties.to_value('DN/s')}\n"
-        )
+        print(f" Intensity uncertainties - {msg}")
 
         print("\nTEMPERATURE GRID")
         print("-" * 70)
         if hasattr(self, "logT"):
-            print(f" logT range: {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}")
-            print(f" Number of temperature bins: {len(self.logT)}")
-            print(f" logT (grid spacing): {self.dlogT:.3f}")
-            print(f" lnT (natural log spacing): {self.dlnT:.3f}")
+            print(
+                f" logT range:              {self.logT[0]:.2f}  to  {self.logT[-1]:.2f}  [log10 K]"
+            )
+            print(f" Number of bins:          {len(self.logT)}")
+            print(f" Grid spacing (dlogT):    {self.dlogT:.3f}")
+            print(f" Natural log spacing:     {self.dlnT:.4f}")
         else:
             print(" Grid has not been constructed (call solve()).")
 
@@ -1284,9 +1106,16 @@ class XRTDEMIterative:
         print("-" * 70)
         if hasattr(self, "_response_matrix"):
             print(
-                f" Matrix shape:    {self._response_matrix.shape}  (filters x T bins)"
+                f" Shape:          {self._response_matrix.shape}  (n_filters x n_T_bins)"
             )
-            print(f" Response units: {self._response_unit}")
+            print(f" Units:          {self._response_unit}")
+            print(f" Non-zero entries per filter:")
+            for i, fname in enumerate(self.filter_names):
+                n_nonzero = np.count_nonzero(self._response_matrix[i])
+                peak_logT = self.logT[np.argmax(self._response_matrix[i])]
+                print(
+                    f"   {fname:<22}  non-zero bins: {n_nonzero:>3d}   peak at logT = {peak_logT:.2f}"
+                )
         else:
             print(" Response matrix not constructed.")
 
@@ -1297,26 +1126,61 @@ class XRTDEMIterative:
         print(f" Monte Carlo runs:         {self.monte_carlo_runs}")
         if hasattr(self, "n_spl"):
             print(f" Number of spline knots:   {self.n_spl}")
-            print(f" Knot positions (logT):    {getattr(self, 'spline_logT', 'N/A')}")
+            print(f" Knot positions (logT):    {np.round(self.spline_logT, 3)}")
         else:
             print(" Spline system not prepared yet.")
-
-        print("\nINITIAL DEM GUESS")
-        print("-" * 70)
-        if hasattr(self, "_initial_log_dem"):
-            print(" Initial DEM assumption:   flat log10(DEM) (IDL-style)")
-            print(f" First 5 bins (log10):     {self._initial_log_dem[:5]}")
-        else:
-            print(" Initial DEM has not been estimated.")
 
         print("\nBASE DEM SOLUTION")
         print("-" * 70)
         if hasattr(self, "dem"):
+            log_dem = np.log10(np.clip(self.dem, 1e-99, None))
+            peak_idx = np.argmax(self.dem)
+            peak_logT = self.logT[peak_idx]
+            peak_dem = self.dem[peak_idx]
+
+            n_dof = (
+                max(1, len(self._observed_intensities) - self.n_spl)
+                if hasattr(self, "n_spl")
+                else len(self._observed_intensities)
+            )
+            reduced_chi2 = self.chisq / n_dof
+
             print(f" DEM shape:               {self.dem.shape}")
-            print(f" First 5 DEM bins:        {self.dem[:5]}")
-            print(f" log10(DEM) first 5:      {np.log10(self.dem[:5] + 1e-99)}")
+            print(
+                f" Peak DEM:                {peak_dem:.4e}  at logT = {peak_logT:.2f}  [cm⁻⁵ K⁻¹]"
+            )
+            print(
+                f" log10(DEM) range:        {log_dem.min():.2f}  to  {log_dem.max():.2f}"
+            )
             print(f" Chi-square:              {self.chisq:.4e}")
-            print(f" Modeled intensities:     {self.modeled_intensities}")
+            print(f" Reduced chi-square:      {reduced_chi2:.4e}  (chi2 / {n_dof} dof)")
+        else:
+            print(" No DEM solution computed yet (call solve()).")
+
+        print("\nBASE DEM SOLUTION")
+        print("-" * 70)
+        if hasattr(self, "dem"):
+            log_dem = np.log10(np.clip(self.dem, 1e-99, None))
+            peak_idx = np.argmax(self.dem)
+            peak_logT = self.logT[peak_idx]
+            peak_dem = self.dem[peak_idx]
+
+            n_dof = (
+                max(1, len(self._observed_intensities) - self.n_spl)
+                if hasattr(self, "n_spl")
+                else len(self._observed_intensities)
+            )
+            reduced_chi2 = self.chisq / n_dof
+
+            print(f" DEM shape:               {self.dem.shape}")
+            print(
+                f" Peak DEM:                {peak_dem:.4e}  at logT = {peak_logT:.2f}  [cm⁻⁵ K⁻¹]"
+            )
+            print(
+                f" log10(DEM) range:        {log_dem.min():.2f}  to  {log_dem.max():.2f}"
+            )
+            print(f" Chi-square:              {self.chisq:.4e}")
+            print(f" Reduced chi-square:      {reduced_chi2:.4e}  (chi2 / {n_dof} dof)")
         else:
             print(" No DEM solution computed yet (call solve()).")
 
@@ -1326,23 +1190,17 @@ class XRTDEMIterative:
             N = self.mc_dem.shape[0] - 1
             print(f" MC realizations:         {N}")
             if N > 0:
-                median = np.median(self.mc_dem[1:], axis=0)
-                p16, p84 = np.percentile(self.mc_dem[1:], [16, 84], axis=0)
-                print(" MC DEM statistics (first T-bin):")
-                print(f"   Median (first 5):      {median[:5]}")
-                print(
-                    f"   1x bounds (log10):     "
-                    f"{np.log10(p16[0] + 1e-99):.2f} – {np.log10(p84[0] + 1e-99):.2f}"
-                )
+                mc_only = self.mc_dem[1:]  # (N, nT)
+                log_mc = np.log10(np.clip(mc_only, 1e-99, None))
             else:
-                print(" MC array allocated but N=0 (no Monte Carlo).")
+                print(" MC array allocated but N=0 (no Monte Carlo runs performed).")
         else:
             print(" No Monte Carlo results available.")
 
         print("\nPLOTTING HELPERS")
         print("-" * 76)
-        print(" • plot_dem()         – Base DEM only")
-        print(" • plot_dem_mc()      – Base DEM + MC ensemble")
+        print(" • solver.plot_dem()     – Base DEM only")
+        print(" • solver.plot_dem_mc()  – Base DEM + MC ensemble")
         print("\n" + "=" * 76 + "\n")
 
 
