@@ -1,10 +1,9 @@
-from pathlib import Path
 
 import astropy.units as u
 import numpy as np
 import pytest
 from lmfit import Parameters
-from scipy.io import readsav
+
 from xrtpy.response.channel import Channel
 from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
@@ -322,7 +321,8 @@ def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
 
     # Make Monte Carlo deterministic for CI/test stability
     _orig_default_rng = np.random.default_rng
-    monkeypatch.setattr(np.random, "default_rng", lambda *a, **k: _orig_default_rng(0))
+    #monkeypatch.setattr(np.random, "default_rng", lambda *a, **k: _orig_default_rng(0))
+    monkeypatch.setattr(np.random, "default_rng", lambda *_, **__: _orig_default_rng(0))
 
     x = XRTDEMIterative(
         observed_channel=filters,
@@ -347,7 +347,8 @@ def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
     assert np.any(x.mc_dem[1:] != x.mc_dem[0])
 
     # No invalid values
-    assert np.all(np.isfinite(x.mc_dem)) and np.all(x.mc_dem >= 0.0)
+    assert np.all(np.isfinite(x.mc_dem))
+    assert np.all(x.mc_dem >= 0.0)
     assert np.all(np.isfinite(x.mc_mod_obs))
     assert np.all(np.isfinite(x.mc_chisq))
 
@@ -371,7 +372,8 @@ def test_reconstruct_dem_from_knots_matches_endpoints_and_is_finite():
     dem = x._reconstruct_dem_from_knots(params)
 
     assert dem.shape == x.logT.shape
-    assert np.isfinite(dem).all() and (dem >= 0.0).all()
+    assert np.isfinite(dem).all()
+    assert (dem >= 0.0).all()
 
     assert dem[0] == pytest.approx(1e-2, rel=1e-6)
     assert dem[-1] == pytest.approx(1e1, rel=1e-6)

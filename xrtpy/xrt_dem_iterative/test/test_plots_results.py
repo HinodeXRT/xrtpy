@@ -1,13 +1,12 @@
-from pathlib import Path
-import numpy as np
-import matplotlib.pyplot as plt
+# ruff: noqa: E402, FBT003
 import matplotlib.animation as animation
-
+import matplotlib.pyplot as plt
+import numpy as np
 from utils_case_io import (
+    case_dir,
+    load_idl_dem_sav,
     read_mc_intensities_csv,
     run_dem_for_mc_csv,
-    load_idl_dem_sav,
-    case_dir,
 )
 
 #NOTE-User will need Python 3.11 to run
@@ -279,8 +278,9 @@ print(f"Movie saved to: {movie_path}")
 #     Δ(log10 DEM) = log10(DEM_XRTpy) - log10(DEM_IDL)
 # -----------------------------------------------------------------------------
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -352,7 +352,7 @@ for k, run in enumerate(runs_to_plot):
         f"Run: {run}\n$\\chi^2$: {chisq:.3g}",
         transform=ax1.transAxes,
         va="top", ha="left",
-        bbox=dict(boxstyle="round", alpha=0.15),
+        bbox={"boxstyle": "round", "alpha": 0.15},
     )
 
     # ---- Bottom: Δ(log10 DEM) at major points with ±1σ error bars ----
@@ -447,10 +447,11 @@ print(f"Saved {len(runs_to_plot)} professional plots to: {plots_dir}")
 # plt.close(fig)
 
 # print(f"Movie saved to: {movie_path}")
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.collections import LineCollection
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -536,7 +537,7 @@ def make_capsegs(y_major):
     yhi = y_major + sigma_major
 
     segs = []
-    for x, yl, yh in zip(major_x, ylo, yhi):
+    for x, yl, yh in zip(major_x, ylo, yhi, strict=False):
         segs.append([[x - cap_halfwidth, yl], [x + cap_halfwidth, yl]])
         segs.append([[x - cap_halfwidth, yh], [x + cap_halfwidth, yh]])
     return np.array(segs, dtype=float)
@@ -698,8 +699,9 @@ print(f"Movie saved to: {movie_path}")
 #   - out.dem_runs shape (n_runs, 26)  (here n_runs=100)
 #   - out.logT shape (26,)
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -735,8 +737,9 @@ print(f"Saved: {out_png}")
 #   - idl.dem_runs shape (100, 26)
 #   - idl.logT shape (26,)
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -765,8 +768,9 @@ plt.close(fig)
 
 print(f"Saved: {out_png}")
 ######
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -795,6 +799,7 @@ ax.grid(True, alpha=0.3)
 
 # Create manual legend entries (so we don’t get 200 legend lines)
 from matplotlib.lines import Line2D
+
 legend_lines = [
     Line2D([0], [0], color="orange", lw=2, label="IDL"),
     Line2D([0], [0], color="blue", lw=2, label="XRTpy"),
@@ -824,7 +829,7 @@ base_idx = 0
 
 base_intensities = np.asarray(mc.mc_intensities[base_idx], dtype=float)
 print("\nBase (row 0) intensities used for XRTpy:")
-for f, val in zip(mc.filters, base_intensities):
+for f, val in zip(mc.filters, base_intensities, strict=False):
     print(f"  {f:>12s}: {val:.6f} DN/s")
 
 print("\nFirst 3 MC rows (sanity):")
@@ -834,8 +839,9 @@ for i in range(3):
 
 
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))

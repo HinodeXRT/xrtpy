@@ -7,7 +7,7 @@ import warnings
 import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
-from scipy.interpolate import interp1d
+from scipy.interpolate import CubicSpline, interp1d
 
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
@@ -838,7 +838,6 @@ class XRTDEMIterative:
         Construct DEM(T) on self.logT using spline of log10(DEM) at knot positions.
         Uses a natural cubic spline interpolation in log10(DEM) space.
         """
-        from scipy.interpolate import CubicSpline
 
         knot_vals = np.array([params[f"knot_{i}"].value for i in range(self.n_spl)])
 
@@ -1109,7 +1108,7 @@ class XRTDEMIterative:
                 f" Shape:          {self._response_matrix.shape}  (n_filters x n_T_bins)"
             )
             print(f" Units:          {self._response_unit}")
-            print(f" Non-zero entries per filter:")
+            print(" Non-zero entries per filter:")
             for i, fname in enumerate(self.filter_names):
                 n_nonzero = np.count_nonzero(self._response_matrix[i])
                 peak_logT = self.logT[np.argmax(self._response_matrix[i])]
@@ -1191,7 +1190,7 @@ class XRTDEMIterative:
             print(f" MC realizations:         {N}")
             if N > 0:
                 mc_only = self.mc_dem[1:]  # (N, nT)
-                log_mc = np.log10(np.clip(mc_only, 1e-99, None))
+                np.log10(np.clip(mc_only, 1e-99, None))
             else:
                 print(" MC array allocated but N=0 (no Monte Carlo runs performed).")
         else:

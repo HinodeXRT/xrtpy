@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -20,7 +19,7 @@ def case_dir(case_name: str) -> Path:
 @dataclass(frozen=True)
 class MonteCarloInputs:
     df: pd.DataFrame
-    filters: List[str]
+    filters: list[str]
     mc_intensities: np.ndarray  # shape: (n_runs, n_filters)
 
 
@@ -99,7 +98,7 @@ def read_mc_intensities_csv(csv_path: str | Path) -> MonteCarloInputs:
 @dataclass(frozen=True)
 class DemBatchResult:
     filters: list[str]
-    logT: np.ndarray  # (nT,)
+    logT: np.ndarray  # (nT,) # noqa: N815
     dem_runs: np.ndarray  # (n_runs, nT)
     modeled_runs: np.ndarray  # (n_runs, n_filters)
     chisq_runs: np.ndarray  # (n_runs,)
@@ -188,7 +187,7 @@ def run_dem_for_mc_csv(
 
 @dataclass(frozen=True)
 class IDLDemResult:
-    logT: np.ndarray  # (nT,)
+    logT: np.ndarray  # (nT,) # noqa: N815
     dem_runs: (
         np.ndarray
     )  # (n_runs, nT)   (runs exclude base or include base depending on file)
