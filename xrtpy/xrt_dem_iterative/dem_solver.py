@@ -655,7 +655,7 @@ class XRTDEMIterative:
         This method repeats the peak-finding logic for diagnostic purposes, but
         the final DEM passed into the solver is always:
 
-            log10(DEM(T)) = 0.0  for all temperature bins
+            log10(DEM(T)) = 1.0  for all temperature bins
 
         which corresponds to DEM(T) = 1 in arbitrary units. This reproduces the
         IDL initial condition exactly.
@@ -671,7 +671,7 @@ class XRTDEMIterative:
         -------
         ndarray
             Initial log10(DEM) estimate on self.logT. This is always a flat
-            array of zeros (IDL-equivalent behavior).
+            array of ones (IDL-equivalent behavior).
         """
         if not hasattr(self, "logT"):
             raise AttributeError(
@@ -771,7 +771,7 @@ class XRTDEMIterative:
         - self.spline_logT    : knot positions (evenly spaced in log10(T))
         - self.spline_log_dem : initial values of log10(DEM) at each knot
         - self.pm_matrix      : response matrix multiplied by T * d(ln T)
-        - self.weights        : all ones (IDL uses a channel weighting mask)
+        - self.weights        : 1.0 for non-zero intensity channels, 0.0 for zero-intensity channels
         - self.abundances     : all ones
 
         pm_matrix corresponds to:
@@ -800,12 +800,12 @@ class XRTDEMIterative:
         # Knot positions are evenly spaced in logT (IDL spl_t)
         self.spline_logT = np.linspace(self.logT.min(), self.logT.max(), self.n_spl)
 
-        # Initial spline DEM values: sample from initial logDEM grid
+        # Initial spline DEM values: sample from initial logDEM grid -  IDL uses a cubic spline
         # (IDL spline(est_t, est_dem, spl_t))
         interp_init = interp1d(
             self.logT,
             self._initial_log_dem,  # IDL is flat logDEM = 1.0
-            kind="linear",  # IDL uses a cubic spline later NOTEFORJOY NOV20
+            kind="linear",
             bounds_error=False,
             fill_value="extrapolate",
         )
@@ -815,7 +815,7 @@ class XRTDEMIterative:
     def _build_lmfit_parameters(self):
         """
         Build lmfit.Parameters object representing log10(DEM) at the spline knots.
-        IDL limits each spline DEM parameter to [-20, 0].
+        IDL applies a lower bound of -20 only (no upper bound).
         """
 
         if not hasattr(self, "spline_log_dem"):
@@ -843,7 +843,7 @@ class XRTDEMIterative:
 
         cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
         log_dem = cs(self.logT)
-        log_dem = np.clip(log_dem, -300.0, 300.0)  # JOY-MARCH 2026!!!!!!!
+        log_dem = np.clip(log_dem, -300.0, 300.0)
         dem = 10.0**log_dem
         return dem
 
@@ -878,8 +878,9 @@ class XRTDEMIterative:
 
         # chi^2 history, mostly for debugging
         chi2_val = np.sum(residuals**2)
-        if not hasattr(self, "_iteration_chi2"):
-            self._iteration_chi2 = []
+        #JOY March 2026
+        # if not hasattr(self, "_iteration_chi2"):
+        #     self._iteration_chi2 = []
         self._iteration_chi2.append(chi2_val)
 
         return residuals
@@ -907,12 +908,13 @@ class XRTDEMIterative:
         # 3. initial guess (log10 DEM_model on grid)
         init_log_dem = self._estimate_initial_dem()  # flat ~ 1.0 in IDL
         self._initial_log_dem = init_log_dem
+        self._iteration_chi2 = []  # reset chi2 history for this solve pass JOY March 2026
 
         # 4. spline system using that initial guess
         self._prepare_spline_system()
         self.weights = np.where(
             observed_intensities_vals != 0.0, 1.0, 0.0
-        )  # JOY- March 2026 !!!!!
+        )
         params0 = self._build_lmfit_parameters()  # values = initial_log_dem at knots
 
         # 5. run minimizer
@@ -1128,33 +1130,6 @@ class XRTDEMIterative:
             print(f" Knot positions (logT):    {np.round(self.spline_logT, 3)}")
         else:
             print(" Spline system not prepared yet.")
-
-        print("\nBASE DEM SOLUTION")
-        print("-" * 70)
-        if hasattr(self, "dem"):
-            log_dem = np.log10(np.clip(self.dem, 1e-99, None))
-            peak_idx = np.argmax(self.dem)
-            peak_logT = self.logT[peak_idx]
-            peak_dem = self.dem[peak_idx]
-
-            n_dof = (
-                max(1, len(self._observed_intensities) - self.n_spl)
-                if hasattr(self, "n_spl")
-                else len(self._observed_intensities)
-            )
-            reduced_chi2 = self.chisq / n_dof
-
-            print(f" DEM shape:               {self.dem.shape}")
-            print(
-                f" Peak DEM:                {peak_dem:.4e}  at logT = {peak_logT:.2f}  [cm⁻⁵ K⁻¹]"
-            )
-            print(
-                f" log10(DEM) range:        {log_dem.min():.2f}  to  {log_dem.max():.2f}"
-            )
-            print(f" Chi-square:              {self.chisq:.4e}")
-            print(f" Reduced chi-square:      {reduced_chi2:.4e}  (chi2 / {n_dof} dof)")
-        else:
-            print(" No DEM solution computed yet (call solve()).")
 
         print("\nBASE DEM SOLUTION")
         print("-" * 70)
