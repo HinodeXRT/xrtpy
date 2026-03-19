@@ -8,6 +8,7 @@ import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
 from scipy.interpolate import interp1d
+
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
 
@@ -108,7 +109,6 @@ class XRTDEMIterative:
             raise ValueError("`observed_intensities` must be finite numbers.")
 
         # uncertainties
-        # NEW (defer to validate_inputs)
         if intensity_uncertainties is not None:
             self._intensity_uncertainties = np.asarray(
                 intensity_uncertainties, dtype=float
@@ -273,7 +273,7 @@ class XRTDEMIterative:
 
         # 6) grid range inside every response
         for r in self.responses:
-            # logT_grid = np√.log10(r.temperature.value)
+            # logT_grid = np.log10(r.temperature.value)
             logT_grid = np.log10(r.temperature.to_value(u.K))
             if not (
                 self._minimum_bound_temperature >= logT_grid.min()
@@ -348,28 +348,18 @@ class XRTDEMIterative:
                 stacklevel=2,
             )
 
-        # success -> no return value
         return None
 
     def __repr__(self):
         return (
             f"<XRTDEMIterative(filters={self.filter_names}, "
-            f"logT={self._minimum_bound_temperature:.2f}–{self._maximum_bound_temperature:.2f}, logarithmic_temperature_step_size={self._logarithmic_temperature_step_size:.3f})>"
+            f"logT={self._minimum_bound_temperature:.1f}–{self._maximum_bound_temperature:.1f}, logarithmic_temperature_step_size={self._logarithmic_temperature_step_size:.2f})>"
         )
-
-    # @property  #Removed if not used
-    # def name(self) -> str:
-    #     """
-    #     The XRT filter channel name, standardized (e.g. "Al-mesh").
-    #     """
-    #     return self._name
 
     @property
     def observed_intensities(
         self,
-    ) -> (
-        u.Quantity
-    ):  # Add method to account for known values not worth observed_intensities
+    ) -> u.Quantity:
         """
         Observed intensities with physical units.
 
@@ -565,7 +555,7 @@ class XRTDEMIterative:
 
         self.dlnT = (
             np.log(10.0) * self.dlogT
-        )  # for IDL-style intergral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
+        )  # for IDL-style integral DEM(T) * R(T) * T dlnT - IDL “regular logT grid”
 
     def _interpolate_responses_to_grid(self):
         """
@@ -584,7 +574,6 @@ class XRTDEMIterative:
         - Output matrix has shape (n_filters, n_temperatures).
         - Rows correspond to filters; columns correspond to temperature bins.
 
-        -------
         IDL method of Interpolate emissivity.
         Interpolate all filter responses onto the common logT grid and build
         the response matrix.
@@ -609,9 +598,7 @@ class XRTDEMIterative:
         ):  # Make sure that R_orig.value is indeed in DN/s/pix per cm^5
             logT_orig = np.log10(T_orig.to_value(u.K))
 
-            response_vals = (
-                R_orig.value
-            )  # already in correct physical units for XRTpy #NOTEFORJOY- TRIPLE check this
+            response_vals = R_orig.value
 
             interp_func = interp1d(
                 logT_orig,
@@ -627,7 +614,6 @@ class XRTDEMIterative:
         self._response_matrix = np.vstack(rows).astype(float)
 
         # Store the physical unit for clarity
-        # self._response_unit = u.DN / u.s / u.pix / (u.cm**5)
         self._response_unit = (u.DN / u.s / u.pix) * u.cm**5
 
         # Quick sanity check
@@ -653,33 +639,6 @@ class XRTDEMIterative:
                 "Response matrix not available. Call _interpolate_responses_to_grid() first."
             )
         return self._response_matrix
-
-    # Might just be dead-code  - JOY HERE !!! MARCH 2026
-    # def _prepare_scaled_observations(self):
-    #     """
-    #     Prepare the scaled observed intensities and uncertainties
-    #     exactly as done in the IDL routine xrt_dem_iterative2.pro.
-
-    #     IDL equivalent:
-    #         input1.i_obs = input1.i_obs / solv_factor
-    #         input1.i_err = input1.i_err / solv_factor
-    #     """
-    #     # Extract values as plain floats (DN/s/pix)
-    #     intensities_scaled_raw = (
-    #         self.observed_intensities.value
-    #     )  # Might just remove this line and up in the normalization
-    #     sigma_intensity_uncertainties_raw = self.intensity_uncertainties.to_value(
-    #         u.DN / u.s
-    #     )  # Might just remove this line and up in the normalization
-
-    #     # Apply normalization
-    #     self.intensities_scaled = intensities_scaled_raw / self.normalization_factor
-    #     self.sigma_scaled_intensity_uncertainties = (
-    #         sigma_intensity_uncertainties_raw / self.normalization_factor
-    #     )
-
-    #     # Store for solver
-    #     self._scaled_prepared = True
 
     # ======================================================================
     # DEM INITIALIZATION AND SOLVER METHODS
@@ -793,21 +752,9 @@ class XRTDEMIterative:
         else:
             self._raw_estimated_dem_peaks = (np.array([]), np.array([]))
 
-        # IDL BEHAVIOR: override with flat initial DEM
-        # xrt_dem_iter_estim ultimately does: dem = 0.0*findgen(nt) + 1.0  ; Use flat dem for initial guess on a regular logT grid. We mirror that here exactly:
-
-        # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 1.0 NOV20
-        # est_log_dem_on_grid = np.ones_like(self.logT, dtype=float) * 0.0 #NOTEFORJOY
-
-        ###
-        # est_log_dem_on_grid = np.zeros_like(self.logT) ####### JOY HERE!!!!!!!! March2026
-        est_log_dem_on_grid = np.ones_like(self.logT)
-        # March 12, 2026
-        # est_log_dem_on_grid = np.ones_like(self.logT)
-        #####
+        est_log_dem_on_grid = np.ones_like(self.logT)  # March2026
 
         # Return the intial first guessed DEM
-
         # Store for later use by the solver
         self._initial_log_dem = est_log_dem_on_grid
 
@@ -841,10 +788,6 @@ class XRTDEMIterative:
         self.n_spl = min(max(n_line - 1, 1), 7)
 
         # Weights and abundances (IDL sets all =1)
-        # Later, should I a use_line mask (IDL ignores lines with i_obs=0), but you can add that when you need it.
-        # JOY HERE!!!!! MARCH 17, 2026
-        # self.weights = np.ones(n_line, dtype=float)
-        # self.abundances = np.ones(n_line, dtype=float)
         self.weights = np.where(self._observed_intensities != 0.0, 1.0, 0.0)
         self.abundances = np.ones(n_line, dtype=float)
 
@@ -880,15 +823,6 @@ class XRTDEMIterative:
 
         params = Parameters()
 
-        # March 16, 2026
-        # for i in range(self.n_spl):
-        #     params.add(
-        #         f"knot_{i}",
-        #         value=float(self.spline_log_dem[i]),
-        #         min=-20.0,
-        #         max=0.0,
-        #         vary=True,
-        #     )
         for i in range(self.n_spl):
             params.add(
                 f"knot_{i}",
@@ -896,8 +830,6 @@ class XRTDEMIterative:
                 min=-20.0,
                 vary=True,
             )
-
-        ##### JOY HERE!!!!!!!!!
 
         return params
 
@@ -910,7 +842,6 @@ class XRTDEMIterative:
 
         knot_vals = np.array([params[f"knot_{i}"].value for i in range(self.n_spl)])
 
-        # Or used the code above but switch from linear to kind="cubic"
         cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
         log_dem = cs(self.logT)
         log_dem = np.clip(log_dem, -300.0, 300.0)  # JOY-MARCH 2026!!!!!!!
@@ -982,7 +913,7 @@ class XRTDEMIterative:
         self._prepare_spline_system()
         self.weights = np.where(
             observed_intensities_vals != 0.0, 1.0, 0.0
-        )  # JOY- March 17, 2026 !!!!!
+        )  # JOY- March 2026 !!!!!
         params0 = self._build_lmfit_parameters()  # values = initial_log_dem at knots
 
         # 5. run minimizer
@@ -1001,86 +932,6 @@ class XRTDEMIterative:
         chisq = float(np.sum(resid**2))
 
         return dem_phys, modeled_intensities_phys, chisq, result
-
-    # _run_monte_carlo never reference after all
-    # def _run_monte_carlo(self):
-    #     """
-    #     Replicates IDL's Monte Carlo loop.
-    #     Produces:
-    #         - self.mc_dem           shape (n_T, N+1)
-    #         - self.mc_base_obs      shape (n_obs, N+1)
-    #         - self.mc_mod_obs       shape (n_obs, N+1)
-    #         - self.mc_chisq         shape (N+1,)
-
-    #     Note that N+1 rows means: row 0 = base case, rows 1..N = MC.
-    #     """
-
-    #     n_obs = len(self._observed_intensities)
-    #     nT = len(self.logT)
-    #     N = self._monte_carlo_runs
-
-    #     # Prepare arrays
-    #     mc_dem = np.zeros((nT, N + 1))
-    #     mc_base = np.zeros((n_obs, N + 1))
-    #     mc_mod = np.zeros((n_obs, N + 1))
-    #     mc_chi = np.zeros(N + 1)
-
-    #     # Base run first (IDL puts real data in column 0)
-    #     dem = self.dem  # already scaled back by normalization
-    #     mc_dem[:, 0] = dem
-    #     mc_base[:, 0] = self._observed_intensities  # unscaled
-    #     mc_mod[:, 0] = self.modeled_intensities  # unscaled
-    #     mc_chi[0] = self.current_chi2
-
-    #     # --- Run the MC loops ---
-    #     rng = np.random.default_rng()  # like systime(1)
-
-    #     for ii in range(1, N + 1):
-    #         # Step 1: Perturbed intensities (scaled)
-    #         perturbed = (
-    #             self.intensities_scaled
-    #             + rng.normal(size=n_obs) * self.sigma_scaled_intensity_uncertainties
-    #         )
-    #         perturbed = np.clip(perturbed, 0, None)
-
-    #         # Store unscaled in mc_base
-    #         mc_base[:, ii] = perturbed * self.normalization_factor
-
-    #         # If all zero → nosolve=True
-    #         if np.all(perturbed == 0):
-    #             mc_dem[:, ii] = 0.0
-    #             mc_mod[:, ii] = 0.0
-    #             mc_chi[ii] = 0.0
-    #             continue
-
-    #         # Step 2: assign perturbed intensities
-    #         self.intensities_scaled = perturbed
-
-    #         # Step 3: Rebuild spline system
-    #         self._prepare_spline_system()
-
-    #         # Step 4: Solve via lmfit
-    #         params = self._build_lmfit_parameters()
-    #         out = minimize(self._residuals, params, max_nfev=self.max_iterations)
-
-    #         # Step 5: Reconstruct DEM
-    #         dem = self._reconstruct_dem_from_knots(out.params)
-    #         dem_scaled = dem * self.normalization_factor  # unscale
-    #         mc_dem[:, ii] = dem_scaled
-
-    #         # Step 6: Compute modeled intensities
-    #         modeled = (self.pm_matrix @ dem) * self.abundances
-    #         mc_mod[:, ii] = modeled * self.normalization_factor
-
-    #         # Step 7: Compute chi-square
-    #         resid = self._residuals(out.params)
-    #         mc_chi[ii] = np.sum(resid**2)
-
-    #     # store results
-    #     self.mc_dem = mc_dem
-    #     self.mc_base_obs = mc_base
-    #     self.mc_mod_obs = mc_mod
-    #     self.mc_chisq = mc_chi
 
     def solve(self):
         """
@@ -1141,7 +992,7 @@ class XRTDEMIterative:
         )
 
         # Store base solution
-        self.logT_solution = self.logT.copy()  # alias
+        # self.logT_solution = self.logT.copy()  # alias - REMOVE after testing
         self.dem = dem_base  # [cm^-5 K^-1]
         self.chisq = chisq_base  # chi-square
         self.modeled_intensities = mod_base  # [DN/s/pix]
