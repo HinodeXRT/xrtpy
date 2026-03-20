@@ -453,7 +453,7 @@ class XRTDEMIterative:
         if not self._using_estimated_uncertainty:
             warnings.warn(
                 (
-                    "\n\nNo intensity_uncertainties provided. Using default model: "
+                    "\n\n No intensity_uncertainties provided. Using default model: "
                     "max(relative-uncertainty * observed_intensity, min_observational_uncertainty)\n"
                     f"=> relative_uncertainty = {self.relative_uncertainty}, "
                     f"min_observational_uncertainty = {self.min_observational_uncertainty.value} DN/s\n"
