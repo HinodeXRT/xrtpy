@@ -83,7 +83,7 @@ Example
 3. Observed intensities
 ~~~~~~~~~~~~~~~~~~~~~~~
 * Type: array-like
-* Units: DN/s (normalized per pixel)
+* Units: DN/s/pix
 * Description: Measured intensities in each filter channel.
 * Length must match the number of filters.
 
@@ -278,7 +278,7 @@ The values shown match the current defaults and are written out for clarity.
         minimum_bound_temperature=5.5,         # Minimum log T (default: 5.5)
         maximum_bound_temperature=8.0,         # Maximum log T (default: 8.0)
         logarithmic_temperature_step_size=0.1, # Bin width in log T (default: 0.1)
-        monte_carlo_runs=100,                  # Number of Monte Carlo runs (default: none)
+        monte_carlo_runs=100,                  # Number of Monte Carlo runs (default: 0 -(disabled))
         max_iterations=2000,                   # Solver max iterations (default: 2000)
         normalization_factor=1e21,             # Normalization scaling factor (default: 1e21)
     )
