@@ -8,7 +8,6 @@ import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
 from scipy.interpolate import CubicSpline, interp1d
-
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
 
@@ -18,7 +17,7 @@ class XRTDEMIterative:
     Differential Emission Measure (DEM) solver for Hinode/XRT observations.
 
     This class implements a Python version of the IDL routine
-    `xrt_dem_iterative2.pro`, using spline-parameterized DEM curves and
+    ``xrt_dem_iterative2.pro``, using spline-parameterized DEM curves and
     iterative least-squares fitting. It supports Monte Carlo uncertainty analysis
     and closely mirrors the logic of the original IDL algorithm.
 
@@ -58,9 +57,6 @@ class XRTDEMIterative:
     provided by all filter responses.
     - If intensity_uncertainties is not provided, a default model is used to
     estimate uncertainties.
-
-    SELFNOTEJOY
-        Add web-link to IDL script.
     """
 
     def __init__(
@@ -627,7 +623,7 @@ class XRTDEMIterative:
 
         Units: DN s^-1 pix^-1 cm⁵ per emission measure.
 
-        Equivalent to `Res_Mat` in IDL's `xrt_dem_iterative2.pro`.
+        Equivalent to `Res_Mat` in IDL's ``xrt_dem_iterative2.pro``.
 
         Raises
         ------
@@ -878,7 +874,7 @@ class XRTDEMIterative:
 
         # chi^2 history, mostly for debugging
         chi2_val = np.sum(residuals**2)
-        #JOY March 2026
+        # JOY March 2026
         # if not hasattr(self, "_iteration_chi2"):
         #     self._iteration_chi2 = []
         self._iteration_chi2.append(chi2_val)
@@ -908,13 +904,13 @@ class XRTDEMIterative:
         # 3. initial guess (log10 DEM_model on grid)
         init_log_dem = self._estimate_initial_dem()  # flat ~ 1.0 in IDL
         self._initial_log_dem = init_log_dem
-        self._iteration_chi2 = []  # reset chi2 history for this solve pass JOY March 2026
+        self._iteration_chi2 = (
+            []
+        )  # reset chi2 history for this solve pass JOY March 2026
 
         # 4. spline system using that initial guess
         self._prepare_spline_system()
-        self.weights = np.where(
-            observed_intensities_vals != 0.0, 1.0, 0.0
-        )
+        self.weights = np.where(observed_intensities_vals != 0.0, 1.0, 0.0)
         params0 = self._build_lmfit_parameters()  # values = initial_log_dem at knots
 
         # 5. run minimizer
@@ -943,8 +939,7 @@ class XRTDEMIterative:
         1. Validate inputs.
         2. Build the logT grid and interpolate temperature responses.
         3. Solve ONE base DEM using the original (unperturbed) intensities.
-        4. If Monte Carlo is requested (monte_carlo_runs > 0), perform N
-        perturbed solves by adding Gaussian noise to the base intensities.
+        4. If Monte Carlo is requested (monte_carlo_runs > 0), perform N perturbed solves by adding Gaussian noise to the base intensities.
         5. Store all outputs on the instance for later analysis/plotting.
 
         After calling solve(), the following attributes are defined:
