@@ -72,18 +72,18 @@ class XRTDEMIterative:
         """
         Notes
         -----
-        - All input lists (`observed_channel`, `observed_intensities`, and `temperature_responses`)
-        must be the same length. Each entry should correspond to one filter.
+        - All input lists (``observed_channel``, ``observed_intensities``, and ``temperature_responses``)
+            must be the same length. Each entry should correspond to one filter.
 
-        - The temperature grid range (`minimum_bound_temperature`, `maximum_bound_temperature`) must lie entirely within the
-        response temperature ranges for **all** filters provided.
+        - The temperature grid range (``minimum_bound_temperature``, ``maximum_bound_temperature``) must lie entirely within the
+            response temperature ranges for all filters provided.
 
-        - If `intensity_uncertainties` is not provided, a model-based uncertainty estimate is used:
-        max(0.03 * observed_intensity, 2 (DN/s/pix)), as in the IDL original.
+        - If ``intensity_uncertainties`` is not provided, a model-based uncertainty estimate is used:
+            max(0.03 * observed_intensity, 2 DN/s/pix), as in the IDL original.
 
         - Default XRT filter names include:
-        {'Al-mesh', 'Al-poly', 'C-poly', 'Ti-poly', 'Be-thin', 'Be-med', 'Al-med', 'Al-thick', 'Be-thick',
-        'Al-poly/Al-mesh', 'Al-poly/Ti-poly', 'Al-poly/Al-thick', 'Al-poly/Be-thick'}
+            Al-mesh, Al-poly, C-poly, Ti-poly, Be-thin, Be-med, Al-med, Al-thick, Be-thick,
+            Al-poly/Al-mesh, Al-poly/Ti-poly, Al-poly/Al-thick, Al-poly/Be-thick.
         """
 
         # Validate and store filter names
@@ -494,7 +494,7 @@ class XRTDEMIterative:
     def create_logT_grid(self):
         """
         Construct the regular log10 temperature grid used for DEM calculations.
-s
+        
         This builds a uniformly spaced grid in :math:`\\log_{10}(T)` between
         ``minimum_bound_temperature`` and ``maximum_bound_temperature``, using
         ``logarithmic_temperature_step_size``. The linear temperature grid is then
@@ -623,7 +623,7 @@ s
         Raises
         ------
         AttributeError
-            If `_interpolate_responses_to_grid()` has not been called yet.
+            If ``_interpolate_responses_to_grid()`` has not been called yet.
         """
         if not hasattr(self, "_response_matrix"):
             raise AttributeError(
