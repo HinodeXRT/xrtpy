@@ -38,7 +38,7 @@ Conceptually, the solver:
     2. Interpolates the filter temperature responses onto that grid.
     3. Represents log10(DEM) as a spline in log10(T).
     4. Uses least-squares fitting (via ``lmfit``) to adjust the spline values so that the modeled filter intensities best match the observed intensities.
-    5. Optionally performs Monte Carlo runs by perturbing the observed intensities with their errors and re-solving the DEM many times to estimate uncertainties.
+    5. Optionally performs Monte Carlo runs by perturbing the observed intensities with their uncertainties and re-solving the DEM many times to estimate uncertainties.
 
 This approach mirrors the structure and behavior of the IDL routine while providing a modern, 
 fully open-source implementation in Python that integrates naturally with the scientific Python ecosystem.
@@ -150,10 +150,10 @@ Solving a DEM
 
 
 
-Enabling Monte Carlo error estimates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enabling Monte Carlo uncertainties estimates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To estimate uncertainties, you can enable Monte Carlo iterations. The solver
-will perturb the observed intensities by their errors and re-solve the DEM
+will perturb the observed intensities by their uncertainties and re-solve the DEM
 for each realization.
 
 .. code-block:: python
@@ -237,7 +237,7 @@ where :math:`\sigma_i` are the observational uncertainties. Smoothness of the
 solution is enforced implicitly through the spline representation and the
 limited number of knots.
 
-When Monte Carlo error estimation is enabled, the observed intensities are
+When Monte Carlo uncertainties estimation is enabled, the observed intensities are
 perturbed according to their uncertainties,
 
 .. math::
@@ -274,7 +274,7 @@ The values shown match the current defaults and are written out for clarity.
         temperature_responses=responses,       # Instrument responses
 
         # Optional configuration:
-        intensity_errors=None,                 # Observed uncertainties - default: auto-estimated (3%)
+        intensity_uncertainties=None,                 # Observed uncertainties - default: auto-estimated (3%)
         minimum_bound_temperature=5.5,         # Minimum log T (default: 5.5)
         maximum_bound_temperature=8.0,         # Maximum log T (default: 8.0)
         logarithmic_temperature_step_size=0.1, # Bin width in log T (default: 0.1)
