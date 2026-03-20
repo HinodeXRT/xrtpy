@@ -479,7 +479,7 @@ class XRTDEMIterative:
     def normalization_factor(self):
         """
         Scaling factor used during DEM optimization to stabilize the spline fit.
-        Corresponds to `normalization_factor` in IDL (default 1e21).
+        Corresponds to ``normalization_factor`` in IDL (default 1e21).
         """
         return self._normalization_factor
 
@@ -494,7 +494,7 @@ class XRTDEMIterative:
     def create_logT_grid(self):
         """
         Construct the regular log10 temperature grid used for DEM calculations.
-
+s
         This builds a uniformly spaced grid in :math:`\\log_{10}(T)` between
         ``minimum_bound_temperature`` and ``maximum_bound_temperature``, using
         ``logarithmic_temperature_step_size``. The linear temperature grid is then
@@ -569,10 +569,8 @@ class XRTDEMIterative:
 
         IDL method of Interpolate emissivity.
         Interpolate all filter responses onto the common logT grid and build
-        the response matrix.
-
-        Equivalent to constructing ``Res_Mat`` in IDL's ``xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>``__
-        and in the DEM_Solver PDF documentation.
+        the response matrix. Equivalent to constructing ``Res_Mat`` in IDL's ``xrt_dem_iterative2.pro``. 
+        
 
         Attributes Created
         ------------------
