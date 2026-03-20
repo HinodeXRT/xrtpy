@@ -20,9 +20,9 @@ active regions.
 
 Hinode/XRT is well suited for DEM analysis because it observes the corona
 through multiple broadband filters, each sensitive to different temperature
-ranges. By combining these channels, we can infer a DEM(T) that reproduces 
-the observed filter intensities when combined with the instrument temperature 
-response functions.
+ranges. By combining these channels, we can infer a DEM(T) that reproduces
+the observed filter intensities when forward-modeled with the instrument
+temperature response functions.
 
 The solver is iterative in that it repeatedly adjusts a parameterized
 DEM to minimize the difference between observed and modeled intensities.
@@ -315,3 +315,7 @@ The solver performs basic validation of user inputs and may emit warnings in
 cases where observed intensities are non-physical (e.g., negative values) or
 approach known instrument limits. These warnings do not stop execution but are
 intended to help users assess the reliability of the results.
+
+When no intensity uncertainties are provided, the solver applies a default
+model: :math:`\sigma_i = \max(0.03 \times I_i,\ 2\ \mathrm{DN/s/pix})`.
+This mirrors the default behavior of the IDL routine.
