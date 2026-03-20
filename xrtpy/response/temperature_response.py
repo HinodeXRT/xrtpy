@@ -2,8 +2,9 @@ __all__ = [
     "TemperatureResponseFundamental",
 ]
 
-from pathlib import Path
 import logging
+from pathlib import Path
+
 logger = logging.getLogger(__name__)
 
 import astropy.constants as const
@@ -11,8 +12,6 @@ import numpy as np
 import scipy.io
 from astropy import units as u
 from scipy import interpolate
-
-
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental, parse_filter_input
@@ -85,8 +84,10 @@ class TemperatureResponseFundamental:
         self._effective_area_fundamental = EffectiveAreaFundamental(
             filter_name, observation_date
         )
-        
-        logger.debug(f"Filter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}")
+
+        logger.debug(
+            f"Filter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}"
+        )
 
     @property
     def filter_name(self):
