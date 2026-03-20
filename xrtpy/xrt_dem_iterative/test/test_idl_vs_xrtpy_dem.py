@@ -1,21 +1,20 @@
-from pathlib import Path
-import numpy as np
-import matplotlib.pyplot as plt
+# ruff: noqa: E402, FBT003
 import matplotlib.animation as animation
-
+import matplotlib.pyplot as plt
+import numpy as np
 from utils_case_io import (
+    case_dir,
+    load_idl_dem_sav,
     read_mc_intensities_csv,
     run_dem_for_mc_csv,
-    load_idl_dem_sav,
-    case_dir,
 )
 
 #NOTE-User will need Python 3.11 to run
 
-CASE_DIR = case_dir("case_20080104_110426")
-csv_path = CASE_DIR / "mc_intensities_20080104_110426_IDL.csv"
-idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_20080104_110426_MCITER100.sav")
-mc = read_mc_intensities_csv(csv_path)
+# CASE_DIR = case_dir("case_20080104_110426")
+# csv_path = CASE_DIR / "mc_intensities_20080104_110426_IDL.csv"
+# idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_20080104_110426_MCITER100.sav")
+# mc = read_mc_intensities_csv(csv_path)
 
 # CASE_DIR = case_dir("case_20080104_110426")
 # csv_path = CASE_DIR / "mc_intensities_20080104_110426_IDL.csv"
@@ -23,16 +22,28 @@ mc = read_mc_intensities_csv(csv_path)
 # mc = read_mc_intensities_csv(csv_path)
 
 
+CASE_DIR = case_dir("case_20260317_225659")
+csv_path = CASE_DIR / "mc_intensities_20210720 1604_IDL.csv"
+idl = load_idl_dem_sav(CASE_DIR / "xrt_dem_output_202107201604_MCITER100.sav")
+mc = read_mc_intensities_csv(csv_path)
+
+
 print(mc.filters)
 print(mc.mc_intensities.shape)  # (N, n_filters)
 print(mc.df.head())
 
-observation_date = "2008-01-04T11:04:26"
+observation_date = "2021-07-20T16:04"
+
+# out = run_dem_for_mc_csv(
+#     csv_path=csv_path,
+#     observation_date=observation_date,
+#     intensity_errors=[ 8.9914,6.6961,2.3677, 3.9784,0.4987]#None,  # keep None to match IDL default behavior
+# )
 
 out = run_dem_for_mc_csv(
     csv_path=csv_path,
     observation_date=observation_date,
-    intensity_errors=[ 8.9914,6.6961,2.3677, 3.9784,0.4987]#None,  # keep None to match IDL default behavior
+    intensity_errors=[11.1806,6.6540,12.0541,0.0063,0.5018, 2.3537]#None,  # keep None to match IDL default behavior
 )
 
 #import pdb; pdb.set_trace()
@@ -276,8 +287,9 @@ print(f"Movie saved to: {movie_path}")
 #     Δ(log10 DEM) = log10(DEM_XRTpy) - log10(DEM_IDL)
 # -----------------------------------------------------------------------------
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -349,7 +361,7 @@ for k, run in enumerate(runs_to_plot):
         f"Run: {run}\n$\\chi^2$: {chisq:.3g}",
         transform=ax1.transAxes,
         va="top", ha="left",
-        bbox=dict(boxstyle="round", alpha=0.15),
+        bbox={"boxstyle": "round", "alpha": 0.15},
     )
 
     # ---- Bottom: Δ(log10 DEM) at major points with ±1σ error bars ----
@@ -445,9 +457,9 @@ print(f"Saved {len(runs_to_plot)} professional plots to: {plots_dir}")
 
 # print(f"Movie saved to: {movie_path}")
 
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy as np
 
 # -------------------------
 # Bottom-panel "major" logT points
@@ -559,8 +571,9 @@ print(f"Science-style movie saved to: {movie_path}")
 #   - out.dem_runs shape (n_runs, 26)  (here n_runs=100)
 #   - out.logT shape (26,)
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -596,8 +609,9 @@ print(f"Saved: {out_png}")
 #   - idl.dem_runs shape (100, 26)
 #   - idl.logT shape (26,)
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -626,8 +640,9 @@ plt.close(fig)
 
 print(f"Saved: {out_png}")
 ######
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
@@ -656,6 +671,7 @@ ax.grid(True, alpha=0.3)
 
 # Create manual legend entries (so we don’t get 200 legend lines)
 from matplotlib.lines import Line2D
+
 legend_lines = [
     Line2D([0], [0], color="orange", lw=2, label="IDL"),
     Line2D([0], [0], color="blue", lw=2, label="XRTpy"),
@@ -685,7 +701,7 @@ base_idx = 0
 
 base_intensities = np.asarray(mc.mc_intensities[base_idx], dtype=float)
 print("\nBase (row 0) intensities used for XRTpy:")
-for f, val in zip(mc.filters, base_intensities):
+for f, val in zip(mc.filters, base_intensities, strict=False):
     print(f"  {f:>12s}: {val:.6f} DN/s")
 
 print("\nFirst 3 MC rows (sanity):")
@@ -695,8 +711,9 @@ for i in range(3):
 
 
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def _log10_dem(dem: np.ndarray, floor: float = 1e-99) -> np.ndarray:
     return np.log10(np.maximum(dem, floor))
