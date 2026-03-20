@@ -2,6 +2,7 @@ __all__ = [
     "TemperatureResponseFundamental",
 ]
 
+import logging
 from pathlib import Path
 
 import astropy.constants as const
@@ -12,6 +13,8 @@ from scipy import interpolate
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.effective_area import EffectiveAreaFundamental, parse_filter_input
+
+logger = logging.getLogger(__name__)
 
 _abundance_model_file_path = {
     "coronal_abundance_path": Path(__file__).parent.absolute()
@@ -81,8 +84,9 @@ class TemperatureResponseFundamental:
         self._effective_area_fundamental = EffectiveAreaFundamental(
             filter_name, observation_date
         )
-        print(
-            f"\nFilter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}\n"
+
+        logger.debug(
+            f"Filter1: {self.filter1_name}, Filter2: {self.filter2_name}, Combo: {self.is_combo}"
         )
 
     @property
