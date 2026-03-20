@@ -51,12 +51,9 @@ class XRTDEMIterative:
 
     Notes
     -----
-    - All lists (observed_channel, observed_intensities,
-    temperature_responses) must be the same length.
-    - The log10(T) range must lie inside the native temperature grid
-    provided by all filter responses.
-    - If intensity_uncertainties is not provided, a default model is used to
-    estimate uncertainties.
+    - All lists (observed_channel, observed_intensities, temperature_responses) must be the same length.
+    - The log10(T) range must lie inside the native temperature grid provided by all filter responses.
+    - If intensity_uncertainties is not provided, a default model is used to estimate uncertainties.
     """
 
     def __init__(
@@ -574,7 +571,7 @@ class XRTDEMIterative:
         Interpolate all filter responses onto the common logT grid and build
         the response matrix.
 
-        Equivalent to constructing ``Res_Mat`` in IDL's `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__
+        Equivalent to constructing ``Res_Mat`` in IDL's ``xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>``__
         and in the DEM_Solver PDF documentation.
 
         Attributes Created
@@ -623,7 +620,7 @@ class XRTDEMIterative:
 
         Units: DN s^-1 pix^-1 cm⁵ per emission measure.
 
-        Equivalent to `Res_Mat` in IDL's ``xrt_dem_iterative2.pro``.
+        Equivalent to ``Res_Mat`` in IDL's ``xrt_dem_iterative2.pro``.
 
         Raises
         ------
