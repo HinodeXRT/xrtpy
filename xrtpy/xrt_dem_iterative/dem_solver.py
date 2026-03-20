@@ -866,12 +866,17 @@ class XRTDEMIterative:
         # 4. Residuals = (i_mod - y_obs) * weights / sigma
         residuals = (i_mod - y_scaled) * self.weights / sigma_scaled
 
-        # chi^2 history, mostly for debugging
-        chi2_val = np.sum(residuals**2)
-        # JOY March 2026
+        # # chi^2 history, mostly for debugging
+        # chi2_val = np.sum(residuals**2)
+        # # JOY March 2026
         # if not hasattr(self, "_iteration_chi2"):
         #     self._iteration_chi2 = []
+        # #self._iteration_chi2.append(chi2_val)
+        chi2_val = np.sum(residuals**2)
+        if not hasattr(self, "_iteration_chi2"):
+            self._iteration_chi2 = []
         self._iteration_chi2.append(chi2_val)
+        
 
         return residuals
 
