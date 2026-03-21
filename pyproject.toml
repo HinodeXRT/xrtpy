@@ -20,7 +20,6 @@ authors = [
   { name = "Nabil Freij", email = "nabil.freij@gmail.com" },
   { name = "Stuart Mumford" },
 ]
-
 # SPEC 0 recommends that packages in the scientific pythoniverse support
 # versions of Python that have been released in the last ≤36 months
 requires-python = ">=3.11"
@@ -47,7 +46,6 @@ dependencies = [
   "sunpy[map]>=5.1",
   "ipywidgets>=8.0.0",
 ]
-
 optional-dependencies.dev = [
   "nox>=2024.10.9",
 ]
@@ -81,11 +79,9 @@ urls.Repository = "https://github.com/HinodeXRT/xrtpy"
 
 [tool.setuptools]
 packages = [ "xrtpy" ]
-
-[tool.setuptools.package-data]
-"xrtpy" = [ "data/*" ]
-"xrtpy.response" = [ "data/*.txt", "data/*.geny" ]
-"xrtpy.response.tests" = [ "data/*/*/*.txt" ]
+package-data."xrtpy" = [ "data/*" ]
+package-data."xrtpy.response" = [ "data/*.txt", "data/*.geny" ]
+package-data."xrtpy.response.tests" = [ "data/*/*/*.txt" ]
 
 [tool.setuptools_scm]
 write_to = "xrtpy/version.py"
@@ -108,48 +104,46 @@ tne,
 ue
 """
 
-[tool.pytest.ini_options]
-testpaths = [ '.' ]
-xfail_strict = true
-norecursedirs = [
-  '*egg-info*',
-  '.*cache*',
-  '.*env',
-  '.[tn]ox',
-  '.cov*',
-  '.git*',
-  '.hypothesis',
-  '.idea',
-  '.jupyter',
-  '.vscode',
-  '__pycache__',
-  '_dev',
-  'binder',
-  'build',
-  'changelog',
-  'dist',
-  'docs',
-  'licenses',
-  'node_modules',
-  'tools',
-  'venv',
-  '.venv',
+[tool.pytest]
+ini_options.testpaths = [ "." ]
+ini_options.xfail_strict = true
+ini_options.norecursedirs = [
+  "*egg-info*",
+  ".*cache*",
+  ".*env",
+  ".[tn]ox",
+  ".cov*",
+  ".git*",
+  ".hypothesis",
+  ".idea",
+  ".jupyter",
+  ".vscode",
+  "__pycache__",
+  "_dev",
+  "binder",
+  "build",
+  "changelog",
+  "dist",
+  "docs",
+  "licenses",
+  "node_modules",
+  "tools",
+  "venv",
+  ".venv",
 ]
 
-[tool.coverage.report]
-exclude_lines = [
+[tool.coverage]
+run.branch = true
+run.omit = [
+  "*/*version.py",
+]
+run.source = [ "xrtpy" ]
+report.exclude_lines = [
+  "@abstractmethod",
+  "coverage: ignore",
   "if TYPE_CHECKING",
   "if typing.TYPE_CHECKING",
-  "coverage: ignore",
   "ImportError",
   "ModuleNotFoundError",
   "raise NotImplementedError",
-  "@abstractmethod",
-]
-
-[tool.coverage.run]
-branch = true
-source = [ "xrtpy" ]
-omit = [
-  "*/*version.py",
 ]
