@@ -443,18 +443,33 @@ class XRTDEMIterative:
         if self._intensity_uncertainties is not None:
             return self._intensity_uncertainties * (u.DN / u.s)
 
+        # if not self._using_estimated_uncertainty:
+        #     warnings.warn(
+        #         (
+        #             "\n\n No intensity_uncertainties provided. Using default model: "
+        #             "max(relative-uncertainty * observed_intensity, min_observational_uncertainty)\n"
+        #             f"=> relative_uncertainty = {self.relative_uncertainty}, "
+        #             f"min_observational_uncertainty = {self.min_observational_uncertainty.value} DN/s\n"
+        #             "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n"
+        #         ),
+        #         category=UserWarning,
+        #         stacklevel=1,#2
+        #     )
         if not self._using_estimated_uncertainty:
-            warnings.warn(
-                (
-                    "\n\n No intensity_uncertainties provided. Using default model: "
-                    "max(relative-uncertainty * observed_intensity, min_observational_uncertainty)\n"
-                    f"=> relative_uncertainty = {self.relative_uncertainty}, "
-                    f"min_observational_uncertainty = {self.min_observational_uncertainty.value} DN/s\n"
-                    "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n"
-                ),
-                category=UserWarning,
-                stacklevel=2,
+            print(
+                "\n"
+                + "=" * 72
+                + "\nWARNING: No intensity uncertainties were provided.\n"
+                "Using the default uncertainty model:\n"
+                f"    relative_uncertainty          = {self.relative_uncertainty}\n"
+                f"    min_observational_uncertainty = "
+                f"{self.min_observational_uncertainty.value} DN/s\n"
+                + "=" * 72
+                + "\n"
             )
+
+
+            
 
         self._using_estimated_uncertainty = True
 
