@@ -1,4 +1,3 @@
-
 import astropy.units as u
 import numpy as np
 import pytest
@@ -321,7 +320,7 @@ def test_monte_carlo_produces_non_identical_realizations(monkeypatch):
 
     # Make Monte Carlo deterministic for CI/test stability
     _orig_default_rng = np.random.default_rng
-    #monkeypatch.setattr(np.random, "default_rng", lambda *a, **k: _orig_default_rng(0))
+    # monkeypatch.setattr(np.random, "default_rng", lambda *a, **k: _orig_default_rng(0))
     monkeypatch.setattr(np.random, "default_rng", lambda *_, **__: _orig_default_rng(0))
 
     x = XRTDEMIterative(
@@ -474,3 +473,77 @@ def test_warns_when_intensity_is_negative():
 
     with pytest.warns(UserWarning, match=r"negative"):
         x.validate_inputs()
+
+
+def test_plot_dem_runs_without_error():
+    """Smoke test — plot_dem() completes without raising."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([500.0, 1800.0, 820.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+    )
+    x.solve()
+    x.plot_dem()
+    plt.close("all")
+
+
+def test_plot_dem_mc_runs_without_error():
+    """Smoke test — plot_dem_mc() completes without raising, with and without MC."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([500.0, 1800.0, 820.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    # Without MC
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+        monte_carlo_runs=0,
+    )
+    x.solve()
+    x.plot_dem_mc()
+    plt.close("all")
+
+    # With MC
+    x2 = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+        monte_carlo_runs=3,
+    )
+    x2.solve()
+    x2.plot_dem_mc()
+    plt.close("all")
+
+
+def test_summary_runs_without_error(capsys):
+    """Smoke test — summary() prints without raising."""
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([500.0, 1800.0, 820.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+    )
+    x.solve()
+    x.summary()
+
+    captured = capsys.readouterr()
+    assert "DEM" in captured.out
+    assert "Chi-square" in captured.out
