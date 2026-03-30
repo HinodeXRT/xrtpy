@@ -1049,7 +1049,7 @@ class XRTDEMIterative:
                 # 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0
                 noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
                 obs_pert = base_obs_phys + noise
-                obs_pert = np.maximum(obs_pert, 0.0)  # IDL: >0 to avoid negatives
+                obs_pert = np.maximum(obs_pert, 0.0) # IDL: >0 to avoid negatives
 
                 # 4b) Solve DEM for this perturbed realization
                 dem_i, mod_i, chisq_i, _ = self._solve_single_dem(
