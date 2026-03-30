@@ -43,7 +43,7 @@ dem_solver = XRTDEMIterative(
     observed_channel=filters,
     observed_intensities=intensities,
     temperature_responses=responses,
-    # You may optionally provide `intensity_uncertainties` in DN/s/pix.
+    # You may optionally provide ``intensity_uncertainties`` in DN/s/pix.
     # If not provided, a default model is used: max(0.03 * intensity, 2 DN/s/pix)
     # intensity_uncertainties=[56.7, 3.8, 121.7, 7.6, 15.2, 0.2], # example values
 )
