@@ -7,6 +7,34 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def _build_filter_str(filters, max_filters=6):
+    """
+    Return a filter subtitle string, truncating gracefully if there are many filters.
+    """
+    if not filters:
+        return None
+    if len(filters) <= max_filters:
+        return ", ".join(filters)
+    shown = ", ".join(filters[:max_filters])
+    return f"{shown}, ... (+{len(filters) - max_filters} more)"
+
+
+def _uncertainty_note(solver):
+    """
+    Return a small footnote string if the default uncertainty model is active,
+    or None if the user supplied their own uncertainties.
+    """
+    if getattr(solver, "_intensity_uncertainties", None) is not None:
+        return None
+    rel = getattr(solver, "relative_uncertainty", 0.03)
+    floor = getattr(solver, "min_observational_uncertainty", None)
+    floor_val = floor.value if floor is not None else 2.0
+    return (
+        f"Uncertainties: default model — "
+        f"max({int(rel * 100)}% \u00d7 I,  {floor_val:.1f} DN/s)"
+    )
+
+
 def plot_dem(solver):
     """
     Plot the base DEM solution in log10 space (no Monte Carlo needed).
@@ -25,16 +53,16 @@ def plot_dem(solver):
     dem_safe = np.clip(dem, 1e-40, None)
     log_dem = np.log10(dem_safe)
 
-    # Build title from filter names if available
-    filters = getattr(solver, "filter_names", None)
-    if filters:
-        filter_str = ", ".join(filters)
-        title = f"Hinode/XRT — Base DEM Solution\nFilters: {filter_str}"
+    # Title
+    filter_str = _build_filter_str(getattr(solver, "filter_names", None))
+    if filter_str:
+        title = f"Hinode/XRT \u2014 Base DEM Solution\nFilters: {filter_str}"
     else:
-        title = "Hinode/XRT — Base DEM Solution"
+        title = "Hinode/XRT \u2014 Base DEM Solution"
 
-    plt.figure(figsize=(8, 5))
-    plt.step(
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    ax.step(
         logT,
         log_dem,
         where="mid",
@@ -43,21 +71,38 @@ def plot_dem(solver):
         label="Base DEM",
     )
 
-    plt.xlabel(r"$\log_{10}\,T$  [K]")
-    plt.ylabel(r"$\log_{10}$ DEM  [cm$^{-5}$ K$^{-1}$]")
-    plt.title(title)
-    plt.grid(visible=True, alpha=0.3)
-    plt.xlim(logT.min(), logT.max())
+    ax.set_xlabel(r"$\log_{10}\,T$  [K]")
+    ax.set_ylabel(r"$\log_{10}$ DEM  [cm$^{-5}$ K$^{-1}$]")
+    ax.set_title(title)
+    ax.grid(visible=True, alpha=0.3)
+    ax.set_xlim(logT.min(), logT.max())
 
     # y-limits based on finite values
     finite = np.isfinite(log_dem)
     if np.any(finite):
         y = log_dem[finite]
         pad = 0.25 * (y.max() - y.min() + 1e-6)
-        plt.ylim(y.min() - pad, y.max() + pad)
+        ax.set_ylim(y.min() - pad, y.max() + pad)
 
-    plt.legend()
-    plt.tight_layout()
+    ax.legend()
+
+    # Uncertainty footnote - only shown when default model is active
+    note = _uncertainty_note(solver)
+    if note:
+        fig.text(
+            0.5,
+            0.01,
+            note,
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            color="gray",
+            style="italic",
+        )
+        plt.tight_layout(rect=[0, 0.05, 1, 1])
+    else:
+        plt.tight_layout()
+
     plt.show()
 
 
@@ -93,25 +138,24 @@ def plot_dem_mc(
         mc_dem = None
         N = 0
 
-    # Build title from filter names if available
-    filters = getattr(solver, "filter_names", None)
-    if filters:
-        filter_str = ", ".join(filters)
-        title = f"Hinode/XRT — DEM with Monte Carlo\nFilters: {filter_str}"
+    # Title - filter string truncated to avoid overflow
+    filter_str = _build_filter_str(getattr(solver, "filter_names", None))
+    if filter_str:
+        title = f"Hinode/XRT \u2014 DEM with Monte Carlo\nFilters: {filter_str}"
     else:
-        title = "Hinode/XRT — DEM with Monte Carlo"
+        title = "Hinode/XRT \u2014 DEM with Monte Carlo"
 
     if N > 0:
         title += f"  ({N} MC realizations)"
 
-    plt.figure(figsize=figsize)
+    fig, ax = plt.subplots(figsize=figsize)
 
     # Plot MC curves first (so base DEM renders on top)
     mc_handle = None
     if has_mc and N > 0:
         for i in range(1, N + 1):
             dem_i = np.clip(mc_dem[i, :], 1e-100, None)
-            (line,) = plt.step(
+            (line,) = ax.step(
                 logT,
                 np.log10(dem_i),
                 where="mid",
@@ -123,7 +167,7 @@ def plot_dem_mc(
                 mc_handle = line  # keep only one handle for the legend
 
     # Base DEM on top
-    (base_handle,) = plt.step(
+    (base_handle,) = ax.step(
         logT,
         log_base_dem,
         where="mid",
@@ -132,23 +176,23 @@ def plot_dem_mc(
         label="Base DEM",
     )
 
-    # Legend: always show base DEM; add MC entry only if MC curves are present
+    # Legend
     if has_mc and N > 0 and mc_handle is not None:
         mc_handle.set_alpha(1.0)  # full opacity for the legend swatch
-        plt.legend(
+        ax.legend(
             handles=[base_handle, mc_handle],
             labels=["Base DEM", f"MC realizations (N={N})"],
         )
     else:
-        plt.legend(handles=[base_handle], labels=["Base DEM"])
+        ax.legend(handles=[base_handle], labels=["Base DEM"])
 
-    plt.title(title)
-    plt.xlabel(r"$\log_{10}\,T$  [K]")
-    plt.ylabel(r"$\log_{10}$ DEM  [cm$^{-5}$ K$^{-1}$]")
-    plt.grid(visible=True, alpha=0.3)
-    plt.xlim(logT.min(), logT.max())
+    ax.set_title(title)
+    ax.set_xlabel(r"$\log_{10}\,T$  [K]")
+    ax.set_ylabel(r"$\log_{10}$ DEM  [cm$^{-5}$ K$^{-1}$]")
+    ax.grid(visible=True, alpha=0.3)
+    ax.set_xlim(logT.min(), logT.max())
 
-    # y-limits — bug fix: log_base_dem is already in log space, do not take log10 again
+    # y-limits - log_base_dem is already in log space
     logs = [log_base_dem]
     if has_mc and N > 0:
         logs.append(np.log10(np.clip(mc_dem[1:, :], 1e-100, None)).ravel())
@@ -158,7 +202,23 @@ def plot_dem_mc(
     if np.any(finite):
         y = logs_all[finite]
         pad = 0.25 * (y.max() - y.min() + 1e-6)
-        plt.ylim(y.min() - pad, y.max() + pad)
+        ax.set_ylim(y.min() - pad, y.max() + pad)
 
-    plt.tight_layout()
+    # Uncertainty footnote - only shown when default model is active
+    note = _uncertainty_note(solver)
+    if note:
+        fig.text(
+            0.5,
+            0.01,
+            note,
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            color="gray",
+            style="italic",
+        )
+        plt.tight_layout(rect=[0, 0.05, 1, 1])
+    else:
+        plt.tight_layout()
+
     plt.show()
