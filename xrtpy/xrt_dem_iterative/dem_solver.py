@@ -1025,33 +1025,21 @@ class XRTDEMIterative:
         self.mc_base_obs[0, :] = base_obs_phys
         self.mc_mod_obs[0, :] = mod_base
 
-        # 4) Monte Carlo loop
+        # 4 - Monte Carlo loop
         if N > 0:
             rng = np.random.default_rng()  # like IDL's systime(1) seeding
 
             # Intensity uncertainties in physical units [DN/s/pix]
             sigma_phys = self.intensity_uncertainties.to_value(u.DN / u.s)
 
-            # Method 1
-            # for ii in range(1, N + 1):
-            #     # Lightweight progress indicator
-            #     #if ii % max(1, N // 20) == 0:
-            #     print(f"  - Monte Carlo run {ii}/{N}")
-
-            # Method 2 - but this one might be better overall
             for ii in range(1, N + 1):
 
-                # Method 3 - I like this one!
-                # from tqdm import tqdm
-                # for ii in tqdm(range(1, N + 1), desc="  Monte Carlo", unit="run", colour="#005A9C"):
                 print(f"  - Monte Carlo run {ii}/{N}", end="\r", flush=True)
 
-                # 4a) Perturb intensities: I' = I + N(0, sigma), clipped at 0
                 noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
                 obs_pert = base_obs_phys + noise
                 obs_pert = np.maximum(obs_pert, 0.0) # IDL: >0 to avoid negatives
 
-                # 4b) Solve DEM for this perturbed realization
                 dem_i, mod_i, chisq_i, _ = self._solve_single_dem(
                     observed_intensities_vals=obs_pert
                 )
