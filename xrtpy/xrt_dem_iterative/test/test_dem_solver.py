@@ -547,3 +547,31 @@ def test_summary_runs_without_error(capsys):
     captured = capsys.readouterr()
     assert "DEM" in captured.out
     assert "Chi-square" in captured.out
+
+
+def test_user_provided_intensity_uncertainties_are_used():
+    """
+    Verify that user-supplied intensity_uncertainties are stored and returned
+    correctly, and that the default model is NOT triggered.
+    """
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([500.0, 1800.0, 820.0], dtype=float)
+    uncertainties = np.array([15.0, 54.0, 24.6], dtype=float)
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+        intensity_uncertainties=uncertainties,
+    )
+
+    # Should not warn — user provided uncertainties
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # any warning becomes an error
+        result = x.intensity_uncertainties
+
+    # Values should match what was passed in
+    np.testing.assert_allclose(result.value, uncertainties)
