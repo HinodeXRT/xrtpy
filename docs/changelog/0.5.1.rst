@@ -1,0 +1,16 @@
+.. _changelog-0.5.1:
+
+*************************
+XRTpy 0.5.1 (2026-04-22)
+*************************
+
+Bug Fixes
+---------
+
+- Fixed the temperature response filter(s) method to remove an unnecessary
+  print statement and corrected logger placement in the code. (:pr:`387`)
+
+- Removed older CCD contamination files and updated with files through
+  2026-02-22. (:pr:`386`, :pr:`385`)
+
+- Updated monthly CCD contamination files. (:pr:`382`, :pr:`380`)
