@@ -79,7 +79,7 @@ urls.Repository = "https://github.com/HinodeXRT/xrtpy"
 
 [tool.setuptools]
 packages = [ "xrtpy" ]
-package-data."xrtpy" = [ "data/*" ]
+package-data.xrtpy = [ "data/*" ]
 package-data."xrtpy.response" = [ "data/*.txt", "data/*.geny" ]
 package-data."xrtpy.response.tests" = [ "data/*/*/*.txt" ]
 
