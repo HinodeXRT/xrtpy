@@ -8,9 +8,9 @@ Bug Fixes
 ---------
 
 - Fixed the temperature response filter(s) method to remove an unnecessary
-  print statement and corrected logger placement in the code. (:pull:`387`)
+  print statement and corrected logger placement in the code. (:pr:`387`)
 
 - Removed older CCD contamination files and updated with files through
-  2026-02-22. (:pull:`386`, :pull:`385`)
+  2026-02-22. (:pr:`386`, :pr:`385`)
 
-- Updated monthly CCD contamination files. (:pull:`382`, :pull:`380`)
+- Updated monthly CCD contamination files. (:pr:`382`, :pr:`380`)
