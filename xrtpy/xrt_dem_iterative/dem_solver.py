@@ -120,6 +120,12 @@ class XRTDEMIterative:
                 "minimum_bound_temperature must be < maximum_bound_temperature."
             )
 
+        # Check logarithmic_temperature_step_size is positive
+        if self._logarithmic_temperature_step_size <= 0:
+            raise ValueError(
+                "logarithmic_temperature_step_size must be a positive scalar."
+            )
+
         n_pts = (
             int(
                 np.floor(
@@ -159,11 +165,12 @@ class XRTDEMIterative:
 
         self._max_iterations = int(max_iterations)
 
-        # Check logarithmic_temperature_step_size is positive
-        if self._logarithmic_temperature_step_size <= 0:
-            raise ValueError(
-                "logarithmic_temperature_step_size must be a positive scalar."
-            )
+        # MOVING ABOVE since never triggered/reached
+        # # Check logarithmic_temperature_step_size is positive
+        # if self._logarithmic_temperature_step_size <= 0:
+        #     raise ValueError(
+        #         "logarithmic_temperature_step_size must be a positive scalar."
+        #     )
 
         # Store temperature response objects
         self.responses = temperature_responses
@@ -463,13 +470,8 @@ class XRTDEMIterative:
                 "Using the default uncertainty model:\n"
                 f"    relative_uncertainty          = {self.relative_uncertainty}\n"
                 f"    min_observational_uncertainty = "
-                f"{self.min_observational_uncertainty.value} DN/s\n"
-                + "=" * 72
-                + "\n"
+                f"{self.min_observational_uncertainty.value} DN/s\n" + "=" * 72 + "\n"
             )
-
-
-            
 
         self._using_estimated_uncertainty = True
 
@@ -891,7 +893,6 @@ class XRTDEMIterative:
         if not hasattr(self, "_iteration_chi2"):
             self._iteration_chi2 = []
         self._iteration_chi2.append(chi2_val)
-        
 
         return residuals
 
@@ -1038,7 +1039,7 @@ class XRTDEMIterative:
 
                 noise = rng.normal(loc=0.0, scale=sigma_phys, size=base_obs_phys.shape)
                 obs_pert = base_obs_phys + noise
-                obs_pert = np.maximum(obs_pert, 0.0) # IDL: >0 to avoid negatives
+                obs_pert = np.maximum(obs_pert, 0.0)  # IDL: >0 to avoid negatives
 
                 dem_i, mod_i, chisq_i, _ = self._solve_single_dem(
                     observed_intensities_vals=obs_pert
