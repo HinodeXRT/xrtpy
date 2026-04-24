@@ -900,3 +900,139 @@ def test_monte_carlo_runs_property_returns_stored_value():
     x = XRTDEMIterative(filters, intensities, responses, monte_carlo_runs=25)
 
     assert x.monte_carlo_runs == 25
+
+
+def test_max_iterations_property_returns_stored_value():
+    """max_iterations property must return the value passed to __init__.
+    Expected: integer 500.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses, max_iterations=500)
+
+    assert x.max_iterations == 500
+
+
+
+#validate_inputs additional coverage
+
+def test_validate_inputs_warns_when_all_intensities_zero():
+    """All-zero intensities must emit a UserWarning (not raise).
+    Expected: UserWarning mentioning 'zero' or 'All observed'.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([0.0, 0.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+
+    with pytest.warns(UserWarning, match="[Zz]ero"):
+        x.validate_inputs()
+
+def test_validate_inputs_rejects_negative_intensity_uncertainties():
+    """intensity_uncertainties with a negative value must raise ValueError in validate_inputs.
+    Expected: ValueError about finite and >= 0.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    errors = np.array([-10.0, 20.0])   # one negative
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses, intensity_uncertainties=errors)
+
+    with pytest.raises(ValueError, match="finite and >= 0"):
+        x.validate_inputs()
+
+def test_validate_inputs_rejects_nan_intensity_uncertainties():
+    """intensity_uncertainties containing NaN must raise ValueError in validate_inputs.
+    Expected: ValueError about finite and >= 0.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    errors = np.array([np.nan, 20.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses, intensity_uncertainties=errors)
+
+    with pytest.raises(ValueError, match="finite and >= 0"):
+        x.validate_inputs()
+        
+def test_validate_inputs_raises_when_temperature_grid_too_small():
+    """A temperature range that produces fewer than 4 bins must raise ValueError.
+    E.g. [6.0, 6.2] with step=0.1 → only 3 bins.
+    Expected: ValueError mentioning 'at least 4 points'.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="at least 4 points"):
+        XRTDEMIterative(
+            filters, intensities, responses,
+            minimum_bound_temperature=6.0,
+            maximum_bound_temperature=6.2,
+            logarithmic_temperature_step_size=0.1,   # → 3 bins only
+        )
+
+
+
+# n_spl FORMULA FOR DIFFERENT FILTER COUNTS
+
+@pytest.mark.parametrize("n_filters,expected_n_spl", [
+    (2, 1),   # min(max(2-1,1),7) = 1
+    (3, 2),   # min(max(3-1,1),7) = 2
+    (5, 4),   # min(max(5-1,1),7) = 4
+    (8, 7),   # min(max(8-1,1),7) = 7  (capped at 7)
+    (10, 7),  # min(max(10-1,1),7) = 7 (still capped)
+])
+
+def test_n_spl_formula_for_various_filter_counts(n_filters, expected_n_spl):
+    """n_spl = min(max(n_filters - 1, 1), 7) — IDL convention.
+    Expected: exact integer n_spl for each filter count.
+    """
+    # Build the required number of filters/intensities/responses
+    available = ["Al-poly", "Ti-poly", "Be-thin", "C-poly", "Be-med",
+                 "Al-med", "Al-mesh", "Al-thick", "Be-thick", "Al-poly/Ti-poly"]
+    filters = available[:n_filters]
+    intensities = np.full(n_filters, 300.0)
+    responses = generate_temperature_responses(filters, "2015-06-01T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+    x.create_logT_grid()
+    x._interpolate_responses_to_grid()
+    x._estimate_initial_dem()
+    x._prepare_spline_system()
+
+    assert x.n_spl == expected_n_spl
+
+
+# _build_lmfit_parameters
+
+def test_build_lmfit_parameters_count_bounds_and_initial_values():
+    """_build_lmfit_parameters must produce exactly n_spl parameters,
+    each named 'knot_i', with lower bound -20, and initialized from spline_log_dem.
+    Expected:
+        - len(params) == n_spl
+        - every param min == -20 (no upper bound)
+        - every param value matches spline_log_dem[i]
+    """
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([300.0, 600.0, 900.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2014-03-15T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+    x.create_logT_grid()
+    x._interpolate_responses_to_grid()
+    x._estimate_initial_dem()
+    x._prepare_spline_system()
+
+    params = x._build_lmfit_parameters()
+
+    assert len(params) == x.n_spl
+
+    for i in range(x.n_spl):
+        p = params[f"knot_{i}"]
+        assert p.min == pytest.approx(-20.0)
+        assert p.value == pytest.approx(x.spline_log_dem[i])
