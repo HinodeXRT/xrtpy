@@ -1079,44 +1079,40 @@ def test_solve_mc_row_zero_contract_with_n_equals_zero():
     np.testing.assert_array_equal(x.mc_base_obs[0], intensities)
 
 
-# # =============================================================================
-# # __repr__
-# # =============================================================================
+# __repr__
 
-# def test_repr_contains_key_fields():
-#     """__repr__ must include filter names, the logT range, and the step size.
-#     Expected: repr string containing 'Al-poly', '5.50', '8.00', '0.100'.
-#     """
-#     filters = ["Al-poly", "Ti-poly"]
-#     intensities = np.array([500.0, 800.0])
-#     responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+def test_repr_contains_key_fields():
+    """__repr__ must include filter names, the logT range, and the step size.
+    Expected: repr string containing 'Al-poly', '5.5', '8.0', '0.10'.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
 
-#     x = XRTDEMIterative(filters, intensities, responses)
-#     r = repr(x)
+    x = XRTDEMIterative(filters, intensities, responses)
+    r = repr(x)
 
-#     assert "Al-poly" in r
-#     assert "5.50" in r
-#     assert "8.00" in r
-#     assert "0.100" in r
+    assert "Al-poly" in r
+    assert "5.5" in r
+    assert "8.0" in r
+    assert "0.10" in r
 
 
-# # =============================================================================
-# # SINGLE-FILTER EDGE CASE
-# # =============================================================================
+# SINGLE-FILTER EDGE CASE
 
-# def test_solve_with_single_filter_completes_without_error():
-#     """solve() with only one filter channel must run without raising.
-#     Expected: finite DEM, finite modeled intensity, non-negative chi-square.
-#     This exercises n_spl=1 and pm_matrix shape (1, nT).
-#     """
-#     filters = ["Al-poly"]
-#     intensities = np.array([350.0], dtype=float)
-#     responses = generate_temperature_responses(filters, "2016-08-20T00:00:00")
+def test_solve_with_single_filter_completes_without_error():
+    """solve() with only one filter channel must run without raising.
+    Expected: finite DEM, finite modeled intensity, non-negative chi-square.
+    This exercises n_spl=1 and pm_matrix shape (1, nT).
+    """
+    filters = ["Al-poly"]
+    intensities = np.array([350.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2016-08-20T00:00:00")
 
-#     x = XRTDEMIterative(filters, intensities, responses)
-#     x.solve()
+    x = XRTDEMIterative(filters, intensities, responses)
+    x.solve()
 
-#     assert np.all(np.isfinite(x.dem))
-#     assert np.all(x.dem >= 0.0)
-#     assert np.isfinite(x.chisq)
-#     assert x.chisq >= 0.0
+    assert np.all(np.isfinite(x.dem))
+    assert np.all(x.dem >= 0.0)
+    assert np.isfinite(x.chisq)
+    assert x.chisq >= 0.0
