@@ -1,7 +1,13 @@
+import warnings
+
 import astropy.units as u
+import matplotlib
 import numpy as np
 import pytest
 from lmfit import Parameters
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 from xrtpy.response.channel import Channel
 from xrtpy.response.tools import generate_temperature_responses
@@ -477,10 +483,10 @@ def test_warns_when_intensity_is_negative():
 
 def test_plot_dem_runs_without_error():
     """Smoke test — plot_dem() completes without raising."""
-    import matplotlib
+    # import matplotlib
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    # matplotlib.use("Agg")
+    # import matplotlib.pyplot as plt
 
     filters = ["Al-poly", "Ti-poly", "Be-thin"]
     intensities = np.array([500.0, 1800.0, 820.0], dtype=float)
@@ -498,10 +504,7 @@ def test_plot_dem_runs_without_error():
 
 def test_plot_dem_mc_runs_without_error():
     """Smoke test — plot_dem_mc() completes without raising, with and without MC."""
-    import matplotlib
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
 
     filters = ["Al-poly", "Ti-poly", "Be-thin"]
     intensities = np.array([500.0, 1800.0, 820.0], dtype=float)
@@ -567,7 +570,6 @@ def test_user_provided_intensity_uncertainties_are_used():
     )
 
     # Should not warn — user provided uncertainties
-    import warnings
 
     with warnings.catch_warnings():
         warnings.simplefilter("error")  # any warning becomes an error
@@ -575,3 +577,326 @@ def test_user_provided_intensity_uncertainties_are_used():
 
     # Values should match what was passed in
     np.testing.assert_allclose(result.value, uncertainties)
+
+
+########
+
+#NEW TEST 
+
+
+def test_init_rejects_boolean_monte_carlo_runs():
+    """monte_carlo_runs=True is a bool, not an int — must raise TypeError.
+    Expected: TypeError is raised immediately in __init__.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(TypeError, match="non-negative whole number"):
+        XRTDEMIterative(filters, intensities, responses, monte_carlo_runs=True)
+
+
+
+def test_init_rejects_negative_monte_carlo_runs():
+    """monte_carlo_runs=-1 must raise ValueError.
+    Expected: ValueError with message about >= 0.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="monte_carlo_runs must be"):
+        XRTDEMIterative(filters, intensities, responses, monte_carlo_runs=-1)
+
+
+def test_init_rejects_float_monte_carlo_runs():
+    """monte_carlo_runs=2.5 (non-integer float) must raise ValueError.
+    Expected: ValueError because decimal values are not allowed.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="Decimal values are not allowed"):
+        XRTDEMIterative(filters, intensities, responses, monte_carlo_runs=2.5)
+
+
+def test_init_rejects_zero_max_iterations():
+    """max_iterations=0 must raise ValueError.
+    Expected: ValueError because max_iterations must be a positive integer.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="max_iterations must be a positive integer"):
+        XRTDEMIterative(filters, intensities, responses, max_iterations=0)
+
+
+def test_init_rejects_negative_max_iterations():
+    """max_iterations=-100 must raise ValueError.
+    Expected: ValueError because max_iterations must be a positive integer.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="max_iterations must be a positive integer"):
+        XRTDEMIterative(filters, intensities, responses, max_iterations=-100)
+
+
+def test_init_rejects_zero_normalization_factor():
+    """normalization_factor=0 must raise ValueError.
+    Expected: ValueError because normalization_factor must be positive.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="normalization_factor must be a positive"):
+        XRTDEMIterative(filters, intensities, responses, normalization_factor=0)
+
+
+def test_init_rejects_negative_normalization_factor():
+    """normalization_factor=-1e21 must raise ValueError.
+    Expected: ValueError because normalization_factor must be positive.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="normalization_factor must be a positive"):
+        XRTDEMIterative(filters, intensities, responses, normalization_factor=-1e21)
+
+
+def test_init_rejects_inverted_temperature_bounds():
+    """minimum >= maximum temperature must raise ValueError in __init__.
+    Expected: ValueError with message about ordering.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="minimum_bound_temperature must be <"):
+        XRTDEMIterative(
+            filters, intensities, responses,
+            minimum_bound_temperature=8.0,
+            maximum_bound_temperature=5.5,
+        )
+
+
+def test_init_rejects_equal_temperature_bounds():
+    """minimum == maximum temperature must raise ValueError.
+    Expected: ValueError because min < max is required.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="minimum_bound_temperature must be <"):
+        XRTDEMIterative(
+            filters, intensities, responses,
+            minimum_bound_temperature=6.0,
+            maximum_bound_temperature=6.0,
+        )
+
+
+def test_init_rejects_non_positive_step_size():
+    """logarithmic_temperature_step_size=0 must raise ValueError.
+    Expected: ValueError because step must be positive.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="logarithmic_temperature_step_size must be a positive"):
+        XRTDEMIterative(
+            filters, intensities, responses,
+            logarithmic_temperature_step_size=0.0,
+        )
+
+
+def test_init_rejects_temperature_range_outside_response():
+    """Requesting logT outside response bounds must raise ValueError.
+    Expected: ValueError explaining the mismatch and hinting at valid range.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="outside the bounds"):
+        XRTDEMIterative(
+            filters, intensities, responses,
+            minimum_bound_temperature=3.0,   # below any realistic response
+            maximum_bound_temperature=10.0,  # above any realistic response
+        )
+
+
+def test_init_rejects_nan_intensities():
+    """NaN in observed_intensities must raise ValueError.
+    Expected: ValueError about finite numbers.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([np.nan, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="finite"):
+        XRTDEMIterative(filters, intensities, responses)
+
+
+def test_init_rejects_inf_intensities():
+    """Inf in observed_intensities must raise ValueError.
+    Expected: ValueError about finite numbers.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([np.inf, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="finite"):
+        XRTDEMIterative(filters, intensities, responses)
+
+
+def test_init_rejects_length_mismatch_intensities_vs_responses():
+    """More intensities than responses must raise ValueError.
+    Expected: ValueError listing the lengths of each input.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0, 300.0])  # 3 but only 2 filters/responses
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises(ValueError, match="[Ll]ength mismatch"):
+        XRTDEMIterative(filters, intensities, responses)
+
+
+def test_init_rejects_empty_observed_channel():
+    """Empty observed_channel must raise ValueError immediately in __init__.
+    Expected: ValueError with 'required and cannot be empty'.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    with pytest.raises((ValueError, Exception)):
+        XRTDEMIterative([], intensities, responses)
+
+
+
+# PROPERTY TESTS
+
+def test_observed_intensities_property_returns_quantity_with_correct_units():
+    """observed_intensities property must return an astropy Quantity in DN/s.
+    Expected: Quantity, unit == DN/s, values match input array.
+    """
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([100.0, 200.0, 300.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+    result = x.observed_intensities
+
+    assert hasattr(result, "unit"), "observed_intensities must be an astropy Quantity"
+    assert result.unit == u.DN / u.s
+    np.testing.assert_allclose(result.value, intensities)
+
+
+def test_filter_names_property_matches_response_filter_names():
+    """filter_names must return a list matching the filter name of each response object.
+    Expected: list of strings equal to the filters passed in.
+    """
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([100.0, 200.0, 300.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+
+    assert x.filter_names == filters
+
+
+def test_min_observational_uncertainty_property_is_two_DN_per_s():
+    """min_observational_uncertainty must be exactly 2 DN/s.
+    Expected: Quantity with value=2.0 and unit=DN/s.
+    """
+    filters = ["Al-poly"]
+    intensities = np.array([100.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+
+    assert x.min_observational_uncertainty.value == pytest.approx(2.0)
+    assert x.min_observational_uncertainty.unit == u.DN / u.s
+
+def test_relative_uncertainty_property_is_three_percent():
+    """relative_uncertainty must be exactly 0.03 (3%).
+    Expected: float 0.03.
+    """
+    filters = ["Al-poly"]
+    intensities = np.array([100.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+
+    assert x.relative_uncertainty == pytest.approx(0.03)
+
+
+@pytest.mark.parametrize("intensity,expected_sigma", [
+    (1.0,    2.0),   # 3% of 1.0 = 0.03 < 2.0 → floor at 2.0
+    (50.0,   2.0),   # 3% of 50 = 1.5 < 2.0 → floor at 2.0
+    (100.0,  3.0),   # 3% of 100 = 3.0 > 2.0 → use 3.0
+    (500.0,  15.0),  # 3% of 500 = 15.0
+    (2000.0, 60.0),  # 3% of 2000 = 60.0
+])
+def test_default_intensity_uncertainties_apply_correct_model(intensity, expected_sigma):
+    """Default uncertainty model: sigma = max(0.03 * I, 2 DN/s).
+    Expected: computed sigma matches the formula at each intensity.
+    """
+    filters = ["Al-poly"]
+    intensities = np.array([intensity])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        sigma = x.intensity_uncertainties.to_value(u.DN / u.s)
+
+    assert sigma[0] == pytest.approx(expected_sigma, rel=1e-6)
+    
+
+def test_default_intensity_uncertainties_triggers_userwarning():
+    """Accessing intensity_uncertainties without providing them must emit a UserWarning.
+    Expected: UserWarning mentioning 'No intensity_uncertainties provided'.
+    """
+    filters = ["Al-poly", "Be-thin"]
+    intensities = np.array([100.0, 200.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses)
+
+    with pytest.warns(UserWarning, match="No intensity_uncertainties provided"):
+        _ = x.intensity_uncertainties
+        
+def test_normalization_factor_property_returns_stored_value():
+    """normalization_factor property must return the value passed to __init__.
+    Expected: float equal to the custom value 1e20.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses, normalization_factor=1e20)
+
+    assert x.normalization_factor == pytest.approx(1e20)
+
+
+def test_monte_carlo_runs_property_returns_stored_value():
+    """monte_carlo_runs property must return the value passed to __init__.
+    Expected: integer 25.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([500.0, 800.0])
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses, monte_carlo_runs=25)
+
+    assert x.monte_carlo_runs == 25
