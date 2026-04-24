@@ -450,28 +450,28 @@ class XRTDEMIterative:
         if self._intensity_uncertainties is not None:
             return self._intensity_uncertainties * (u.DN / u.s)
 
-        # if not self._using_estimated_uncertainty:
-        #     warnings.warn(
-        #         (
-        #             "\n\n No intensity_uncertainties provided. Using default model: "
-        #             "max(relative-uncertainty * observed_intensity, min_observational_uncertainty)\n"
-        #             f"=> relative_uncertainty = {self.relative_uncertainty}, "
-        #             f"min_observational_uncertainty = {self.min_observational_uncertainty.value} DN/s\n"
-        #             "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n"
-        #         ),
-        #         category=UserWarning,
-        #         stacklevel=1,#2
-        #     )
         if not self._using_estimated_uncertainty:
-            print(
-                "\n"
-                + "=" * 72
-                + "\nWARNING: No intensity uncertainties were provided.\n"
-                "Using the default uncertainty model:\n"
-                f"    relative_uncertainty          = {self.relative_uncertainty}\n"
-                f"    min_observational_uncertainty = "
-                f"{self.min_observational_uncertainty.value} DN/s\n" + "=" * 72 + "\n"
+            warnings.warn(
+                (
+                    "\n\n No intensity_uncertainties provided. Using default model: "
+                    "max(relative-uncertainty * observed_intensity, min_observational_uncertainty)\n"
+                    f"=> relative_uncertainty = {self.relative_uncertainty}, "
+                    f"min_observational_uncertainty = {self.min_observational_uncertainty.value} DN/s\n"
+                    "See: https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro\n\n"
+                ),
+                category=UserWarning,
+                stacklevel=2, #1
             )
+        # if not self._using_estimated_uncertainty:
+        #     print(
+        #         "\n"
+        #         + "=" * 72
+        #         + "\nWARNING: No intensity uncertainties were provided.\n"
+        #         "Using the default uncertainty model:\n"
+        #         f"    relative_uncertainty          = {self.relative_uncertainty}\n"
+        #         f"    min_observational_uncertainty = "
+        #         f"{self.min_observational_uncertainty.value} DN/s\n" + "=" * 72 + "\n"
+        #     )
 
         self._using_estimated_uncertainty = True
 
@@ -839,17 +839,21 @@ class XRTDEMIterative:
             )
 
         return params
-
+    
     def _reconstruct_dem_from_knots(self, params):
         """
         Construct DEM(T) on self.logT using spline of log10(DEM) at knot positions.
-        Uses a natural cubic spline interpolation in log10(DEM) space.
+        Uses a natural cubic spline for n_spl >= 2, or a constant for n_spl == 1.
         """
-
         knot_vals = np.array([params[f"knot_{i}"].value for i in range(self.n_spl)])
 
-        cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
-        log_dem = cs(self.logT)
+        if self.n_spl == 1:
+            # Constant DEM across all temperatures
+            log_dem = np.full_like(self.logT, knot_vals[0])
+        else:
+            cs = CubicSpline(self.spline_logT, knot_vals, bc_type="natural")
+            log_dem = cs(self.logT)
+
         log_dem = np.clip(log_dem, -300.0, 300.0)
         dem = 10.0**log_dem
         return dem

@@ -1036,3 +1036,87 @@ def test_build_lmfit_parameters_count_bounds_and_initial_values():
         p = params[f"knot_{i}"]
         assert p.min == pytest.approx(-20.0)
         assert p.value == pytest.approx(x.spline_log_dem[i])
+ 
+
+# solve() ROW-0 CONTRACT
+
+def test_solve_mc_row_zero_matches_base_solution():
+    """After solve(), mc_dem[0], mc_base_obs[0], mc_mod_obs[0], mc_chisq[0]
+    must exactly match the base solution attributes (dem, modeled_intensities, chisq).
+    Expected: array equality (not just close) for the row-0 contract.
+    """
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([500.0, 1200.0, 800.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2019-05-10T00:00:00")
+
+    x = XRTDEMIterative(
+        filters, intensities, responses,
+        monte_carlo_runs=3,
+    )
+    x.solve()
+
+    np.testing.assert_array_equal(x.mc_dem[0], x.dem)
+    np.testing.assert_array_equal(x.mc_base_obs[0], intensities)
+    np.testing.assert_array_equal(x.mc_mod_obs[0], x.modeled_intensities)
+    assert x.mc_chisq[0] == pytest.approx(x.chisq)
+
+
+def test_solve_mc_row_zero_contract_with_n_equals_zero():
+    """With monte_carlo_runs=0, mc_* arrays must still have shape (1, ...) and
+    row 0 must equal the base solution.
+    Expected: arrays of shape (1, nT) or (1, n_filters), row 0 == base.
+    """
+    filters = ["Al-poly", "Ti-poly"]
+    intensities = np.array([400.0, 900.0], dtype=float)
+    responses = generate_temperature_responses(filters, "2019-05-10T00:00:00")
+
+    x = XRTDEMIterative(filters, intensities, responses, monte_carlo_runs=0)
+    x.solve()
+
+    assert x.mc_dem.shape == (1, len(x.logT))
+    assert x.mc_base_obs.shape == (1, len(filters))
+    np.testing.assert_array_equal(x.mc_dem[0], x.dem)
+    np.testing.assert_array_equal(x.mc_base_obs[0], intensities)
+
+
+# # =============================================================================
+# # __repr__
+# # =============================================================================
+
+# def test_repr_contains_key_fields():
+#     """__repr__ must include filter names, the logT range, and the step size.
+#     Expected: repr string containing 'Al-poly', '5.50', '8.00', '0.100'.
+#     """
+#     filters = ["Al-poly", "Ti-poly"]
+#     intensities = np.array([500.0, 800.0])
+#     responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+#     x = XRTDEMIterative(filters, intensities, responses)
+#     r = repr(x)
+
+#     assert "Al-poly" in r
+#     assert "5.50" in r
+#     assert "8.00" in r
+#     assert "0.100" in r
+
+
+# # =============================================================================
+# # SINGLE-FILTER EDGE CASE
+# # =============================================================================
+
+# def test_solve_with_single_filter_completes_without_error():
+#     """solve() with only one filter channel must run without raising.
+#     Expected: finite DEM, finite modeled intensity, non-negative chi-square.
+#     This exercises n_spl=1 and pm_matrix shape (1, nT).
+#     """
+#     filters = ["Al-poly"]
+#     intensities = np.array([350.0], dtype=float)
+#     responses = generate_temperature_responses(filters, "2016-08-20T00:00:00")
+
+#     x = XRTDEMIterative(filters, intensities, responses)
+#     x.solve()
+
+#     assert np.all(np.isfinite(x.dem))
+#     assert np.all(x.dem >= 0.0)
+#     assert np.isfinite(x.chisq)
+#     assert x.chisq >= 0.0
