@@ -462,6 +462,8 @@ class XRTDEMIterative:
                 category=UserWarning,
                 stacklevel=2, #1
             )
+            
+        #JoyRemove - April 24,2026
         # if not self._using_estimated_uncertainty:
         #     print(
         #         "\n"
@@ -647,9 +649,8 @@ class XRTDEMIterative:
             )
         return self._response_matrix
 
-    # ======================================================================
+
     # DEM INITIALIZATION AND SOLVER METHODS
-    # ======================================================================
 
     def _estimate_initial_dem(self, cutoff: float = 1.0 / np.e) -> np.ndarray:
         """
