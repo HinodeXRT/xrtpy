@@ -30,10 +30,14 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from xrtpy.xrt_dem_iterative.utils_sav_io import IDLResult, SavCase, discover_cases, load_idl_sav
-
 from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
+from xrtpy.xrt_dem_iterative.utils_sav_io import (
+    IDLResult,
+    SavCase,
+    discover_cases,
+    load_idl_sav,
+)
 
 # ---------------------------------------------------------------------------
 # Tolerances
@@ -62,7 +66,7 @@ def _valid_mask(dem_idl: np.ndarray, dem_xrt: np.ndarray) -> np.ndarray:
 # Case discovery
 # ---------------------------------------------------------------------------
 
-DATA_DIR = Path(__file__).parent / "data" / "validation"
+DATA_DIR = Path(__file__).parent / "data" / "validation" / "base" 
 
 
 def _collect_cases() -> list[SavCase]:
@@ -363,7 +367,7 @@ def test_diagnostic_print_full_comparison(solved):
         5.755926,  # Be-thin
         ], dtype=float)
     OBSERVATION_DATE = "2008-01-04T11:04:26"
-    
+
 #     FILTERS= ["be-med","Be-thin","Al-poly", "Al-poly/Ti-poly","Ti-poly","Al-thick"]
 #     INTENSITIES = [603.875886,150.921435,2412.340960, 301.354389 ,603.100596,2.519851]
 #     OBSERVATION_DATE = "2007-12-13T04:01"
