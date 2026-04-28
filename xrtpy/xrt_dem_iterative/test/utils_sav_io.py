@@ -20,7 +20,6 @@ from pathlib import Path
 import numpy as np
 from scipy.io import readsav
 
-
 # Filter name mapping — compact filename token → XRTpy filter name
 # Keys are sorted longest-first at parse time to handle compound filters
 # (e.g. "AlpolyTipoly" must be matched before "Alpoly")
