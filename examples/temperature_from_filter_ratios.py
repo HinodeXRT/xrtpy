@@ -22,7 +22,7 @@ from xrtpy.response import temperature_from_filter_ratio
 # Note that not all filter ratios produce good results.
 
 query = Fido.search(
-    a.Time("2011-01-28 01:31:55", "2011-01-28 01:32:05"), a.Instrument("xrt")
+    a.Time("2011-01-28 01:31:30", "2011-01-28 01:32:30"), a.Instrument("xrt")
 )
 data_files = Fido.fetch(query)
 xrt_map_1 = sunpy.map.Map(data_files[0])
