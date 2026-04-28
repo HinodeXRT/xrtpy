@@ -21,12 +21,27 @@ from xrtpy.response import temperature_from_filter_ratio
 # It is important to use images that same size and with the smallest time separation.
 # Note that not all filter ratios produce good results.
 
-query = Fido.search(
-    a.Time("2011-01-28 01:31:30", "2011-01-28 01:32:30"), a.Instrument("xrt")
+# query = Fido.search(
+#     a.Time("2011-01-28 01:31:30", "2011-01-28 01:32:30"), a.Instrument("xrt")
+# )
+# data_files = Fido.fetch(query)
+# xrt_map_1 = sunpy.map.Map(data_files[0])
+# xrt_map_2 = sunpy.map.Map(data_files[1])
+
+query_1 = Fido.search(
+    a.Time("2011-01-28 01:31:00", "2011-01-28 01:33:00"),
+    a.Instrument("xrt"),
+    a.xrt.Filter("Ti-poly"),
 )
-data_files = Fido.fetch(query)
-xrt_map_1 = sunpy.map.Map(data_files[0])
-xrt_map_2 = sunpy.map.Map(data_files[1])
+query_2 = Fido.search(
+    a.Time("2011-01-28 01:31:00", "2011-01-28 01:33:00"),
+    a.Instrument("xrt"),
+    a.xrt.Filter("Al-mesh"),
+)
+data_files_1 = Fido.fetch(query_1)
+data_files_2 = Fido.fetch(query_2)
+xrt_map_1 = sunpy.map.Map(data_files_1[0])
+xrt_map_2 = sunpy.map.Map(data_files_2[0])
 
 ##############################################################################
 # The `xrtpy.response.temperature_from_filter_ratio` function has several options, mirroring
