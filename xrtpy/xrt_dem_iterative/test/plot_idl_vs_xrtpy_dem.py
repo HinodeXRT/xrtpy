@@ -25,10 +25,15 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 
-from xrtpy.xrt_dem_iterative.utils_sav_io import SavCase, IDLResult, discover_cases, load_idl_sav, parse_sav_filename
-
 from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
+from xrtpy.xrt_dem_iterative.utils_sav_io import (
+    IDLResult,
+    SavCase,
+    discover_cases,
+    load_idl_sav,
+    parse_sav_filename,
+)
 
 # ---------------------------------------------------------------------------
 # Config
@@ -110,7 +115,7 @@ def make_figure(case: SavCase, idl: IDLResult, solver: XRTDEMIterative) -> plt.F
     print(f"  Max  |Δ|:      {max_diff:.4f} dex")
     print(f"  IDL  peak:     logT = {logT_idl[np.argmax(idl.dem)]:.2f}")
     print(f"  XRTpy peak:    logT = {logT_xrt[np.argmax(solver.dem)]:.2f}")
-    print(f"  Per-filter log10(modeled/observed):")
+    print("  Per-filter log10(modeled/observed):")
     for f, lr in zip(case.filters, log_ratio):
         flag = "  ← !" if abs(lr) > 1.0 else ""
         print(f"    {f:<22} {lr:+.3f}{flag}")
@@ -164,7 +169,7 @@ def make_figure(case: SavCase, idl: IDLResult, solver: XRTDEMIterative) -> plt.F
     y_top_idl = log_dem_idl.max()
     y_top_xrt = log_dem_xrt.max()
 
-    #Maybelater 
+    #Maybelater
     # ax1.annotate(
     #     f"IDL\nlogT={pk_idl:.2f}",
     #     xy=(pk_idl, y_top_idl),
@@ -272,7 +277,7 @@ def main() -> None:
     parser.add_argument(
         "--all",
         action="store_true",
-        help="Plot all xrt_IDL_dem_*.sav files in data/validation/.",
+        help="Plot all xrt_IDL_dem_*.sav files in data/validation/base.",
     )
     parser.add_argument(
         "--save",
@@ -285,7 +290,7 @@ def main() -> None:
     cases: list[SavCase] = []
 
     if args.all:
-        data_dir = Path(__file__).parent / "data" / "validation"
+        data_dir = Path(__file__).parent / "data" / "validation"/ "base"
         cases = discover_cases(data_dir)
         if not cases:
             print(f"No xrt_IDL_dem_*.sav files found in {data_dir}")
@@ -370,12 +375,12 @@ if __name__ == "__main__":
 # # FILTERS = ["Be-med", "Al-mesh", "Ti-poly", "Al-poly", "Be-thin"]
 # # INTENSITIES = np.array([234.283365, 183.711876, 45.931438, 91.745329, 5.755926])
 # # OBSERVATION_DATE = "2008-01-04T11:04:26"
-    
+
 # FILTERS= ["be-med","Be-thin","Al-poly", "Al-poly/Ti-poly","Ti-poly","Al-thick"]
 # INTENSITIES = [603.875886,150.921435,2412.340960, 301.354389 ,603.100596,2.519851]
 # OBSERVATION_DATE = "2007-12-13T04:01"
 
-    
+
 # DEM_FLOOR = 1e10
 
 # MEAN_TOL = 0.20
