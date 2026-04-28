@@ -13,6 +13,8 @@ from xrtpy.response.effective_area import EffectiveAreaFundamental
 from xrtpy.response.temperature_from_filter_ratio import temperature_from_filter_ratio
 from xrtpy.response.temperature_response import TemperatureResponseFundamental
 
+from . import tools
+
 __all__ = [
     "Geometry",
     "EntranceFilter",
@@ -24,4 +26,5 @@ __all__ = [
     "EffectiveAreaFundamental",
     "TemperatureResponseFundamental",
     "temperature_from_filter_ratio",
+    "tools"
 ]
