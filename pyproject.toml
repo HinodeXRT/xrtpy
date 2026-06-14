@@ -79,15 +79,14 @@ urls.Repository = "https://github.com/HinodeXRT/xrtpy"
 
 [tool.setuptools]
 packages = [ "xrtpy" ]
-package-data.xrtpy = [ "data/*" ]
-package-data."xrtpy.response" = [ "data/*.txt", "data/*.geny" ]
+package-data."xrtpy.response" = [ "data/*.geny", "data/*.txt" ]
 package-data."xrtpy.response.tests" = [ "data/*/*/*.txt" ]
+package-data.xrtpy = [ "data/*" ]
 
 [tool.setuptools_scm]
 write_to = "xrtpy/version.py"
 
 [tool.codespell]
-skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
 ignore-words-list = """
 4rd,
 aas,
@@ -103,10 +102,10 @@ te,
 tne,
 ue
 """
+skip = "*.genx,*.geny,*.png,*egg*,.git,.hypothesis,.nox,.tox,.idea,__pycache__,_build"
 
 [tool.pytest]
 ini_options.testpaths = [ "." ]
-ini_options.xfail_strict = true
 ini_options.norecursedirs = [
   "*egg-info*",
   ".*cache*",
@@ -117,6 +116,7 @@ ini_options.norecursedirs = [
   ".hypothesis",
   ".idea",
   ".jupyter",
+  ".venv",
   ".vscode",
   "__pycache__",
   "_dev",
@@ -129,8 +129,8 @@ ini_options.norecursedirs = [
   "node_modules",
   "tools",
   "venv",
-  ".venv",
 ]
+ini_options.xfail_strict = true
 
 [tool.coverage]
 run.branch = true

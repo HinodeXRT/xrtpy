@@ -67,7 +67,7 @@ repos:
     exclude: .*\.fits
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.12
+  rev: v0.15.15
   hooks:
   - id: ruff
     name: ruff
@@ -90,6 +90,6 @@ repos:
     additional_dependencies: ['validate-pyproject-schema-store[all]']
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: v2.21.1
+  rev: v2.23.0
   hooks:
   - id: pyproject-fmt
