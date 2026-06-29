@@ -1,0 +1,12 @@
+
+# generated test outputs
+*.png
+*.mp4
+*.sav
+
+# generated DEM test outputs
+xrtpy/xrt_dem_iterative/test/data/cases/**/plots_overlay*/
+xrtpy/xrt_dem_iterative/test/data/cases/**/*overlay*.png
+xrtpy/xrt_dem_iterative/test/data/cases/**/*initial_dem*.png
+xrtpy/xrt_dem_iterative/test/data/cases/**/*.mp4
+xrtpy/xrt_dem_iterative/test/data/cases/**/*.sav

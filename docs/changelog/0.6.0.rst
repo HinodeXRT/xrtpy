@@ -1,0 +1,24 @@
+XRTpy v0.6.0 (2026-05-04)
+=========================
+
+New Features
+------------
+- Introduced :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative`, a Python
+  implementation of the IDL routine ``xrt_dem_iterative2.pro``. This solver
+  uses spline-parameterized DEM curves and iterative least-squares fitting to
+  infer the differential emission measure from Hinode/XRT multi-filter
+  observations. (Will udpate with PR)
+- Added Monte Carlo uncertainty estimation to the DEM solver via the
+  ``monte_carlo_runs`` parameter. Perturbed intensity realizations are used
+  to estimate the spread in DEM(T). 
+- Added ``plot_dem()`` and ``plot_dem_mc()`` methods to
+  :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative` for visualizing the
+  base DEM solution and Monte Carlo ensemble.
+
+Documentation Updates
+---------------------
+- Added a new overview page ``dem_overview.rst`` providing an introduction
+  to DEM analysis with Hinode/XRT, the mathematical background, and
+  worked examples using :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative`.
+
+- Added API reference page for ``xrtpy.xrt_dem_iterative``.
