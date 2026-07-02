@@ -16,7 +16,6 @@ nox.options.sessions = [f"tests-{current_python}(all)"]
 
 pytest_command: tuple[str, ...] = (
     "pytest",
-    "--pyargs",
     "--durations=5",
     "--tb=short",
     "-n=auto",
@@ -24,7 +23,7 @@ pytest_command: tuple[str, ...] = (
 )
 
 with_coverage: tuple[str, ...] = (
-    "--cov=plasmapy",
+    "--cov=xrtpy",
     "--cov-report=xml",
     "--cov-config=pyproject.toml",
     "--cov-append",
@@ -55,7 +54,9 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
     session.install("uv")
     session.install(".[tests]", *install_options)
 
-    session.run("pytest", *pytest_options, *session.posargs)
+    session.env["MPLBACKEND"] = "Agg"
+
+    session.run(*pytest_command, *pytest_options, *session.posargs)
 
 
 @nox.session
