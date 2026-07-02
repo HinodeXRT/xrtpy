@@ -54,7 +54,7 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
 
     session.install("uv")
     session.install(".[tests]", *install_options)
-    
+
     session.env["MPLBACKEND"] = "Agg"
 
     session.run("pytest", *pytest_options, *session.posargs)
