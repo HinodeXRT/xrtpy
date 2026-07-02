@@ -16,7 +16,6 @@ nox.options.sessions = [f"tests-{current_python}(all)"]
 
 pytest_command: tuple[str, ...] = (
     "pytest",
-    "--pyargs",
     "--durations=5",
     "--tb=short",
     "-n=auto",
@@ -57,7 +56,7 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
 
     session.env["MPLBACKEND"] = "Agg"
 
-    session.run("pytest", *pytest_options, *session.posargs)
+    session.run(*pytest_command, *pytest_options, *session.posargs)
 
 
 @nox.session
