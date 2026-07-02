@@ -21,6 +21,7 @@ Whether you're conducting research or just beginning to explore the world of X-r
    about_xrt
    install
    getting_started
+   dem_overview
    generated/gallery/index
    reference/index
    acknowledging_xrtpy
@@ -30,3 +31,10 @@ Whether you're conducting research or just beginning to explore the world of X-r
    contributing
    code_of_conduct
    changelog/index
+
+Published Work
+--------------
+
+The following paper describes the XRTpy package and its initial release- v0.4.0:
+
+:cite:p:`velasquez:2024`

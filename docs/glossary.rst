@@ -17,7 +17,13 @@ Glossary
       A numerical image processing technique used to correct for the blurring caused by the telescope's Point Spread Function (PSF), improving sharpness and visibility of fine structures.
 
    DEM
-      Differential Emission Measure (DEM) — a function that describes the distribution of plasma as a function of temperature along the line of sight. XRTpy will support DEM modeling in future versions.
+      Differential Emission Measure (DEM) — a function that describes how much plasma is present along the line of sight as a function of temperature. See :ref:`xrtpy-dem-overview` for a detailed overview of DEM theory,
+      usage, and the solver provided in XRTpy.
+   
+   DEM Inversion
+      The process of determining the temperature distribution of coronal plasma (the DEM) from a small number of filter intensities. Since more temperature bins are used than available filters, the problem is mathematically
+      underconstrained (“ill posed”), so regularization and smoothing are required to obtain a stable, physical solution.
+
 
    DN
       Data Number (DN) — the digital value recorded by the CCD, representing the detected photon flux, usually in DN s\ :sup:`−1`\ .
@@ -38,8 +44,19 @@ Glossary
    Contamination (related to the XRT)
       Refers to the gradual accumulation of material on the CCD and focal plane filters (FPFs), which reduces instrument throughput. This time-dependent degradation impacts effective area calculations and must be accounted for in data analysis. Refer to Section 2.5.3 *Contamination* in the `SolarSoft XRT Analysis Guide`_ for more information.
 
+   Monte Carlo DEM
+      A set of DEM solutions computed by adding random noise (based on intensity errors) to the observed intensities and re-solving the DEM multiple times.
+      The spread of these Monte Carlo solutions provides an estimate ofuncertainty in the DEM at each temperature.
+
    PSF
       Point Spread Function — describes the response of the telescope to a point source of light. In XRTpy, it is used in deconvolution routines to sharpen images.
+
+   Response Matrix
+      A two-dimensional array containing the temperature response of each XRT filter interpolated onto the solver’s regular log10 temperature grid.This matrix connects 
+      the DEM to the modeled filter intensities through the forward model:
+
+      :math:`I_i^{model} = \sum_j DEM(T_j)\, R_i(T_j)\, T_j\, \Delta(\ln T)`.
+
 
    Solar Emission Spectra
       Emission spectra produced by solar plasma across a range of temperatures, calculated using spectral models such as CHIANTI. These spectra are used in temperature response and filter ratio methods
