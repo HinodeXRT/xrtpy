@@ -25,20 +25,6 @@ query = Fido.search(
     a.Time("2011-01-28 01:31:55", "2011-01-28 01:32:05"), a.Instrument("xrt")
 )
 data_files = Fido.fetch(query)
-
-# Retry any downloads that failed transiently (e.g., VSO/SDAC hiccups).
-# Calling fetch on the previous result only re-attempts missing files.
-for _ in range(3):
-    if not data_files.errors:
-        break
-    data_files = Fido.fetch(data_files)
-
-if len(data_files) < 2:
-    raise RuntimeError(
-        f"Expected 2 XRT files from VSO, got {len(data_files)}. "
-        f"Download errors: {data_files.errors}"
-    )
-
 xrt_map_1 = sunpy.map.Map(data_files[0])
 xrt_map_2 = sunpy.map.Map(data_files[1])
 

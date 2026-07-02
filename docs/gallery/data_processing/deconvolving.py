@@ -22,19 +22,6 @@ result = Fido.search(
 )
 data_file = Fido.fetch(result[0])
 
-# Retry any downloads that failed transiently (e.g., VSO/SDAC hiccups).
-# Calling fetch on the previous result only re-attempts missing files.
-for _ in range(3):
-    if not data_file.errors:
-        break
-    data_file = Fido.fetch(data_file)
-
-if len(data_file) < 1:
-    raise RuntimeError(
-        f"Expected 1 XRT file from VSO, got {len(data_file)}. "
-        f"Download errors: {data_file.errors}"
-    )
-
 ##############################################################################
 # Typically most deconvolve routines use the Richardson-Lucy deconvolution algorithm.
 

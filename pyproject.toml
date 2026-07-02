@@ -39,6 +39,7 @@ classifiers = [
 dynamic = [ "version" ]
 dependencies = [
   "astropy>=6",
+  "lmfit>=1.2.2",
   "matplotlib>=3.7",
   "numpy>=1.24",
   "scikit-image>=0.21",
