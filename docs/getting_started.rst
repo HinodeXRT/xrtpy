@@ -72,9 +72,7 @@ To use a different abundance model:
    from xrtpy.response import TemperatureResponseFundamental
 
    TemperatureResponseFundamental(
-      "Al-poly", 
-      "2022-07-04T23:43:12", 
-      abundance_model="hybrid"
+       "Al-poly", "2022-07-04T23:43:12", abundance_model="hybrid"
    )
 
 You may also pass the ``abundance_model`` keyword to ``temperature_from_filter_ratio``.
@@ -103,15 +101,15 @@ This function returns a list of ``TemperatureResponseFundamental`` objects, one 
    from xrtpy.response.tools import generate_temperature_responses
 
    responses = generate_temperature_responses(
-      filters=["Al-poly", "Be-thick", "Al-poly/Ti-poly"],
-      obs_date="2020-07-04T00:00:00",
-      abundance="Hybrid",
+       filters=["Al-poly", "Be-thick", "Al-poly/Ti-poly"],
+       obs_date="2020-07-04T00:00:00",
+       abundance="Hybrid",
    )
 
    for resp in responses:
-         print(f"Filter: {resp.filter_name}")
-         print(f"  Temperatures: {resp.temperature[:3]}")
-         print(f"  Response: {resp.response[:3]}")
+       print(f"Filter: {resp.filter_name}")
+       print(f"  Temperatures: {resp.temperature[:3]}")
+       print(f"  Response: {resp.response[:3]}")
 
 
 **Example Output:**
@@ -161,10 +159,10 @@ XRTpy now supports double filter combinations such as ``"Al-poly/Ti-poly"`` in b
    from xrtpy.response import EffectiveAreaFundamental, TemperatureResponseFundamental
 
    eff_area = EffectiveAreaFundamental(
-      "Al-poly/Ti-poly", "2020-08-17T09:00:00", abundance_model="photospheric"
+       "Al-poly/Ti-poly", "2020-08-17T09:00:00", abundance_model="photospheric"
    )
    temp_resp = TemperatureResponseFundamental(
-      "C-poly/Ti-poly", "2025-07-10T12:00:00", abundance_model="coronal"
+       "C-poly/Ti-poly", "2025-07-10T12:00:00", abundance_model="coronal"
    )
 
 The following combinations are currently supported:
