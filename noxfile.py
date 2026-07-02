@@ -24,7 +24,7 @@ pytest_command: tuple[str, ...] = (
 )
 
 with_coverage: tuple[str, ...] = (
-    "--cov=plasmapy",
+    "--cov=xrtpy",
     "--cov-report=xml",
     "--cov-config=pyproject.toml",
     "--cov-append",
@@ -54,6 +54,8 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
 
     session.install("uv")
     session.install(".[tests]", *install_options)
+    
+    session.env["MPLBACKEND"] = "Agg"
 
     session.run("pytest", *pytest_options, *session.posargs)
 
