@@ -4,7 +4,7 @@ import nox
 
 nox.options.default_venv_backend = "uv"
 
-supported_python_versions = ("3.11", "3.12", "3.13")
+supported_python_versions = ("3.11", "3.12", "3.13", "3.14")
 
 maxpython = max(supported_python_versions)
 minpython = min(supported_python_versions)
