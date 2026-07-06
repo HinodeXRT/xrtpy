@@ -26,6 +26,11 @@ jobs:
       matrix:
         include:
 
+        - name: Tests, Python 3.14, Ubuntu
+          os: ubuntu-latest
+          nox_session: tests-3.14(all)
+          python: '3.14'
+
         - name: Tests, Python 3.13, Ubuntu
           os: ubuntu-latest
           nox_session: tests-3.13(all)
