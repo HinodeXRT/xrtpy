@@ -132,3 +132,18 @@ repos:
   rev: v2.25.1
   hooks:
   - id: pyproject-fmt
+
+- repo: https://github.com/hukkin/mdformat
+  rev: 1.0.0
+  hooks:
+  - id: mdformat
+    name: format .md files
+    # skip wrapping line length to preserve semantic line breaks and
+    # avoid messing up GitHub formatting of files in .github/content
+    exclude: licenses/.*|LICENSE.md
+    additional_dependencies:
+    - mdformat-beautysh
+    - mdformat-footnote
+    - mdformat-gfm
+    - mdformat-gfm-alerts
+    - mdformat-ruff
