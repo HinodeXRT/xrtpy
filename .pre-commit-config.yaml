@@ -91,6 +91,14 @@ repos:
     - tomli
     exclude: .*\.fits
 
+- repo: https://github.com/adhtruong/mirrors-typos
+  # use mirrors-typos because `pre-commit autoupdate` drops the version
+  # of the primary typos repo from v1.x.y to v1
+  rev: v1.48.0
+  hooks:
+  - id: typos
+    name: typos (add false positives to _typos.toml)
+
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.15.20
   hooks:
