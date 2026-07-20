@@ -3,6 +3,5 @@
 [default.extend-words]
 eis = "eis"
 emiss = "emiss"
-k1thr = "k1thr"
-k2thr = "k2thr"
 sav = "sav"
+thr = "thr"
