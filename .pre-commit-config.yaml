@@ -128,11 +128,6 @@ repos:
     additional_dependencies:
     - validate-pyproject[all,store]
 
-- repo: https://github.com/tox-dev/pyproject-fmt
-  rev: v2.25.1
-  hooks:
-  - id: pyproject-fmt
-
 - repo: https://github.com/hukkin/mdformat
   rev: 1.0.0
   hooks:
@@ -147,3 +142,8 @@ repos:
     - mdformat-gfm
     - mdformat-gfm-alerts
     - mdformat-ruff
+
+- repo: https://github.com/tox-dev/pyproject-fmt
+  rev: v2.25.1
+  hooks:
+  - id: pyproject-fmt
