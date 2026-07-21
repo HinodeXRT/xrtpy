@@ -1,0 +1,7 @@
+[default]
+
+[default.extend-words]
+eis = "eis"
+emiss = "emiss"
+sav = "sav"
+thr = "thr"
