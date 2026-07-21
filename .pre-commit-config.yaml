@@ -1,3 +1,22 @@
+# pre-commit is a framework for running code quality checks and making
+# automated fixes. These checks are defined below as "hooks", which each
+# run a specific tool or perform a specific check.
+#
+# All of these hooks are run on every pull request via pre-commit.ci. To
+# apply all pre-commit autofixes on a pull request, add the following
+# comment to the conversation tab:
+#
+#     pre-commit.ci autofix
+#
+# To perform all checks and apply all autofixes, run:
+#
+#     pre-commit run --all-files
+#
+# For more information, please refer to the following resources.
+#
+# pre-commit.ci configuration: https://pre-commit.ci/#configuration
+# pre-commit docs: https://pre-commit.com/#adding-pre-commit-plugins-to-your-project
+
 ci:
   autofix_prs: false
   autoupdate_schedule: monthly
@@ -14,8 +33,14 @@ repos:
     exclude: .*\.rst
   - id: check-case-conflict
     name: check for filename case conflicts
+  - id: check-illegal-windows-names
   - id: name-tests-test
     args: [--pytest-test-first]
+  - id: detect-private-key
+  - id: fix-byte-order-marker
+  - id: mixed-line-ending
+    args: [--fix=lf]
+  - id: forbid-submodules
   - id: trailing-whitespace
   - id: end-of-file-fixer
   - id: check-json
@@ -66,11 +91,19 @@ repos:
     - tomli
     exclude: .*\.fits
 
+- repo: https://github.com/adhtruong/mirrors-typos
+  # use mirrors-typos because `pre-commit autoupdate` drops the version
+  # of the primary typos repo from v1.x.y to v1
+  rev: v1.48.0
+  hooks:
+  - id: typos
+    name: typos (add false positives to _typos.toml)
+
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.15.20
   hooks:
-  - id: ruff
-    name: ruff
+  - id: ruff-check
+    name: ruff-check (see https://docs.astral.sh/ruff/rules)
     args: [--fix]
   - id: ruff-format
     name: autoformat source code with ruff formatter
@@ -83,11 +116,32 @@ repos:
     additional_dependencies:
     - black
 
+- repo: https://github.com/sphinx-contrib/sphinx-lint
+  rev: v1.0.2
+  hooks:
+  - id: sphinx-lint
+
 - repo: https://github.com/abravalheri/validate-pyproject
   rev: v0.25
   hooks:
   - id: validate-pyproject
-    additional_dependencies: ['validate-pyproject-schema-store[all]']
+    additional_dependencies:
+    - validate-pyproject[all,store]
+
+- repo: https://github.com/hukkin/mdformat
+  rev: 1.0.0
+  hooks:
+  - id: mdformat
+    name: format .md files
+    # skip wrapping line length to preserve semantic line breaks and
+    # avoid messing up GitHub formatting of files in .github/content
+    exclude: licenses/.*|LICENSE.md|joss/paper.md
+    additional_dependencies:
+    - mdformat-beautysh
+    - mdformat-footnote
+    - mdformat-gfm
+    - mdformat-gfm-alerts
+    - mdformat-ruff
 
 - repo: https://github.com/tox-dev/pyproject-fmt
   rev: v2.25.1
