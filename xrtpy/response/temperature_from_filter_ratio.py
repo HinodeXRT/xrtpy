@@ -159,19 +159,17 @@ def temperature_from_filter_ratio(
     data1 = data1.astype(float)
     data2 = data2.astype(float)
 
-    #JOY
     if expmap1 is not None and np.shape(expmap1) != data1.shape:
         raise ValueError(
             f"expmap1 must match map1 shape {data1.shape}; "
             f"received {np.shape(expmap1)}"
         )
-    #JOY
+
     if expmap2 is not None and np.shape(expmap2) != data2.shape:
         raise ValueError(
             f"expmap2 must match map2 shape {data2.shape}; "
             f"received {np.shape(expmap2)}"
         )
-
 
     n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
     n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
@@ -202,22 +200,6 @@ def temperature_from_filter_ratio(
     map1 = Map(data1, map1.meta, mask=mask)
     map2 = Map(data2, map2.meta, mask=mask)
 
-    # if binfac > 1:
-    #     map1 = map1.superpixel([binfac, binfac] * u.pix)
-    #     map2 = map2.superpixel([binfac, binfac] * u.pix)
-    #     data1 = map1.data
-    #     data2 = map2.data
-    #     # fix for issue with binning in superpixel - mask not summed
-    #     mask = (
-    #         reshape_image_to_4d_superpixel(mask, [binfac, binfac], [0, 0]).sum(3).sum(1)
-    #     )
-    #     mask = mask.astype(bool)
-    #     map1.mask = mask
-    #     map2.mask = mask
-    #     # binning updates header keywords
-    #     hdr1 = map1.meta
-    #     hdr2 = map2.meta
-    #JOY
     if binfac > 1:
         map1 = map1.superpixel([binfac, binfac] * u.pix)
         map2 = map2.superpixel([binfac, binfac] * u.pix)
@@ -225,9 +207,9 @@ def temperature_from_filter_ratio(
         data2 = map2.data
 
         # A superpixel is masked if any contributing pixel is masked.
-        mask = reshape_image_to_4d_superpixel(
-            mask, [binfac, binfac], [0, 0]
-        ).sum(axis=(1, 3))
+        mask = reshape_image_to_4d_superpixel(mask, [binfac, binfac], [0, 0]).sum(
+            axis=(1, 3)
+        )
         mask = mask.astype(bool)
 
         # Bin exposure maps to match the binned image dimensions. The mean is
