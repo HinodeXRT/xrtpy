@@ -161,14 +161,12 @@ def temperature_from_filter_ratio(
 
     if expmap1 is not None and np.shape(expmap1) != data1.shape:
         raise ValueError(
-            f"expmap1 must match map1 shape {data1.shape}; "
-            f"received {np.shape(expmap1)}"
+            f"expmap1 must match map1 shape {data1.shape}; received {np.shape(expmap1)}"
         )
 
     if expmap2 is not None and np.shape(expmap2) != data2.shape:
         raise ValueError(
-            f"expmap2 must match map2 shape {data2.shape}; "
-            f"received {np.shape(expmap2)}"
+            f"expmap2 must match map2 shape {data2.shape}; received {np.shape(expmap2)}"
         )
 
     n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
