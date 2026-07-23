@@ -95,10 +95,13 @@ def temperature_from_filter_ratio(
     expmap1 : numpy array [Optional]
         if provided, gives exposure time (s) for each pixel in image 1. This
         is useful for composite images in which different parts of the image
-        have different exposure times
+        have different exposure times. Must have the same shape as image 1.
+        If ``binfac`` > 1, the exposure map is binned internally to match the
+        binned image, so it should be given at the original (unbinned) size.
 
     expmap2 : numpy array [Optional]
-        if provided, gives exposure time (s) for each pixel in image 2.
+        if provided, gives exposure time (s) for each pixel in image 2. The
+        same requirements apply as for ``expmap1``.
 
     Returns:
     --------
