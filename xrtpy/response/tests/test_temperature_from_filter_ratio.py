@@ -148,6 +148,7 @@ def test_binning_case():
         10.0 ** EMerr.data[goodE], 10.0 ** idlEMerr[goodE], atol=2.0e43, rtol=0.03
     )
 
+
 def test_expmap_shape_mismatch_raises():
     """
     Test that an exposure map whose shape does not match its image raises a
@@ -174,7 +175,8 @@ def test_expmap_shape_mismatch_raises():
         temperature_from_filter_ratio(
             map1, map2, expmap1=good_expmap1, expmap2=bad_expmap
         )
-        
+
+
 def test_expmap_with_binfac_matches_scalar_exptime():
     """
     Test that a uniform exposure map combined with binning gives the same
