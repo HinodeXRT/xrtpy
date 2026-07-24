@@ -95,10 +95,13 @@ def temperature_from_filter_ratio(
     expmap1 : numpy array [Optional]
         if provided, gives exposure time (s) for each pixel in image 1. This
         is useful for composite images in which different parts of the image
-        have different exposure times
+        have different exposure times. Must have the same shape as image 1.
+        If ``binfac`` > 1, the exposure map is binned internally to match the
+        binned image, so it should be given at the original (unbinned) size.
 
     expmap2 : numpy array [Optional]
-        if provided, gives exposure time (s) for each pixel in image 2.
+        if provided, gives exposure time (s) for each pixel in image 2. The
+        same requirements apply as for ``expmap1``.
 
     Returns:
     --------
@@ -159,6 +162,16 @@ def temperature_from_filter_ratio(
     data1 = data1.astype(float)
     data2 = data2.astype(float)
 
+    if expmap1 is not None and np.shape(expmap1) != data1.shape:
+        raise ValueError(
+            f"expmap1 must match map1 shape {data1.shape}; received {np.shape(expmap1)}"
+        )
+
+    if expmap2 is not None and np.shape(expmap2) != data2.shape:
+        raise ValueError(
+            f"expmap2 must match map2 shape {data2.shape}; received {np.shape(expmap2)}"
+        )
+
     n1 = "XRT_RENORMALIZE" in hdr1["HISTORY"]
     n2 = "XRT_RENORMALIZE" in hdr2["HISTORY"]
     # This allows use of normalized data (contrary to original IDL code):
@@ -193,16 +206,37 @@ def temperature_from_filter_ratio(
         map2 = map2.superpixel([binfac, binfac] * u.pix)
         data1 = map1.data
         data2 = map2.data
-        # fix for issue with binning in superpixel - mask not summed
-        mask = (
-            reshape_image_to_4d_superpixel(mask, [binfac, binfac], [0, 0]).sum(3).sum(1)
+
+        # A superpixel is masked if any contributing pixel is masked.
+        mask = reshape_image_to_4d_superpixel(mask, [binfac, binfac], [0, 0]).sum(
+            axis=(1, 3)
         )
         mask = mask.astype(bool)
+
+        # Bin exposure maps to match the binned image dimensions. The mean is
+        # required because the emission-measure calculation already accounts
+        # for the number of pixels using binfac**2.
+        if expmap1 is not None:
+            expmap1 = reshape_image_to_4d_superpixel(
+                np.asarray(expmap1),
+                [binfac, binfac],
+                [0, 0],
+            ).mean(axis=(1, 3))
+
+        if expmap2 is not None:
+            expmap2 = reshape_image_to_4d_superpixel(
+                np.asarray(expmap2),
+                [binfac, binfac],
+                [0, 0],
+            ).mean(axis=(1, 3))
+
         map1.mask = mask
         map2.mask = mask
-        # binning updates header keywords
+
+        # Binning updates header keywords.
         hdr1 = map1.meta
         hdr2 = map2.meta
+
     # input mask for data should be False in parts of the images to be used and
     # True in places we want to mask out
     # Here we additionally mask out pixels in which the data in either image

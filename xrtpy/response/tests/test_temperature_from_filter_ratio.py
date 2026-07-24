@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import pytest
 import sunpy.map
 from scipy.io import readsav
 
@@ -146,3 +147,72 @@ def test_binning_case():
     assert np.allclose(
         10.0 ** EMerr.data[goodE], 10.0 ** idlEMerr[goodE], atol=2.0e43, rtol=0.03
     )
+
+
+def test_expmap_shape_mismatch_raises():
+    """
+    Test that an exposure map whose shape does not match its image raises a
+    clear ValueError up front, rather than failing later with a confusing
+    broadcasting error.
+    """
+
+    data_files = get_observed_data()
+    file1 = data_files[1]
+    file2 = data_files[0]
+    map1 = sunpy.map.Map(file1)
+    map2 = sunpy.map.Map(file2)
+
+    good_expmap1 = np.full(map1.data.shape, map1.meta["EXPTIME"])
+    good_expmap2 = np.full(map2.data.shape, map2.meta["EXPTIME"])
+    bad_expmap = np.full((10, 10), 1.0)
+
+    with pytest.raises(ValueError, match="expmap1 must match map1 shape"):
+        temperature_from_filter_ratio(
+            map1, map2, expmap1=bad_expmap, expmap2=good_expmap2
+        )
+
+    with pytest.raises(ValueError, match="expmap2 must match map2 shape"):
+        temperature_from_filter_ratio(
+            map1, map2, expmap1=good_expmap1, expmap2=bad_expmap
+        )
+
+
+def test_expmap_with_binfac_matches_scalar_exptime():
+    """
+    Test that a uniform exposure map combined with binning gives the same
+    result as passing no exposure map at all (which uses the scalar EXPTIME).
+
+    This guards the fix for combining expmap1/expmap2 with binfac > 1, and
+    also catches a change from mean to sum when binning the exposure maps,
+    since that would shift EM by log10(binfac**2).
+    """
+
+    data_files = get_observed_data()
+    file1 = data_files[1]
+    file2 = data_files[0]
+    map1 = sunpy.map.Map(file1)
+    map2 = sunpy.map.Map(file2)
+
+    expmap1 = np.full(map1.data.shape, map1.meta["EXPTIME"])
+    expmap2 = np.full(map2.data.shape, map2.meta["EXPTIME"])
+
+    with_exp = temperature_from_filter_ratio(
+        map1,
+        map2,
+        no_threshold=True,
+        binfac=2,
+        expmap1=expmap1,
+        expmap2=expmap2,
+    )
+    without_exp = temperature_from_filter_ratio(
+        map1,
+        map2,
+        no_threshold=True,
+        binfac=2,
+    )
+
+    expected_shape = (map1.data.shape[0] // 2, map1.data.shape[1] // 2)
+    assert with_exp.Tmap.data.shape == expected_shape
+
+    assert np.allclose(with_exp.Tmap.data, without_exp.Tmap.data)
+    assert np.allclose(with_exp.EMmap.data, without_exp.EMmap.data)
