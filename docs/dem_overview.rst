@@ -64,8 +64,6 @@ provided in `xrtpy.response.tools`.
 * Description: Instrument response as a function of temperature for each filter, matching the order of the filters.
 * Can be generated using :func:`xrtpy.response.tools.generate_temperature_responses`.
 
-
-
 Example
 ^^^^^^^
 
