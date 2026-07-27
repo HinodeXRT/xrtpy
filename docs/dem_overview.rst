@@ -291,7 +291,7 @@ The values shown match the current defaults and are written out for clarity.
     The values shown above correspond to the solver defaults and are written
     out here to illustrate which parameters can be tuned. You can adjust these
     to suit your specific analysis needs. This mirrors the flexibility of the
-    IDL routine ``xrt_dem_iterative2.pro``.
+    IDL routine :file:`xrt_dem_iterative2.pro`.
 
 References
 ----------
