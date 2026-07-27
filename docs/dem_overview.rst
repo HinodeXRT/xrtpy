@@ -214,7 +214,7 @@ DEM by
     I_i = \int DEM(T)\, R_i(T)\, dT
 
 where :math:`R_i(T)` is the temperature response function of the filter and
-:math:`DEM(T)` describes the amount of emitting plasma as a function of
+:math:`\mathrm{DEM}(T)` describes the amount of emitting plasma as a function of
 temperature.
 
 Because the number of temperature bins typically exceeds the number of observed
