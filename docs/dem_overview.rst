@@ -182,20 +182,28 @@ Comparison with IDL
 The Python solver is designed to closely follow the logic of the
 SolarSoft/IDL routine `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__:
 
-* Uses a regular  :math:`\log_{10}(T)` grid.
-* Represents  :math:`\log_{10}(\mathrm{DEM})` at a set of spline knots.
+* Uses a regular :math:`\log_{10}(T)` grid.
+* Represents :math:`\log_{10}(\mathrm{DEM})` at a set of spline knots.
 * Uses a least-squares algorithm to minimize the chi-square statistic.
 * Supports Monte Carlo noise realizations for uncertainty estimation.
 
 Small numerical differences between the Python and IDL implementations can arise due to:
 
-* Different interpolation choices (``scipy.interpolate.CubicSpline`` with natural boundary conditions in Python versus IDL's tension spline with :math:`\sigma = 1.0`.).
+* Different interpolation choices (``scipy.interpolate.CubicSpline`` with natural boundary conditions in Python versus IDL's tension spline with :math:`\sigma = 1.0`).
+* Response interpolation: IDL uses linear interpolation (``interpol``) to place the temperature responses onto the solver grid, while XRTpy uses ``scipy.interpolate.CubicSpline``. This can produce small but systematic differences in the response matrix, particularly where the response curve changes rapidly with temperature.
 * Differences in optimization libraries (`lmfit <https://lmfit.github.io/lmfit-py/>`__ versus IDL `MPFIT <https://www.nv5geospatialsoftware.com/docs/mpfit.html>`__).
 * Floating-point rounding and platform-specific details.
 
 Within these limits, the Python implementation is intended to produce
 results that are consistent with the IDL tool.
 
+Users should expect the following when comparing XRTpy and IDL results:
+
+* **General agreement:** For well-constrained temperature bins (where the observed filters have strong sensitivity), the two implementations typically agree within a few percent.
+* **Low-emission temperature ranges:** At temperatures where little plasma is present - particularly at the cool and hot ends of the grid — relative differences tend to be larger. In these bins the DEM is poorly constrained by the data and the two optimizers may converge to different local minima.
+* **Response interpolation:** IDL uses linear interpolation (``interpol``) to place the temperature responses onto the solver grid, while XRTpy uses ``scipy.interpolate.CubicSpline``. This can produce small but systematic differences in the response matrix, particularly where the response curve changes rapidly with temperature.
+* **Optimizer sensitivity:** Because ``lmfit`` and IDL's ``MPFIT`` use different convergence criteria and step-size heuristics, solutions can diverge in cases where the chi-square surface has multiple shallow minima, such as observations with a complex multi-temperature structure.
+* **Monte Carlo spread as a guide:** A practical way to assess whether a difference between IDL and XRTpy is significant is to compare it against the Monte Carlo uncertainty spread. If the IDL solution falls within the XRTpy MC envelope (or vice versa), the difference is within the natural uncertainty of the inversion.
 
 Mathematical background
 -----------------------
