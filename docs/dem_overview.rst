@@ -107,7 +107,7 @@ logT : `~numpy.ndarray`
     The regular :math:`\log_{10}(T)` grid (dimensionless).
 
 T : `~astropy.units.Quantity`
-    The linear temperature grid in Kelvin.
+    The linear temperature grid in kelvin.
 
 dlogT : float
     Step size in :math:`\log_{10}(T)`.
