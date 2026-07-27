@@ -114,10 +114,6 @@ dlogT : float
 
 dlnT : float
     Step size in :math:`\ln(T)`, computed as ``np.log(10) * dlogT``.
-
-
-
-
 Solving a DEM
 ~~~~~~~~~~~~~
 .. code-block:: python
