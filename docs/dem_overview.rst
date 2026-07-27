@@ -11,7 +11,7 @@ Differential Emission Measures
 Introduction
 ------------
 
-This page describes the XRTpy iterative DEM solver and the inputs and outputs needed to run it.
+This page describes the XRTpy iterative differential emission measure (DEM) solver and the inputs and outputs needed to run it.
 
 The differential emission measure (DEM) describes how much plasma is present
 in the solar corona as a function of temperature. It is a key diagnostic for
