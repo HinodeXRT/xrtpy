@@ -14,7 +14,7 @@ Introduction
 This page describes the XRTpy iterative differential emission measure (DEM) solver and the inputs and outputs needed to run it.
 
 The DEM describes how much plasma is present
-in the solar corona as a function of temperature. It is a key diagnostic for
+in the solar corona as a function of temperature along a line of sight. DEMs are key diagnostics for
 understanding coronal heating, solar flares, and the thermal structure of
 active regions.
 
