@@ -1,8 +1,8 @@
 .. _xrtpy-dem-overview:
 
-===================================
-Differential Emission Measure (DEM)
-===================================
+==============================
+Differential Emission Measures
+==============================
 
 .. contents::
     :local:
