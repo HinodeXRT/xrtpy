@@ -183,7 +183,7 @@ The Python solver is designed to closely follow the logic of the
 SolarSoft/IDL routine `xrt_dem_iterative2.pro <https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/util/xrt_dem_iterative2.pro>`__:
 
 * Uses a regular  :math:`\log_{10}(T)` grid.
-* Represents  :math:`\log_{10}(DEM)` at a set of spline knots.
+* Represents  :math:`\log_{10}(\mathrm{DEM})` at a set of spline knots.
 * Uses a least-squares algorithm to minimize the chi-square statistic.
 * Supports Monte Carlo noise realizations for uncertainty estimation.
 
