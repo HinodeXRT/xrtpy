@@ -99,7 +99,7 @@ The solver constructs a uniformly spaced grid in :math:`\log_{10}(T)` between
 
 .. rubric:: Notes
 
-This mirrors the "regular logT grid" used by the IDL routine ``xrt_dem_iterative2.pro``.
+This mirrors the "regular logT grid" option used by the IDL routine :file:`xrt_dem_iterative2.pro`.
 
 .. rubric:: Attributes created
 
