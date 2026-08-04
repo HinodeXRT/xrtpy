@@ -12,7 +12,7 @@
 [![astropy](http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat&logo=astropy)](http://www.astropy.org/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13157914.svg)](https://doi.org/10.5281/zenodo.13157914)
 
-XRTpy is a Python package being developed for the analysis of observations made by the X-Ray Telescope (XRT) on the **Hinode** spacecraft.
+XRTpy is a Python package for the analysis of observations made by the X-Ray Telescope (XRT) on the **Hinode** spacecraft.
 
 ## Documentation
 
@@ -29,13 +29,13 @@ Found an issue or have suggestions? Open an issue on our [GitHub Issues page](ht
 
 ## Contributing
 
-We welcome contributions!
+We welcome contributions by members of the community!
 See our [Contributing Guide](https://xrtpy.readthedocs.io/en/latest/contributing.html) for how to get started.
 
 ## Contact
 
 For general questions, feel free to reach out to us at:
-**XRTpy@cfa.harvard.edu**
+xrtpy@cfa.harvard.edu.
 
 ## Citation
 
