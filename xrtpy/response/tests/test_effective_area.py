@@ -62,7 +62,8 @@ invalid_dates = [
 
 def test_ccd_contam_data_loads():
     eff = EffectiveAreaFundamental(
-        "Al-poly", datetime(year=2013, month=9, day=22, hour=22, minute=1, second=1)  # noqa: DTZ001
+        "Al-poly",
+        datetime(year=2013, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
     )
     data = eff.ccd_contam_data
     assert isinstance(data, dict)
@@ -79,7 +80,8 @@ def test_channel_name(channel_name):
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_filter_name(name):
     instance = EffectiveAreaFundamental(
-        name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0)  # noqa: DTZ001
+        name,
+        datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0),  # noqa: DTZ001
     )
     assert instance.name == name
 
