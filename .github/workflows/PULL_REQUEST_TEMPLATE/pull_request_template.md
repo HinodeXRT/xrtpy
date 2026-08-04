@@ -6,4 +6,4 @@
 
 ## AI usage disclosure
 
-<!-- Please briefly describe how AI tools were used in this pull request. -->
+<!-- Please briefly describe how AI tools were used in this pull request, if at all. -->
