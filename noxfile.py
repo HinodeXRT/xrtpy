@@ -1,6 +1,7 @@
 import sys
 
 import nox
+import nox_uv
 
 nox.options.default_venv_backend = "uv"
 
@@ -38,7 +39,7 @@ test_specifiers: list = [
 ]
 
 
-@nox.session(python=supported_python_versions)
+@nox_uv.session(python=supported_python_versions, uv_groups=["test"])
 @nox.parametrize("test_specifier", test_specifiers)
 def tests(session, test_specifier: nox._parametrize.Param) -> None:
     """Run tests with pytest."""
@@ -51,8 +52,8 @@ def tests(session, test_specifier: nox._parametrize.Param) -> None:
         with_coverage if test_specifier == "with code coverage" else []
     )
 
-    session.install("uv")
-    session.install(".[tests]", *install_options)
+    # session.install("uv")
+    # session.install(".[tests]", *install_options)
 
     session.env["MPLBACKEND"] = "Agg"
 
@@ -82,7 +83,7 @@ def build(session: nox.Session) -> None:
     session.run("twine", "check", "dist/*", *session.posargs)
 
 
-@nox.session(python=docpython)
+@nox_uv.session(python=docpython, uv_groups=["docs"])
 def docs(session):
     """
     Build documentation with Sphinx.
@@ -96,7 +97,6 @@ def docs(session):
     sphinx_opts = (
         sphinx_paths + sphinx_fail_on_warnings + sphinx_builder + sphinx_nitpicky
     )
-    session.install(".[docs]")
     session.run(
         "sphinx-build",
         *sphinx_opts,

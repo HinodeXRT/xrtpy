@@ -46,36 +46,38 @@ dependencies = [
   "scipy>=1.11.1",
   "sunpy[map]>=5.1",
 ]
-optional-dependencies.dev = [
-  "nox>=2024.10.9",
-]
-optional-dependencies.docs = [
-  "astropy>=6",
-  "pydata-sphinx-theme>=0.15",
-  # Need pkg_resources for sphinxcontrib-bibtex
-  # and this comes from setuptools
-  # This is a bug upstream in the extension which
-  # has yet to be fixed.
-  "setuptools>71.0.1",
-  "sphinx>=7.3",
-  "sphinx-automodapi>=0.17",
-  "sphinx-copybutton>=0.5.2",
-  "sphinx-gallery>=0.16",
-  "sphinx-issues>=4.1",
-  "sphinxcontrib-bibtex>=2.6.2",
-  "sphinxext-opengraph>=0.6",
-  "sunpy[map,net]>=5",
-]
-optional-dependencies.tests = [
-  "pytest>=8.3.1",
-  "pytest-astropy>=0.11",
-  "pytest-cov>=6",
-  "pytest-xdist>=3.6.1",
-]
 urls.Changelog = "https://xrtpy.readthedocs.io/en/stable/changelog/index.html"
 urls.Documentation = "https://xrtpy.readthedocs.io"
 urls.Issues = "https://github.com/HinodeXRT/xrtpy/issues"
 urls.Repository = "https://github.com/HinodeXRT/xrtpy"
+
+[dependency-groups]
+dev = [
+  { include-group = "docs" },
+  { include-group = "nox" },
+  { include-group = "test" },
+]
+test = [
+  "pytest>=9.1.1",
+  "pytest-astropy>=0.12",
+  "pytest-cov>=7.1",
+  "pytest-xdist>=3.8",
+]
+docs = [
+  "pydata-sphinx-theme>=0.20",
+  "sphinx>=9.0.4",
+  "sphinx-automodapi>=0.22",
+  "sphinx-copybutton>=0.5.2",
+  "sphinx-gallery>=0.21",
+  "sphinx-issues>=6",
+  "sphinxcontrib-bibtex>=2.7",
+  "sphinxext-opengraph>=0.13",
+  "sunpy[map,net]>=7.0.5",
+]
+nox = [
+  "nox>=2026.7.11",
+  "nox-uv>=0.8",
+]
 
 [tool.setuptools]
 packages = [ "xrtpy" ]
