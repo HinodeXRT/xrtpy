@@ -19,7 +19,7 @@
 
 ci:
   autofix_prs: false
-  autoupdate_schedule: monthly
+  autoupdate_schedule: quarterly
 
 repos:
 
