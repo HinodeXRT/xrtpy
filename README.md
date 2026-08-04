@@ -48,4 +48,4 @@ Journal of Open Source Software, 2024.
 
 ## Acknowledgements
 
-The development of XRTpy is supported by NASA contract **NNM07AB07C** to the Smithsonian Astrophysical Observatory.
+The development of XRTpy has been supported by NASA contract **NNM07AB07C** to the Smithsonian Astrophysical Observatory.
