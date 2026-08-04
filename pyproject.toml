@@ -57,6 +57,12 @@ dev = [
   { include-group = "nox" },
   { include-group = "test" },
 ]
+test = [
+  "pytest>=9.1.1",
+  "pytest-astropy>=0.12",
+  "pytest-cov>=7.1",
+  "pytest-xdist>=3.8",
+]
 docs = [
   "pydata-sphinx-theme>=0.20",
   "sphinx>=9.0.4",
@@ -70,13 +76,7 @@ docs = [
 ]
 nox = [
   "nox>=2026.7.11",
-  "nox-uv>=0.8.0",
-]
-test = [
-  "pytest>=9.1.1",
-  "pytest-astropy>=0.12",
-  "pytest-cov>=7.1",
-  "pytest-xdist>=3.8",
+  "nox-uv>=0.8",
 ]
 
 [tool.setuptools]
