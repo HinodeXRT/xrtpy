@@ -38,31 +38,32 @@ channel_single_filter_names = [
 ]
 
 valid_dates = [
-    datetime(year=2006, month=9, day=25, hour=22, minute=1, second=1),
-    datetime(year=2007, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2009, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2010, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2012, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2015, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2017, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2019, month=9, day=23, hour=22, minute=1, second=1),
-    datetime(year=2020, month=9, day=23, hour=22, minute=1, second=1),
-    datetime(year=2021, month=9, day=23, hour=22, minute=1, second=1),
-    datetime(year=2022, month=9, day=23, hour=22, minute=1, second=1),
+    datetime(year=2006, month=9, day=25, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2007, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2009, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2010, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2012, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2015, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2017, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2019, month=9, day=23, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2020, month=9, day=23, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2021, month=9, day=23, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2022, month=9, day=23, hour=22, minute=1, second=1),  # noqa: DTZ001
 ]
 
 invalid_dates = [
-    datetime(year=2006, month=8, day=25, hour=22, minute=1, second=1),
-    datetime(year=2005, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2002, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=2000, month=9, day=22, hour=22, minute=1, second=1),
-    datetime(year=1990, month=9, day=22, hour=22, minute=1, second=1),
+    datetime(year=2006, month=8, day=25, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2005, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2002, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=2000, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
+    datetime(year=1990, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
 ]
 
 
 def test_ccd_contam_data_loads():
     eff = EffectiveAreaFundamental(
-        "Al-poly", datetime(year=2013, month=9, day=22, hour=22, minute=1, second=1)
+        "Al-poly",
+        datetime(year=2013, month=9, day=22, hour=22, minute=1, second=1),  # noqa: DTZ001
     )
     data = eff.ccd_contam_data
     assert isinstance(data, dict)
@@ -79,7 +80,8 @@ def test_channel_name(channel_name):
 @pytest.mark.parametrize("name", channel_names)
 def test_EffectiveArea_filter_name(name):
     instance = EffectiveAreaFundamental(
-        name, datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0)
+        name,
+        datetime(year=2013, month=9, day=22, hour=22, minute=0, second=0),  # noqa: DTZ001
     )
     assert instance.name == name
 

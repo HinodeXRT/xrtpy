@@ -207,7 +207,7 @@ class EffectiveAreaFundamental:
             -1
         ].datetime.strftime("%Y/%m/%d")
 
-        modified_time_datetime = datetime.datetime.fromtimestamp(
+        modified_time_datetime = datetime.datetime.fromtimestamp(  # noqa: DTZ006
             modified_time_path
         ).strftime("%Y/%m/%d")
 
@@ -500,7 +500,7 @@ class EffectiveAreaFundamental:
     def _angular_wavenumber_CCD(self):
         """Define angular wavenumber on CCD."""
 
-        index, _, cos_a, wavelength_max, _, _, _ = self._transmission_equation
+        index, _, cos_a, wavelength_max, _, _, _ = self._transmission_equation  # noqa: RUF059
 
         # Define wavevector
         angular_wavenumber = np.array(
