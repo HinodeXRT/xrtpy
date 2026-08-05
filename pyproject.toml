@@ -86,6 +86,22 @@ package-data.xrtpy = [ "data/*" ]
 [tool.setuptools_scm]
 write_to = "xrtpy/version.py"
 
+[tool.ruff]
+target-version = "py311"
+lint.ignore = []
+lint.per-file-ignores."xrtpy/xrt_dem_iterative/**/*.py" = [
+  "B905",
+  "BLE001",
+  "C408",
+  "F841",
+  "FBT003",
+  "ICN001",
+  "PLC0415",
+  "PT006"
+]
+lint.per-file-ignores."xrtpy/xrt_dem_iterative/test/utils_sav_io.py" = [ "N815", "PERF203" ]
+lint.per-file-ignores."xrtpy/xrt_dem_iterative/utils_sav_io.py" = [ "N815", "PERF203" ]
+
 [tool.codespell]
 ignore-words-list = """
 4rd,

@@ -1,0 +1,48 @@
+XRTpy v0.6.0
+=========================
+
+New Features
+------------
+- Introduced :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative`, a Python
+  implementation of the IDL routine ``xrt_dem_iterative2.pro``. This solver
+  uses spline-parameterized DEM curves and iterative least-squares fitting to
+  infer the differential emission measure from Hinode/XRT multi-filter
+  observations. (`#PR <https://github.com/HinodeXRT/xrtpy/pull/PR>`__)
+- Added Monte Carlo uncertainty estimation to the DEM solver through the
+  ``monte_carlo_runs`` parameter. Perturbed intensity realizations are used
+  to estimate the spread in DEM(T).
+- Added support for user-supplied intensity uncertainties through the
+  ``intensity_errors`` parameter. If not provided, the default uncertainty is
+  ``max(0.03 * intensity, 2 DN/s/pix)``, matching the IDL behavior.
+- Added ``plot_dem()`` and ``plot_dem_mc()`` methods to
+  :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative` for visualizing the base
+  DEM solution and Monte Carlo ensemble.
+- Added a ``summary()`` method to
+  :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative` that reports the solver
+  configuration, inputs, and results.
+
+Documentation Updates
+---------------------
+- Added a new DEM overview page introducing DEM analysis with Hinode/XRT,
+  describing the mathematical background, and providing worked examples
+  using :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative`.
+- Added an API reference page for ``xrtpy.xrt_dem_iterative``.
+- Updated the general documentation, including the XRT overview, getting
+  started guide, glossary, and documentation index. (`#398
+  <https://github.com/HinodeXRT/xrtpy/pull/398>`__)
+
+Testing and Infrastructure
+--------------------------
+- Enabled parallel test execution and improved pytest output and test
+  distribution settings. (`#400
+  <https://github.com/HinodeXRT/xrtpy/pull/400>`__)
+- Added Python 3.14 to the supported Python versions and continuous
+  integration test matrix. (`#401
+  <https://github.com/HinodeXRT/xrtpy/pull/401>`__)
+
+Compatibility
+-------------
+- Requires Python 3.11 or later.
+- Added support for Python 3.14. (`#401
+  <https://github.com/HinodeXRT/xrtpy/pull/401>`__)
+- Added dependencies on ``lmfit`` and ``scipy``.

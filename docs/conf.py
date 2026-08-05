@@ -4,11 +4,15 @@ Configuration file for the Sphinx documentation builder.
 
 # -- stdlib imports ------------------------------------------------------------
 import os
+import sys
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 
 from packaging.version import Version
+
+# Ensure Sphinx imports the local xrtpy checkout (repo root), not site-packages
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # -- Read the Docs Specific Configuration --------------------------------------
 # This needs to be done before xrtpy is imported
@@ -230,6 +234,7 @@ html_sidebars = {
     "feedback_communication*": [],
     "contributing*": [],
     "code_of_conduct*": [],
+    "dem_overview*": [],
 }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
