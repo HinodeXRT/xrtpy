@@ -115,7 +115,7 @@ def deconvolve(image_map, niter=5, verbose=False, psf1keV=False):
         tmp_deconv = tmp_deconv[xcen - ddx : xcen + ddx, ycen - ddy : ycen + ddy]
     deconv_data = np.minimum(tmp_deconv, 2500.0)
 
-    date = datetime.now().ctime()
+    date = datetime.now().ctime()  # noqa: DTZ005
     added_hist = f"{__name__}: ({date}) " + deconvolve_hist
     deconv_meta = image_meta
     deconv_meta["history"] = image_meta["history"] + added_hist

@@ -58,28 +58,28 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
         logging.basicConfig(format="%(funcName)s: %(message)s", level=logging.INFO)
     comp_header = fits.getheader(comp_image_file)
     short_exp_filepath = Path(comp_header["SRTFNAME"])
-    logging.info(f"short exp. file: {short_exp_filepath}")
+    logging.info(f"short exp. file: {short_exp_filepath}")  # noqa: LOG015
     short_exp_urlpath = filename2repo_path(short_exp_filepath, join=True)
-    logging.info(f"short exp. url: {short_exp_urlpath}")
+    logging.info(f"short exp. url: {short_exp_urlpath}")  # noqa: LOG015
     short_exp_filepath = download_file(short_exp_urlpath)
 
     if "MEDFNAME" in comp_header:
         triple = True
-        logging.info("Composite image is a triple")
+        logging.info("Composite image is a triple")  # noqa: LOG015
         if qualfiles is None:
             medium_exp_filename = Path(comp_header["MEDFNAME"])
             medium_exp_qualpath = Path(
                 medium_exp_filename.stem + ".qual" + medium_exp_filename.suffix
             )
             medium_exp_urlpath = filename2repo_path(medium_exp_qualpath, join=True)
-            logging.info(f"medium exp. url: {medium_exp_urlpath}")
+            logging.info(f"medium exp. url: {medium_exp_urlpath}")  # noqa: LOG015
             medium_exp_qualpath = download_file(medium_exp_urlpath, allow_insecure=True)
         else:
             medium_exp_qualpath = Path(qualfiles[0])
     else:
         medium_exp_filename = None
         triple = False
-        logging.info("Composite image is a double")
+        logging.info("Composite image is a double")  # noqa: LOG015
 
     if qualfiles is None:
         long_exp_filename = Path(comp_header["LNGFNAME"])
@@ -98,7 +98,7 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
     naxis2 = comp_header["NAXIS2"]
 
     srt_exp = fits.getval(short_exp_filepath, "EXPTIME")
-    logging.info(f"Short image exposure time = {srt_exp}")
+    logging.info(f"Short image exposure time = {srt_exp}")  # noqa: LOG015
     lng_hdu = fits.open(long_exp_qualpath)
     lng_exp = lng_hdu[0].header["EXPTIME"]
     lng_gmap = lng_hdu[0].data
@@ -106,7 +106,7 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
 
     # do bit arithmetic to get saturated pixels
     lng_sat = (lng_gmap & 1).astype(bool)
-    logging.info(f"No. of saturated pixels in long exposure = {np.sum(lng_sat)}")
+    logging.info(f"No. of saturated pixels in long exposure = {np.sum(lng_sat)}")  # noqa: LOG015
     exp_map = np.ones((naxis1, naxis2)) * lng_exp
     exp_map[lng_sat] = srt_exp
 
@@ -117,9 +117,9 @@ def make_exposure_map(comp_image_file, qualfiles=None, retsatpix=False, verbose=
         med_hdu.close()
         med_sat = (med_gmap & 1).astype(bool)
         exp_map[~med_sat & lng_sat] = med_exp
-        logging.info(f"No. of saturated pixels in medium exposure = {np.sum(med_sat)}")
-        logging.info(f"Medium image exposure time = {med_exp}")
-    logging.info(f"Long image exposure time = {lng_exp}")
+        logging.info(f"No. of saturated pixels in medium exposure = {np.sum(med_sat)}")  # noqa: LOG015
+        logging.info(f"Medium image exposure time = {med_exp}")  # noqa: LOG015
+    logging.info(f"Long image exposure time = {lng_exp}")  # noqa: LOG015
 
     if retsatpix:
         if triple:
