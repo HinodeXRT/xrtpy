@@ -19,7 +19,7 @@
 
 ci:
   autofix_prs: false
-  autoupdate_schedule: monthly
+  autoupdate_schedule: quarterly
 
 repos:
 
@@ -82,7 +82,7 @@ repos:
   - id: text-unicode-replacement-char
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.4.2
+  rev: v2.4.3
   hooks:
   - id: codespell
     name: codespell (add false positives to pyproject.toml)
@@ -94,13 +94,13 @@ repos:
 - repo: https://github.com/adhtruong/mirrors-typos
   # use mirrors-typos because `pre-commit autoupdate` drops the version
   # of the primary typos repo from v1.x.y to v1
-  rev: v1.48.0
+  rev: v1.49.0
   hooks:
   - id: typos
     name: typos (add false positives to _typos.toml)
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.20
+  rev: v0.16.1
   hooks:
   - id: ruff-check
     name: ruff-check (see https://docs.astral.sh/ruff/rules)
@@ -144,6 +144,6 @@ repos:
     - mdformat-ruff
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: v2.25.1
+  rev: v2.27.0
   hooks:
   - id: pyproject-fmt
