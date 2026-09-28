@@ -14,4 +14,4 @@ except ImportError:
     __version__ = "0.0.0"
 
 # Then you can be explicit to control what ends up in the namespace,
-__all__ = ["response", "__version__"]
+__all__ = ["__version__", "response"]
