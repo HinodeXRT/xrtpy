@@ -67,7 +67,7 @@ def filename2repo_path(
         mo = date[4:6]
         dy = date[6:]
         hr = "H" + time[0:2] + "00"
-    logging.info(f"yr, mo, dy, hr = {yr}, {mo}, {dy}, {hr}")
+    logging.info(f"yr, mo, dy, hr = {yr}, {mo}, {dy}, {hr}")  # noqa: LOG015
     if filename.name[:6] == "L1_XRT":
         if filename.name[-9:] == "qual.fits":
             path = root / "data_products" / "Level1_Qual" / yr / mo / dy / hr

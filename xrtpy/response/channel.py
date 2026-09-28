@@ -8,12 +8,12 @@ import sunpy.time
 from astropy import units as u
 
 __all__ = [
-    "Geometry",
-    "EntranceFilter",
-    "Mirror",
-    "Filter",
     "CCD",
     "Channel",
+    "EntranceFilter",
+    "Filter",
+    "Geometry",
+    "Mirror",
     "resolve_filter_name",
 ]
 

@@ -754,7 +754,7 @@ def make_results_maps(hdr1, hdr2, T_e, EM, T_error, EMerror, extra_metadata):
     new_hdr["L1_file2"] = filename2
     extra_values, extra_comments = split_values_comments(extra_metadata)
     new_hdr.update(extra_values)
-    create_date = datetime.now().ctime()
+    create_date = datetime.now().ctime()  # noqa: DTZ005
     new_hdr["history"] = f"Created by temperature_from_filter_ratio {create_date}\n"
     Thdr = new_hdr.copy()
     Thdr["BUNIT"] = "log10(K)"
