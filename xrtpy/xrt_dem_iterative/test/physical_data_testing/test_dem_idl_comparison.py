@@ -32,7 +32,7 @@ import pytest
 
 from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
-from xrtpy.xrt_dem_iterative.utils_sav_io import (
+from utils_sav_io import (
     IDLResult,
     SavCase,
     discover_cases,
