@@ -79,7 +79,6 @@ Glossary
          I_i^{\mathrm{model}}
          = \sum_j \mathrm{DEM}(T_j)\,R_i(T_j)\,T_j\,\Delta(\ln T)
 
-
    Solar Emission Spectra
       Emission spectra produced by solar plasma across a range of temperatures, calculated using spectral models such as CHIANTI. These spectra are used in temperature response and filter ratio methods.
 
