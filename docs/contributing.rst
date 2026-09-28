@@ -5,7 +5,7 @@ Contributing to XRTpy
 *********************
 
 Thank you for your interest in contributing to XRTpy!
-We welcome contributions from the community to improve and expand the functionality of this package.
+We welcome contributions by the community to improve and expand the functionality of this package.
 
 There are several ways you can contribute to XRTpy:
 
