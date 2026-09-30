@@ -1135,3 +1135,27 @@ def test_solve_with_single_filter_completes_without_error():
     assert np.all(x.dem >= 0.0)
     assert np.isfinite(x.chisq)
     assert x.chisq >= 0.0
+
+
+def test_summary_shows_user_provided_uncertainties(capsys):
+    """summary() must print the user's uncertainties, not the observed intensities."""
+    filters = ["Al-poly", "Ti-poly", "Be-thin"]
+    intensities = np.array([500.0, 1800.0, 820.0], dtype=float)
+    uncertainties = np.array([15.0, 54.0, 24.6], dtype=float)
+    responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
+
+    x = XRTDEMIterative(
+        observed_channel=filters,
+        observed_intensities=intensities,
+        temperature_responses=responses,
+        intensity_uncertainties=uncertainties,
+    )
+    x.solve()
+    x.summary()
+
+    out = capsys.readouterr().out
+    input_section = out.split("INPUT DATA")[1].split("TEMPERATURE GRID")[0]
+
+    assert "User-provided" in input_section
+    assert "24.6" in input_section
+    assert "820" not in input_section
