@@ -1112,7 +1112,7 @@ class XRTDEMIterative:
         print(f" Number of channels: {len(self._observed_intensities)}")
         if self._intensity_uncertainties is not None:
             arr_str = np.array2string(
-                np.array(self._observed_intensities),
+                np.array(self._intensity_uncertainties),
                 precision=3,
                 suppress_small=True,
                 separator=", ",
