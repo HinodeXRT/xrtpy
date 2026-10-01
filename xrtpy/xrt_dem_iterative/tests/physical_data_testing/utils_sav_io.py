@@ -9,8 +9,8 @@ Filename convention expected:
 Example:
     xrt_IDL_dem_20071213T0401_Bemed603.875886_Bethin150.921435_Alpoly2412.34_.sav
 
-Compact filter name  XRTpy filter name mapping is handled automatically.
-Will be updated once I start testing with MC.
+Compact filter name to XRTpy filter name mapping is handled automatically.
+Supports both base and Monte Carlo IDL DEM .sav files.
 """
 
 from __future__ import annotations
@@ -102,18 +102,12 @@ class IDLMCResult:
         Monte Carlo DEM realizations — columns 1..n_runs of dem_out.
     n_runs : int
         Number of MC realizations (excludes base).
-    chisq_base : float
-        Chi-square of the base DEM solution (run 0).
-    chisq_mc : ndarray (n_runs,) or None
-        Chi-square values for each MC realization.
-        None if chi-square was not stored in the SAV file.
     """
 
     logT: np.ndarray  # noqa: N815
     dem_base: np.ndarray
     dem_mc: np.ndarray
     n_runs: int
-    chisq_base: float = 0.0
     chisq_mc: np.ndarray | None = None
 
 
@@ -193,7 +187,10 @@ def parse_sav_filename(sav_path: str | Path) -> SavCase:
     )
 
 
-# SAV load
+# ---------------------------------------------------------------------------
+# SAV loading
+# ---------------------------------------------------------------------------
+
 def load_idl_sav(sav_path: str | Path) -> IDLResult:
     """Load base DEM only (column 0) from an IDL .sav file."""
     sav_path = Path(sav_path)
@@ -238,8 +235,6 @@ def load_idl_mc_sav(sav_path: str | Path) -> IDLMCResult:
         dem_base    (nT,)         — NOTE: this is dem_out[0], not the standalone base
         dem_mc      (n_runs, nT)
         n_runs      int
-        chisq_base  float         — chi-square of run 0
-        chisq_mc    (n_runs,) or None
     """
     sav_path = Path(sav_path)
     data = readsav(str(sav_path), python_dict=True)
@@ -312,43 +307,11 @@ def load_idl_mc_sav(sav_path: str | Path) -> IDLMCResult:
 
 
 
-    # chi-square — try to load, handle gracefully if absent or wrong shape
-    chisq_base = 0.0
-    chisq_mc = None
-
-    for key in ("chisq_out", "chisq", "chi2_out", "chi2"):
-        if key in data:
-            raw = np.array(data[key]).ravel().astype(float)
-
-            if raw.size == 1:
-                # Scalar — only base chi-square was saved
-                chisq_base = float(raw[0])
-                chisq_mc = None
-
-            elif raw.size == n_runs + 1:
-                # Full array: index 0 = base, 1..n_runs = MC
-                chisq_base = float(raw[0])
-                chisq_mc = raw[1:].copy()
-
-            elif raw.size == n_runs:
-                # MC only (no base stored)
-                chisq_base = 0.0
-                chisq_mc = raw.copy()
-
-            else:
-                # Unexpected size — store what we can
-                chisq_base = float(raw[0]) if raw.size > 0 else 0.0
-                chisq_mc = raw[1:] if raw.size > 1 else None
-
-            break  # found a chi-square key, stop looking
-
     return IDLMCResult(
         logT=logT,
         dem_base=dem_base,
         dem_mc=dem_mc,
         n_runs=n_runs,
-        chisq_base=chisq_base,
-        chisq_mc=chisq_mc,
     )
 
 
