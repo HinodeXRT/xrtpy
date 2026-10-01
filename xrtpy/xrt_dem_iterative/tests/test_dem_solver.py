@@ -240,8 +240,8 @@ def test_residuals_matches_hand_computed_forward_model():
     x.n_spl = 2
 
     params = Parameters()
-    params.add("knot_0", value=0.0, min=-20, max=0)
-    params.add("knot_1", value=0.0, min=-20, max=0)
+    params.add("knot_0", value=0.0, min=-20)
+    params.add("knot_1", value=0.0, min=-20)
 
     x.intensities_scaled = np.array([10.0])
     x.sigma_scaled_intensity_uncertainties = np.array([1.0])
