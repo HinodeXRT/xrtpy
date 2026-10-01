@@ -5,10 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from lmfit import Parameters
-
-import matplotlib as mpl
 from xrtpy.response.channel import Channel
-
 from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
 
@@ -169,7 +166,7 @@ def test_estimate_initial_dem_returns_flat_log_dem_one():
 
 def test_prepare_spline_system_initializes_all_solver_state():
     """
-    1. _prepare_spline_system runs without uncertainties
+    1. _prepare_spline_system runs without errors
     2. n_spl computed correctly
     3. spline_logT shape and monotonicity
     4. spline_log_dem has correct values
@@ -386,7 +383,7 @@ def test_solve_end_to_end_produces_finite_dem_and_mc_outputs():
     """
     Full DEM solving pipeline using real XRT filter responses.
     Verifies:
-        -solve() runs without uncertainties
+        -solve() runs without errors
         -base DEM exists, finite, and positive
         -modeled intensities computed
         -chi-square finite
@@ -447,7 +444,7 @@ def test_solve_end_to_end_produces_finite_dem_and_mc_outputs():
     ]
     assert any(different), "Monte Carlo DEMs identical to base DEM — noise not applied?"
 
-    # Modes must differ for perturbed cases
+    # Modeled intensities must differ for perturbed cases
     base_mod = x.mc_mod_obs[0]
     different_mod = [
         not np.allclose(base_mod, x.mc_mod_obs[i]) for i in range(1, N + 1)
@@ -942,10 +939,12 @@ def test_validate_inputs_rejects_negative_intensity_uncertainties():
     """
     filters = ["Al-poly", "Ti-poly"]
     intensities = np.array([500.0, 800.0])
-    errors = np.array([-10.0, 20.0])  # one negative
+    uncertainties = np.array([-10.0, 20.0])  # one negative
     responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
 
-    x = XRTDEMIterative(filters, intensities, responses, intensity_uncertainties=errors)
+    x = XRTDEMIterative(
+        filters, intensities, responses, intensity_uncertainties=uncertainties
+    )
 
     with pytest.raises(ValueError, match="finite and >= 0"):
         x.validate_inputs()
@@ -957,10 +956,12 @@ def test_validate_inputs_rejects_nan_intensity_uncertainties():
     """
     filters = ["Al-poly", "Ti-poly"]
     intensities = np.array([500.0, 800.0])
-    errors = np.array([np.nan, 20.0])
+    uncertainties = np.array([np.nan, 20.0])
     responses = generate_temperature_responses(filters, "2012-10-27T00:00:00")
 
-    x = XRTDEMIterative(filters, intensities, responses, intensity_uncertainties=errors)
+    x = XRTDEMIterative(
+        filters, intensities, responses, intensity_uncertainties=uncertainties
+    )
 
     with pytest.raises(ValueError, match="finite and >= 0"):
         x.validate_inputs()
