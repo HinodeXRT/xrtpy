@@ -195,11 +195,11 @@ def test_prepare_spline_system_initializes_all_solver_state():
     # spline knot positions
     assert len(x.spline_logT) == 2
     assert np.all(np.diff(x.spline_logT) > 0)
-
-    # spline_log_dem should be zeros (flat initial DEM)
+    
     # spline_log_dem starts at 1.0 (IDL flat initial guess)
     assert len(x.spline_log_dem) == 2
-    assert np.allclose(x.spline_log_dem, 1.0)  # 0.0) - March 2026 Edit
+    assert np.allclose(x.spline_log_dem, 1.0)
+
 
     # pm_matrix has correct shape
     assert x.pm_matrix.shape == (3, len(x.logT))
@@ -558,18 +558,12 @@ def test_user_provided_intensity_uncertainties_are_used():
     )
 
     # Should not warn — user provided uncertainties
-
     with warnings.catch_warnings():
         warnings.simplefilter("error")  # any warning becomes an error
         result = x.intensity_uncertainties
 
     # Values should match what was passed in
     np.testing.assert_allclose(result.value, uncertainties)
-
-
-########
-
-# NEW TEST
 
 
 def test_init_rejects_boolean_monte_carlo_runs():
@@ -775,9 +769,6 @@ def test_init_rejects_empty_observed_channel():
 
     with pytest.raises(ValueError, match="required and cannot be empty"):
         XRTDEMIterative([], intensities, responses)
-
-
-# PROPERTY TESTS
 
 
 def test_observed_intensities_property_returns_quantity_with_correct_units():
