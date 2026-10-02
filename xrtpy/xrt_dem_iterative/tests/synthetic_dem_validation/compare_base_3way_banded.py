@@ -1,24 +1,42 @@
 """
-Three-way BASE DEM comparison WITH contribution-band shading, for the
-162-DEM synthetic validation campaign.
+Compare synthetic truth, IDL base DEM results, and XRTpy base DEM results
+with contribution-band shading.
 
-Synthetic truth (red) + IDL base (orange) + XRTpy base (blue dashed),
-with grey shaded regions marking the temperatures that carry > N% of the
-emission -- where the filters actually constrain the DEM. Each contiguous
-run of qualifying logT bins (spacing ~0.1) is shaded as its own box, so
-multi-component DEMs get multiple bands with gaps between them.
+For each synthetic DEM case, the plot contains:
 
-Loads:
-    - Bands:     data/contribution_bands.csv (from extract_contribution_bands.py)
-    - True DEM:  data/synthetic_dems_data/DEM_{id}.txt
-    - IDL base:  data/all_IDL_synthetic_dem_data/*_base.sav
-    - XRTpy:     xrtpy_output/*_MC1000.npz (row 0), or *_base.npz fallback
+- synthetic truth DEM;
+- IDL base DEM;
+- XRTpy base DEM;
+- shaded temperature ranges corresponding to the contribution-band data.
 
-Saved to plots/compare_base_banded/compare_base_dem_idx{id}_allfilters.png
+Contiguous qualifying temperature bins are grouped into separate shaded
+regions so multi-component DEMs retain gaps between constrained regions.
 
-Usage (from synthetic_dem_validation/):
-    python compare_synthetic_base_3way_banded.py --dem 137   # one DEM
-    python compare_synthetic_base_3way_banded.py             # all found
+Inputs
+------
+Contribution bands:
+    data/contribution_bands.csv
+
+Synthetic truth:
+    data/synthetic_dems_data/DEM_{id}.txt
+
+IDL base results:
+    data/all_IDL_synthetic_dem_data/
+    idl_synthetic_dem_idx{id}_allfilters_base.sav
+
+XRTpy base results:
+    data/output_data/xrtpy_base_dem_results/
+    xrtpy_dem_idx{id}_allfilters_base.npz
+
+Outputs
+-------
+    plots/idl_xrtpy_synthetic_base_dem_comparison_with_contribution_bands/
+    compare_base_dem_idx{id}_allfilters.png
+
+Usage from ``synthetic_dem_validation/``:
+
+    python compare_base_3way_banded.py --dem 137
+    python compare_base_3way_banded.py
 """
 
 import argparse
@@ -30,13 +48,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import readsav
 
-# ── Configuration ─────────────────────────────────────────────────────────────
+
 BASE_DIR = Path(__file__).parent
+
 IDL_BASE_DIR = BASE_DIR / "data" / "all_IDL_synthetic_dem_data"
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
-XRTPY_DIR = BASE_DIR  / "data" / "output_data"/ "xrtpy_base_dem_results"
+
+XRTPY_BASE_DIR = (
+    BASE_DIR
+    / "data"
+    / "output_data"
+    / "xrtpy_base_dem_results"
+)
+
 BANDS_CSV = BASE_DIR / "data" / "contribution_bands.csv"
-PLOT_DIR = BASE_DIR / "plots" / "idl_xrtpy_synthetic_base_dem_comparison_with_contribution_bands"
+
+PLOT_DIR = (
+    BASE_DIR
+    / "plots"
+    / "idl_xrtpy_synthetic_base_dem_comparison_with_contribution_bands"
+)
+
 
 COLOR_TRUE = "red"
 COLOR_IDL = "orange"
@@ -110,124 +142,258 @@ def load_idl_base(dem_id):
 
 
 def load_xrtpy_base(dem_id):
-    mc = XRTPY_DIR / f"xrtpy_dem_idx{dem_id}_allfilters_MC1000.npz"
-    base = XRTPY_DIR / f"xrtpy_dem_idx{dem_id}_allfilters_base.npz"
-    if mc.exists():
-        d = np.load(mc, allow_pickle=True)
-        return d["logT"], d["mc_dem"][0], float(d["mc_chisq"][0])
-    if base.exists():
-        d = np.load(base, allow_pickle=True)
-        return d["logT"], d["dem"], float(d["chisq"])
-    raise FileNotFoundError(f"No XRTpy npz for DEM {dem_id} in {XRTPY_DIR}")
+    """Load the XRTpy base DEM result for one synthetic case."""
+    path = (
+        XRTPY_BASE_DIR
+        / f"xrtpy_dem_idx{dem_id}_allfilters_base.npz"
+    )
 
+    if not path.exists():
+        raise FileNotFoundError(
+            f"No XRTpy base NPZ for DEM {dem_id}: {path}"
+        )
+
+    with np.load(path) as result:
+        log_temperature = np.asarray(result["logT"], dtype=float)
+        dem = np.asarray(result["dem"], dtype=float)
+        chisq = float(result["chisq"])
+
+    return log_temperature, dem, chisq
 
 def load_true_dem(dem_id):
+    """Load the synthetic truth DEM for one case."""
     path = TRUE_DEM_DIR / f"DEM_{dem_id}.txt"
+
     if not path.exists():
         return None
-    d = np.loadtxt(path)
-    return d[:, 0], _log10_dem(d[:, 1])
+
+    data = np.loadtxt(path)
+
+    log_temperature = data[:, 0]
+    log_dem = _log10_dem(data[:, 1])
+
+    return log_temperature, log_dem
+
 
 
 # ── Plot ──────────────────────────────────────────────────────────────────────
 def plot_one_dem(dem_id, bands):
-    idl_logT, idl_base, idl_chisq, filters, obs_val, obs_err = load_idl_base(dem_id)
-    py_logT, py_base, py_chisq = load_xrtpy_base(dem_id)
+    """Plot truth, IDL base, and XRTpy base DEMs with contribution bands."""
+    (
+        idl_log_temperature,
+        idl_base_dem,
+        idl_chisq,
+        filters,
+        observed_values,
+        observed_errors,
+    ) = load_idl_base(dem_id)
 
-    if not np.allclose(idl_logT, py_logT, atol=1e-6):
-        raise ValueError(f"IDL and XRTpy logT grids differ for DEM {dem_id}!")
-    logT = py_logT
+    (
+        xrtpy_log_temperature,
+        xrtpy_base_dem,
+        xrtpy_chisq,
+    ) = load_xrtpy_base(dem_id)
+
+    if not np.allclose(
+        idl_log_temperature,
+        xrtpy_log_temperature,
+        atol=1e-6,
+    ):
+        raise ValueError(
+            f"IDL and XRTpy logT grids differ for DEM {dem_id}."
+        )
+
+    log_temperature = xrtpy_log_temperature
 
     fig, ax = plt.subplots(figsize=(11, 7))
 
-    spans = contiguous_spans(bands.get(dem_id, []))
-    for k, (lo, hi) in enumerate(spans):
-        ax.axvspan(lo, hi, color=BAND_COLOR, alpha=BAND_ALPHA,
-                   label=">2% contribution" if k == 0 else None)
+    spans = contiguous_spans(
+        bands.get(dem_id, [])
+    )
+
+    for span_index, (lower, upper) in enumerate(spans):
+        ax.axvspan(
+            lower,
+            upper,
+            color=BAND_COLOR,
+            alpha=BAND_ALPHA,
+            label=">2% contribution" if span_index == 0 else None,
+        )
 
     true_dem = load_true_dem(dem_id)
-    if true_dem is not None:
-        ax.step(true_dem[0], true_dem[1], where="mid",
-                color=COLOR_TRUE, linewidth=2.5, label="Synthetic DEM")
 
-    ax.step(logT, _log10_dem(idl_base), where="mid",
-            color=COLOR_IDL, linewidth=2.5,
-            label=f"IDL base  |  χ² = {idl_chisq:.4f}")
-    ax.step(logT, _log10_dem(py_base), where="mid",
-            color=COLOR_XRTPY, linewidth=2.5, linestyle="--",
-            label=f"XRTpy base  |  χ² = {py_chisq:.4f}")
+    if true_dem is not None:
+        true_log_temperature, true_log_dem = true_dem
+
+        ax.step(
+            true_log_temperature,
+            true_log_dem,
+            where="mid",
+            color=COLOR_TRUE,
+            linewidth=2.5,
+            label="Synthetic DEM",
+        )
+
+    ax.step(
+        log_temperature,
+        _log10_dem(idl_base_dem),
+        where="mid",
+        color=COLOR_IDL,
+        linewidth=2.5,
+        label=f"IDL base  |  χ² = {idl_chisq:.4f}",
+    )
+
+    ax.step(
+        log_temperature,
+        _log10_dem(xrtpy_base_dem),
+        where="mid",
+        color=COLOR_XRTPY,
+        linewidth=2.5,
+        linestyle="--",
+        label=f"XRTpy base  |  χ² = {xrtpy_chisq:.4f}",
+    )
 
     ax.set_title(
-        f"Base DEM Comparison — IDL vs XRTpy vs Synthetic — DEM Index {dem_id} "
+        f"Base DEM Comparison — IDL vs XRTpy vs Synthetic — "
+        f"DEM Index {dem_id} "
         f"(all {len(filters)} filters)",
-        fontsize=13, pad=34,
+        fontsize=13,
+        pad=34,
     )
 
-    entries = [
-        f"{f} [{i:.4g} ± {e:.3g}]"
-        for f, i, e in zip(filters, obs_val, obs_err, strict=True)
+    filter_entries = [
+        f"{filter_name} [{value:.4g} ± {error:.3g}]"
+        for filter_name, value, error in zip(
+            filters,
+            observed_values,
+            observed_errors,
+            strict=True,
+        )
     ]
-    per_line = 4
+
+    filters_per_line = 4
     filter_label = "\n".join(
-        ",   ".join(entries[k : k + per_line])
-        for k in range(0, len(entries), per_line)
+        ",   ".join(
+            filter_entries[start : start + filters_per_line]
+        )
+        for start in range(0, len(filter_entries), filters_per_line)
     )
-    fig.text(0.5, 0.945, filter_label, ha="center", va="top", fontsize=7.5)
+
+    fig.text(
+        0.5,
+        0.945,
+        filter_label,
+        ha="center",
+        va="top",
+        fontsize=7.5,
+    )
 
     ax.set_xlabel(r"log$_{10}$ T  [K]", fontsize=12)
     ax.set_ylabel(r"log$_{10}$ DEM  [cm$^{-5}$ K$^{-1}$]", fontsize=12)
-    ax.set_xlim(logT.min(), logT.max())
+    ax.set_xlim(log_temperature.min(), log_temperature.max())
     ax.set_ylim(18, 26)
     ax.grid(visible=True, alpha=0.3)
     ax.legend(fontsize=11, loc="best")
 
     fig.tight_layout(rect=[0, 0, 1, 0.87])
+
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
-    out_png = PLOT_DIR / f"compare_base_dem_idx{dem_id}_allfilters.png"
+
+    out_png = (
+        PLOT_DIR
+        / f"compare_base_dem_idx{dem_id}_allfilters.png"
+    )
+
     fig.savefig(out_png, dpi=150)
     plt.close(fig)
-    return idl_chisq, py_chisq, len(spans)
+
+    return idl_chisq, xrtpy_chisq, len(spans)
+
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
-def _dem_id_from_path(p: Path) -> int:
-    m = re.search(r"idx(\d+)_", p.name)
-    return int(m.group(1)) if m else -1
+def _dem_id_from_path(path: Path) -> int:
+    """Extract the DEM index from an IDL result filename."""
+    match = re.search(r"idx(\d+)_", path.name)
+
+    if match is None:
+        raise ValueError(
+            f"Could not extract DEM index from filename: {path.name}"
+        )
+
+    return int(match.group(1))
 
 
 def main():
-    parser = argparse.ArgumentParser(description="3-way base comparison (banded)")
-    parser.add_argument("--dem", type=int, default=None,
-                        help="Single DEM index (e.g., 137). Omit for all found.")
+    """Generate contribution-banded base DEM comparison plots."""
+    parser = argparse.ArgumentParser(
+        description=(
+            "Compare synthetic truth, IDL base, and XRTpy base DEMs "
+            "with contribution-band shading."
+        )
+    )
+    parser.add_argument(
+        "--dem",
+        type=int,
+        default=None,
+        help="Plot a single DEM index. Omit to process all available cases.",
+    )
     args = parser.parse_args()
 
     bands = load_bands()
 
     sav_files = sorted(
-        IDL_BASE_DIR.glob("idl_synthetic_dem_idx*_allfilters_base.sav"),
+        IDL_BASE_DIR.glob(
+            "idl_synthetic_dem_idx*_allfilters_base.sav"
+        ),
         key=_dem_id_from_path,
     )
-    if not sav_files:
-        raise FileNotFoundError(f"No IDL base .sav files found in {IDL_BASE_DIR}")
 
-    dem_ids = [_dem_id_from_path(p) for p in sav_files]
+    if not sav_files:
+        raise FileNotFoundError(
+            f"No IDL base SAV files found in {IDL_BASE_DIR}"
+        )
+
+    dem_ids = [
+        _dem_id_from_path(path)
+        for path in sav_files
+    ]
+
     if args.dem is not None:
         if args.dem not in dem_ids:
-            raise FileNotFoundError(f"No IDL base .sav for DEM {args.dem}")
+            raise FileNotFoundError(
+                f"No IDL base SAV file found for DEM {args.dem}"
+            )
+
         dem_ids = [args.dem]
 
     n_no_band = 0
+
     print(f"Plotting {len(dem_ids)} DEM(s).")
-    for k, dem_id in enumerate(dem_ids, 1):
-        idl_chi, py_chi, n_spans = plot_one_dem(dem_id, bands)
+
+    for index, dem_id in enumerate(dem_ids, start=1):
+        idl_chisq, xrtpy_chisq, n_spans = plot_one_dem(
+            dem_id,
+            bands,
+        )
+
         if n_spans == 0:
             n_no_band += 1
-        print(f"[{k:3d}/{len(dem_ids)}] DEM {dem_id:3d}  "
-              f"IDL {idl_chi:12.4f}   XRTpy {py_chi:10.4f}   bands: {n_spans}")
+
+        print(
+            f"[{index:3d}/{len(dem_ids)}] "
+            f"DEM {dem_id:3d}  "
+            f"IDL {idl_chisq:12.4f}   "
+            f"XRTpy {xrtpy_chisq:10.4f}   "
+            f"bands: {n_spans}"
+        )
 
     if n_no_band:
-        print(f"\nNote: {n_no_band} DEM(s) plotted without shading "
-              f"(not in {BANDS_CSV.name}).")
+        print(
+            f"\nNote: {n_no_band} DEM(s) plotted without shading "
+            f"(not in {BANDS_CSV.name})."
+        )
+
     print("\nDone.")
 
 
