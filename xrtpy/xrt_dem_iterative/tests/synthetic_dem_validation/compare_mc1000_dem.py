@@ -42,17 +42,60 @@ BASE_DIR = Path(".")
 IDL_MC_DIR = BASE_DIR / "data" / "all_IDL_MC_synthetic_dem_data"
 IDL_MC_PATTERN = "idl_synthetic_dem_idx{n}_allfilters_MC1000.sav"
 
-XRTPY_MC_DIR = BASE_DIR / "xrtpy_output"
+XRTPY_MC_DIR = BASE_DIR / "data" / "output_data" / "xrtpy_monte_carlo_dem_results"
 XRTPY_MC_PATTERN = "xrtpy_dem_idx{n}_allfilters_MC1000.npz"
 
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
 TRUE_DEM_PATTERN = "DEM_{n}.txt"
 
-OUT_LONG_CSV = BASE_DIR / "data" / "mc1000_chisq_long.csv"
-OUT_SUMMARY_CSV = BASE_DIR / "data" / "mc1000_chisq_summary.csv"
-OVERLAY_DIR = BASE_DIR / "plots" / "mc1000_overlay"
-MEDIAN_HIST_PNG = BASE_DIR / "plots" / "mc1000_chisq_histogram.png"
-ALLRUNS_HIST_PNG = BASE_DIR / "plots" / "mc1000_chisq_all_runs_histogram.png"
+CHI_SQUARE_TABLE_DIR = (
+    BASE_DIR
+    / "data"
+    / "output_data"
+    / "chi_square_comparison_tables"
+)
+
+OUT_LONG_CSV = (
+    CHI_SQUARE_TABLE_DIR
+    / "mc1000_chi_square_all_runs.csv"
+)
+
+OUT_SUMMARY_CSV = (
+    CHI_SQUARE_TABLE_DIR
+    / "mc1000_chi_square_summary.csv"
+)
+
+PLOT_DIR = (
+    BASE_DIR
+    / "plots"
+    / "idl_xrtpy_synthetic_monte_carlo_1000_run_comparison"
+)
+
+OVERLAY_DIR = (
+    PLOT_DIR
+    / "per_dem_monte_carlo_overlays"
+)
+
+CHI_SQUARE_PLOT_DIR = (
+    PLOT_DIR
+    / "chi_square_summary_plots"
+)
+
+MEDIAN_HIST_PNG = (
+    CHI_SQUARE_PLOT_DIR
+    / "mc1000_median_chi_square_distribution_histogram.png"
+)
+
+ALLRUNS_HIST_PNG = (
+    CHI_SQUARE_PLOT_DIR
+    / "mc1000_all_runs_chi_square_distribution_histogram.png"
+)
+
+# OUT_LONG_CSV = BASE_DIR / "data" / "mc1000_chisq_long.csv"
+# OUT_SUMMARY_CSV = BASE_DIR / "data" / "mc1000_chisq_summary.csv"
+# OVERLAY_DIR = BASE_DIR / "plots" / "mc1000_overlay"
+# MEDIAN_HIST_PNG = BASE_DIR / "plots" / "mc1000_chisq_histogram.png"
+# ALLRUNS_HIST_PNG = BASE_DIR / "plots" / "mc1000_chisq_all_runs_histogram.png"
 
 DEM_FLOOR = 1e-99
 N_OVERLAY_MAX_CURVES = 1000  # set lower (e.g. 200) to speed up plotting if desired

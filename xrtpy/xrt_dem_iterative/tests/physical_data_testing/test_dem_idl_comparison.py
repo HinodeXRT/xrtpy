@@ -101,10 +101,14 @@ def solved(request) -> tuple[SavCase, IDLResult, XRTDEMIterative]:
 
     idl = load_idl_sav(case.sav_path)
 
-    responses = generate_temperature_responses(case.filters, case.observation_date)
+    responses = generate_temperature_responses(
+        case.filters,
+        idl.observation_date,
+    )
+
     solver = XRTDEMIterative(
         observed_channel=case.filters,
-        observed_intensities=case.intensities_array,
+        observed_intensities=idl.observed_intensities,
         temperature_responses=responses,
         monte_carlo_runs=0,
     )

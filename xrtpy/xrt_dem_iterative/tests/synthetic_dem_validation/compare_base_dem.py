@@ -48,16 +48,33 @@ BASE_DIR = Path(".")
 IDL_BASE_DIR = BASE_DIR / "data" / "all_IDL_synthetic_dem_data"
 IDL_BASE_PATTERN = "idl_synthetic_dem_idx{n}_allfilters_base.sav"
 
-XRTPY_BASE_DIR = BASE_DIR / "xrtpy_output"
+XRTPY_BASE_DIR = BASE_DIR / "data" / "output_data"/ "xrtpy_base_dem_results"
 XRTPY_BASE_PATTERN = "xrtpy_dem_idx{n}_allfilters_base.npz"
 
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
 TRUE_DEM_PATTERN = "DEM_{n}.txt"
 
-OUT_CSV = BASE_DIR / "data" / "base_dem_comparison.csv"
-OVERLAY_DIR = BASE_DIR / "plots" / "base_dem_overlay"
-HIST_PNG = BASE_DIR / "plots" / "base_chisq_histogram.png"
-SCATTER_PNG = BASE_DIR / "plots" / "base_chisq_scatter.png"
+OUT_CSV = BASE_DIR / "data" / "output_data"/ "chi_square_comparison_tables" /"base_dem_comparison.csv"
+
+PLOT_DIR = (
+    BASE_DIR
+    / "plots"
+    / "idl_xrtpy_synthetic_base_dem_comparison"
+)
+
+OVERLAY_DIR = PLOT_DIR / "per_dem_overlays"
+
+CHI_SQUARE_PLOT_DIR = PLOT_DIR / "chi_square_summary_plots"
+
+HIST_PNG = (
+    CHI_SQUARE_PLOT_DIR
+    / "base_chi_square_distribution_histogram.png"
+)
+
+SCATTER_PNG = (
+    CHI_SQUARE_PLOT_DIR
+    / "base_chi_square_idl_xrtpy_scatter.png"
+)
 
 DEM_FLOOR = 1e-99  # for log10 safety
 
