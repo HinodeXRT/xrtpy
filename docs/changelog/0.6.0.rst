@@ -10,7 +10,7 @@ New Features
   observations. (`#PR <https://github.com/HinodeXRT/xrtpy/pull/PR>`__)
 - Added Monte Carlo uncertainty estimation to the DEM solver through the
   ``monte_carlo_runs`` parameter. Perturbed intensity realizations are used
-  to estimate the spread in DEM(T).
+  to estimate the spread in :math:`\mathrm{DEM}(T)`.
 - Added support for user-supplied intensity uncertainties through the
   ``intensity_errors`` parameter. If not provided, the default uncertainty is
   ``max(0.03 * intensity, 2 DN/s/pix)``, matching the IDL behavior.
