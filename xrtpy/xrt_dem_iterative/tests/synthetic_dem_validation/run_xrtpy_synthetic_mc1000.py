@@ -377,7 +377,7 @@ def write_mc_chisq_csvs():
         )
 
         for npz_path in npz_files:
-            with np.load(npz_path, allow_pickle=True) as result:
+            with np.load(npz_path) as result:
                 dem_id = int(result["dem_id"])
                 chisq = np.asarray(result["mc_chisq"], dtype=float)
 
