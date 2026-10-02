@@ -6,7 +6,7 @@ New Features
 - Introduced :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative`, a Python
   implementation of the IDL routine :file:`xrt_dem_iterative2.pro`. This solver
   uses spline-parameterized DEM curves and iterative least-squares fitting to
-  infer the differential emission measure from Hinode/XRT multi-filter
+  infer the DEM from Hinode/XRT multi-filter
   observations. (`#PR <https://github.com/HinodeXRT/xrtpy/pull/PR>`__)
 - Added Monte Carlo uncertainty estimation to the DEM solver through the
   ``monte_carlo_runs`` parameter. Perturbed intensity realizations are used
