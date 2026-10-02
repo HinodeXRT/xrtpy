@@ -4,7 +4,7 @@ XRTpy v0.6.0
 New Features
 ------------
 - Introduced :class:`~xrtpy.xrt_dem_iterative.XRTDEMIterative`, a Python
-  implementation of the IDL routine ``xrt_dem_iterative2.pro``. This solver
+  implementation of the IDL routine :file:`xrt_dem_iterative2.pro`. This solver
   uses spline-parameterized DEM curves and iterative least-squares fitting to
   infer the differential emission measure from Hinode/XRT multi-filter
   observations. (`#PR <https://github.com/HinodeXRT/xrtpy/pull/PR>`__)
