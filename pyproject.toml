@@ -33,6 +33,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Scientific/Engineering :: Physics",
 ]
@@ -149,11 +150,11 @@ ini_options.norecursedirs = [
 ini_options.xfail_strict = true
 
 [tool.coverage]
-run.branch = true
+run.source = [ "xrtpy" ]
 run.omit = [
   "*/*version.py",
 ]
-run.source = [ "xrtpy" ]
+run.branch = true
 report.exclude_lines = [
   "@abstractmethod",
   "coverage: ignore",
