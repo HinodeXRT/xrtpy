@@ -149,3 +149,5 @@ version.py
 
 # local directory
 idl_routines/
+
+/uv.lock

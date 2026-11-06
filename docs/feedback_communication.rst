@@ -1,4 +1,4 @@
-.. _xrytpy-feedback-communication:
+.. _xrtpy-feedback-communication:
 
 ******************
 Providing Feedback
