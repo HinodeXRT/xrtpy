@@ -981,7 +981,7 @@ def main() -> None:
     parser.add_argument(
         "--save",
         action="store_true",
-        help="Save ONGs instead of showing interactively.",
+        help="Save PNGs instead of showing interactively.",
     )
     args = parser.parse_args()
 
