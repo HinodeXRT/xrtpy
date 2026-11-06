@@ -333,7 +333,7 @@
 #     parser.add_argument("--all", action="store_true",
 #                         help=f"Process all MC .sav files in {MC_DIR}")
 #     parser.add_argument("--save", action="store_true",
-#                         help="Save PNGs instead of showing interactively.")
+#                         help="Save ONGs instead of showing interactively.")
 #     args = parser.parse_args()
 
 #     mc_cases: list[SavCase] = []
@@ -393,9 +393,9 @@ import sys
 import warnings
 from pathlib import Path
 
-import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import gridspec
 from utils_sav_io import (
     IDLMCResult,
     SavCase,
@@ -981,7 +981,7 @@ def main() -> None:
     parser.add_argument(
         "--save",
         action="store_true",
-        help="Save PNGs instead of showing interactively.",
+        help="Save ONGs instead of showing interactively.",
     )
     args = parser.parse_args()
 

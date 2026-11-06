@@ -45,15 +45,14 @@ Chi-square summary plots:
     chi_square_summary_plots/
 """
 
-
 from __future__ import annotations
 
-from pathlib import Path
 import re
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from scipy.io import readsav
 
 # ============================================================
@@ -72,46 +71,25 @@ TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
 TRUE_DEM_PATTERN = "DEM_{n}.txt"
 
 CHI_SQUARE_TABLE_DIR = (
-    BASE_DIR
-    / "data"
-    / "output_data"
-    / "chi_square_comparison_tables"
+    BASE_DIR / "data" / "output_data" / "chi_square_comparison_tables"
 )
 
-OUT_LONG_CSV = (
-    CHI_SQUARE_TABLE_DIR
-    / "mc1000_chi_square_all_runs.csv"
-)
+OUT_LONG_CSV = CHI_SQUARE_TABLE_DIR / "mc1000_chi_square_all_runs.csv"
 
-OUT_SUMMARY_CSV = (
-    CHI_SQUARE_TABLE_DIR
-    / "mc1000_chi_square_summary.csv"
-)
+OUT_SUMMARY_CSV = CHI_SQUARE_TABLE_DIR / "mc1000_chi_square_summary.csv"
 
-PLOT_DIR = (
-    BASE_DIR
-    / "plots"
-    / "idl_xrtpy_synthetic_monte_carlo_1000_run_comparison"
-)
+PLOT_DIR = BASE_DIR / "plots" / "idl_xrtpy_synthetic_monte_carlo_1000_run_comparison"
 
-OVERLAY_DIR = (
-    PLOT_DIR
-    / "per_dem_monte_carlo_overlays"
-)
+OVERLAY_DIR = PLOT_DIR / "per_dem_monte_carlo_overlays"
 
-CHI_SQUARE_PLOT_DIR = (
-    PLOT_DIR
-    / "chi_square_summary_plots"
-)
+CHI_SQUARE_PLOT_DIR = PLOT_DIR / "chi_square_summary_plots"
 
 MEDIAN_HIST_PNG = (
-    CHI_SQUARE_PLOT_DIR
-    / "mc1000_median_chi_square_distribution_histogram.png"
+    CHI_SQUARE_PLOT_DIR / "mc1000_median_chi_square_distribution_histogram.png"
 )
 
 ALLRUNS_HIST_PNG = (
-    CHI_SQUARE_PLOT_DIR
-    / "mc1000_all_runs_chi_square_distribution_histogram.png"
+    CHI_SQUARE_PLOT_DIR / "mc1000_all_runs_chi_square_distribution_histogram.png"
 )
 
 DEM_FLOOR = 1e-99
@@ -122,11 +100,11 @@ N_OVERLAY_MAX_CURVES = 1000  # set lower (e.g. 200) to speed up plotting if desi
 # Discovery (same pattern as compare_base_dem.py)
 # ============================================================
 
+
 def _extract_index(filename: str, pattern: str) -> int | None:
     regex = re.escape(pattern).replace(r"\{n\}", r"(\d+)")
     m = re.match(regex, filename)
     return int(m.group(1)) if m else None
-
 
 
 def discover_common_indices() -> list[int]:
@@ -251,10 +229,7 @@ def plot_mc_overlay(
         xrtpy["logT"],
         atol=1e-8,
     ):
-        print(
-            f"  [warn] DEM {dem_id}: "
-            "IDL and XRTpy logT grids differ."
-        )
+        print(f"  [warn] DEM {dem_id}: IDL and XRTpy logT grids differ.")
 
     log_temperature = xrtpy["logT"]
 
@@ -336,7 +311,6 @@ def plot_mc_overlay(
     plt.close(fig)
 
 
-
 # ============================================================
 # Step 4: Chi-square tables + summary plots
 # ============================================================
@@ -394,9 +368,7 @@ def build_chisq_tables(
                     idl["chisq_mc"],
                     84,
                 ),
-                "chisq_xrtpy_median": np.median(
-                    xrtpy["chisq_mc"]
-                ),
+                "chisq_xrtpy_median": np.median(xrtpy["chisq_mc"]),
                 "chisq_xrtpy_p16": np.percentile(
                     xrtpy["chisq_mc"],
                     16,
@@ -410,14 +382,9 @@ def build_chisq_tables(
 
     long_df = pd.DataFrame(long_rows)
 
-    summary_df = (
-        pd.DataFrame(summary_rows)
-        .sort_values("dem_id")
-        .reset_index(drop=True)
-    )
+    summary_df = pd.DataFrame(summary_rows).sort_values("dem_id").reset_index(drop=True)
 
     return long_df, summary_df
-
 
 
 def plot_median_chisq_histogram(
@@ -427,21 +394,13 @@ def plot_median_chisq_histogram(
     """Plot the distribution of per-DEM median Monte Carlo chi-square values."""
     out_png.parent.mkdir(parents=True, exist_ok=True)
 
-    median_chisq_idl = summary_df[
-        "chisq_idl_median"
-    ].to_numpy(dtype=float)
+    median_chisq_idl = summary_df["chisq_idl_median"].to_numpy(dtype=float)
 
-    median_chisq_xrtpy = summary_df[
-        "chisq_xrtpy_median"
-    ].to_numpy(dtype=float)
+    median_chisq_xrtpy = summary_df["chisq_xrtpy_median"].to_numpy(dtype=float)
 
-    log_median_chisq_idl = np.log10(
-        np.maximum(median_chisq_idl, 1e-10)
-    )
+    log_median_chisq_idl = np.log10(np.maximum(median_chisq_idl, 1e-10))
 
-    log_median_chisq_xrtpy = np.log10(
-        np.maximum(median_chisq_xrtpy, 1e-10)
-    )
+    log_median_chisq_xrtpy = np.log10(np.maximum(median_chisq_xrtpy, 1e-10))
 
     idl_median_of_medians = np.median(median_chisq_idl)
     xrtpy_median_of_medians = np.median(median_chisq_xrtpy)
@@ -480,20 +439,14 @@ def plot_median_chisq_histogram(
         np.log10(max(idl_median_of_medians, 1e-10)),
         color="darkorange",
         linestyle="--",
-        label=(
-            "IDL median-of-medians "
-            f"$\\chi^2$ = {idl_median_of_medians:.3g}"
-        ),
+        label=(f"IDL median-of-medians $\\chi^2$ = {idl_median_of_medians:.3g}"),
     )
 
     ax.axvline(
         np.log10(max(xrtpy_median_of_medians, 1e-10)),
         color="navy",
         linestyle="--",
-        label=(
-            "XRTpy median-of-medians "
-            f"$\\chi^2$ = {xrtpy_median_of_medians:.3g}"
-        ),
+        label=(f"XRTpy median-of-medians $\\chi^2$ = {xrtpy_median_of_medians:.3g}"),
     )
 
     ax.set_title(
@@ -502,9 +455,7 @@ def plot_median_chisq_histogram(
         f"({N_OVERLAY_MAX_CURVES} MC each)"
     )
 
-    ax.set_xlabel(
-        r"$\log_{10}$(median $\chi^2$)  (per DEM)"
-    )
+    ax.set_xlabel(r"$\log_{10}$(median $\chi^2$)  (per DEM)")
     ax.set_ylabel("Number of DEMs")
 
     ax.legend()
@@ -525,12 +476,8 @@ def plot_all_runs_chisq_histogram(
     chisq_idl = long_df["chisq_idl"].to_numpy(dtype=float)
     chisq_xrtpy = long_df["chisq_xrtpy"].to_numpy(dtype=float)
 
-    log_chisq_idl = np.log10(
-        np.maximum(chisq_idl, 1e-10)
-    )
-    log_chisq_xrtpy = np.log10(
-        np.maximum(chisq_xrtpy, 1e-10)
-    )
+    log_chisq_idl = np.log10(np.maximum(chisq_idl, 1e-10))
+    log_chisq_xrtpy = np.log10(np.maximum(chisq_xrtpy, 1e-10))
 
     bins = np.linspace(
         min(
@@ -564,13 +511,8 @@ def plot_all_runs_chisq_histogram(
 
     n_dems = long_df["dem_id"].nunique()
 
-    ax.set_title(
-        f"All Individual MC Run $\\chi^2$ — "
-        f"{n_dems} Synthetic DEMs"
-    )
-    ax.set_xlabel(
-        r"$\log_{10}(\chi^2)$  (single MC run)"
-    )
+    ax.set_title(f"All Individual MC Run $\\chi^2$ — {n_dems} Synthetic DEMs")
+    ax.set_xlabel(r"$\log_{10}(\chi^2)$  (single MC run)")
     ax.set_ylabel("Number of runs")
 
     ax.legend()
@@ -614,24 +556,15 @@ def main():
         index=False,
     )
 
-    print(
-        f"Saved: {OUT_LONG_CSV} "
-        f"({len(long_df)} rows)"
-    )
-    print(
-        f"Saved: {OUT_SUMMARY_CSV} "
-        f"({len(summary_df)} rows)"
-    )
+    print(f"Saved: {OUT_LONG_CSV} ({len(long_df)} rows)")
+    print(f"Saved: {OUT_SUMMARY_CSV} ({len(summary_df)} rows)")
 
     print("\nGenerating per-DEM MC overlay plots...")
 
     for dem_id in summary_df["dem_id"]:
         plot_mc_overlay(int(dem_id))
 
-    print(
-        f"Saved {len(summary_df)} overlay plots to: "
-        f"{OVERLAY_DIR}"
-    )
+    print(f"Saved {len(summary_df)} overlay plots to: {OVERLAY_DIR}")
 
     print("\nGenerating chi-square summary plots...")
 

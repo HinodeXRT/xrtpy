@@ -273,4 +273,3 @@ def test_diagnostic_print_full_comparison(solved):
             f"  {f:<22} {obs:>10.3f} {mod:>10.3f} {lr:>+11.3f}{'  ←!' if abs(lr) > 1.0 else ''}"
         )
     print(f"{sep}\n")
-

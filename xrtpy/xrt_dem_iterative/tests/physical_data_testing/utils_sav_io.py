@@ -191,6 +191,7 @@ def parse_sav_filename(sav_path: str | Path) -> SavCase:
 # SAV loading
 # ---------------------------------------------------------------------------
 
+
 def load_idl_sav(sav_path: str | Path) -> IDLResult:
     """Load base DEM only (column 0) from an IDL .sav file."""
     sav_path = Path(sav_path)
@@ -261,16 +262,13 @@ def load_idl_mc_sav(sav_path: str | Path) -> IDLMCResult:
 
     if dem_all is None:
         raise KeyError(
-            f"DEM array not found in {sav_path.name}. "
-            f"Keys: {sorted(data.keys())}"
+            f"DEM array not found in {sav_path.name}. Keys: {sorted(data.keys())}"
         )
 
     if dem_all.ndim == 1:
         dem_all = dem_all[np.newaxis, :]
     elif dem_all.ndim != 2:
-        raise ValueError(
-            f"Expected a 1-D or 2-D DEM array, got shape {dem_all.shape}."
-        )
+        raise ValueError(f"Expected a 1-D or 2-D DEM array, got shape {dem_all.shape}.")
 
     # Determine the number of MC runs recorded in the SAV file.
     saved_n_runs = 0
@@ -304,8 +302,6 @@ def load_idl_mc_sav(sav_path: str | Path) -> IDLMCResult:
     dem_base = runs_by_temperature[0].copy()
     dem_mc = runs_by_temperature[1:].copy()
     n_runs = dem_mc.shape[0]
-
-
 
     return IDLMCResult(
         logT=logT,

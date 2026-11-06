@@ -49,7 +49,6 @@ Usage from ``synthetic_dem_validation/``:
     python compare_mc1000_3way_banded.py
 """
 
-
 import argparse
 import csv
 import re
@@ -66,21 +65,15 @@ IDL_MC_DIR = BASE_DIR / "data" / "all_IDL_MC_synthetic_dem_data"
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
 XRTPY_DIR = BASE_DIR / "data" / "output_data" / "xrtpy_monte_carlo_dem_results"
 BANDS_CSV = BASE_DIR / "data" / "contribution_bands.csv"
-PLOT_DIR = BASE_DIR / "plots" / "idl_xrtpy_synthetic_monte_carlo_1000_run_comparison_with_contribution_bands"
-
-XRTPY_BASE_DIR = (
+PLOT_DIR = (
     BASE_DIR
-    / "data"
-    / "output_data"
-    / "xrtpy_base_dem_results"
+    / "plots"
+    / "idl_xrtpy_synthetic_monte_carlo_1000_run_comparison_with_contribution_bands"
 )
 
-XRTPY_MC_DIR = (
-    BASE_DIR
-    / "data"
-    / "output_data"
-    / "xrtpy_monte_carlo_dem_results"
-)
+XRTPY_BASE_DIR = BASE_DIR / "data" / "output_data" / "xrtpy_base_dem_results"
+
+XRTPY_MC_DIR = BASE_DIR / "data" / "output_data" / "xrtpy_monte_carlo_dem_results"
 
 N_MC = 1000
 COLOR_TRUE = "red"
@@ -129,9 +122,7 @@ def load_bands():
 
         for row in reader:
             temps = (
-                [float(value) for value in row["temps"].split()]
-                if row["temps"]
-                else []
+                [float(value) for value in row["temps"].split()] if row["temps"] else []
             )
 
             bands[int(row["dem_id"])] = temps
@@ -147,9 +138,7 @@ def contiguous_spans(
     if not temps:
         return []
 
-    temperatures = np.sort(
-        np.asarray(temps, dtype=float)
-    )
+    temperatures = np.sort(np.asarray(temps, dtype=float))
 
     spans = []
 
@@ -158,16 +147,12 @@ def contiguous_spans(
 
     for temperature in temperatures[1:]:
         if temperature - previous > step * 1.5:
-            spans.append(
-                (start, previous)
-            )
+            spans.append((start, previous))
             start = temperature
 
         previous = temperature
 
-    spans.append(
-        (start, previous)
-    )
+    spans.append((start, previous))
 
     half_step = step / 2.0
 
@@ -183,10 +168,7 @@ def contiguous_spans(
 # ── Loaders ───────────────────────────────────────────────────────────────────
 def load_idl_base(dem_id):
     """Load the standalone IDL base DEM result."""
-    path = (
-        IDL_BASE_DIR
-        / f"idl_synthetic_dem_idx{dem_id}_allfilters_base.sav"
-    )
+    path = IDL_BASE_DIR / f"idl_synthetic_dem_idx{dem_id}_allfilters_base.sav"
 
     data = readsav(
         str(path),
@@ -203,21 +185,13 @@ def load_idl_base(dem_id):
         len(log_temperature),
     )[0]
 
-    chisq = float(
-        np.atleast_1d(data["chisq"])[0]
-    )
+    chisq = float(np.atleast_1d(data["chisq"])[0])
 
-    filters = _decode(
-        data["obs_index"]
-    )
+    filters = _decode(data["obs_index"])
 
-    observed_values = np.atleast_1d(
-        data["obs_val"]
-    ).astype(float)
+    observed_values = np.atleast_1d(data["obs_val"]).astype(float)
 
-    observed_errors = np.atleast_1d(
-        data["obs_err"]
-    ).astype(float)
+    observed_errors = np.atleast_1d(data["obs_err"]).astype(float)
 
     return (
         log_temperature,
@@ -234,10 +208,7 @@ def load_idl_mc(
     log_temperature,
 ):
     """Load the IDL Monte Carlo DEM realizations, excluding row 0."""
-    path = (
-        IDL_MC_DIR
-        / f"idl_synthetic_dem_idx{dem_id}_allfilters_MC{N_MC}.sav"
-    )
+    path = IDL_MC_DIR / f"idl_synthetic_dem_idx{dem_id}_allfilters_MC{N_MC}.sav"
 
     data = readsav(
         str(path),
@@ -254,15 +225,10 @@ def load_idl_mc(
 
 def load_xrtpy_base(dem_id):
     """Load the standalone XRTpy base DEM result."""
-    path = (
-        XRTPY_BASE_DIR
-        / f"xrtpy_dem_idx{dem_id}_allfilters_base.npz"
-    )
+    path = XRTPY_BASE_DIR / f"xrtpy_dem_idx{dem_id}_allfilters_base.npz"
 
     if not path.exists():
-        raise FileNotFoundError(
-            f"No XRTpy base NPZ for DEM {dem_id}: {path}"
-        )
+        raise FileNotFoundError(f"No XRTpy base NPZ for DEM {dem_id}: {path}")
 
     with np.load(path) as result:
         log_temperature = np.asarray(result["logT"], dtype=float)
@@ -274,22 +240,16 @@ def load_xrtpy_base(dem_id):
 
 def load_xrtpy_mc(dem_id):
     """Load the XRTpy Monte Carlo DEM realizations."""
-    path = (
-        XRTPY_MC_DIR
-        / f"xrtpy_dem_idx{dem_id}_allfilters_MC{N_MC}.npz"
-    )
+    path = XRTPY_MC_DIR / f"xrtpy_dem_idx{dem_id}_allfilters_MC{N_MC}.npz"
 
     if not path.exists():
-        raise FileNotFoundError(
-            f"No XRTpy MC NPZ for DEM {dem_id}: {path}"
-        )
+        raise FileNotFoundError(f"No XRTpy MC NPZ for DEM {dem_id}: {path}")
 
     with np.load(path) as result:
         log_temperature = np.asarray(result["logT"], dtype=float)
         mc_dem = np.asarray(result["mc_dem"], dtype=float)
 
     return log_temperature, mc_dem[1:]
-
 
 
 def load_true_dem(dem_id):
@@ -305,7 +265,6 @@ def load_true_dem(dem_id):
     log_dem = _log10_dem(data[:, 1])
 
     return log_temperature, log_dem
-
 
 
 # ── Plot ──────────────────────────────────────────────────────────────────────
@@ -341,27 +300,21 @@ def plot_one_dem(dem_id, bands):
         xrtpy_base_log_temperature,
         atol=1e-6,
     ):
-        raise ValueError(
-            f"IDL and XRTpy base logT grids differ for DEM {dem_id}."
-        )
+        raise ValueError(f"IDL and XRTpy base logT grids differ for DEM {dem_id}.")
 
     if not np.allclose(
         idl_log_temperature,
         xrtpy_mc_log_temperature,
         atol=1e-6,
     ):
-        raise ValueError(
-            f"IDL and XRTpy MC logT grids differ for DEM {dem_id}."
-        )
+        raise ValueError(f"IDL and XRTpy MC logT grids differ for DEM {dem_id}.")
 
     log_temperature = xrtpy_base_log_temperature
 
     fig, ax = plt.subplots(figsize=(11, 7))
 
     # Contribution bands are drawn first so they remain behind all DEM curves.
-    spans = contiguous_spans(
-        bands.get(dem_id, [])
-    )
+    spans = contiguous_spans(bands.get(dem_id, []))
 
     for span_index, (lower, upper) in enumerate(spans):
         ax.axvspan(
@@ -449,9 +402,7 @@ def plot_one_dem(dem_id, bands):
     filters_per_line = 4
 
     filter_label = "\n".join(
-        ",   ".join(
-            filter_entries[start : start + filters_per_line]
-        )
+        ",   ".join(filter_entries[start : start + filters_per_line])
         for start in range(
             0,
             len(filter_entries),
@@ -492,19 +443,14 @@ def plot_one_dem(dem_id, bands):
         loc="best",
     )
 
-    fig.tight_layout(
-        rect=[0, 0, 1, 0.87]
-    )
+    fig.tight_layout(rect=[0, 0, 1, 0.87])
 
     PLOT_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    out_png = (
-        PLOT_DIR
-        / f"compare_mc{N_MC}_dem_idx{dem_id}_allfilters.png"
-    )
+    out_png = PLOT_DIR / f"compare_mc{N_MC}_dem_idx{dem_id}_allfilters.png"
 
     fig.savefig(
         out_png,
@@ -519,17 +465,15 @@ def plot_one_dem(dem_id, bands):
     )
 
 
-
 # ── Main ──────────────────────────────────────────────────────────────────────
+
 
 def _dem_id_from_path(path: Path) -> int:
     """Extract the DEM index from a result filename."""
     match = re.search(r"idx(\d+)_", path.name)
 
     if match is None:
-        raise ValueError(
-            f"Could not extract DEM index from filename: {path.name}"
-        )
+        raise ValueError(f"Could not extract DEM index from filename: {path.name}")
 
     return int(match.group(1))
 
@@ -554,39 +498,29 @@ def main():
 
     idl_ids = {
         _dem_id_from_path(path)
-        for path in IDL_MC_DIR.glob(
-            f"idl_synthetic_dem_idx*_allfilters_MC{N_MC}.sav"
-        )
+        for path in IDL_MC_DIR.glob(f"idl_synthetic_dem_idx*_allfilters_MC{N_MC}.sav")
     }
 
     xrtpy_ids = {
         _dem_id_from_path(path)
-        for path in XRTPY_MC_DIR.glob(
-            f"xrtpy_dem_idx*_allfilters_MC{N_MC}.npz"
-        )
+        for path in XRTPY_MC_DIR.glob(f"xrtpy_dem_idx*_allfilters_MC{N_MC}.npz")
     }
 
-    dem_ids = sorted(
-        idl_ids & xrtpy_ids
-    )
+    dem_ids = sorted(idl_ids & xrtpy_ids)
 
     if not dem_ids:
         raise FileNotFoundError(
             "No DEMs with both IDL and XRTpy MC results were found."
         )
 
-    missing = sorted(
-        (idl_ids | xrtpy_ids)
-        - (idl_ids & xrtpy_ids)
-    )
+    missing = sorted((idl_ids | xrtpy_ids) - (idl_ids & xrtpy_ids))
 
     if missing:
         preview = missing[:15]
         suffix = " ..." if len(missing) > 15 else ""
 
         print(
-            f"Note: {len(missing)} DEM(s) skipped "
-            f"(one solver only): {preview}{suffix}"
+            f"Note: {len(missing)} DEM(s) skipped (one solver only): {preview}{suffix}"
         )
 
     if args.dem is not None:
@@ -614,6 +548,7 @@ def main():
         )
 
     print("\nDone.")
+
 
 if __name__ == "__main__":
     main()

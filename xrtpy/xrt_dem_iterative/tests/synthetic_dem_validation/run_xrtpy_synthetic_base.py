@@ -54,12 +54,7 @@ INTENSITY_DIR = BASE_DIR / "data" / "synthetic_initial_condition_dems_data_with_
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
 OUT_DIR = BASE_DIR / "data" / "output_data" / "xrtpy_base_dem_results"
 PLOT_DIR = BASE_DIR / "plots" / "xrtpy_base_dem_vs_synthetic_truth"
-CHISQ_DIR = (
-    BASE_DIR
-    / "data"
-    / "output_data"
-    / "chi_square_comparison_tables"
-)
+CHISQ_DIR = BASE_DIR / "data" / "output_data" / "chi_square_comparison_tables"
 
 OBSERVATION_DATE = "2008-10-10T00:00:00"
 EXCLUDED_FILTERS = {"C-poly/Al-thick"}
@@ -173,6 +168,7 @@ def read_true_dem(dem_id: int):
     log_dem = np.log10(np.clip(data[:, 1], 1e-40, None))
 
     return log_temperature, log_dem
+
 
 # ── Runner ────────────────────────────────────────────────────────────────────
 def run_one_dem(txt_path: Path, responses_cache: dict):
@@ -333,12 +329,10 @@ def plot_one_dem(solver, dem_id, filters, intensities, uncertainties):
 
     fig.tight_layout(rect=[0, 0, 1, 0.87])
 
-    out_png = (
-        PLOT_DIR
-        / f"xrtpy_synthetic_dem_idx{dem_id}_allfilters_base.png"
-    )
+    out_png = PLOT_DIR / f"xrtpy_synthetic_dem_idx{dem_id}_allfilters_base.png"
     fig.savefig(out_png, dpi=150)
     plt.close(fig)
+
 
 def write_base_chisq_csv():
     """Rebuild the base chi-square summary CSV from saved NPZ results."""
@@ -365,6 +359,7 @@ def write_base_chisq_csv():
             writer.writerow([dem_id, f"{chisq:.6f}"])
 
     print(f"\nChi-square CSV ({len(npz_files)} DEMs): {csv_path}")
+
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 def _dem_id_from_path(path: Path) -> int:
@@ -406,16 +401,10 @@ def main():
         )
 
     if args.dem is not None:
-        txt_files = [
-            path
-            for path in txt_files
-            if _dem_id_from_path(path) == args.dem
-        ]
+        txt_files = [path for path in txt_files if _dem_id_from_path(path) == args.dem]
 
         if not txt_files:
-            raise FileNotFoundError(
-                f"No intensity file found for DEM index {args.dem}"
-            )
+            raise FileNotFoundError(f"No intensity file found for DEM index {args.dem}")
 
     todo = []
     skipped = 0
@@ -429,10 +418,7 @@ def main():
         else:
             todo.append(txt_path)
 
-    print(
-        f"Found {len(txt_files)} file(s); "
-        f"{skipped} done, {len(todo)} to solve."
-    )
+    print(f"Found {len(txt_files)} file(s); {skipped} done, {len(todo)} to solve.")
 
     if not todo:
         print("Nothing to do. Use --overwrite to re-solve.")

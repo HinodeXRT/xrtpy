@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from lmfit import Parameters
+
 from xrtpy.response.channel import Channel
 from xrtpy.response.tools import generate_temperature_responses
 from xrtpy.xrt_dem_iterative import XRTDEMIterative
@@ -195,11 +196,10 @@ def test_prepare_spline_system_initializes_all_solver_state():
     # spline knot positions
     assert len(x.spline_logT) == 2
     assert np.all(np.diff(x.spline_logT) > 0)
-    
+
     # spline_log_dem starts at 1.0 (IDL flat initial guess)
     assert len(x.spline_log_dem) == 2
     assert np.allclose(x.spline_log_dem, 1.0)
-
 
     # pm_matrix has correct shape
     assert x.pm_matrix.shape == (3, len(x.logT))
