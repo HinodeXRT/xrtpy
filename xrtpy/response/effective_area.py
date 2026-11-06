@@ -207,7 +207,7 @@ class EffectiveAreaFundamental:
             -1
         ].datetime.strftime("%Y/%m/%d")
 
-        modified_time_datetime = datetime.datetime.fromtimestamp(  # noqa: DTZ006
+        modified_time_datetime = datetime.datetime.fromtimestamp(
             modified_time_path
         ).strftime("%Y/%m/%d")
 
