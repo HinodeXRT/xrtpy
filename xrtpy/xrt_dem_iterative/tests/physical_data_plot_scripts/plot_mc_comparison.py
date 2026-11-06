@@ -333,7 +333,7 @@
 #     parser.add_argument("--all", action="store_true",
 #                         help=f"Process all MC .sav files in {MC_DIR}")
 #     parser.add_argument("--save", action="store_true",
-#                         help="Save ONGs instead of showing interactively.")
+#                         help="Save PNGs instead of showing interactively.")
 #     args = parser.parse_args()
 
 #     mc_cases: list[SavCase] = []
