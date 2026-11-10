@@ -74,9 +74,36 @@ urls.Documentation = "https://xrtpy.readthedocs.io"
 urls.Issues = "https://github.com/HinodeXRT/xrtpy/issues"
 urls.Repository = "https://github.com/HinodeXRT/xrtpy"
 
+# Match the files that setuptools and setuptools_scm put in the sdist
+# (all git-tracked files except package tests) and wheel (no tests).
 [tool.uv]
 build-backend.module-root = ""
-build-backend.source-include = [ "licenses/**" ]
+build-backend.source-exclude = [
+  "docs/_build",
+  "docs/api",
+  "docs/generated",
+  "docs/sg_execution_times.rst",
+  "xrtpy/*/tests",
+]
+build-backend.source-include = [
+  ".codecov.yaml",
+  ".github/**",
+  ".gitignore",
+  ".pre-commit-config.yaml",
+  ".readthedocs.yaml",
+  ".ruff.toml",
+  "_typos.toml",
+  "changelog/**",
+  "conftest.py",
+  "docs/**",
+  "examples/**",
+  "IDL_scripts/**",
+  "joss/**",
+  "licenses/**",
+  "noxfile.py",
+  "pytest.ini",
+]
+build-backend.wheel-exclude = [ "xrtpy/*/tests" ]
 
 [tool.codespell]
 ignore-words-list = """
