@@ -21,12 +21,9 @@ import argparse
 import sys
 from pathlib import Path
 
-import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
-
-from xrtpy.response.tools import generate_temperature_responses
-from xrtpy.xrt_dem_iterative import XRTDEMIterative
+from matplotlib import gridspec
 from xrtpy.xrt_dem_iterative.utils_sav_io import (
     IDLResult,
     SavCase,
@@ -34,6 +31,9 @@ from xrtpy.xrt_dem_iterative.utils_sav_io import (
     load_idl_sav,
     parse_sav_filename,
 )
+
+from xrtpy.response.tools import generate_temperature_responses
+from xrtpy.xrt_dem_iterative import XRTDEMIterative
 
 # ---------------------------------------------------------------------------
 # Config

@@ -8,6 +8,7 @@ import astropy.units as u
 import numpy as np
 from lmfit import Parameters, minimize
 from scipy.interpolate import CubicSpline, interp1d
+
 from xrtpy.util.filters import validate_and_format_filters
 from xrtpy.xrt_dem_iterative import dem_plotting
 
@@ -345,8 +346,6 @@ class XRTDEMIterative:
                 stacklevel=2,
             )
 
-        return None
-
     def __repr__(self):
         return (
             f"<XRTDEMIterative(filters={self.filter_names}, "
@@ -617,7 +616,7 @@ class XRTDEMIterative:
             rows.append(interp_func(self.logT))
 
         self.interpolated_responses = rows
-        #self._response_matrix = np.vstack(rows).astype(float) #JOY-UPDATED-JULY16
+        # self._response_matrix = np.vstack(rows).astype(float) #JOY-UPDATED-JULY16
         self._response_matrix = np.maximum(np.vstack(rows).astype(float), 0.0)
 
         # Store the physical unit for clarity
@@ -942,9 +941,7 @@ class XRTDEMIterative:
         # 3. initial guess (log10 DEM_model on grid)
         init_log_dem = self._estimate_initial_dem()  # flat ~ 1.0 in IDL
         self._initial_log_dem = init_log_dem
-        self._iteration_chi2 = (
-            []
-        )  # reset chi2 history for this solve pass JOY March 2026
+        self._iteration_chi2 = []  # reset chi2 history for this solve pass JOY March 2026
 
         # 4. spline system using that initial guess
         self._prepare_spline_system()

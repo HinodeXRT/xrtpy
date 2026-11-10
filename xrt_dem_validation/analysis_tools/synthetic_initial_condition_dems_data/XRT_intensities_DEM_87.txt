@@ -1,0 +1,21 @@
+DEM index: 87
+10-Oct-2008 00:00:00
+Units: DN/s
+Temperatures with > 2% contribution      6.40000      6.90000      7.00000
+      7.10000
+Filter	Intensity	Error	Percent
+Al-mesh      11573.8      308.588      2.66627
+Al-poly      12630.1      390.337      3.09053
+C-poly      10231.3      290.615      2.84047
+Ti-poly      7144.74      204.262      2.85892
+Be-thin      4329.52      133.997      3.09497
+Be-med      1015.99      32.4868      3.19754
+Al-med      420.652      12.3989      2.94754
+Al-thick      40.6162      1.14416      2.81701
+Be-thick      2.57001     0.213696      8.31499
+Al-poly/Al-mesh      8567.04      266.609      3.11203
+Al-poly/Ti-poly      5501.05      150.535      2.73647
+Al-poly/Al-thick      36.9489      1.09273      2.95740
+Al-poly/Be-thick      2.28108     0.202261      8.86690
+C-poly/Ti-poly      4641.34      138.597      2.98615
+C-poly/Al-thick      34.4414      1.05607      3.06629
