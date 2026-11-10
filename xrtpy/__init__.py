@@ -4,12 +4,13 @@ Hinode_.
 """
 
 import warnings
+from importlib.metadata import PackageNotFoundError, version
 
 from xrtpy import response
 
 try:
-    from xrtpy.version import __version__
-except ImportError:
+    __version__ = version("xrtpy")
+except PackageNotFoundError:
     warnings.warn("version not found.", stacklevel=3)
     __version__ = "0.0.0"
 
