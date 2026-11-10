@@ -4,7 +4,7 @@ requires = [ "uv-build>=0.13.7,<0.14" ]
 
 [project]
 name = "xrtpy"
-version = "0.5.2.dev0"
+version = "0.6.0"
 description = "For analyzing data from the X-Ray Telescope (XRT) on the Hinode spacecraft."
 readme = "README.md"
 keywords = [ "Hinode", "Solar Physics", "x-ray", "XRT" ]
