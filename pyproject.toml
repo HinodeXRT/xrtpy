@@ -12,7 +12,7 @@ license = { file = "LICENSE" }
 authors = [
   { name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu" },
   { name = "Jonathan Slavin", email = "jslavin@cfa.harvard.edu" },
-  { name = "Nick Murpy", email = "namurphy@cfa.harvard.edu" },
+  { name = "Nick Murphy", email = "namurphy@cfa.harvard.edu" },
   { name = "Will Barnes" },
   { name = "Nabil Freij", email = "nabil.freij@gmail.com" },
   { name = "Stuart Mumford" },
