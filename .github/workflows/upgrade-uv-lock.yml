@@ -16,7 +16,7 @@ jobs:
   upgrade-requirements: # zizmor:ignore[excessive-permissions]
     name: Upgrade uv.lock
     runs-on: ubuntu-latest
-    if: github.repository == 'HinodeXRT/pyfaradaycup'
+    if: github.repository == 'HinodeXRT/xrtpy'
 
     steps:
 
@@ -41,13 +41,13 @@ jobs:
     - name: Upgrade uv.lock
       run: uv lock --upgrade
 
-    - name: Perform static type checking autofixes with ty (continue on failure)
-      run: uvx nox --session ty -- --fix
-      continue-on-error: true
-
-    - name: Add ignore flags for ty (continue on failure)
-      run: uvx nox --session ty -- --add-ignore
-      continue-on-error: true
+#    - name: Perform static type checking autofixes with ty (continue on failure)
+#      run: uvx nox --session ty -- --fix
+#      continue-on-error: true
+#
+#    - name: Add ignore flags for ty (continue on failure)
+#      run: uvx nox --session ty -- --add-ignore
+#      continue-on-error: true
 
     - name: Run pre-commit (continue on failure)
       run: uvx pre-commit run --all-files
