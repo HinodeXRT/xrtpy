@@ -207,9 +207,9 @@ class EffectiveAreaFundamental:
             -1
         ].datetime.strftime("%Y/%m/%d")
 
-        modified_time_datetime = dt.datetime.fromtimestamp(
-            modified_time_path
-        ).strftime("%Y/%m/%d")
+        modified_time_datetime = dt.datetime.fromtimestamp(modified_time_path).strftime(
+            "%Y/%m/%d"
+        )
 
         if observation_date > modified_time:
             raise ValueError(
