@@ -2,7 +2,7 @@ __all__ = [
     "EffectiveAreaFundamental",
 ]
 
-import datetime
+import datetime as dt
 import math
 from functools import cached_property
 from pathlib import Path
@@ -207,9 +207,9 @@ class EffectiveAreaFundamental:
             -1
         ].datetime.strftime("%Y/%m/%d")
 
-        modified_time_datetime = datetime.datetime.fromtimestamp(  # noqa: DTZ006
-            modified_time_path
-        ).strftime("%Y/%m/%d")
+        modified_time_datetime = dt.datetime.fromtimestamp(modified_time_path).strftime(
+            "%Y/%m/%d"
+        )
 
         if observation_date > modified_time:
             raise ValueError(
