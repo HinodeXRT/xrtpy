@@ -75,10 +75,8 @@ def lint(session: nox.Session) -> None:
 @nox.session
 def build(session: nox.Session) -> None:
     """Build & verify the source distribution and wheel."""
-    session.install("twine", "build")
-    build_command = ("python", "-m", "build")
-    session.run(*build_command, "--sdist")
-    session.run(*build_command, "--wheel")
+    session.install("twine", "uv")
+    session.run("uv", "build", "--sdist", "--wheel")
     session.run("twine", "check", "dist/*", *session.posargs)
 
 

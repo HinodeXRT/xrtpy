@@ -1,13 +1,10 @@
 [build-system]
-build-backend = "setuptools.build_meta"
-requires = [
-  "setuptools>=62.1,!=71.0.1",
-  "setuptools-scm[toml]>=6.2",
-  "wheel>=0.34",
-]
+build-backend = "uv_build"
+requires = [ "uv-build>=0.13.7,<0.14" ]
 
 [project]
 name = "xrtpy"
+version = "0.6.0"
 description = "For analyzing data from the X-Ray Telescope (XRT) on the Hinode spacecraft."
 readme = "README.md"
 keywords = [ "Hinode", "Solar Physics", "x-ray", "XRT" ]
@@ -15,7 +12,7 @@ license = { file = "LICENSE" }
 authors = [
   { name = "Joy Velasquez", email = "joy.velasquez@cfa.harvard.edu" },
   { name = "Jonathan Slavin", email = "jslavin@cfa.harvard.edu" },
-  { name = "Nick Murpy", email = "namurphy@cfa.harvard.edu" },
+  { name = "Nick Murphy", email = "namurphy@cfa.harvard.edu" },
   { name = "Will Barnes" },
   { name = "Nabil Freij", email = "nabil.freij@gmail.com" },
   { name = "Stuart Mumford" },
@@ -37,7 +34,6 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Scientific/Engineering :: Physics",
 ]
-dynamic = [ "version" ]
 dependencies = [
   "astropy>=6",
   "lmfit>=1.2.2",
@@ -78,14 +74,36 @@ urls.Documentation = "https://xrtpy.readthedocs.io"
 urls.Issues = "https://github.com/HinodeXRT/xrtpy/issues"
 urls.Repository = "https://github.com/HinodeXRT/xrtpy"
 
-[tool.setuptools]
-packages = [ "xrtpy" ]
-package-data."xrtpy.response" = [ "data/*.geny", "data/*.txt" ]
-package-data."xrtpy.response.tests" = [ "data/*/*/*.txt" ]
-package-data.xrtpy = [ "data/*" ]
-
-[tool.setuptools_scm]
-write_to = "xrtpy/version.py"
+# Match the files that setuptools and setuptools_scm put in the sdist
+# (all git-tracked files except package tests) and wheel (no tests).
+[tool.uv]
+build-backend.module-root = ""
+build-backend.source-exclude = [
+  "docs/_build",
+  "docs/api",
+  "docs/generated",
+  "docs/sg_execution_times.rst",
+  "xrtpy/*/tests",
+]
+build-backend.source-include = [
+  ".codecov.yaml",
+  ".github/**",
+  ".gitignore",
+  ".pre-commit-config.yaml",
+  ".readthedocs.yaml",
+  ".ruff.toml",
+  "_typos.toml",
+  "changelog/**",
+  "conftest.py",
+  "docs/**",
+  "examples/**",
+  "IDL_scripts/**",
+  "joss/**",
+  "licenses/**",
+  "noxfile.py",
+  "pytest.ini",
+]
+build-backend.wheel-exclude = [ "xrtpy/*/tests" ]
 
 [tool.codespell]
 ignore-words-list = """
@@ -135,9 +153,6 @@ ini_options.xfail_strict = true
 
 [tool.coverage]
 run.source = [ "xrtpy" ]
-run.omit = [
-  "*/*version.py",
-]
 run.branch = true
 report.exclude_lines = [
   "@abstractmethod",
