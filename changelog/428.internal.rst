@@ -1,0 +1,3 @@
+Added a check to the PyPI publish workflow that the release tag matches the version in
+:file:`pyproject.toml`, and a job that opens a pull request to bump the version to the next
+minor development version after each release.
