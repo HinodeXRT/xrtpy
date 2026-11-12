@@ -1,0 +1,22 @@
+# Dependabot opens pull requests to update the versions of GitHub
+# Actions used in workflows. Python dependencies are upgraded by the
+# .github/workflows/upgrade-uv-lock.yml workflow instead.
+#
+# Documentation: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+
+version: 2
+
+updates:
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: monthly
+  cooldown:
+    default-days: 7
+  groups:
+    github-actions:
+      patterns:
+      - '*'
+  labels:
+  - CI
+  - dependencies

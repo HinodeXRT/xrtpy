@@ -1,0 +1,2 @@
+Switched the build backend and frontend from setuptools to ``uv build``, and removed setuptools_scm.
+The version is now set statically in :file:`pyproject.toml`.
