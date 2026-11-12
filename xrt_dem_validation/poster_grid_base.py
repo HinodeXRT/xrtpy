@@ -1,23 +1,22 @@
 """
-Poster 2x2 grid — DEMs + 1000 Monte Carlo (synthetic + IDL + XRTpy).
+Poster 2x2 grid — BASE DEMs (synthetic + IDL + XRTpy), no Monte Carlo.
 
 Give four DEM indices on the command line; they fill the grid in the order
-passed. Shared axes: one x-label along the bottom, one y-label up the side.
-Both 1000-run MC clouds drawn faint behind the base curves. Contribution
-bands shaded if data/contribution_bands.csv exists.
+you pass them (top-left, top-right, bottom-left, bottom-right). Shared axes:
+one x-label along the bottom, one y-label up the side, per-panel legends
+kept compact. Contribution bands shaded if data/contribution_bands.csv exists.
 
 Loads per DEM:
-    - Band:     data/contribution_bands.csv (optional)
-    - True:     data/synthetic_dems_data/DEM_{id}.txt
-    - IDL base: data/all_IDL_synthetic_dem_data/*_base.sav
-    - IDL MC:   data/all_IDL_MC_synthetic_dem_data/*_MC1000.sav
-    - XRTpy:    xrtpy_output/*_MC1000.npz
+    - Band:    data/contribution_bands.csv (optional)
+    - True:    data/synthetic_dems_data/DEM_{id}.txt
+    - IDL:     data/IDL_synthetic_dem_data/*_base.sav
+    - XRTpy:   data/xrtpy_monte_carlo_synthetic_dem_data/*_MC1000.npz (row 0) or *_base.npz fallback
 
-Saved to plots/poster/poster_mc1000_{a}_{b}_{c}_{d}.png
+Saved to plots/poster/poster_base_{a}_{b}_{c}_{d}.png
 
 Usage (from synthetic_dem_validation/):
-    python poster_grid_mc1000_v2.py 14 65 112 159
-    python poster_grid_mc1000_v2.py 14 65 112 159 --out my_panel.png
+    python poster_grid_base_v2.py 14 65 112 159
+    python poster_grid_base_v2.py 14 65 112 159 --out my_panel.png
 """
 
 import argparse
@@ -30,18 +29,15 @@ from scipy.io import readsav
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent
-IDL_BASE_DIR = BASE_DIR / "data" / "all_IDL_synthetic_dem_data"
-IDL_MC_DIR = BASE_DIR / "data" / "all_IDL_MC_synthetic_dem_data"
+IDL_BASE_DIR = BASE_DIR / "data" / "IDL_synthetic_dem_data"
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
-XRTPY_DIR = BASE_DIR / "xrtpy_output"
+XRTPY_DIR = BASE_DIR / "data" / "xrtpy_monte_carlo_synthetic_dem_data"
 BANDS_CSV = BASE_DIR / "data" / "contribution_bands.csv"
 PLOT_DIR = BASE_DIR / "plots" / "poster"
 
-N_MC = 1000
 COLOR_TRUE = "red"
 COLOR_IDL = "orange"
 COLOR_XRTPY = "#1E90FF"
-ALPHA_MC = 0.02
 BAND_COLOR = "0.6"
 BAND_ALPHA = 0.25
 GRID_STEP = 0.1
@@ -102,16 +98,16 @@ def load_idl_base(dem_id):
     return logT, dem, chisq
 
 
-def load_idl_mc(dem_id, logT):
-    path = IDL_MC_DIR / f"idl_synthetic_dem_idx{dem_id}_allfilters_MC{N_MC}.sav"
-    data = readsav(str(path), python_dict=True)
-    return _runs_by_T(data["dem_out"], len(logT))[1:]
-
-
-def load_xrtpy(dem_id):
-    path = XRTPY_DIR / f"xrtpy_dem_idx{dem_id}_allfilters_MC{N_MC}.npz"
-    d = np.load(path, allow_pickle=True)
-    return d["logT"], d["mc_dem"][0], float(d["mc_chisq"][0]), d["mc_dem"][1:]
+def load_xrtpy_base(dem_id):
+    mc = XRTPY_DIR / f"xrtpy_dem_idx{dem_id}_allfilters_MC1000.npz"
+    base = XRTPY_DIR / f"xrtpy_dem_idx{dem_id}_allfilters_base.npz"
+    if mc.exists():
+        d = np.load(mc, allow_pickle=True)
+        return d["logT"], d["mc_dem"][0], float(d["mc_chisq"][0])
+    if base.exists():
+        d = np.load(base, allow_pickle=True)
+        return d["logT"], d["dem"], float(d["chisq"])
+    raise FileNotFoundError(f"No XRTpy npz for DEM {dem_id}")
 
 
 def load_true_dem(dem_id):
@@ -125,18 +121,10 @@ def load_true_dem(dem_id):
 # ── Panel ─────────────────────────────────────────────────────────────────────
 def draw_panel(ax, dem_id, bands):
     logT, idl_base, idl_chisq = load_idl_base(dem_id)
-    idl_mc = load_idl_mc(dem_id, logT)
-    _, py_base, py_chisq, py_mc = load_xrtpy(dem_id)
+    _, py_base, py_chisq = load_xrtpy_base(dem_id)
 
     for lo, hi in contiguous_spans(bands.get(dem_id, [])):
         ax.axvspan(lo, hi, color=BAND_COLOR, alpha=BAND_ALPHA)
-
-    for row in idl_mc:
-        ax.step(logT, _log10_dem(row), where="mid",
-                color=COLOR_IDL, alpha=ALPHA_MC, linewidth=0.7)
-    for row in py_mc:
-        ax.step(logT, _log10_dem(row), where="mid",
-                color=COLOR_XRTPY, alpha=ALPHA_MC, linewidth=0.7)
 
     true_dem = load_true_dem(dem_id)
     if true_dem is not None:
@@ -151,6 +139,7 @@ def draw_panel(ax, dem_id, bands):
     ax.set_ylim(*YLIM)
     ax.grid(visible=True, alpha=0.3)
 
+    # Per-panel identifier + chi-square, compact, top-right
     txt = (f"DEM {dem_id}\n"
            f"IDL χ²={idl_chisq:.2f}\n"
            f"XRTpy χ²={py_chisq:.2f}")
@@ -161,7 +150,7 @@ def draw_panel(ax, dem_id, bands):
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description="Poster 2x2 MC1000 DEM grid")
+    parser = argparse.ArgumentParser(description="Poster 2x2 base DEM grid")
     parser.add_argument("dems", type=int, nargs=4,
                         help="Four DEM indices (top-left, top-right, "
                              "bottom-left, bottom-right).")
@@ -175,16 +164,17 @@ def main():
     for ax, dem_id in zip(axes.flat, args.dems):
         draw_panel(ax, dem_id, bands)
 
+    # One x-label bottom, one y-label side
     for ax in axes[-1, :]:
         ax.set_xlabel(r"log$_{10}$ T  [K]", fontsize=13)
     for ax in axes[:, 0]:
         ax.set_ylabel(r"log$_{10}$ DEM  [cm$^{-5}$ K$^{-1}$]", fontsize=13)
 
+    # Single shared legend across the top
     handles = [
         plt.Line2D([], [], color=COLOR_TRUE, lw=2.2, label="Synthetic DEM"),
-        plt.Line2D([], [], color=COLOR_IDL, lw=2.2, label="IDL base + MC"),
-        plt.Line2D([], [], color=COLOR_XRTPY, lw=2.2, ls="--",
-                   label="XRTpy base + MC"),
+        plt.Line2D([], [], color=COLOR_IDL, lw=2.2, label="IDL base"),
+        plt.Line2D([], [], color=COLOR_XRTPY, lw=2.2, ls="--", label="XRTpy base"),
         plt.Rectangle((0, 0), 1, 1, fc=BAND_COLOR, alpha=BAND_ALPHA,
                       label=">2% contribution"),
     ]
@@ -198,7 +188,7 @@ def main():
         out_png = PLOT_DIR / args.out
     else:
         a, b, c, d = args.dems
-        out_png = PLOT_DIR / f"poster_mc1000_{a}_{b}_{c}_{d}.png"
+        out_png = PLOT_DIR / f"poster_base_{a}_{b}_{c}_{d}.png"
     fig.savefig(out_png, dpi=200)
     plt.close(fig)
     print(f"Saved: {out_png}")

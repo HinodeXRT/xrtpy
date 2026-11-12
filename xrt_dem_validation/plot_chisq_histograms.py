@@ -10,8 +10,8 @@ dashed median line per solver:
                   plots/histograms/chisq_hist_mc_all_v2.png
 
 Sources (each solver from its own clean file, no paired CSV):
-  Python base : xrtpy_output/*_MC1000.npz  -> mc_chisq[0]  (fallback *_base.npz)
-  Python MC   : xrtpy_output/*_MC1000.npz  -> mc_chisq[1:]
+  Python base : data/xrtpy_monte_carlo_synthetic_dem_data/*_MC1000.npz  -> mc_chisq[0]  (fallback *_base.npz)
+  Python MC   : data/xrtpy_monte_carlo_synthetic_dem_data/*_MC1000.npz  -> mc_chisq[1:]
   IDL base    : data/idl_base_chisq.csv        (dem_id, chisq)
   IDL MC      : data/idl_mc_chisq_long.csv     (dem_id, mc_run, chisq); mc_run>=1
 
@@ -28,7 +28,7 @@ import numpy as np
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent
-XRTPY_DIR = BASE_DIR / "xrtpy_output"
+XRTPY_DIR = BASE_DIR / "data" / "xrtpy_monte_carlo_synthetic_dem_data"
 IDL_BASE_CSV = BASE_DIR / "data" / "idl_base_chisq.csv"
 IDL_MC_CSV = BASE_DIR / "data" / "idl_mc_chisq_long.csv"
 PLOT_DIR = BASE_DIR / "plots" / "histograms"

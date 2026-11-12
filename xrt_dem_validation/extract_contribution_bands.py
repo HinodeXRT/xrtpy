@@ -25,7 +25,7 @@ import re
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
-INTENSITY_DIR = BASE_DIR / "data" / "synthetic_initial_condition_dems_data_with_bands"
+INTENSITY_DIR = BASE_DIR / "data" / "synthetic_DEM_condition_data"
 OUT_CSV = BASE_DIR / "data" / "contribution_bands.csv"
 
 # Matches a float like 5.50000, 6.1, 1.2e3, etc.

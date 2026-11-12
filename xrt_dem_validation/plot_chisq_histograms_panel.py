@@ -9,7 +9,7 @@ in one figure. Each panel keeps its own axes (counts differ: 162 vs 162,000).
 One shared legend across the top; per-panel median lines with values.
 
 Sources (each solver from its own clean file):
-  Python : xrtpy_output/*_MC1000.npz  (mc_chisq[0] base, mc_chisq[1:] MC)
+  Python : data/xrtpy_monte_carlo_synthetic_dem_data/*_MC1000.npz  (mc_chisq[0] base, mc_chisq[1:] MC)
   IDL    : data/idl_base_chisq.csv, data/idl_mc_chisq_long.csv (mc_run>=1)
 
 Usage (from synthetic_dem_validation/):
@@ -27,7 +27,7 @@ from matplotlib.patches import Patch
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent
-XRTPY_DIR = BASE_DIR / "xrtpy_output"
+XRTPY_DIR = BASE_DIR / "data" / "xrtpy_monte_carlo_synthetic_dem_data"
 IDL_BASE_CSV = BASE_DIR / "data" / "idl_base_chisq.csv"
 IDL_MC_CSV = BASE_DIR / "data" / "idl_mc_chisq_long.csv"
 PLOT_DIR = BASE_DIR / "plots" / "histograms"

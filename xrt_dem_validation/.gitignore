@@ -15,3 +15,4 @@ analysis_tools/synthetic_initial_condition_dems_data/
 analysis_tools/*copy.py
 
 __pycache__/
+data/contribution_bands.csv
