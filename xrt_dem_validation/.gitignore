@@ -1,0 +1,17 @@
+# Generated outputs: stay local, never committed
+plots/
+data/output_data/
+data/Cleanup_Joy/
+data/IDL_synthetic_dem_data/
+data/IDL_monte_carlo_synthetic_dem_data/
+data/xrtpy_synthetic_dem_data/
+data/xrtpy_monte_carlo_synthetic_dem_data/
+
+# Legacy / superseded work
+analysis_tools/legacy_plots/
+analysis_tools/legacy_data_tables/
+analysis_tools/test_analysis_tools/
+analysis_tools/synthetic_initial_condition_dems_data/
+analysis_tools/*copy.py
+
+__pycache__/
