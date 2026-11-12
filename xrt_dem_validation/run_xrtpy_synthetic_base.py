@@ -13,7 +13,7 @@ For each synthetic DEM case, this script:
 - runs ``XRTDEMIterative`` with ``monte_carlo_runs=0``;
 - saves the base inversion result to:
 
-      data/output_data/xrtpy_base_dem_results/
+      data/xrtpy_base_dem_results/
 
 - saves a comparison plot of the synthetic truth and XRTpy base solution to:
 
@@ -21,7 +21,7 @@ For each synthetic DEM case, this script:
 
 For a full campaign run, the script also rebuilds:
 
-    data/output_data/chi_square_comparison_tables/xrtpy_base_chisq.csv
+    data/chi_square_comparison_tables/xrtpy_base_chisq.csv
 
 The chi-square table is generated from all saved base NPZ files on disk, so it
 remains complete when a campaign is resumed.
@@ -62,13 +62,13 @@ BASE_DIR = Path(__file__).resolve().parent
 INTENSITY_DIR = BASE_DIR / "data" / "synthetic_DEM_condition_data"
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
 
-OUT_DIR = BASE_DIR / "data" / "output_data" / "xrtpy_base_dem_results"
+OUT_DIR = BASE_DIR / "data" / "xrtpy_base_dem_results"
 PLOT_DIR = BASE_DIR / "plots" / "xrtpy_base_dem_vs_synthetic_truth"
+
 CHISQ_DIR = (
     BASE_DIR
     / "data"
-    / "output_data"
-    / "chi_square_comparison_tables"
+    / "xrtpy_dem_base_chi_square_comparison_tables"
 )
 
 OBSERVATION_DATE = "2008-10-10T00:00:00"
