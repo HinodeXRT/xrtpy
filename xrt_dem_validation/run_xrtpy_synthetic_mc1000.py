@@ -51,16 +51,19 @@ from xrtpy.xrt_dem_iterative import XRTDEMIterative
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent
-INTENSITY_DIR = BASE_DIR / "data" / "synthetic_initial_condition_dems_data_with_bands"
+
+
+INTENSITY_DIR = BASE_DIR / "data" / "synthetic_DEM_condition_data"
 TRUE_DEM_DIR = BASE_DIR / "data" / "synthetic_dems_data"
-OUT_DIR = BASE_DIR / "data" / "output_data" / "xrtpy_monte_carlo_dem_results"
+
+
+OUT_DIR = BASE_DIR / "data" / "xrtpy_monte_carlo_dem_results"
 PLOT_DIR = BASE_DIR / "plots" / "xrtpy_monte_carlo_1000_run_dem_vs_synthetic_truth"
 
 CHISQ_DIR = (
     BASE_DIR
     / "data"
-    / "output_data"
-    / "chi_square_comparison_tables"
+    / "xrtpy_monte_carlo_dem_base_chi_square_comparison_tables"
 )
 
 OBSERVATION_DATE = "2008-10-10T00:00:00"
