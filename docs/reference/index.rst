@@ -5,8 +5,10 @@ API Reference
 *************
 
 .. toctree::
-    :maxdepth: 1
-    :caption: Contents:
-    :glob:
+    :maxdepth: 2
 
-    *
+    xrtpy
+    response
+    util
+    xrt_dem_iterative
+    image_correction
